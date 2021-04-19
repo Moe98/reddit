@@ -1,4 +1,4 @@
-package org.sab;
+package org.sab.demo;
 
 import static org.junit.Assert.assertTrue;
 
