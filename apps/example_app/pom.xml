@@ -4,14 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.scale_a_bull</groupId>
-  <artifactId>apps</artifactId>
+  <artifactId>example_app</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <modules>
-    <module>example_app</module>
-  </modules>
-  <packaging>pom</packaging>
 
-  <name>apps</name>
+  <name>example_app</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -27,6 +23,12 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scale_a_bull</groupId>
+      <artifactId>example_util</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

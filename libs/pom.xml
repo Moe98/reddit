@@ -6,6 +6,9 @@
   <groupId>org.scale_a_bull</groupId>
   <artifactId>libs</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <modules>
+    <module>example_util</module>
+  </modules>
   <packaging>pom</packaging>
 
   <name>libs</name>
