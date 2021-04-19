@@ -5,6 +5,10 @@
     <groupId>org.scale_a_bull</groupId>
     <artifactId>reddit</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>libs</module>
+        <module>apps</module>
+    </modules>
     <packaging>pom</packaging>
 
     <properties>
