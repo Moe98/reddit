@@ -1,4 +1,4 @@
-package org.scale_a_bull;
+package org.sab;
 
 import java.util.List;
 import java.util.stream.Collectors;
