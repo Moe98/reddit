@@ -8,6 +8,7 @@
   <version>1.0-SNAPSHOT</version>
   <modules>
     <module>example_util</module>
+    <module>netty</module>
   </modules>
   <packaging>pom</packaging>
 
