@@ -11,6 +11,9 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
+import javax.net.ssl.SSLException;
+import java.security.cert.CertificateException;
+
 
 public final class Server {
 
@@ -18,7 +21,7 @@ public final class Server {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
