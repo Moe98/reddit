@@ -44,13 +44,6 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
     JSONObject body;
     Map<String, List<String>> uriParams;
     HttpRequest req;
-    void printAll(){
-        System.out.println(methodType);
-        System.out.println(uri);
-        System.out.println(body);
-        System.out.println(uriParams.toString());
-        System.out.println(req);
-    }
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
@@ -71,7 +64,6 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
             ByteBuf jsonBuf = content.content();
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
             body = new JSONObject(jsonStr);
-            System.out.println(body.get("name"));
             // attempt();
 
         }
@@ -102,7 +94,7 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (!keepAlive) {
                 f.addListener(ChannelFutureListener.CLOSE);
             }
-            printAll();
+            System.out.println(this);
         }
     }
 
@@ -165,17 +157,15 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
         cause.printStackTrace();
         ctx.close();
     }
+
+    @Override
     public String toString() {
-        return "{"
-                + "method type='"
-                + methodType
-                + " "
-                + ", uri='"
-                + uri
-                + " "
-                + ", body="
-                + body +"}"
-                +"uriParams = "
-                +uriParams.toString()+"}";
+        return "UserHandler{" +
+                "methodType='" + methodType + '\'' +
+                ", uri='" + uri + '\'' +
+                ", body=" + body +
+                ", uriParams=" + uriParams +
+                '}';
     }
+
 }
