@@ -13,14 +13,17 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
+import javax.net.ssl.SSLException;
+import java.security.cert.CertificateException;
+import java.util.Arrays;
+
 
 public final class Server {
 
     static final boolean SSL = System.getProperty("ssl") != null;
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
         final SslContext sslCtx;
         if (SSL) {
@@ -43,7 +46,11 @@ public final class Server {
             Channel ch = b.bind(PORT).sync().channel();
             System.err.println("Open your web browser and navigate to " +
                     (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
-            PostgresConnection.getInstance();
+            if(args == null || args.length!=1 || args[0].equals("false")){
+                PostgresConnection.getInstance();
+            }
+
+
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
