@@ -27,7 +27,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
     static Map<String, List<String>> getURIParams(String uri){
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -115,9 +114,7 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
         String email = (body.get("email")).toString();
         String password2 = (body.get("password")).toString();
         String birthdate = (body.get("birthdate")).toString();
-        // SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM/yyyy");  
 
-        // Date birthdate=formatter1.parse((body.get("birthdate")).toString()); 
         boolean hasprofilephoto = Boolean.parseBoolean((body.get("hasprofilephoto")).toString());
         String user_id = (body.get("user_id")).toString();
         JSONObject response;
