@@ -36,7 +36,7 @@ public class ServerTest {
     public void serverWorking() throws IOException, InterruptedException {
 
         runServer();
-        String response=get("http://localhost:8080");
-        assertEquals(response, "{\"USERS\":\"HELLO\"}");
+        String response=get("http://localhost:8080/api");
+        assertEquals(response, "{\"msg\":\"Hello World\"}");
     }
 }
