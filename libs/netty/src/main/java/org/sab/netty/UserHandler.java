@@ -63,7 +63,8 @@ public class UserHandler extends SimpleChannelInboundHandler<HttpObject> {
             HttpContent content = (HttpContent) msg;
             ByteBuf jsonBuf = content.content();
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
-            body = new JSONObject(jsonStr);
+            if(!methodType.equals("GET"))
+                body = new JSONObject(jsonStr);
             // attempt();
 
         }
