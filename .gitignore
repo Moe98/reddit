@@ -14,10 +14,10 @@ local.properties
 .settings/
 .loadpath
 .recommenders
-
+*.env
 # External tool builders
 .externalToolBuilders/
-
+config.json
 # Locally stored "Eclipse launch configurations"
 *.launch
 
