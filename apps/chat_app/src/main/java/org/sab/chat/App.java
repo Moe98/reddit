@@ -1,4 +1,4 @@
-package org.sab;
+package org.sab.chat;
 
 /**
  * Hello world!
