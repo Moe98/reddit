@@ -11,14 +11,6 @@ import java.net.http.HttpResponse;
 import static org.junit.Assert.assertEquals;
 
 public class ServerTest {
-    public static boolean isJUnitTest() {
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            if (element.getClassName().startsWith("org.junit.")) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public String get(String uri) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
@@ -31,10 +23,11 @@ public class ServerTest {
 
         return response.body();
     }
-    public void runServer(boolean test){
+
+    public void runServer() {
         new Thread(() -> {
             try {
-                Server.main(new String [] {test+""});
+                Server.main(null);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -43,9 +36,9 @@ public class ServerTest {
 
     @Test
     public void serverWorking() throws IOException, InterruptedException {
-        boolean test = isJUnitTest();
-        runServer(test);
-        String response=get("http://localhost:8080");
-        assertEquals(response, "{\"USERS\":\"HELLO\"}");
+        runServer();
+        String response = get("http://localhost:8080/api");
+        // TODO this will need to be more generic in the future.
+        assertEquals(response, "{\"msg\":\"Hello World\"}");
     }
 }
