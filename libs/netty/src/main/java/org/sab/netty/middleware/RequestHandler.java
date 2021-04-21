@@ -22,6 +22,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     Map<String, List<String>> uriParams;
     HttpRequest req;
     HttpHeaders headers;
+    String correlationId;
 
     static Map<String, List<String>> getURIParams(String uri) {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -55,7 +56,10 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             methodType = req.method().toString();
             uriParams = getURIParams(uri);
             headers = req.headers();
+            correlationId = req.headers().get("id");
             ctx.channel().attr(Server.REQ_KEY).set(req);
+            ctx.channel().attr(Server.URI_KEY).set(uri);
+            ctx.channel().attr(Server.CORR_KEY).set(correlationId);
         }
         if (msg instanceof HttpContent) {
             HttpContent content = (HttpContent) msg;
@@ -73,8 +77,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (uri.equals("api")) {
                 // TODO The passed object that will generate this response be
                 //  |body|. The generated response will come from the backend app.
-                JSONObject JSONResponse = new JSONObject("{\"msg\":\"Hello World\"}");
-                ByteBuf content = Unpooled.copiedBuffer(JSONResponse.toString(), CharsetUtil.UTF_8);
+                JSONObject JSONRequest = packRequest();
+                ByteBuf content = Unpooled.copiedBuffer(JSONRequest.toString(), CharsetUtil.UTF_8);
                 ctx.fireChannelRead(content.copy());
             } else {
                 String resource = uri.split("/")[1];

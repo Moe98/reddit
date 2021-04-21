@@ -22,6 +22,8 @@ public final class Server {
     static final boolean SSL = System.getProperty("ssl") != null;
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
+    public static final AttributeKey<String> URI_KEY = AttributeKey.valueOf("uri");
+    public static final AttributeKey<String> CORR_KEY = AttributeKey.valueOf("corr");
 
 
     public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
