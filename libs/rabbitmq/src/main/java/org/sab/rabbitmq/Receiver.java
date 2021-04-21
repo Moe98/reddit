@@ -1,16 +1,19 @@
 package org.sab.rabbitmq;
 
 import com.rabbitmq.client.*;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 //import java.util.logging.Level;
 
 public class Receiver {
-    private final static String QUEUE_NAME = "hello";
     ConnectionFactory factory;
     Connection connection;
     Channel channel;
     Consumer consumer;
+
+    String message;
 
     public Receiver() {
         try{
@@ -18,14 +21,19 @@ public class Receiver {
             this.factory.setHost("localhost");
             this.connection = factory.newConnection();
             this.channel = connection.createChannel();
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             System.out.println(" [*] Waiting for sad messages. To exit press CTRL+C");
             // Move the consumer here?
+//                AMQP.BasicProperties props = new AMQP.BasicProperties
+//                        .Builder()
+//                        .correlationId(this.correlationId)
+//                        .replyTo(queueName)
+//                        .build();
             this.consumer = new DefaultConsumer(this.channel) {
                 @Override
                 public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
                         throws IOException {
                     String message = new String(body, "UTF-8");
+                    Receiver.this.message = message;
                     System.out.println(" [x] Received '" + message + "'");
                 }
             };
@@ -35,10 +43,14 @@ public class Receiver {
     }
 
 
-    public String receive() {
+    public JSONObject receive(String queueName) {
         if (consumer != null) {
             try {
-                channel.basicConsume(QUEUE_NAME, true, consumer);
+                // TODO check if queue exists
+                channel.queueDeclare(queueName, false, false, false, null);
+                channel.basicConsume(queueName, true, consumer);
+                JSONObject jsonObject = new JSONObject(message);
+                return jsonObject;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -61,6 +73,9 @@ public class Receiver {
     public static void main(String[] argv) {
         // TODO figure out where Receiver is called.
         Receiver r = new Receiver();
-        r.receive();
+        final String QUEUE_NAME = "hello";
+
+        //TODO how to consume only 1 message?
+        System.out.println(r.receive(QUEUE_NAME));
     }
 }

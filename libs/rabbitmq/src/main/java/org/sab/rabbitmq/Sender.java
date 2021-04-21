@@ -1,15 +1,12 @@
 package org.sab.rabbitmq;
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class Sender {
-    private final static String QUEUE_NAME = "hello";
-
     ConnectionFactory factory;
     Connection connection;
     Channel channel;
@@ -20,16 +17,24 @@ public class Sender {
         try {
             this.connection = factory.newConnection();
             this.channel = connection.createChannel();
-            this.channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+//            this.channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
     }
 
-    public void send(String message) {
-
+    public void send(JSONObject message, String queueName) {
         try {
-            channel.basicPublish("", QUEUE_NAME, null, message.getBytes("UTF-8"));
+            // TODO check if queue exists first
+            this.channel.queueDeclare(queueName, false, false, false, null);
+            channel.basicPublish("", queueName, null, message.toString().getBytes("UTF-8"));
+
+//            AMQP.BasicProperties props = new BasicProperties
+//                    .Builder()
+//                    .replyTo(callbackQueueName)
+//                    .correlationId()
+//                    .build();
+
             System.out.println(" [x] Sent '" + message + "'");
             this.channel.close();
             this.connection.close();
@@ -39,13 +44,16 @@ public class Sender {
     }
 
     public static void main(String[] argv)  {
-        Sender s = new Sender();
-        String message = "Hello Moe, Manta, Lujine!";
-        s.send(message);
+        Sender sender = new Sender();
+        final String QUEUE_NAME = "hello";
+        JSONObject message = new JSONObject();
+        message.put("message", "Hello Moe, Manta, Lujine!;");
+        sender.send(message, QUEUE_NAME);
 
-        s = new Sender();
-        message = "o";
-        s.send(message);
+        sender = new Sender();
+        message = new JSONObject();
+        message.put("message", "GoodbyeWorld, no yeet");
+        sender.send(message, QUEUE_NAME);
 
     }
 
