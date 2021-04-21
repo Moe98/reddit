@@ -1,4 +1,4 @@
-package org.sab.netty;
+package org.sab.netty.middleware;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
+import org.sab.netty.Server;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
