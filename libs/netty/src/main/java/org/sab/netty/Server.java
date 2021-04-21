@@ -49,10 +49,10 @@ public final class Server {
             Channel ch = b.bind(PORT).sync().channel();
             System.err.println("Open your web browser and navigate to " +
                     (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
-            if(args == null || args.length!=1 || args[0].equals("false")){
-                PostgresConnection pg = PostgresConnection.getInstance();
-                pg.connect();
-            }
+            // if(args == null || args.length!=1 || args[0].equals("false")){
+            //     PostgresConnection pg = PostgresConnection.getInstance();
+            //     pg.connect();
+            // }
 
 
             ch.closeFuture().sync();
