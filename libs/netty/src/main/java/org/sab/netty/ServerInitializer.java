@@ -41,6 +41,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         // where should the handlers reside in out project?
         p.addLast(new CorsHandler(corsConfig));
         p.addLast(new RequestHandler());
+        p.addLast(new ResponseHandler());
 
     }
 }

@@ -23,7 +23,8 @@ public class ServerTest {
 
         return response.body();
     }
-    public void runServer(){
+
+    public void runServer() {
         new Thread(() -> {
             try {
                 Server.main(null);
@@ -32,11 +33,12 @@ public class ServerTest {
             }
         }).start();
     }
+
     @Test
     public void serverWorking() throws IOException, InterruptedException {
-
         runServer();
-        String response=get("http://localhost:8080/api");
+        String response = get("http://localhost:8080/api");
+        // TODO this will need to be more generic in the future.
         assertEquals(response, "{\"msg\":\"Hello World\"}");
     }
 }
