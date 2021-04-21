@@ -4,10 +4,8 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,7 +14,8 @@ import org.json.simple.parser.ParseException;
 public class CassandraConnector {
     private Cluster cluster;
     private String node, keyspaceName, replicationStrategy;
-    private Integer port, replicationFactor;
+    private Integer port;
+    private Integer replicationFactor;
     private Session session;
 
     public CassandraConnector() {
@@ -32,11 +31,11 @@ public class CassandraConnector {
             e.printStackTrace();
         }
         node = (String) configJSON.get("CASSANDRA_NODE");
-        port = (Integer) configJSON.get("CASSANDRA_PORT");
+        port = ((Long) configJSON.get("CASSANDRA_PORT")).intValue();
 
         keyspaceName = (String) configJSON.get("KEYSPACE_NAME");
         replicationStrategy = (String) configJSON.get("REPLICATION_STRATEGY");
-        replicationFactor = (Integer) configJSON.get("REPLICATION_FACTOR");
+        replicationFactor = ((Long) configJSON.get("REPLICATION_FACTOR")).intValue();
     }
 
     public void connect() {
@@ -68,7 +67,6 @@ public class CassandraConnector {
         JSONObject configJSON = null;
 
         Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
-
         JSONObject jsonObject = (JSONObject) obj;
         configJSON = jsonObject;
         return configJSON;
