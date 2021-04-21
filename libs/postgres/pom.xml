@@ -34,6 +34,7 @@
           <artifactId>postgresql</artifactId>
           <version>42.2.19.jre7</version>
       </dependency>
+
   </dependencies>
   <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
@@ -51,10 +52,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -77,7 +74,21 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.0.0</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.9</version>
+              </plugin> 
         </plugins>
     </pluginManagement>
+      <resources>
+          <resource>
+              <directory>src/main/resources</directory>
+              <includes>
+                  <include>**/*.txt</include>
+                  <include>**/*.json</include>
+              </includes>
+          </resource>
+      </resources>
 </build>
 </project>

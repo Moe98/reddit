@@ -50,7 +50,8 @@ public final class Server {
             System.err.println("Open your web browser and navigate to " +
                     (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
             if(args == null || args.length!=1 || args[0].equals("false")){
-                PostgresConnection.getInstance();
+                PostgresConnection pg = PostgresConnection.getInstance();
+                pg.connect();
             }
 
 

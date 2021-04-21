@@ -1,5 +1,6 @@
 package org.sab.postgres;
 
+import java.io.File;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -31,14 +32,13 @@ public class PostgresConnection {
 
     private void init() {
         loadProperties();
-        connect();
     }
 
     private void loadProperties(){
         JSONParser parser = new JSONParser();
         JSONObject propertiesJson = null;
         try {
-            Object obj = parser.parse(new FileReader("libs/postgres/config.json"));
+            Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("config.json").getFile()));
 
             // A JSON object. Key value pairs are unordered. JSONObject supports java.util.Map interface.
             JSONObject jsonObject = (JSONObject) obj;
@@ -57,15 +57,25 @@ public class PostgresConnection {
                 (String) propertiesJson.get("POSTGRES_DB"));
     }
 
-    private void connect() {
+    public Connection connect() {
         try {
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+        return conn;
     }
 
+    public void closeConnection(Connection c) {
+        try
+        {
+            c.close();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }    
+    }
     public void run(String storedProcedure, List<Object> arguments){
         try {
             final PreparedStatement stmt = conn.prepareStatement("call " + storedProcedure + "(?)");
