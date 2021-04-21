@@ -23,3 +23,6 @@ jobs:
         distribution: 'adopt'
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - uses: nijel/rabbitmq-action@v1.0.0
+      with:
+        rabbitmq version: '5'
