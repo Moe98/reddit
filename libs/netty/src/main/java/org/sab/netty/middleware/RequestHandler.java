@@ -28,9 +28,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         return decoder.parameters();
     }
 
-    enum MethodType {
-        GET, POST, PUT, DELETE
-    }
 
     JSONObject packRequest() {
         JSONObject request = new JSONObject();
@@ -66,7 +63,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
             if (!methodType.equals("GET"))
                 body = new JSONObject(jsonStr);
-            // attempt();
         }
         if (msg instanceof FullHttpRequest) {
             System.out.println("FullHttpRequest");
