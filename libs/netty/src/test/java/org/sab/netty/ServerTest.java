@@ -40,6 +40,7 @@ public class ServerTest {
             }
         }).start();
     }
+
     @Test
     public void serverWorking() throws IOException, InterruptedException {
         boolean test = isJUnitTest();

@@ -3,9 +3,15 @@ package org.sab.netty;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerExpectContinueHandler;
+import io.netty.handler.codec.http.cors.CorsConfig;
+import io.netty.handler.codec.http.cors.CorsConfigBuilder;
+import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.ssl.SslContext;
+import org.sab.netty.middleware.RequestHandler;
+import org.sab.netty.middleware.ResponseHandler;
 
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -17,13 +23,26 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     public void initChannel(SocketChannel ch) {
+        CorsConfig corsConfig =
+        CorsConfigBuilder.forAnyOrigin()
+            .allowedRequestHeaders(
+                "X-Requested-With", "Content-Type", "Content-Length", "Authorization")
+            .allowedRequestMethods(
+                HttpMethod.GET,
+                HttpMethod.POST,
+                HttpMethod.PUT,
+                HttpMethod.DELETE,
+                HttpMethod.OPTIONS)
+            .build();
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc()));
         }
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpServerExpectContinueHandler());
-        // where should the handlers reside in out project?
-        p.addLast(new UserHandler());
+        p.addLast(new CorsHandler(corsConfig));
+        p.addLast(new RequestHandler());
+        p.addLast(new ResponseHandler());
+
     }
 }
