@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.ssl.SslContext;
+import org.sab.netty.middleware.QueueHandler;
 import org.sab.netty.middleware.RequestHandler;
 import org.sab.netty.middleware.ResponseHandler;
 
@@ -42,6 +43,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpServerExpectContinueHandler());
         p.addLast(new CorsHandler(corsConfig));
         p.addLast(new RequestHandler());
+        p.addLast(new QueueHandler());
         p.addLast(new ResponseHandler());
 
     }
