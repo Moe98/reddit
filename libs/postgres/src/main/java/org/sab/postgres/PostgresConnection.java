@@ -1,16 +1,16 @@
 package org.sab.postgres;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Properties;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
 public class PostgresConnection {
     private static PostgresConnection instance = null;
@@ -19,37 +19,39 @@ public class PostgresConnection {
     private Properties props;
     private Connection conn;
     private final URL configPath = getClass().getClassLoader().getResource("config.json");
+    private final String[] propertiesParams = {"POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_DB"};
+
     private PostgresConnection() {
     }
 
-    public static PostgresConnection getInstance(){
-        if(instance == null){
+    public static PostgresConnection getInstance() throws PropertiesNotLoadedException {
+        if (instance == null) {
             instance = new PostgresConnection();
-            instance.loadProperties();
+            try {
+                instance.loadProperties();
+            } catch (IOException | ParseException e) {
+                throw new PropertiesNotLoadedException(e);
+            }
         }
         return instance;
     }
-    private void loadProperties(){
-        JSONParser parser = new JSONParser();
-        JSONObject propertiesJson = null;
-        try {
-            Object obj = parser.parse(new FileReader(configPath.getFile()));
 
-            // A JSON object. Key value pairs are unordered. JSONObject supports java.util.Map interface.
-            JSONObject jsonObject = (JSONObject) obj;
-            propertiesJson = jsonObject;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
+        JSONParser parser = new JSONParser();
+        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
-        props.setProperty("user",(String) propertiesJson.get("POSTGRES_USER"));
-        props.setProperty("password",(String) propertiesJson.get("POSTGRES_PASSWORD"));
+        for (String param : propertiesParams)
+            if (!propertiesJson.containsKey(param))
+                throw new PropertiesNotLoadedException(String.format("%s is not found in the config.json", param));
+        props.setProperty("user", (String) propertiesJson.get("POSTGRES_USER"));
+        props.setProperty("password", (String) propertiesJson.get("POSTGRES_PASSWORD"));
         url =
-        String.format(
-                "jdbc:postgresql://%s:%s/%s",
-                (String) propertiesJson.get("POSTGRES_HOST"),
-                (String) propertiesJson.get("POSTGRES_PORT"),
-                (String) propertiesJson.get("POSTGRES_DB"));
+                String.format(
+                        "jdbc:postgresql://%s:%s/%s",
+                        propertiesJson.get("POSTGRES_HOST"),
+                        propertiesJson.get("POSTGRES_PORT"),
+                        propertiesJson.get("POSTGRES_DB"));
+
     }
 
     public Connection connect() {
@@ -57,21 +59,20 @@ public class PostgresConnection {
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
         return conn;
     }
 
     public void closeConnection(Connection c) {
-        try
-        {
+        try {
             c.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-        }    
+        }
     }
-    public void run(String storedProcedure, List<Object> arguments){
+
+    public void run(String storedProcedure, List<Object> arguments) {
         try {
             final PreparedStatement stmt = conn.prepareStatement("call " + storedProcedure + "(?)");
             for (int i = 0; i < arguments.size(); i++) {
