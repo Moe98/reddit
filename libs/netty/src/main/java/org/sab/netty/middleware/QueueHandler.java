@@ -4,15 +4,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.HttpObject;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
 import org.sab.netty.Server;
-import org.sab.rabbitmq.Sender;
+import org.sab.rabbitmq.RPCClient;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 
 
 public class QueueHandler extends SimpleChannelInboundHandler<Object> {
@@ -27,29 +27,20 @@ public class QueueHandler extends SimpleChannelInboundHandler<Object> {
 
         String uri =  ctx.channel().attr(Server.URI_KEY).get();
         String reqQueueName = uri + "_REQ";
-
-        // TODO java.NoClassDefFoundError (cross module import problem??)
-        Sender sender = new Sender();
-        sender.send(request, reqQueueName);
-
-        // TODO add something that waits on the response queue
         String resQueueName = uri + "_RES";
-        String correlationId = ctx.channel().attr(Server.CORR_KEY).get();
-        Notifier notifier = new Notifier(resQueueName, correlationId);
-//        Future future = executorService.submit(notifier);
-//        this.responseBody = new JSONObject( (String) future.get());
 
-        // TODO add correlation id
-        // TODO make queue distributed
+        String response = null;
+        try (RPCClient rpcClient = RPCClient.getInstance()) {
+            response = rpcClient.call(request.toString(), reqQueueName, resQueueName);
+        } catch (IOException | TimeoutException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
-//        ByteBuf content = Unpooled.copiedBuffer(responseBody.toString(), CharsetUtil.UTF_8);
 
         // TODO change temporary test code
-        JSONObject helloWorldResponse = new JSONObject("{\"msg\":\"Hello World\"}");
-        ByteBuf content = Unpooled.copiedBuffer(helloWorldResponse.toString(), CharsetUtil.UTF_8);
+//        JSONObject helloWorldResponse = new JSONObject("{\"msg\":\"Hello World\"}");
+        ByteBuf content = Unpooled.copiedBuffer(response, CharsetUtil.UTF_8);
         ctx.fireChannelRead(content.copy());
-
-
     }
 
     @Override
