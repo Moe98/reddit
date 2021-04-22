@@ -1,12 +1,14 @@
 package org.sab.netty;
 
 import org.junit.Test;
+import org.sab.rabbitmq.RPCServer;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,11 +34,20 @@ public class ServerTest {
                 e.printStackTrace();
             }
         }).start();
+
+        new Thread(() -> {
+            try {
+                RPCServer.getInstance("/api_REQ");
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     @Test
-    public void serverWorking() throws IOException, InterruptedException {
+    public void serverWorking() throws IOException, InterruptedException, TimeoutException {
         runServer();
+
         String response = get("http://localhost:8080/api");
         // TODO this will need to be more generic in the future.
         assertEquals(response, "{\"msg\":\"Hello World\"}");
