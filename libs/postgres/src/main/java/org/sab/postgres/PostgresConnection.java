@@ -1,7 +1,7 @@
 package org.sab.postgres;
 
-import java.io.File;
 import java.io.FileReader;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,27 +18,22 @@ public class PostgresConnection {
     private String url;
     private Properties props;
     private Connection conn;
-
+    private final URL configPath = getClass().getClassLoader().getResource("config.json");
     private PostgresConnection() {
     }
 
     public static PostgresConnection getInstance(){
         if(instance == null){
             instance = new PostgresConnection();
-            instance.init();
+            instance.loadProperties();
         }
         return instance;
     }
-
-    private void init() {
-        loadProperties();
-    }
-
     private void loadProperties(){
         JSONParser parser = new JSONParser();
         JSONObject propertiesJson = null;
         try {
-            Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("config.json").getFile()));
+            Object obj = parser.parse(new FileReader(configPath.getFile()));
 
             // A JSON object. Key value pairs are unordered. JSONObject supports java.util.Map interface.
             JSONObject jsonObject = (JSONObject) obj;

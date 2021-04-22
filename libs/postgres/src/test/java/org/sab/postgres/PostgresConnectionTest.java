@@ -1,14 +1,9 @@
 package org.sab.postgres;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.junit.Test;
-import org.sab.postgres.PostgresConnection;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import static org.junit.Assert.*;
 
 public class PostgresConnectionTest{
@@ -30,7 +25,7 @@ public class PostgresConnectionTest{
     @Test
     public void postgresWorking() {
         // runDB();
-        assertTrue(true);
+       assertTrue(true);
 
     }
 
