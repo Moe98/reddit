@@ -12,9 +12,12 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.AttributeKey;
+import org.sab.rabbitmq.RPCClient;
 
 import javax.net.ssl.SSLException;
+import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.concurrent.TimeoutException;
 
 
 public final class Server {
@@ -25,6 +28,8 @@ public final class Server {
     public static final AttributeKey<String> URI_KEY = AttributeKey.valueOf("uri");
     public static final AttributeKey<String> CORR_KEY = AttributeKey.valueOf("corr");
 
+    public Server() throws IOException, TimeoutException {
+    }
 
     public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
