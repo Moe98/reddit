@@ -19,6 +19,11 @@ jobs:
         image: rabbitmq
         ports:
           - 5672:5672
+          
+      cassandra:
+        image: cassandra
+        ports:
+          - 9042:9042
 
     steps:
     - uses: actions/checkout@v2
