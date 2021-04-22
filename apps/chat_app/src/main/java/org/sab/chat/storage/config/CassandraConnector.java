@@ -10,6 +10,8 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.sab.chat.storage.models.ChatTableInitializer;
+import org.sab.chat.storage.models.MessageTableInitializer;
 
 public class CassandraConnector {
     private Cluster cluster;
@@ -47,6 +49,8 @@ public class CassandraConnector {
 
         session = cluster.connect();
         KeyspaceInitializer.initializeKeyspace(session, keyspaceName, replicationStrategy, replicationFactor);
+        ChatTableInitializer.createChatTable(session);
+        MessageTableInitializer.createMessageTable(session);
     }
 
     public ResultSet runQuery(String query) {
