@@ -27,6 +27,7 @@ public class ServerTest {
     }
 
     public void runServer() {
+        // creating a thread for running the netty HTTP server
         new Thread(() -> {
             try {
                 Server.main(null);
@@ -35,6 +36,7 @@ public class ServerTest {
             }
         }).start();
 
+        // creating a thread for running the RPCServer "example mini app"
         new Thread(() -> {
             try {
                 RPCServer.getInstance("/api_REQ");
