@@ -33,11 +33,7 @@ public class CassandraConnectorTest {
 
     private JSONObject loadConfigFile() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject configJSON = null;
-
-        Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
-        JSONObject jsonObject = (JSONObject) obj;
-        configJSON = jsonObject;
+        JSONObject configJSON = (JSONObject) parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
         return configJSON;
     }
 
@@ -50,11 +46,11 @@ public class CassandraConnectorTest {
 
         List<String> matchedKeyspaces = result.all()
                 .stream()
-                .filter(r -> r.getString(0).equals(keyspaceName.toLowerCase()))
-                .map(r -> r.getString(0))
+                .filter(row -> row.getString(0).equals(keyspaceName.toLowerCase()))
+                .map(row -> row.getString(0))
                 .collect(Collectors.toList());
 
-        assertEquals(matchedKeyspaces.size(), 1);
+        assertEquals(1, matchedKeyspaces.size());
         assertTrue(matchedKeyspaces.get(0).equals(keyspaceName.toLowerCase()));
     }
 

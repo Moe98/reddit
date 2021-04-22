@@ -221,6 +221,5 @@ buildNumber.properties
 # End of https://www.toptal.com/developers/gitignore/api/java,maven,intellij,visualstudiocode,eclipse
 
 .classpath
-#apps/chat_app/src/main/resources/config.development.json
 *.env
 config.json

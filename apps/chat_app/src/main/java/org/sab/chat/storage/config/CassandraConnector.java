@@ -39,11 +39,11 @@ public class CassandraConnector {
     }
 
     public void connect() {
-        Cluster.Builder b = Cluster.builder().addContactPoint(node);
+        Cluster.Builder clusterBuilder = Cluster.builder().addContactPoint(node);
         if (port != null) {
-            b.withPort(port);
+            clusterBuilder.withPort(port);
         }
-        cluster = b.build();
+        cluster = clusterBuilder.build();
 
         session = cluster.connect();
         KeyspaceInitializer.initializeKeyspace(session, keyspaceName, replicationStrategy, replicationFactor);
@@ -64,11 +64,7 @@ public class CassandraConnector {
 
     private JSONObject loadConfigFile() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject configJSON = null;
-
-        Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
-        JSONObject jsonObject = (JSONObject) obj;
-        configJSON = jsonObject;
+        JSONObject configJSON = (JSONObject) parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
         return configJSON;
     }
 
