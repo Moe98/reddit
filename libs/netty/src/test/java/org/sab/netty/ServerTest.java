@@ -16,7 +16,7 @@ import java.sql.Statement;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
-import org.junit.jupiter.api.Assertions;
+//import org.junit.jupiter.api.Assertions;
 public class ServerTest {
 
     public String get(String uri) throws IOException, InterruptedException {
@@ -83,14 +83,14 @@ public class ServerTest {
 //        postgresConnection.closeConnection(conn);
 //    }
 
-    @Test
-    public void cantUseClosedConnection() throws PropertiesNotLoadedException {
-        PostgresConnection postgresConnection = PostgresConnection.getInstance();
-        Connection conn = postgresConnection.connect();
-        postgresConnection.closeConnection(conn);
-
-        Assertions.assertThrows(org.postgresql.util.PSQLException.class, () -> {
-            conn.createStatement();
-        });
-    }
+//    @Test
+//    public void cantUseClosedConnection() throws PropertiesNotLoadedException {
+//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
+//        Connection conn = postgresConnection.connect();
+//        postgresConnection.closeConnection(conn);
+//
+//        Assertions.assertThrows(org.postgresql.util.PSQLException.class, () -> {
+//            conn.createStatement();
+//        });
+//    }
 }
