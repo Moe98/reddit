@@ -1,6 +1,6 @@
 package org.sab.postgres;
 
-import io.github.cdimascio.dotenv.Dotenv;
+//import io.github.cdimascio.dotenv.Dotenv;
 import org.json.simple.parser.ParseException;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
@@ -20,8 +20,8 @@ public class PostgresConnection {
     private Properties props;
     private Connection conn;
     private final URL configPath = getClass().getClassLoader().getResource("config.json");
-    private final String[] propertiesParams = {"POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT","POSTGRES_DB"};
-    Dotenv dotenv = Dotenv.configure().load();
+    private final String[] propertiesParams = {"POSTGRES_DB","POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
+//    Dotenv dotenv = Dotenv.configure().load();
 
     private PostgresConnection() {
     }
@@ -41,19 +41,19 @@ public class PostgresConnection {
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
         //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
-        if(System.getenv("POSTGRES_USER")==null)
-            throw new PropertiesNotLoadedException("I can read the secrets!!!!!!!!!!!");
+//        if(System.getenv("POSTGRES_USER")==null)
+//            throw new PropertiesNotLoadedException("I can read the secrets!!!!!!!!!!!");
         for (String param : propertiesParams)
-            if (dotenv.get(param)==null)
+            if (System.getenv(param)==null)
                 throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
-        props.setProperty("user", dotenv.get("POSTGRES_USER"));
-        props.setProperty("password", dotenv.get("POSTGRES_PASSWORD"));
+        props.setProperty("user", System.getenv("POSTGRES_USER"));
+        props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
                 String.format(
                         "jdbc:postgresql://%s:%s/%s",
-                        dotenv.get("POSTGRES_HOST"),
-                        dotenv.get("POSTGRES_PORT"),
-                        dotenv.get("POSTGRES_DB"));
+                        System.getenv("POSTGRES_HOST"),
+                        System.getenv("POSTGRES_PORT"),
+                        System.getenv("POSTGRES_DB"));
     }
 
     public Connection connect() {
