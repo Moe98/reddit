@@ -56,7 +56,6 @@ public class PostgresConnection {
     }
 
     public Connection connect() {
-        System.out.println(url);
         try{
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
