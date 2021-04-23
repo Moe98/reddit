@@ -43,9 +43,9 @@ public class PostgresConnection {
         props = new Properties();
 //        if(System.getenv("POSTGRES_USER")==null)
 //            throw new PropertiesNotLoadedException("I can read the secrets!!!!!!!!!!!");
-        for (String param : propertiesParams)
-            if (System.getenv(param)==null)
-                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
+//        for (String param : propertiesParams)
+//            if (System.getenv(param)==null)
+//                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
