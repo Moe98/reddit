@@ -76,12 +76,12 @@ public class ServerTest {
         assertTrue(conn1 == conn2);
     }
 
-    @Test
-    public void canCloseConnection() throws PropertiesNotLoadedException {
-        PostgresConnection postgresConnection = PostgresConnection.getInstance();
-        Connection conn = postgresConnection.connect();
-        postgresConnection.closeConnection(conn);
-    }
+//    @Test
+//    public void canCloseConnection() throws PropertiesNotLoadedException {
+//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
+//        Connection conn = postgresConnection.connect();
+//        postgresConnection.closeConnection(conn);
+//    }
 
     @Test
     public void cantUseClosedConnection() throws PropertiesNotLoadedException {
