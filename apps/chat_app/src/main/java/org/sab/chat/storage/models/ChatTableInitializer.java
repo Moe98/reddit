@@ -5,16 +5,14 @@ import com.datastax.driver.core.Session;
 public class ChatTableInitializer {
 
     public static void createChatTable(Session session) {
-        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ")
-                .append("chats").append("(")
-                .append("chat_id uuid PRIMARY KEY, ")
-                .append("name text,")
-                .append("description text,")
-                .append("members list<uuid>,")
-                .append("admin uuid, ")
-                .append("date_created timestamp);");
-
-        String query = sb.toString();
+        String query = "CREATE TABLE IF NOT EXISTS chats (" +
+                "chat_id uuid, " +
+                "name text, " +
+                "description text, " +
+                "members list<uuid>, " +
+                "admin uuid, " +
+                "date_created timestamp, " +
+                "PRIMARY KEY (chat_id));";
         session.execute(query);
     }
 }

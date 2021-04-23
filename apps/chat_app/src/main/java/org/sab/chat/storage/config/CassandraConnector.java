@@ -48,6 +48,7 @@ public class CassandraConnector {
         cluster = clusterBuilder.build();
 
         session = cluster.connect();
+
         KeyspaceInitializer.initializeKeyspace(session, keyspaceName, replicationStrategy, replicationFactor);
         ChatTableInitializer.createChatTable(session);
         MessageTableInitializer.createMessageTable(session);

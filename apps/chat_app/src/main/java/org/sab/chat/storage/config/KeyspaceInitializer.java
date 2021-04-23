@@ -6,18 +6,14 @@ public class KeyspaceInitializer {
 
     public static void initializeKeyspace(Session session,
                                           String keyspaceName, String replicationStrategy, int replicationFactor) {
-        StringBuilder query =
-                new StringBuilder("CREATE KEYSPACE IF NOT EXISTS ")
-                        .append(keyspaceName).append(" WITH replication = {")
-                        .append("'class':'").append(replicationStrategy)
-                        .append("','replication_factor':").append(replicationFactor)
-                        .append("};");
+        String query = String.format("CREATE KEYSPACE IF NOT EXISTS %s WITH " +
+                "replication = {'class':'%s', 'replication_factor': %d};",
+                keyspaceName, replicationStrategy, replicationFactor
+        );
+        session.execute(query);
 
-        session.execute(query.toString());
-
-        query = new StringBuilder("USE ");
-        query.append(keyspaceName).append(";");
-        session.execute(query.toString());
+        query = String.format("USE %s;", keyspaceName);
+        session.execute(query);
 
     }
 

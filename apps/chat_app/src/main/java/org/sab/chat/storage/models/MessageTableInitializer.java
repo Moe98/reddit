@@ -3,15 +3,15 @@ package org.sab.chat.storage.models;
 import com.datastax.driver.core.Session;
 
 public class MessageTableInitializer {
-    public static void createMessageTable(Session session) {
-        StringBuilder sb = new StringBuilder("CREATE TABLE IF NOT EXISTS ")
-                .append("messages").append("(")
-                .append("chat_id uuid, ")
-                .append("message_id timeuuid  PRIMARY KEY,")
-                .append("content text, ")
-                .append("sender_id uuid);");
 
-        String query = sb.toString();
+    public static void createMessageTable(Session session) {
+        String query = "CREATE TABLE IF NOT EXISTS messages (" +
+                "chat_id uuid, " +
+                "message_id timeuuid, " +
+                "content text, " +
+                "sender_id uuid," +
+                "PRIMARY KEY (chat_id, message_id)" +
+                ") WITH CLUSTERING ORDER BY (message_id DESC);";
         session.execute(query);
     }
-}
+};
