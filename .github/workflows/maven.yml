@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
+
       postgres:
         image: postgres:10.8
         env:
@@ -23,6 +24,11 @@ jobs:
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
+
+      cassandra:
+        image: cassandra
+        ports:
+          - 9042:9042
 
     steps:
     - uses: actions/checkout@v2
