@@ -29,7 +29,6 @@ public class PostgresConnectionTest {
     @Test
     public void postgresWorking() {
         runDB();
-        assertTrue(true);
     }
 
     @Test
