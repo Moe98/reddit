@@ -38,19 +38,19 @@ public class PostgresConnection {
 
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
         JSONParser parser = new JSONParser();
-        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
+//        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
         for (String param : propertiesParams)
-            if (!propertiesJson.containsKey(param))
-                throw new PropertiesNotLoadedException(String.format("%s is not found in the config.json", param));
-        props.setProperty("user", (String) propertiesJson.get("POSTGRES_USER"));
-        props.setProperty("password", (String) propertiesJson.get("POSTGRES_PASSWORD"));
+            if (System.getenv(param)==null)
+                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
+        props.setProperty("user", (String) System.getenv("POSTGRES_USER"));
+        props.setProperty("password", (String) System.getenv("POSTGRES_PASSWORD"));
         url =
                 String.format(
                         "jdbc:postgresql://%s:%s/%s",
-                        propertiesJson.get("POSTGRES_HOST"),
-                        propertiesJson.get("POSTGRES_PORT"),
-                        propertiesJson.get("POSTGRES_DB"));
+                        System.getenv("POSTGRES_HOST"),
+                        System.getenv("POSTGRES_PORT"),
+                        System.getenv("POSTGRES_DB"));
 
     }
 
