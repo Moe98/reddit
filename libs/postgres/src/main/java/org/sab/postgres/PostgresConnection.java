@@ -41,12 +41,10 @@ public class PostgresConnection {
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
         //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
-//        if(System.getenv("POSTGRES_USER")==null)
-//            throw new PropertiesNotLoadedException("I can read the secrets!!!!!!!!!!!");
-//        for (String param : propertiesParams)
-//            if (System.getenv(param)==null)
-//                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
-        System.out.println(System.getenv("POSTGRES_DB"));
+
+        for (String param : propertiesParams)
+            if (System.getenv(param)==null)
+                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
