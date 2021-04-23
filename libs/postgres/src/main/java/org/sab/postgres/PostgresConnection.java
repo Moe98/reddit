@@ -1,16 +1,17 @@
 package org.sab.postgres;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.*;
-import java.util.List;
-import java.util.Properties;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.json.simple.parser.ParseException;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Properties;
 
 public class PostgresConnection {
     private static PostgresConnection instance = null;
@@ -20,6 +21,7 @@ public class PostgresConnection {
     private Connection conn;
     private final URL configPath = getClass().getClassLoader().getResource("config.json");
     private final String[] propertiesParams = {"POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT", "POSTGRES_DB"};
+    Dotenv dotenv = Dotenv.load();
 
     private PostgresConnection() {
     }
@@ -37,25 +39,25 @@ public class PostgresConnection {
     }
 
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
-        JSONParser parser = new JSONParser();
-//        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
+        //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
         for (String param : propertiesParams)
-            if (System.getenv(param)==null)
+            if (dotenv.get(param)==null)
                 throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
-        props.setProperty("user", (String) System.getenv("POSTGRES_USER"));
-        props.setProperty("password", (String) System.getenv("POSTGRES_PASSWORD"));
+        props.setProperty("user", dotenv.get("POSTGRES_USER"));
+        props.setProperty("password", dotenv.get("POSTGRES_PASSWORD"));
         url =
                 String.format(
                         "jdbc:postgresql://%s:%s/%s",
-                        System.getenv("POSTGRES_HOST"),
-                        System.getenv("POSTGRES_PORT"),
-                        System.getenv("POSTGRES_DB"));
+                        dotenv.get("POSTGRES_HOST"),
+                        dotenv.get("POSTGRES_PORT"),
+                        dotenv.get("POSTGRES_DB"));
 
     }
 
     public Connection connect() {
         try {
+            System.out.println(props + "    "+ url);
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
