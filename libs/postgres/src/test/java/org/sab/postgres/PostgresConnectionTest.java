@@ -1,7 +1,6 @@
 package org.sab.postgres;
 
 import org.junit.Test;
-//import org.junit.jupiter.api.Assertions;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
 import java.sql.Connection;
@@ -33,30 +32,20 @@ public class PostgresConnectionTest {
         assertTrue(true);
     }
 
-//    @Test
-//    public void postgresIsSingleton() throws PropertiesNotLoadedException {
-//        PostgresConnection conn1 = PostgresConnection.getInstance();
-//        PostgresConnection conn2 = PostgresConnection.getInstance();
-//        assertTrue(conn1 == conn2);
-//    }
-//
-//    @Test
-//    public void canCloseConnection() throws PropertiesNotLoadedException {
-//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
-//        Connection conn = postgresConnection.connect();
-//        postgresConnection.closeConnection(conn);
-//    }
-//
-//    @Test
-//    public void cantUseClosedConnection() throws PropertiesNotLoadedException {
-//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
-//        Connection conn = postgresConnection.connect();
-//        postgresConnection.closeConnection(conn);
-//
-//        Assertions.assertThrows(org.postgresql.util.PSQLException.class, () -> {
-//            conn.createStatement();
-//        });
-//    }
+    @Test
+    public void postgresIsSingleton() throws PropertiesNotLoadedException {
+        PostgresConnection conn1 = PostgresConnection.getInstance();
+        PostgresConnection conn2 = PostgresConnection.getInstance();
+        assertTrue(conn1 == conn2);
+    }
+
+    @Test
+    public void canCloseConnection() throws PropertiesNotLoadedException {
+        PostgresConnection postgresConnection = PostgresConnection.getInstance();
+        Connection conn = postgresConnection.connect();
+        postgresConnection.closeConnection(conn);
+    }
+
 
 
 }
