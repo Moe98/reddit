@@ -46,6 +46,7 @@ public class PostgresConnection {
 //        for (String param : propertiesParams)
 //            if (System.getenv(param)==null)
 //                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
+        System.out.println(System.getenv("POSTGRES_DB"));
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
@@ -57,6 +58,7 @@ public class PostgresConnection {
     }
 
     public Connection connect() {
+        System.out.println(url);
         try{
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
