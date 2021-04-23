@@ -66,15 +66,15 @@ public class ServerTest {
     @Test
     public void postgresWorking() {
         runDB();
-        assertTrue(true);
+//        assertTrue(true);
     }
 
-    @Test
-    public void postgresIsSingleton() throws PropertiesNotLoadedException {
-        PostgresConnection conn1 = PostgresConnection.getInstance();
-        PostgresConnection conn2 = PostgresConnection.getInstance();
-        assertTrue(conn1 == conn2);
-    }
+//    @Test
+//    public void postgresIsSingleton() throws PropertiesNotLoadedException {
+//        PostgresConnection conn1 = PostgresConnection.getInstance();
+//        PostgresConnection conn2 = PostgresConnection.getInstance();
+//        assertTrue(conn1 == conn2);
+//    }
 
 //    @Test
 //    public void canCloseConnection() throws PropertiesNotLoadedException {
