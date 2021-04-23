@@ -9,7 +9,7 @@
   <modules>
     <module>example_util</module>
     <module>netty</module>
-      <module>rabbitmq</module>
+    <module>rabbitmq</module>
   </modules>
   <packaging>pom</packaging>
 
