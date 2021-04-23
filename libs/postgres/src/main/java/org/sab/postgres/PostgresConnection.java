@@ -21,7 +21,7 @@ public class PostgresConnection {
     private Connection conn;
     private final URL configPath = getClass().getClassLoader().getResource("config.json");
     private final String[] propertiesParams = {"POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT","POSTGRES_DB"};
-    Dotenv dotenv = Dotenv.load();
+    Dotenv dotenv = Dotenv.configure().load();
 
     private PostgresConnection() {
     }
