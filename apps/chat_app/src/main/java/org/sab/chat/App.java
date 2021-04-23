@@ -7,7 +7,8 @@ import org.sab.chat.storage.config.CassandraConnector;
 
 import org.sab.chat.storage.models.Chat;
 import org.sab.chat.storage.models.Message;
-
+import org.sab.chat.storage.tables.ChatTable;
+import org.sab.chat.storage.tables.MessageTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,14 @@ public class App {
     public static void main(String[] args) {
         CassandraConnector cassandra = new CassandraConnector();
         cassandra.connect();
+        cassandra.initializeKeySpace();
         System.out.println("Cassandra Connected");
 
+        ChatTable chats = new ChatTable(cassandra);
+        chats.createTable();
+
+        MessageTable messages = new MessageTable(cassandra);
+        messages.createTable();
 
         MappingManager manager = new MappingManager(cassandra.getSession());
         Mapper<Chat> mapper = manager.mapper(Chat.class);
