@@ -1,13 +1,13 @@
 package org.sab.postgres;
 
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.junit.Test;
-//import org.junit.jupiter.api.Assertions;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
 import static org.junit.Assert.*;
 
@@ -53,9 +53,9 @@ public class PostgresConnectionTest {
         Connection conn = postgresConnection.connect();
         postgresConnection.closeConnection(conn);
 
-//        Assertions.assertThrows(org.postgresql.util.PSQLException.class, () -> {
-//            conn.createStatement();
-//        });
+        Assertions.assertThrows(org.postgresql.util.PSQLException.class, () -> {
+            conn.createStatement();
+        });
     }
 
 
