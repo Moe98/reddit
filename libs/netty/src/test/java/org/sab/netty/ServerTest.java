@@ -1,6 +1,8 @@
 package org.sab.netty;
 
 import org.junit.Test;
+import org.sab.postgres.PostgresConnection;
+import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -40,5 +42,11 @@ public class ServerTest {
         String response = get("http://localhost:8080/api");
         // TODO this will need to be more generic in the future.
         assertEquals(response, "{\"msg\":\"Hello World\"}");
+    }
+    @Test
+    public void testDB() throws PropertiesNotLoadedException {
+        PostgresConnection conn= PostgresConnection.getInstance();
+        conn.connect();
+
     }
 }
