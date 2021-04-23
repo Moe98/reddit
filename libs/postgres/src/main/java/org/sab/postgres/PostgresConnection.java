@@ -41,7 +41,7 @@ public class PostgresConnection {
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
         //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
-        if(System.getenv("POSTGRES_DB")==null)
+        if(System.getenv("POSTGRES_USER")==null)
             throw new PropertiesNotLoadedException("I can read the secrets!!!!!!!!!!!");
         for (String param : propertiesParams)
             if (dotenv.get(param)==null)
