@@ -1,4 +1,4 @@
-package org.sab.chat.storage.models;
+package org.sab.chat.storage.config;
 
 import com.datastax.driver.core.Session;
 

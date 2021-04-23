@@ -10,8 +10,6 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.sab.chat.storage.models.ChatTableInitializer;
-import org.sab.chat.storage.models.MessageTableInitializer;
 
 public class CassandraConnector {
     private Cluster cluster;
