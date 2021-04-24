@@ -1,6 +1,6 @@
 package org.sab.demo.commands;
 
-import org.sab.demo.Command;
+import org.sab.service.Command;
 
 import java.util.concurrent.Callable;
 

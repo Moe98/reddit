@@ -1,9 +1,11 @@
-package org.sab.demo;
-
-//import org.sab.demo.commands.GoodByeWorld;
-//import org.sab.demo.commands.HelloWorld;
+package org.sab.service;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * This class uses reflection to save a reference to the classes without defining them in the code
+ * This is used in the command pattern to access classes
+ */
 
 public class ConfigMap {
     // TODO change this to config file.

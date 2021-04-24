@@ -1,4 +1,4 @@
-package org.sab.demo;
+package org.sab.service;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -10,13 +10,17 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.*;
 
+/**
+ * Abstract class service which will be extended by the main class of each mini-app.
+ * Uses the Command Pattern.
+ * Contains the threading and command invoking functionality.
+ */
 
 public abstract class Service {
     private static ExecutorService threadPool;
     private static ConcurrentHashMap<String, Class<?>> cmdMap;
-    private static final String EXAMPLE_APP_QUEUE = "/api_REQ";
 
-    //Singleton Design Pattern
+    // Singleton Design Pattern
     public static ExecutorService getThreadPool(int threads) {
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(threads);
@@ -24,11 +28,14 @@ public abstract class Service {
         return threadPool;
     }
 
+    // creating a monitor that always listens to the app specific queue
     public static void listenOnQueue(String queueName) throws IOException, TimeoutException {
+        // initializing a connection with rabbitMQ and initializing the queue on which the app listens
         RPCServer server = RPCServer.getInstance(queueName);
         Channel channel = server.getChannel();
         // TODO server will initialize the required queues from a config file
 
+        // creating our monitor
         Object monitor = new Object();
 
         // creating a callback which would invoke the required command specified by the JSON request message
@@ -82,10 +89,14 @@ public abstract class Service {
         }
     }
 
+    // function to invoke the required command using command pattern design
     public static String invokeCommand(String commandName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
+        // getting the class responsible for the command
         Class<?> commandClass = ConfigMap.getClass(commandName);
+        // creating an instance of the command class
         Command commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
 
+        // callback responsible for invoking the required method of the command class
         Callable<String> callable = new Callable<String>() {
             @Override
             public String call() {
@@ -98,22 +109,18 @@ public abstract class Service {
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 }
-                return "yeet";
+                return "invoke command error";
             }
         };
 
-//        try {
+        // submitting the callback fn. to the thread pool
         Future<String> executorCallable = threadPool.submit(callable);
 
+        // waiting until the future is done
         while (!executorCallable.isDone()) ;
+
+        // returning the output of the future
         return executorCallable.get();
-    }
-
-    public static void main(String[] args) throws IOException, TimeoutException {
-        ConfigMap.instantiate();
-        getThreadPool(10);
-        listenOnQueue(EXAMPLE_APP_QUEUE);
-
     }
 
 }

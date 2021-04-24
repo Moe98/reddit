@@ -10,6 +10,7 @@
     <module>example_util</module>
     <module>netty</module>
     <module>rabbitmq</module>
+    <module>service</module>
   </modules>
   <packaging>pom</packaging>
 
