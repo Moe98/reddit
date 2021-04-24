@@ -28,9 +28,10 @@ public class PostgresConnection {
 
     public static PostgresConnection getInstance() throws PropertiesNotLoadedException {
         if (instance == null) {
-            instance = new PostgresConnection();
+            final PostgresConnection attemptedConnection = new PostgresConnection();
             try {
-                instance.loadProperties();
+                attemptedConnection.loadProperties();
+                instance = attemptedConnection;
             } catch (IOException | ParseException e) {
                 throw new PropertiesNotLoadedException(e);
             }

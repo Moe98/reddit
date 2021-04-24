@@ -21,8 +21,7 @@ public class PostgresConnectionTest {
             assertEquals(1, rs.getInt(1));
             assertFalse(rs.next());
         } catch (PropertiesNotLoadedException | SQLException e) {
-            e.printStackTrace();
-            fail();
+            fail(e.getMessage());
         }
     }
 
@@ -32,15 +31,26 @@ public class PostgresConnectionTest {
     }
 
     @Test
-    public void postgresIsSingleton() throws PropertiesNotLoadedException {
-        PostgresConnection conn1 = PostgresConnection.getInstance();
-        PostgresConnection conn2 = PostgresConnection.getInstance();
+    public void postgresIsSingleton()  {
+        PostgresConnection conn1 = null;
+        PostgresConnection conn2 = null;
+        try {
+            conn1 = PostgresConnection.getInstance();
+            conn2 = PostgresConnection.getInstance();
+        } catch (PropertiesNotLoadedException e) {
+            fail(e.getMessage());
+        }
         assertTrue(conn1 == conn2);
     }
 
     @Test
-    public void canCloseConnection() throws PropertiesNotLoadedException {
-        PostgresConnection postgresConnection = PostgresConnection.getInstance();
+    public void canCloseConnection() {
+        PostgresConnection postgresConnection = null;
+        try {
+            postgresConnection = PostgresConnection.getInstance();
+        } catch (PropertiesNotLoadedException e) {
+            fail(e.getMessage());
+        }
         Connection conn = postgresConnection.connect();
         postgresConnection.closeConnection(conn);
     }
