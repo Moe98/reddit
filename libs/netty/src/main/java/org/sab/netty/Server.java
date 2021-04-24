@@ -12,8 +12,8 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.AttributeKey;
-
 import javax.net.ssl.SSLException;
+
 import java.security.cert.CertificateException;
 
 
@@ -49,7 +49,6 @@ public final class Server {
 
             System.err.println("Open your web browser and navigate to " +
                     (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
-
             ch.closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
