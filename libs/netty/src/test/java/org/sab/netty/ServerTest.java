@@ -1,23 +1,37 @@
 package org.sab.netty;
 
+import com.rabbitmq.client.*;
 import org.junit.Test;
-import org.sab.rabbitmq.RPCServer;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.concurrent.TimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
 
 public class ServerTest {
+    int NUM_THREADS = 3;
+    String queueName = "TEST_QUEUE";
+    String receivedMessage = "";
+    String expectedReplyMessage = "{\"msg\":\"Hello World\"}";
+    static String response = "";
 
-    public String get(String uri) throws IOException, InterruptedException {
+    /**
+     * Much Rigorous Test :-)
+     * Clean Code++
+     * No need to trust me that it works:(
+     * ┏(・o・)┛
+     */
+    public String get(String uri, String functionName) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(uri))
+                .header("Function-Name", functionName)
                 .build();
 
         HttpResponse<String> response =
@@ -26,35 +40,52 @@ public class ServerTest {
         return response.body();
     }
 
-    public void runServer() {
-        // creating a thread for running the netty HTTP server
-        new Thread(() -> {
+    @Test
+    public void serverWorking() {
+        int threads = NUM_THREADS;
+        ExecutorService threadPool = Executors.newFixedThreadPool(threads);
+
+        Runnable runRabbitClient = () -> {
             try {
                 Server.main(null);
-            } catch (Exception e) {
+                response = get("http://localhost:8080/api/example_app", "HELLO_WORLD");
+            } catch (CertificateException | InterruptedException | IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        };
 
-        // creating a thread for running the RPCServer "example mini app"
-//        new Thread(() -> {
-//            try {
-//                RPCServer.getInstance("/api_REQ");
-//            } catch(Exception e) {
-//                e.printStackTrace();
-//            }
-//        }).start();
-    }
+        Callable<String> respondToClient = () -> {
+            ConnectionFactory factory = new ConnectionFactory();
+            Connection connection = factory.newConnection();
+            Channel channel = connection.createChannel();
+            factory.setHost("localhost");
+            DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+                try {
+                    receivedMessage = new String(delivery.getBody(), StandardCharsets.UTF_8);
+                } finally {
 
-    @Test
-    public void serverWorking() throws IOException, InterruptedException, TimeoutException {
-        runServer();
+                    AMQP.BasicProperties replyProps = new AMQP.BasicProperties
+                            .Builder()
+                            .correlationId(delivery.getProperties().getCorrelationId())
+                            .build();
+                    channel.basicPublish("", delivery.getProperties().getReplyTo(), replyProps, expectedReplyMessage.getBytes(StandardCharsets.UTF_8));
 
-        // TODO fix test
-//        String response = get("http://localhost:8080/api");
-        // TODO this will need to be more generic in the future.
-//        assertEquals(response, "{\"msg\":\"Hello World\"}");
+                }
 
+            };
+
+            return channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+            });
+        };
+
+
+        Future<?> executorCallable1 = threadPool.submit(runRabbitClient);
+        Future<String> executorCallable2 = threadPool.submit(respondToClient);
+
+        while (!executorCallable1.isDone() || !executorCallable2.isDone()) ;
+        System.out.println("Done with callables");
+
+        assertEquals(response, expectedReplyMessage);
 
     }
 }
