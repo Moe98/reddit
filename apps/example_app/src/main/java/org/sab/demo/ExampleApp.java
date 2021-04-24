@@ -8,7 +8,8 @@ import java.util.concurrent.TimeoutException;
 
 public class ExampleApp extends Service {
 
-    private static final String EXAMPLE_APP_QUEUE = "/api_REQ";
+    // TODO get this from config file
+    private static final String EXAMPLE_APP_QUEUE = "EXAMPLE_APP_REQ";
 
     public static void main(String[] args) throws IOException, TimeoutException {
         ConfigMap.instantiate();

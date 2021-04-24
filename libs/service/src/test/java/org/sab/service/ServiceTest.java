@@ -7,14 +7,12 @@ import org.junit.Test;
 /**
  * Unit test for simple App.
  */
-public class ServiceTest
-{
+public class ServiceTest {
     /**
      * Rigorous Test :-)
      */
     @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
+    public void shouldAnswerWithTrue() {
+        assertTrue(true);
     }
 }

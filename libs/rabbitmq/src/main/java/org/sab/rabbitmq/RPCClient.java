@@ -6,6 +6,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -35,7 +36,7 @@ public class RPCClient implements AutoCloseable {
     }
 
     // adding a channel to the connection
-    private void addChannel() throws IOException, TimeoutException {
+    private void addChannel() throws IOException {
         channel = connection.createChannel();
     }
 
@@ -58,7 +59,7 @@ public class RPCClient implements AutoCloseable {
                 .build();
 
         // sending the request message in the request queue with it's properties
-        channel.basicPublish("", resQueueName, props, message.getBytes("UTF-8"));
+        channel.basicPublish("", resQueueName, props, message.getBytes(StandardCharsets.UTF_8));
 
         // creating a blocking queue to put the expected response in
         final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);
@@ -66,18 +67,19 @@ public class RPCClient implements AutoCloseable {
         // listening on the expected response queue
         // with a callback that checks that the response queue received a response message with corrID equal to request corrID
         // and putting the response message in the blocking queue response
-        String ctag = channel.basicConsume(replyQueueName, /*isAutoAck=*/ true, (consumerTag, delivery) -> {
+        String cTag = channel.basicConsume(replyQueueName, /*isAutoAck=*/ true, (consumerTag, delivery) -> {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
-                response.offer(new String(delivery.getBody(), "UTF-8"));
+                response.offer(new String(delivery.getBody(), StandardCharsets.UTF_8));
             }
-        }, consumerTag -> {});
+        }, consumerTag -> {
+        });
 
         // attempting to retrieve the response from the blocked queue
         // if response not yet present, block the RPCClient until the callback fn. above is able to retrieve the message
         String result = response.take();
 
         // cancelling any further consumptions from the channel
-        channel.basicCancel(ctag);
+        channel.basicCancel(cTag);
 
         // returning the response message
         return result;

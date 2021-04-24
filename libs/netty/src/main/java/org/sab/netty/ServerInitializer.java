@@ -24,17 +24,15 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     public void initChannel(SocketChannel ch) {
-        CorsConfig corsConfig =
-        CorsConfigBuilder.forAnyOrigin()
-            .allowedRequestHeaders(
-                "X-Requested-With", "Content-Type", "Content-Length", "Authorization")
-            .allowedRequestMethods(
-                HttpMethod.GET,
-                HttpMethod.POST,
-                HttpMethod.PUT,
-                HttpMethod.DELETE,
-                HttpMethod.OPTIONS)
-            .build();
+        CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
+                .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length", "Authorization")
+                .allowedRequestMethods(
+                        HttpMethod.GET,
+                        HttpMethod.POST,
+                        HttpMethod.PUT,
+                        HttpMethod.DELETE,
+                        HttpMethod.OPTIONS)
+                .build();
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc()));

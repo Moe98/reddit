@@ -1,4 +1,5 @@
 package org.sab.netty;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -12,24 +13,17 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.AttributeKey;
-import org.sab.rabbitmq.RPCClient;
 
 import javax.net.ssl.SSLException;
-import java.io.IOException;
 import java.security.cert.CertificateException;
-import java.util.concurrent.TimeoutException;
 
 
 public final class Server {
 
     static final boolean SSL = System.getProperty("ssl") != null;
-    static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
+    static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8443" : "8080"));
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
-    public static final AttributeKey<String> URI_KEY = AttributeKey.valueOf("uri");
-    public static final AttributeKey<String> CORR_KEY = AttributeKey.valueOf("corr");
-
-    public Server() throws IOException, TimeoutException {
-    }
+    public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
 
     public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
@@ -55,7 +49,7 @@ public final class Server {
             Channel ch = b.bind(PORT).sync().channel();
 
             System.err.println("Open your web browser and navigate to " +
-                    (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
+                    (SSL ? "https" : "http") + "://127.0.0.1:" + PORT + '/');
 
             ch.closeFuture().sync();
         } finally {

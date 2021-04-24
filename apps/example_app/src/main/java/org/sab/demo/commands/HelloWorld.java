@@ -1,19 +1,14 @@
 package org.sab.demo.commands;
 
+import org.json.JSONObject;
 import org.sab.service.Command;
 
 import java.util.concurrent.Callable;
 
-public class HelloWorld extends Command implements Callable {
-    private static double classVersion = 1.0;
-
-    public static double getClassVersion() {
-        return classVersion;
-    }
+public class HelloWorld extends Command implements Callable<String> {
 
     @Override
-    public String execute() throws Exception {
-        String message = "{\"msg\":\"Hello World\"}";
-        return message;
+    public String execute(JSONObject request) {
+        return "{\"msg\":\"Hello World\"}";
     }
 }

@@ -3,11 +3,15 @@ package org.sab.service;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
+
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.sab.rabbitmq.RPCServer;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 /**
@@ -18,14 +22,12 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     private static ExecutorService threadPool;
-    private static ConcurrentHashMap<String, Class<?>> cmdMap;
 
     // Singleton Design Pattern
-    public static ExecutorService getThreadPool(int threads) {
+    public static void getThreadPool(int threads) {
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(threads);
         }
-        return threadPool;
     }
 
     // creating a monitor that always listens to the app specific queue
@@ -49,19 +51,28 @@ public abstract class Service {
             String response = "";
             try {
                 // invoking command
-                JSONObject req = new JSONObject(new String(delivery.getBody(), "UTF-8"));
+                String req = new String(delivery.getBody(), StandardCharsets.UTF_8);
+
+                System.out.println("App: request: " + req);
 
                 // TODO change command name
-                // String commandName = (String) req.get("operationId");
-                String commandName = "HELLO_WORLD";
-                response += invokeCommand(commandName);
+                JSONParser parser = new JSONParser();
+                org.json.simple.JSONObject propertiesJson = (org.json.simple.JSONObject) parser.parse(req);
+                Object commandName = propertiesJson.get("functionName");
+
+                System.out.println("Prop JSON" + propertiesJson);
+                System.out.println("-H- " + commandName);
+
+                response += invokeCommand((String) commandName, new JSONObject(req));
+
                 System.out.println("Sending: " + response);
 
-            } catch (RuntimeException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | ExecutionException | InterruptedException | ClassNotFoundException e) {
+            } catch (RuntimeException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | ExecutionException | InterruptedException | ClassNotFoundException | ParseException e) {
                 System.out.println(" [.] " + e.toString());
             } finally {
                 // sending response message to the response queue, which is defined by the request message's properties
-                channel.basicPublish("", delivery.getProperties().getReplyTo(), replyProps, response.getBytes("UTF-8"));
+                channel.basicPublish("", delivery.getProperties().getReplyTo(), replyProps, response.getBytes(StandardCharsets.UTF_8));
+
 
                 // sending a manual acknowledgement of sending the response
                 channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -90,27 +101,29 @@ public abstract class Service {
     }
 
     // function to invoke the required command using command pattern design
-    public static String invokeCommand(String commandName) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
+    public static String invokeCommand(String commandName, JSONObject req) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
         // getting the class responsible for the command
         Class<?> commandClass = ConfigMap.getClass(commandName);
+        System.out.println("Command Class: " + commandClass);
         // creating an instance of the command class
         Command commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
 
         // callback responsible for invoking the required method of the command class
-        Callable<String> callable = new Callable<String>() {
-            @Override
-            public String call() {
-                try {
-                    return (String) commandClass.getMethod("execute").invoke(commandInstance);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-                return "invoke command error";
+        Callable<String> callable = () -> {
+            try {
+                // TODO 1st option
+                //  Do we need to invoke call here?
+//                    commandClass.getMethod("setRequest",  req.getClass()).invoke(commandInstance, req);
+//                    FutureTask f1 = (FutureTask) executor.submit(callable);
+//                    String res = (String) commandClass.getMethod("call").invoke(commandInstance);
+//                    System.out.println("Call returned: " + res);
+//                    return res;
+                // TODO 2nd option (invoking execute directly)
+                return (String) commandClass.getMethod("execute", req.getClass()).invoke(commandInstance, req);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
             }
+            return "invoke command error";
         };
 
         // submitting the callback fn. to the thread pool
