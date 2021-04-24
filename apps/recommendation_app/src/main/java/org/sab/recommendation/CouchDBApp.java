@@ -19,7 +19,7 @@ import static com.couchbase.client.java.kv.ReplaceOptions.replaceOptions;
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
 
-public class App {
+public class CouchDBApp {
     public static void testUpsert(Collection threadsCollection, Collection usersCollection){
         // Create an JSON array of recommended items, put it in a JSON object "listOfThreads/Users/Subthreads", and upsert (insert but allows overwriting)
         JsonArray threads = JsonArray.create().add("thread1").add("thread2");
@@ -43,7 +43,7 @@ public class App {
     }
     public static void testQuery(Cluster cluster){
         try {
-            final QueryResult result = cluster.query("select * from `CodeCreatedBucket` where id = \"test1\" limit 10 ",
+            final QueryResult result = cluster.query("select * from `CodeCreatedBucket` USE KEYS \"test1\" limit 10",
                     queryOptions().metrics(true));
 
             for (JsonObject row : result.rowsAsObject()) {
@@ -58,7 +58,7 @@ public class App {
     public static void main(String[] args) {
 
         // Connect to DB
-        Cluster cluster = Cluster.connect("127.0.0.1", "Administrator", "123456");
+        Cluster cluster = Cluster.connect("127.0.0.1", "Administrator", "password");
 
         // The Table (Bucket) RecommendedThreads
         Bucket threadsBucket = cluster.bucket("RecommendedThreads");
@@ -72,7 +72,10 @@ public class App {
 //        Bucket subthreadsBucket = cluster.bucket("RecommendedSubthreads");
 //        Collection subthreadsCollection = subthreadsBucket.defaultCollection();
 
-//        testQuery(cluster); // Must create a primary index on desired table before querying
+        // TODO Must create a primary index on desired table(BUCKETNAME) before querying
+        // CREATE PRIMARY INDEX on `default` : `BUCKETNAME`;
+//        testQuery(cluster);
+
 
         // create bucket
         BucketManager bucketManager = cluster.buckets();
