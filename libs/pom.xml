@@ -16,7 +16,9 @@
     <module>netty</module>
         
     <module>postgres</module>
-      
+      <module>couchbase</module>
+    <module>arango</module>
+
   </modules>
     
   <packaging>pom</packaging>
