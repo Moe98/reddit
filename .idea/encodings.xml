@@ -3,6 +3,8 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/apps" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/recommendation_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/recommendation_app/src/main/java" charset="UTF-8" />
