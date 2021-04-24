@@ -3,6 +3,7 @@ package org.sab.netty;
 import com.rabbitmq.client.*;
 import org.junit.Test;
 
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.concurrent.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ServerTest {
     int NUM_THREADS = 3;
