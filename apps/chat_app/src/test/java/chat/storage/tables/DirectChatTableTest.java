@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
+import org.sab.chat.storage.tables.DirectChatTable;
 import org.sab.chat.storage.tables.GroupChatTable;
 
 import java.util.List;
@@ -14,10 +15,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
-public class ChatTableTest {
+public class DirectChatTableTest {
 
     private CassandraConnector cassandra;
-    private GroupChatTable chats;
+    private DirectChatTable chats;
 
     @Before
     public void connect() {
@@ -25,7 +26,7 @@ public class ChatTableTest {
         cassandra.connect();
         cassandra.initializeKeySpace();
 
-        chats = new GroupChatTable(cassandra);
+        chats = new DirectChatTable(cassandra);
         chats.createTable();
     }
 
@@ -44,12 +45,9 @@ public class ChatTableTest {
                         .map(cl -> cl.getName())
                         .collect(Collectors.toList());
 
-        assertEquals(6, columnNames.size());
+        assertEquals(3, columnNames.size());
         assertTrue(columnNames.contains("chat_id"));
-        assertTrue(columnNames.contains("name"));
-        assertTrue(columnNames.contains("description"));
-        assertTrue(columnNames.contains("members"));
-        assertTrue(columnNames.contains("admin"));
-        assertTrue(columnNames.contains("date_created"));
+        assertTrue(columnNames.contains("first_member"));
+        assertTrue(columnNames.contains("second_member"));
     }
 }
