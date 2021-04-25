@@ -1,5 +1,6 @@
 package chat.storage.tables;
 
+import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class GroupMessageTableTest {
 
     private CassandraConnector cassandra;
-    private GroupMessageTable messages;
+    private GroupMessageTable groupMessages;
 
     @Before
     public void connect() {
@@ -25,8 +26,8 @@ public class GroupMessageTableTest {
         cassandra.connect();
         cassandra.initializeKeySpace();
 
-        messages = new GroupMessageTable(cassandra);
-        messages.createTable();
+        groupMessages = new GroupMessageTable(cassandra);
+        groupMessages.createTable();
     }
 
     @After
@@ -37,11 +38,11 @@ public class GroupMessageTableTest {
     @Test
     public void whenCreatingMessageTable_thenCreatedCorrectly() {
         ResultSet result = cassandra.runQuery(
-                "SELECT * FROM " + messages.TABLE_NAME + ";");
+                "SELECT * FROM " + groupMessages.TABLE_NAME + ";");
 
         List<String> columnNames =
                 result.getColumnDefinitions().asList().stream()
-                        .map(cl -> cl.getName())
+                        .map(ColumnDefinitions.Definition::getName)
                         .collect(Collectors.toList());
 
         assertEquals(4, columnNames.size());

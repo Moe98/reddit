@@ -1,12 +1,12 @@
 package chat.storage.tables;
 
+import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.tables.DirectMessageTable;
-import org.sab.chat.storage.tables.GroupMessageTable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public class DirectMessageTableTest {
 
     private CassandraConnector cassandra;
-    private DirectMessageTable messages;
+    private DirectMessageTable directMessages;
 
     @Before
     public void connect() {
@@ -26,8 +26,8 @@ public class DirectMessageTableTest {
         cassandra.connect();
         cassandra.initializeKeySpace();
 
-        messages = new DirectMessageTable(cassandra);
-        messages.createTable();
+        directMessages = new DirectMessageTable(cassandra);
+        directMessages.createTable();
     }
 
     @After
@@ -38,11 +38,11 @@ public class DirectMessageTableTest {
     @Test
     public void whenCreatingMessageTable_thenCreatedCorrectly() {
         ResultSet result = cassandra.runQuery(
-                "SELECT * FROM " + messages.TABLE_NAME + ";");
+                "SELECT * FROM " + DirectMessageTable.TABLE_NAME + ";");
 
         List<String> columnNames =
                 result.getColumnDefinitions().asList().stream()
-                        .map(cl -> cl.getName())
+                        .map(ColumnDefinitions.Definition::getName)
                         .collect(Collectors.toList());
 
         assertEquals(4, columnNames.size());
