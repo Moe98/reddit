@@ -1,5 +1,6 @@
 package chat.storage.tables;
 
+import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import org.junit.After;
 import org.junit.Before;
@@ -39,11 +40,11 @@ public class GroupChatTableTest {
     @Test
     public void whenCreatingChatTable_thenCreatedCorrectly() {
         ResultSet result = cassandra.runQuery(
-                "SELECT * FROM " + groupChats.TABLE_NAME + ";");
+                "SELECT * FROM " + GroupChatTable.TABLE_NAME + ";");
 
         List<String> columnNames =
                 result.getColumnDefinitions().asList().stream()
-                        .map(cl -> cl.getName())
+                        .map(ColumnDefinitions.Definition::getName)
                         .collect(Collectors.toList());
 
         assertEquals(6, columnNames.size());
@@ -83,7 +84,7 @@ public class GroupChatTableTest {
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
                 fail("Created group chat with invalid data");
-            } catch (InvalidInputException e) {
+            } catch (InvalidInputException ignored) {
 
             }
         }

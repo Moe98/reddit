@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class CassandraConnectorTest {
     private CassandraConnector cassandra;
@@ -41,7 +40,7 @@ public class CassandraConnectorTest {
                 .collect(Collectors.toList());
 
         assertEquals(1, matchedKeyspaces.size());
-        assertTrue(matchedKeyspaces.get(0).equals(keyspaceName.toLowerCase()));
+        assertEquals(matchedKeyspaces.get(0), keyspaceName.toLowerCase());
     }
 
 }
