@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
-import org.sab.chat.storage.tables.ChatTable;
+import org.sab.chat.storage.tables.GroupChatTable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class ChatTableTest {
 
     private CassandraConnector cassandra;
-    private ChatTable chats;
+    private GroupChatTable chats;
 
     @Before
     public void connect() {
@@ -25,7 +25,7 @@ public class ChatTableTest {
         cassandra.connect();
         cassandra.initializeKeySpace();
 
-        chats = new ChatTable(cassandra);
+        chats = new GroupChatTable(cassandra);
         chats.createTable();
     }
 

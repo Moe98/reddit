@@ -2,13 +2,13 @@ package org.sab.chat.storage.tables;
 
 import org.sab.chat.storage.config.CassandraConnector;
 
-public class MessageTable {
+public class GroupMessageTable {
 
-    public static final String TABLE_NAME = "messages";
+    public static final String TABLE_NAME = "group_messages";
 
     private CassandraConnector cassandra;
 
-    public MessageTable(CassandraConnector cassandra) {
+    public GroupMessageTable(CassandraConnector cassandra) {
         this.cassandra = cassandra;
     }
 
