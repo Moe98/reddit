@@ -1,40 +1,42 @@
 package org.sab.recommendation;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
-import com.arangodb.ArangoDBException;
-import com.arangodb.ArangoDatabase;
-import com.arangodb.entity.BaseDocument;
-import com.arangodb.mapping.ArangoJack;
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.kv.GetResult;
 
 public class GetPopularThreadsCommand {
     private static ArangoDB arangoDB;
+    private Cluster cluster;
 
     public void execute() {
         try {
-            arangoDB = new ArangoDB.Builder().user(System.getenv("ARANGO_USER")).password(System.getenv("ARANGO_PASSWORD")).serializer(new ArangoJack()).build();
-            ArangoDatabase db = arangoDB.db(System.getenv("ARANGO_DB"));
+            cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
 
-            String query = "for thread in Threads sort thread.NumOfFollowers desc limit 20 return thread";
-            ArangoCursor<BaseDocument> cursor = db.query(query, null, null, BaseDocument.class);
+            Collection recommendedThreadsCollection = cluster.bucket("Listings").defaultCollection();
+            GetResult getResult = recommendedThreadsCollection.get("popThreads");
+            JsonArray resultThreads = getResult.contentAsArray();
 
             Thread thread = new Thread();
-            if(cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    thread.setName(document.getKey());
-                    thread.setDescription((String) document.getProperties().get("Description"));
-                    thread.setCreator((String) document.getProperties().get("Creator"));
-                    thread.setNumOfFollowers((Integer) document.getProperties().get("NumOfFollowers"));
-                    thread.setDateCreated((String) document.getProperties().get("DateCreated"));
-                    System.out.println("Top Results " + thread);
-                });
+            for(int i = 0; i<resultThreads.size(); i++) {
+                JsonObject o = resultThreads.getObject(i);
+                thread.setName(o.getString("name"));
+                thread.setDescription(o.getString("description"));
+                thread.setCreator(o.getString("creator"));
+                thread.setNumOfFollowers(o.getInt("numOfFollowers"));
+                thread.setDateCreated((String) o.get("dateCreated"));
+                System.out.println("Recommendation Results " + thread);
             }
-            else
-                System.out.println("No Threads found");
-        } catch (ArangoDBException e) {
-            System.err.println("Failed to execute query. " + e.getMessage());
+        } catch (DocumentNotFoundException ex) {
+            System.err.println("Document with the given key not found");
+        } catch (CouchbaseException ex) {
+            ex.printStackTrace();
         } finally {
-            arangoDB.shutdown();
+            cluster.disconnect();
         }
     }
 
