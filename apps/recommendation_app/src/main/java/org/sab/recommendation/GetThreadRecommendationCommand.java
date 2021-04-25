@@ -25,11 +25,11 @@ public class GetThreadRecommendationCommand {
             Thread thread = new Thread();
             for(int i = 0; i<resultThreads.size(); i++) {
                 JsonObject o = resultThreads.getObject(i);
-                thread.setName(o.getString("_key"));
-                thread.setDescription(o.getString("Description"));
-                thread.setCreator(o.getString("Creator"));
-                thread.setNumOfFollowers(o.getInt("NumOfFollowers"));
-                thread.setDateCreated((String) o.get("DateCreated"));
+                thread.setName(o.getString("name"));
+                thread.setDescription(o.getString("description"));
+                thread.setCreator(o.getString("creator"));
+                thread.setNumOfFollowers(o.getInt("numOfFollowers"));
+                thread.setDateCreated((String) o.get("dateCreated"));
                 System.out.println("Recommendation Results " + thread);
             }
         } catch (DocumentNotFoundException ex) {
