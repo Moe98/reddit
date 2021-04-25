@@ -45,7 +45,7 @@ jobs:
         with:
           arangodb version: 'latest'
       - name: Run CouchbaseFakeIt
-        uses: btburnett3/run-couchbasefakeit@v1
+        uses: btburnett3/run-couchbasefakeit@v0.1
         with:
           couchbase-version: enterprise-6.5.0
           # couchbase-configuration: example
