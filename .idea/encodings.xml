@@ -2,16 +2,21 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/apps" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apps/example_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/example_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/recommendation_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/recommendation_app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/recommendation_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/arango/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/couchbase/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/example_util" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/example_util/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/netty" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/netty/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/postgres/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/postgres/src/main/resources" charset="UTF-8" />
   </component>
 </project>
