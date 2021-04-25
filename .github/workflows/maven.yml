@@ -45,12 +45,7 @@ jobs:
         with:
           arangodb version: 'latest'
       - name: Run CouchbaseFakeIt
-        uses: btburnett3/run-couchbasefakeit@v0.1
-        with:
-          couchbase-version: enterprise-6.5.0
-          # couchbase-configuration: example
-          couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
-          couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
+        uses: brantburnett/run-couchbasefakeit@v0.1
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
