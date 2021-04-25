@@ -15,6 +15,7 @@ public class GroupChatTable {
     public static final String TABLE_NAME = "group_chats";
 
     private CassandraConnector cassandra;
+
     private Mapper<GroupChat> mapper;
 
     public GroupChatTable(CassandraConnector cassandra) {
@@ -36,7 +37,7 @@ public class GroupChatTable {
         cassandra.runQuery(query);
     }
 
-    public void createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
+    public UUID createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
         UUID chatId = UUID.randomUUID();
 
         if(name == null || name.length() == 0)
@@ -53,7 +54,10 @@ public class GroupChatTable {
         List<UUID> membersList = new ArrayList<>();
         membersList.add(creator);
         mapper.save(new GroupChat(chatId, name, description, membersList, creator));
+        return chatId;
     }
 
-
+    public Mapper<GroupChat> getMapper() {
+        return mapper;
+    }
 }

@@ -5,19 +5,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
+import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.tables.GroupChatTable;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class GroupChatTableTest {
 
     private CassandraConnector cassandra;
-    private GroupChatTable chats;
+    private GroupChatTable groupChats;
 
     @Before
     public void connect() {
@@ -25,8 +27,8 @@ public class GroupChatTableTest {
         cassandra.connect();
         cassandra.initializeKeySpace();
 
-        chats = new GroupChatTable(cassandra);
-        chats.createTable();
+        groupChats = new GroupChatTable(cassandra);
+        groupChats.createTable();
     }
 
     @After
@@ -37,7 +39,7 @@ public class GroupChatTableTest {
     @Test
     public void whenCreatingChatTable_thenCreatedCorrectly() {
         ResultSet result = cassandra.runQuery(
-                "SELECT * FROM " + chats.TABLE_NAME + ";");
+                "SELECT * FROM " + groupChats.TABLE_NAME + ";");
 
         List<String> columnNames =
                 result.getColumnDefinitions().asList().stream()
@@ -52,4 +54,39 @@ public class GroupChatTableTest {
         assertTrue(columnNames.contains("admin"));
         assertTrue(columnNames.contains("date_created"));
     }
+
+    @Test
+    public void whenCreatingGroupChat_thenCreatedCorrectly() {
+        String groupName = "Alpha Squad";
+        String groupDesc = "Aqwa Squad fe Masr";
+        UUID admin = UUID.randomUUID();
+        UUID chatId = null;
+        try {
+            chatId = groupChats.createGroupChat(admin, groupName, groupDesc);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+
+        GroupChat createdGroupChat = groupChats.getMapper().get(chatId);
+
+        assertEquals(groupName, createdGroupChat.getName());
+        assertEquals(groupDesc, createdGroupChat.getDescription());
+        assertEquals(admin, createdGroupChat.getAdmin());
+    }
+
+    @Test
+    public void whenCreatingGroupChatWithInvalidData_thenFailsToCreate() {
+        String[] groupNames = {"Alpha Squad", "", null};
+        String[] groupDescs = {null, "Aqwa Squad fe Masr", "Cats"};
+        for (int i = 0; i < 3; i++) {
+            UUID admin = UUID.randomUUID();
+            try {
+                groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
+                fail("Created group chat with invalid data");
+            } catch (InvalidInputException e) {
+
+            }
+        }
+    }
+
 }
