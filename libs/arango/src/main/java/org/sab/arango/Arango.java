@@ -21,9 +21,17 @@ public class Arango {
             return arangoDB.createDatabase(dbName);
     }
 
+    public static Boolean dropDatabase(ArangoDB arangoDB, String dbName){
+        return arangoDB.db(dbName).drop();
+    }
+
     public static Boolean createCollection(ArangoDB arangoDB, String dbName, String collectionName){
         CollectionEntity collectionEntity = arangoDB.db(dbName).createCollection(collectionName);
         return (collectionEntity.getName().equals(collectionName));
+    }
+
+    public static void dropCollection(ArangoDB arangoDB, String dbName, String collectionName){
+        arangoDB.db(dbName).collection(collectionName).drop();
     }
 
     public static Boolean createDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseDocument baseDocument){
