@@ -1,16 +1,11 @@
 package chat.storage.config;
 
 import com.datastax.driver.core.ResultSet;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +19,7 @@ public class CassandraConnectorTest {
     public void connect() {
         cassandra = new CassandraConnector();
         cassandra.connect();
+        cassandra.initializeKeySpace();
     }
 
     @After
@@ -31,15 +27,9 @@ public class CassandraConnectorTest {
         cassandra.close();
     }
 
-    private JSONObject loadConfigFile() throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
-        JSONObject configJSON = (JSONObject) parser.parse(new FileReader(getClass().getClassLoader().getResource("config.development.json").getFile()));
-        return configJSON;
-    }
-
     @Test
-    public void whenCreatingAKeyspace_thenCreated() throws IOException, ParseException {
-        String keyspaceName = (String) loadConfigFile().get("KEYSPACE_NAME");
+    public void whenCreatingKeyspace_thenCreated() {
+        String keyspaceName = cassandra.getKeyspaceName();
 
         ResultSet result =
                 cassandra.runQuery("SELECT * FROM system_schema.keyspaces;");
