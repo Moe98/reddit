@@ -55,8 +55,7 @@ public class DirectChatTable {
 
         List<Row> all1 = queryResult1.all();
         List<Row> all2 = queryResult2.all();
-        boolean flag1 = false;
-        boolean flag2 = false;
+
         if (!((all1 == null || all1.size() == 0) && (all2 == null || all2.size() == 0)))
             throw new InvalidInputException("Chat already exist between Users");
         mapper.save(new DirectChat(chatId, first_member, second_member));
