@@ -10,6 +10,8 @@ import com.arangodb.mapping.ArangoJack;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.Map;
+
 @SuppressWarnings("unused")
 public class Arango {
     private static Arango instance = null;
@@ -150,6 +152,14 @@ public class Arango {
     public void dropView(ArangoDB arangoDB, String dbName, String viewName) throws ArangoDBException {
         try {
             arangoDB.db(dbName).view(viewName).drop();
+        } catch (ArangoDBException e) {
+            throw new ArangoDBException(e);
+        }
+    }
+
+    public ArangoCursor<BaseDocument> query(ArangoDB arangoDB, String dbName, String query, Map<String, Object> bindVars) throws ArangoDBException {
+        try {
+            return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
         } catch (ArangoDBException e) {
             throw new ArangoDBException(e);
         }

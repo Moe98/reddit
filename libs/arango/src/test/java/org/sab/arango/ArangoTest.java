@@ -1,5 +1,6 @@
 package org.sab.arango;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
@@ -159,6 +160,18 @@ public class ArangoTest {
             assertTrue(arangoDB.db(dbName).view("DropViewTest").exists());
             arango.dropView(arangoDB, dbName, "DropViewTest");
             assertFalse(arangoDB.db(dbName).view("DropViewTest").exists());
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void query() {
+        try {
+            ArangoCursor<?> cursor = arango.query(arangoDB, dbName, "RETURN { number: 1 }", null);
+            assertTrue(cursor.hasNext());
+            cursor.next();
+            assertFalse(cursor.hasNext());
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
