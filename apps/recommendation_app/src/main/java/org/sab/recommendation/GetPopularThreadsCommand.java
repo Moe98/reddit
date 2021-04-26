@@ -1,25 +1,23 @@
 package org.sab.recommendation;
 
-import com.arangodb.ArangoDB;
-import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.kv.GetResult;
+import org.sab.couchbase.Couchbase;
+import org.sab.models.Thread;
 
 public class GetPopularThreadsCommand {
-    private static ArangoDB arangoDB;
+    private Couchbase couchbase;
     private Cluster cluster;
 
     public void execute() {
         try {
-            cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
+            couchbase = Couchbase.getInstance();
+            cluster = couchbase.connect();
 
-            Collection recommendedThreadsCollection = cluster.bucket("Listings").defaultCollection();
-            GetResult getResult = recommendedThreadsCollection.get("popThreads");
-            JsonArray resultThreads = getResult.contentAsArray();
+            JsonObject result = couchbase.getDocument(cluster, "Listings", "popThreads");
+            JsonArray resultThreads = result.getArray("listOfThreads");
 
             Thread thread = new Thread();
             for(int i = 0; i<resultThreads.size(); i++) {
@@ -33,10 +31,8 @@ public class GetPopularThreadsCommand {
             }
         } catch (DocumentNotFoundException ex) {
             System.err.println("Document with the given key not found");
-        } catch (CouchbaseException ex) {
-            ex.printStackTrace();
         } finally {
-            cluster.disconnect();
+            couchbase.disconnect(cluster);
         }
     }
 

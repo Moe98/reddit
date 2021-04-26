@@ -1,26 +1,27 @@
 package org.sab.recommendation;
 
-import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.kv.GetResult;
+import org.sab.couchbase.Couchbase;
+import org.sab.models.Thread;
 
 import java.util.HashMap;
 
 public class GetThreadRecommendationCommand {
     private HashMap<String, String> parameters;
+    private Couchbase couchbase;
     private Cluster cluster;
 
     public void execute() {
         try {
-            cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
+            couchbase = Couchbase.getInstance();
+            cluster = couchbase.connect();
 
-            Collection recommendedThreadsCollection = cluster.bucket("RecommendedThreads").defaultCollection();
-            GetResult getResult = recommendedThreadsCollection.get(parameters.get("username"));
-            JsonArray resultThreads = getResult.contentAsArray();
+            JsonObject result = couchbase.getDocument(cluster, "RecommendedThreads", parameters.get("username"));
+            JsonArray resultThreads = result.getArray("listOfThreads");
+
 
             Thread thread = new Thread();
             for(int i = 0; i<resultThreads.size(); i++) {
@@ -34,10 +35,8 @@ public class GetThreadRecommendationCommand {
             }
         } catch (DocumentNotFoundException ex) {
             System.err.println("Document with the given username not found");
-        } catch (CouchbaseException ex) {
-            ex.printStackTrace();
         } finally {
-            cluster.disconnect();
+            couchbase.disconnect(cluster);
         }
     }
 

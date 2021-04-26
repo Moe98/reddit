@@ -1,11 +1,11 @@
-package org.sab.recommendation;
+package org.sab.search;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
-import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
-import com.arangodb.mapping.ArangoJack;
+import org.sab.arango.Arango;
+import org.sab.models.Thread;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,16 +13,20 @@ import java.util.Map;
 
 public class SearchThreadCommand {
     protected HashMap<String, String> parameters;
-    private static ArangoDB arangoDB;
+    private Arango arango;
+    private ArangoDB arangoDB;
 
     public void execute() {
         try {
-            arangoDB = new ArangoDB.Builder().user(System.getenv("ARANGO_USER")).password(System.getenv("ARANGO_PASSWORD")).serializer(new ArangoJack()).build();
-            ArangoDatabase db = arangoDB.db(System.getenv("ARANGO_DB"));
+            arango = Arango.getInstance();
+            arangoDB = arango.connect();
 
-            String query = "for result in ThreadsView search phrase(result.Description, @words, \"text_en\") return result";
+            String query = "" +
+                    "FOR result IN ThreadsView\n" +
+                    "    SEARCH PHRASE(result.Description, @words, \"text_en\")\n" +
+                    "    RETURN result";
             Map<String, Object> bindVars = Collections.singletonMap("words", parameters.get("searchText"));
-            ArangoCursor<BaseDocument> cursor = db.query(query, bindVars, null, BaseDocument.class);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
             Thread thread = new Thread();
             if(cursor.hasNext()) {
@@ -40,7 +44,7 @@ public class SearchThreadCommand {
         } catch (ArangoDBException e) {
             System.err.println("Failed to execute query. " + e.getMessage());
         } finally {
-            arangoDB.shutdown();
+            arango.disconnect(arangoDB);
         }
     }
 

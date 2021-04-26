@@ -1,5 +1,6 @@
-package org.sab.recommendation;
+package org.sab.models;
 
+@SuppressWarnings("unused")
 public class Thread {
     public String name;
     public String description;
@@ -7,7 +8,7 @@ public class Thread {
     public int numOfFollowers;
     public String dateCreated;
 
-    Thread(){
+    public Thread(){
         super();
     }
 

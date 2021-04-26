@@ -3,15 +3,14 @@ package org.sab.recommendation;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
-import com.arangodb.ArangoDatabase;
 import com.arangodb.entity.BaseDocument;
-import com.arangodb.mapping.ArangoJack;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,13 +18,16 @@ import java.util.Map;
 
 public class UpdateThreadRecommendationCommand {
     public HashMap<String, String> parameters;
-    private static ArangoDB arangoDB;
+    private Arango arango;
+    private ArangoDB arangoDB;
+    private Couchbase couchbase;
     private Cluster cluster;
 
     public void execute() {
+        JsonArray threads = JsonArray.create();
         try {
-            arangoDB = new ArangoDB.Builder().user(System.getenv("ARANGO_USER")).password(System.getenv("ARANGO_PASSWORD")).serializer(new ArangoJack()).build();
-            ArangoDatabase db = arangoDB.db(System.getenv("ARANGO_DB"));
+            arango = Arango.getInstance();
+            arangoDB = arango.connect();
 
             parameters.put("username", "Users/" + parameters.get("username"));
             String query = "LET followed = (\n" +
@@ -65,9 +67,8 @@ public class UpdateThreadRecommendationCommand {
                     "FOR thread IN SLICE(APPEND(uniqueRecommendations, fill), 0, 25)\n" +
                     "    RETURN thread";
             Map<String, Object> bindVars = Collections.singletonMap("username", parameters.get("username"));
-            ArangoCursor<BaseDocument> cursor = db.query(query, bindVars, null, BaseDocument.class);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
-            JsonArray threads = JsonArray.create();
             if(cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
                     JsonObject thread = JsonObject.create();
@@ -78,27 +79,29 @@ public class UpdateThreadRecommendationCommand {
                     thread.put("dateCreated", (String) document.getProperties().get("DateCreated"));
                     threads.add(thread);
                 });
-
-                try {
-                    cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
-
-                    Collection recommendedThreadsCollection = cluster.bucket("RecommendedThreads").defaultCollection();
-                    recommendedThreadsCollection.upsert(parameters.get("username").split("/")[1], threads);
-                } catch (DocumentNotFoundException ex) {
-                    System.err.println("Document with the given username not found");
-                } catch (CouchbaseException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    cluster.disconnect();
-                }
             }
             else
                 System.out.println("No results found");
-
         } catch(ArangoDBException e) {
             System.err.println(e.getMessage());
         } finally {
-            arangoDB.shutdown();
+            arango.disconnect(arangoDB);
+        }
+
+        if(threads.size() != 0) {
+            try {
+                couchbase = Couchbase.getInstance();
+                cluster = couchbase.connect();
+
+                JsonObject object = JsonObject.create().put("listOfThreads", threads);
+                couchbase.upsertDocument(cluster, "RecommendedThreads", parameters.get("username").split("/")[1], object);
+            } catch (DocumentNotFoundException ex) {
+                System.err.println("Document with the given username not found");
+            } catch (CouchbaseException ex) {
+                ex.printStackTrace();
+            } finally {
+                couchbase.disconnect(cluster);
+            }
         }
     }
 
