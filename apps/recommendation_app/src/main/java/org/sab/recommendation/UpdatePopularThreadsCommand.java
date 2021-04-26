@@ -55,6 +55,10 @@ public class UpdatePopularThreadsCommand {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
+                if(!cluster.buckets().getAllBuckets().containsKey("Listings")){
+                    couchbase.createBucket(cluster, "Listings", 100);
+                }
+
                 JsonObject object = JsonObject.create().put("listOfThreads", threads);
                 couchbase.upsertDocument(cluster, "Listings", "popThreads", object);
             } catch (DocumentNotFoundException ex) {

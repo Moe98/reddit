@@ -93,6 +93,10 @@ public class UpdateThreadRecommendationCommand {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
+                if(!cluster.buckets().getAllBuckets().containsKey("RecommendedThreads")){
+                    couchbase.createBucket(cluster, "RecommendedThreads", 100);
+                }
+
                 JsonObject object = JsonObject.create().put("listOfThreads", threads);
                 couchbase.upsertDocument(cluster, "RecommendedThreads", parameters.get("username").split("/")[1], object);
             } catch (DocumentNotFoundException ex) {

@@ -21,6 +21,10 @@ public class SearchThreadCommand {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
+            if(!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()){
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"Description"});
+            }
+
             String query = "" +
                     "FOR result IN ThreadsView\n" +
                     "    SEARCH PHRASE(result.Description, @words, \"text_en\")\n" +
