@@ -47,7 +47,7 @@ public class ArangoTest {
         try {
             arango.dropCollection(arangoDB, dbName, collectionName);
             assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
-            arango.dropDatabase(arangoDB, dbName);
+            assertTrue(arango.dropDatabase(arangoDB, dbName));
             arango.disconnect(arangoDB);
         } catch (ArangoDBException e) {
             fail(e.getMessage());
@@ -122,7 +122,7 @@ public class ArangoTest {
             arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
             baseDocument.updateAttribute("string_field", "updated");
             BaseDocument updated = arango.updateDocument(arangoDB, dbName, collectionName, baseDocument, "update");
-            assertTrue(updated.getProperties().get("string_field").equals("updated"));
+            assertEquals("updated", updated.getProperties().get("string_field"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -137,6 +137,28 @@ public class ArangoTest {
             arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
             assertTrue(arango.deleteDocument(arangoDB, dbName, collectionName, "delete"));
             assertEquals(arangoDB.db(dbName).collection(collectionName).count().getCount().intValue(), currentDocsNum);
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void createView() {
+        try {
+            assertNotNull(arango.createView(arangoDB, dbName, "CreateViewTest", collectionName, new String[] {"string_field"}));
+            assertTrue(arangoDB.db(dbName).view("CreateViewTest").exists());
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void dropView() {
+        try {
+            assertNotNull(arango.createView(arangoDB, dbName, "DropViewTest", collectionName, new String[] {"string_field"}));
+            assertTrue(arangoDB.db(dbName).view("DropViewTest").exists());
+            arango.dropView(arangoDB, dbName, "DropViewTest");
+            assertFalse(arangoDB.db(dbName).view("DropViewTest").exists());
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }

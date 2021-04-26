@@ -3,7 +3,11 @@ package org.sab.arango;
 import com.arangodb.*;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.CollectionEntity;
+import com.arangodb.entity.ViewEntity;
+import com.arangodb.entity.arangosearch.CollectionLink;
+import com.arangodb.entity.arangosearch.FieldLink;
 import com.arangodb.mapping.ArangoJack;
+import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @SuppressWarnings("unused")
@@ -120,6 +124,36 @@ public class Arango {
     public ObjectNode readDocumentAsJSON(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) throws ArangoDBException{
         try {
             return arangoDB.db(dbName).collection(collectionName).getDocument(documentKey, ObjectNode.class);
+        } catch (ArangoDBException e) {
+            throw new ArangoDBException(e);
+        }
+    }
+
+    public ViewEntity createView(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) throws ArangoDBException{
+        try {
+            ArangoSearchCreateOptions options = new ArangoSearchCreateOptions();
+
+            FieldLink[] fieldLinks = new FieldLink[fields.length];
+            for (int i = 0 ; i < fields.length; i++) {
+                FieldLink fieldLink = FieldLink.on(fields[i]);
+                fieldLink.analyzers("text_en");
+                fieldLinks[i] = fieldLink;
+            }
+
+            CollectionLink collectionLink = CollectionLink.on(collectionName);
+            collectionLink.includeAllFields(true);
+            collectionLink.fields(fieldLinks);
+
+            options.link(collectionLink);
+            return arangoDB.db(dbName).createArangoSearch(viewName, options);
+        } catch (ArangoDBException e) {
+            throw new ArangoDBException(e);
+        }
+    }
+
+    public void dropView(ArangoDB arangoDB, String dbName, String viewName) throws ArangoDBException {
+        try {
+            arangoDB.db(dbName).view(viewName).drop();
         } catch (ArangoDBException e) {
             throw new ArangoDBException(e);
         }
