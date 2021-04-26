@@ -37,12 +37,8 @@ public class Arango {
         return instance;
     }
 
-    public ArangoDB connect() throws  ArangoDBException {
-        try {
-            return builder.build();
-        } catch (ArangoDBException e){
-            throw new ArangoDBException(e);
-        }
+    public ArangoDB connect() {
+        return builder.build();
     }
 
     public void disconnect(ArangoDB arangoDB) throws  ArangoDBException {
