@@ -1,6 +1,13 @@
 package org.sab.chat.storage.tables;
 
+import com.datastax.driver.mapping.Mapper;
 import org.sab.chat.storage.config.CassandraConnector;
+import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.GroupChat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class DirectMessageTable {
 
@@ -22,4 +29,5 @@ public class DirectMessageTable {
                 ") WITH CLUSTERING ORDER BY (message_id DESC);";
         cassandra.runQuery(query);
     }
+
 };
