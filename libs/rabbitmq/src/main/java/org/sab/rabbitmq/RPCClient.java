@@ -1,31 +1,25 @@
 package org.sab.rabbitmq;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
 
-public class RPCClient implements AutoCloseable {
+import com.rabbitmq.client.CancelCallback;
+import com.rabbitmq.client.DeliverCallback;
 
-    private static Connection connection;
-    private Channel channel;
+public class RPCClient extends RPCBase implements AutoCloseable {
+
     private static RPCClient instance = null;
 
     // creating a connection with RabbitMQ
-    private RPCClient() throws IOException, TimeoutException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        connection = factory.newConnection();
+    private RPCClient() throws IOException, TimeoutException { 
+        super();
     }
 
-    // creating a singleton of the RPCClient
     public static RPCClient getInstance() throws IOException, TimeoutException {
         if (instance == null) {
             instance = new RPCClient();
@@ -35,58 +29,66 @@ public class RPCClient implements AutoCloseable {
         return instance;
     }
 
-    // adding a channel to the connection
-    private void addChannel() throws IOException {
-        channel = connection.createChannel();
-    }
-
-    // sending the message to the request queue and receiving the response from the respond queue
-    public String call(String message, String reqQueueName, String replyQueueName) throws IOException, InterruptedException {
-        // creating a unique identifier for each request put in the request queue
+    
+    // Send |message| to |requestQueue| and receive the response from 
+    // |replyQueue|.
+    public String call(String message, String requestQueue, String replyToQueue)
+            throws IOException, InterruptedException {
+        // Create a unique identifier for the request being placed in 
+        // |requestQueue|.
         final String corrId = UUID.randomUUID().toString();
+        
+        final boolean durable = false;
+        final boolean exclusive = false;
+        final boolean autoDelete = false;
+        final Map<String, Object> arguments = null;
+        
+        // Initialize the request queue.
+        String declaredRequestQueue = declareQueue(requestQueue, durable, exclusive, autoDelete, arguments);
+        // Initialize the response queue.
+        String declaredReplyToQueue = declareQueue(replyToQueue, durable, exclusive, autoDelete, arguments);
+        
+        sendRequest(corrId, message, declaredRequestQueue, declaredReplyToQueue);
 
-        // initializing the request queue
-        String resQueueName = channel.queueDeclare(reqQueueName, false, false, false, null).getQueue();
-        // initializing the response queue
-        String replyQueue = channel.queueDeclare(replyQueueName, false, false, false, null).getQueue();
-
-        // adding the corrID of the request
-        // adding the name of the response queue that the client server will listen for a response on
-        AMQP.BasicProperties props = new AMQP.BasicProperties
-                .Builder()
-                .correlationId(corrId)
-                .replyTo(replyQueue)
-                .build();
-
-        // sending the request message in the request queue with it's properties
-        channel.basicPublish("", resQueueName, props, message.getBytes(StandardCharsets.UTF_8));
-
-        // creating a blocking queue to put the expected response in
+        return awaitResponse(corrId, declaredReplyToQueue);
+    }
+    
+    private String awaitResponse(String corrId, String targetQueue) throws IOException, InterruptedException {
+        // Create a blocking queue to put the expected response in.
         final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);
-
-        // listening on the expected response queue
-        // with a callback that checks that the response queue received a response message with corrID equal to request corrID
-        // and putting the response message in the blocking queue response
-        String cTag = channel.basicConsume(replyQueueName, /*isAutoAck=*/ true, (consumerTag, delivery) -> {
+    
+    
+        final boolean isAutoAck = true;
+    
+        final DeliverCallback onReception = (consumerTag, delivery) -> {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 response.offer(new String(delivery.getBody(), StandardCharsets.UTF_8));
             }
-        }, consumerTag -> {
-        });
-
-        // attempting to retrieve the response from the blocked queue
-        // if response not yet present, block the RPCClient until the callback fn. above is able to retrieve the message
-        String result = response.take();
-
-        // cancelling any further consumptions from the channel
-        channel.basicCancel(cTag);
-
-        // returning the response message
+        };
+    
+        final CancelCallback onCancellation = consumerTag -> {};
+        
+        // Listen on the expected response queue, |targetQueue|, with the
+        // callback function |onReception|, which checks that the response
+        // queue received a response message with a correlation id of |corrId|.
+        // If that is the case, put the response message in the blocking queue
+        // response.
+        final String channelTag = channel.basicConsume(targetQueue, isAutoAck, onReception, onCancellation);
+    
+        // Attempts to retrieve the response from the blocked queue, if the 
+        // response is not yet present, block the RPCClient until the callback
+        // function, |onReception|, is able to retrieve the message.
+        final String result = response.take();
+        
+        // Cancel any further consumptions from the channel.
+        channel.basicCancel(channelTag);
+    
         return result;
     }
 
-    // closing the connection with RabbitMQ
+    // Close the connection with RabbitMQ.
     public void close() throws IOException {
         connection.close();
     }
+
 }

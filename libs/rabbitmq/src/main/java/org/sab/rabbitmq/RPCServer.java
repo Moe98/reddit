@@ -1,21 +1,14 @@
 package org.sab.rabbitmq;
 
-import com.rabbitmq.client.*;
-
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class RPCServer {
-
-    private static Connection connection;
-    private Channel channel;
+public class RPCServer extends RPCBase {
     private static RPCServer instance = null;
 
     // creating a connection with RabbitMQ
     private RPCServer() throws IOException, TimeoutException {
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        connection = factory.newConnection();
+        super();
     }
 
     // creating a singleton of the RPCServer
@@ -29,22 +22,9 @@ public class RPCServer {
         return instance;
     }
 
-    // adding a channel to the connection, along with it's listener
-    private void addChannel() {
-        try {
-            // creating a channel
-            channel = connection.createChannel();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
+    // TODO replace with method in super class
     private void addQueue(String queueName) throws IOException {
-        // initializing the queue which the RCPServer is constantly listening to
+        // Initialize the queue which the RPCServer will be listening to.
         channel.queueDeclare(queueName, false, false, false, null);
     }
 
