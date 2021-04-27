@@ -1,14 +1,22 @@
 package org.sab.chat.storage.tables;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.TimestampGenerator;
+import com.datastax.driver.core.TypeCodec;
+import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
+import org.apache.cassandra.db.marshal.TimestampType;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupChat;
+import org.sab.chat.storage.models.GroupMessage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.*;
 
 public class GroupChatTable {
 
@@ -25,6 +33,7 @@ public class GroupChatTable {
         this.mapper = manager.mapper(GroupChat.class);
     }
 
+
     public void createTable() {
         String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 "chat_id uuid, " +
@@ -40,24 +49,64 @@ public class GroupChatTable {
     public UUID createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
         UUID chatId = UUID.randomUUID();
 
-        if(name == null || name.length() == 0)
+        if (name == null || name.length() == 0)
             throw new InvalidInputException("Group name cannot be empty or null.");
-        if(description == null)
+        if (description == null)
             throw new InvalidInputException("Group name cannot be null.");
 
         try {
-           UUID.fromString(creator.toString());
-        } catch (IllegalArgumentException e){
+            UUID.fromString(creator.toString());
+        } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid Admin UUID.");
         }
 
         List<UUID> membersList = new ArrayList<>();
         membersList.add(creator);
-        mapper.save(new GroupChat(chatId, name, description, membersList, creator));
+        Date date = new Date();
+        mapper.save(new GroupChat(chatId, name, description, membersList, creator, new Timestamp(date.getTime())));
         return chatId;
+    }
+
+    public UUID addGroupMember(UUID chat_id, UUID admin, UUID user) throws InvalidInputException {
+        try {
+            UUID.fromString(chat_id.toString());
+            UUID.fromString(admin.toString());
+            UUID.fromString(user.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid UUID.");
+        }
+        String query = "SELECT * FROM " + "group_chats" +
+                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+
+        ResultSet queryResult = cassandra.runQuery(query);
+        List<Row> all = queryResult.all();
+
+        if (((all == null || all.size() == 0))) {
+            throw new InvalidInputException("Chat does not exist");
+        }
+
+        String query1 = "SELECT * FROM " + "group_chats" +
+                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+        ResultSet query1Result = cassandra.runQuery(query1);
+        List<Row> all1 = query1Result.all();
+        if (((all1 == null || all1.size() == 0))) {
+            throw new InvalidInputException("Not the admin to add members");
+        }
+
+        String name = all1.get(0).get(5, String.class);
+        String description = all1.get(0).get(3, String.class);
+        List<UUID> members = all1.get(0).getList(4, UUID.class);
+        Date date_created = all1.get(0).getTimestamp(2);
+
+        members.add(user);
+
+        mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+
+        return user;
     }
 
     public Mapper<GroupChat> getMapper() {
         return mapper;
     }
 }
+

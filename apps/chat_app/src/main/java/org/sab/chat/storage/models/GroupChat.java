@@ -3,6 +3,7 @@ package org.sab.chat.storage.models;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -20,14 +21,13 @@ public class GroupChat {
 
     public GroupChat() {
     }
-
-    public GroupChat(UUID chat_id, String name, String description, List<UUID> members, UUID admin) {
+    public GroupChat(UUID chat_id, String name, String description, List<UUID> members, UUID admin,Date date_created) {
         this.chat_id = chat_id;
         this.name = name;
         this.description = description;
         this.members = members;
         this.admin = admin;
-        this.date_created = new Date();
+        this.date_created = date_created;
     }
 
     public UUID getChat_id() {
