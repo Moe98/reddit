@@ -25,6 +25,9 @@ public final class Server {
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
     public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
 
+    public static EventLoopGroup bossGroup;
+    public static EventLoopGroup workerGroup;
+    
     public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
         final SslContext sslCtx;
@@ -36,8 +39,8 @@ public final class Server {
         }
 
         // Configure the server.
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
@@ -48,13 +51,17 @@ public final class Server {
 
             Channel ch = b.bind(PORT).sync().channel();
 
-            System.err.println("Open your web browser and navigate to " +
+            System.out.println("Open your web browser and navigate to " +
                     (SSL ? "https" : "http") + "://127.0.0.1:" + PORT + '/');
 
             ch.closeFuture().sync();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            shutdownGracefully();
         }
+    }
+
+    public static void shutdownGracefully() {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 }
