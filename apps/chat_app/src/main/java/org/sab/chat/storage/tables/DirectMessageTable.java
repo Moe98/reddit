@@ -2,15 +2,14 @@ package org.sab.chat.storage.tables;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.datastax.driver.core.UserType;
+
 import com.datastax.driver.core.utils.UUIDs;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
-import org.sab.chat.storage.models.DirectChat;
+
 import org.sab.chat.storage.models.DirectMessage;
-import org.sab.chat.storage.models.GroupChat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,12 @@ public class DirectMessageTable {
             throw new InvalidInputException("Invalid chat UUID.");
         }
 
-
+        String query0 = "SELECT * FROM " + "direct_chats" +
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+        ResultSet queryResult0 = cassandra.runQuery(query0);
+        List<Row> all0 = queryResult0.all();
+        if (all0 == null || all0.size() == 0)
+            throw new InvalidInputException("There is no chat between users");
 
         String query1 = "SELECT * FROM " + "direct_chats" +
                 " WHERE chat_id = " + chat_id + "AND first_member = " + sender_id + " ALLOW FILTERING;";
@@ -74,10 +78,49 @@ public class DirectMessageTable {
         List<Row> all2 = queryResult2.all();
 
         if (((all1 == null || all1.size() == 0) && (all2 == null || all2.size() == 0)))
-            throw new InvalidInputException("There is no chat between users");
+            throw new InvalidInputException("Not a chat member");
         mapper.save(new DirectMessage(chat_id, message_id, sender_id, content));
 
         return message_id;
+    }
+
+    public List<String> getDirectMessages(UUID chat_id, UUID user) throws InvalidInputException {
+        try {
+            UUID.fromString(user.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid user UUID.");
+        }
+
+        try {
+            UUID.fromString(chat_id.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid chat UUID.");
+        }
+        String query0 = "SELECT * FROM " + "direct_chats" +
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+        ResultSet queryResult0 = cassandra.runQuery(query0);
+        List<Row> all0 = queryResult0.all();
+        if (((all0 == null || all0.size() == 0))) {
+            throw new InvalidInputException("Chat does not exist");
+        }
+        UUID first_member = all0.get(0).get(1, UUID.class);
+        UUID second_member = all0.get(0).get(2, UUID.class);
+        if (!first_member.toString().equals(user.toString()) && !second_member.toString().equals(user.toString()))
+            throw new InvalidInputException("Not a chat member");
+
+        String query1 = "SELECT content FROM " + "direct_messages" +
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+
+        ResultSet queryResult1 = cassandra.runQuery(query1);
+        List<Row> all1 = queryResult1.all();
+
+        List<String> messages = new ArrayList<>();
+        for (int i = 0; i < all1.size(); i++) {
+            messages.add(all1.get(i).get(0, String.class));
+        }
+
+        return messages;
+
     }
 
     public Mapper<DirectMessage> getMapper() {

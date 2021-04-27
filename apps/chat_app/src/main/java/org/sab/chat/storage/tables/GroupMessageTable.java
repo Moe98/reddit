@@ -78,7 +78,7 @@ public class GroupMessageTable {
 
     }
 
-    public List<String> getGroupMessage(UUID chat_id, UUID user) throws InvalidInputException {
+    public List<String> getGroupMessages(UUID chat_id, UUID user) throws InvalidInputException {
         try {
             UUID.fromString(user.toString());
         } catch (IllegalArgumentException e) {
