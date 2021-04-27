@@ -76,7 +76,7 @@ public class GroupChatTable {
             throw new InvalidInputException("Invalid UUID.");
         }
         String query = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query);
         List<Row> all = queryResult.all();
@@ -105,6 +105,47 @@ public class GroupChatTable {
         return user;
     }
 
+    public UUID removeGroupMember(UUID chat_id, UUID admin, UUID user) throws InvalidInputException {
+        try {
+            UUID.fromString(chat_id.toString());
+            UUID.fromString(admin.toString());
+            UUID.fromString(user.toString());
+
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid UUID.");
+        }
+        String query = "SELECT * FROM " + "group_chats" +
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+
+        ResultSet queryResult = cassandra.runQuery(query);
+        List<Row> all = queryResult.all();
+
+        if (((all == null || all.size() == 0))) {
+            throw new InvalidInputException("Chat does not exist");
+        }
+
+        String query1 = "SELECT * FROM " + "group_chats" +
+                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+        ResultSet query1Result = cassandra.runQuery(query1);
+        List<Row> all1 = query1Result.all();
+        if (((all1 == null || all1.size() == 0))) {
+            throw new InvalidInputException("Not the admin to add members");
+        }
+
+        String name = all1.get(0).get(5, String.class);
+        String description = all1.get(0).get(3, String.class);
+        List<UUID> members = all1.get(0).getList(4, UUID.class);
+        Date date_created = all1.get(0).getTimestamp(2);
+
+
+        if(!members.contains(user)){
+            throw new InvalidInputException("Member not in group");
+        }
+        members.remove(user);
+        mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+
+        return user;
+    }
     public Mapper<GroupChat> getMapper() {
         return mapper;
     }
