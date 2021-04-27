@@ -42,6 +42,7 @@ public class RabbitTest {
             Connection connection = factory.newConnection();
             Channel channel = connection.createChannel();
             factory.setHost("localhost");
+            channel.queueDeclare(queueName, false, false, false, null).getQueue();
             DeliverCallback deliverCallback = (consumerTag, delivery) -> {
                 try {
                     receivedMessage = new String(delivery.getBody(), StandardCharsets.UTF_8);
