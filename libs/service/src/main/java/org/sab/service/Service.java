@@ -111,14 +111,6 @@ public abstract class Service {
         // callback responsible for invoking the required method of the command class
         Callable<String> callable = () -> {
             try {
-                // TODO 1st option
-                //  Do we need to invoke call here?
-//                    commandClass.getMethod("setRequest",  req.getClass()).invoke(commandInstance, req);
-//                    FutureTask f1 = (FutureTask) executor.submit(callable);
-//                    String res = (String) commandClass.getMethod("call").invoke(commandInstance);
-//                    System.out.println("Call returned: " + res);
-//                    return res;
-                // TODO 2nd option (invoking execute directly)
                 return (String) commandClass.getMethod("execute", req.getClass()).invoke(commandInstance, req);
             } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
