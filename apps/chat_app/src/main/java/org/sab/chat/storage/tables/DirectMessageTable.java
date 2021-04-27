@@ -54,9 +54,9 @@ public class DirectMessageTable {
         }
 
         try {
-            UUID.fromString(message_id.toString());
+            UUID.fromString(chat_id.toString());
         } catch (IllegalArgumentException e) {
-            throw new InvalidInputException("Invalid message UUID.");
+            throw new InvalidInputException("Invalid chat UUID.");
         }
 
 
