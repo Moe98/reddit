@@ -58,17 +58,17 @@ public class GroupMessageTable {
         }
 
 
-        String query = "SELECT members FROM " + "group_chats" +
+        String query1 = "SELECT members FROM " + "group_chats" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
-        ResultSet queryResult = cassandra.runQuery(query);
-        List<Row> all = queryResult.all();
-        if (((all == null || all.size() == 0))) {
+        ResultSet queryResult = cassandra.runQuery(query1);
+        List<Row> query1Rows = queryResult.all();
+        if (((query1Rows == null || query1Rows.size() == 0))) {
             throw new InvalidInputException("Invalid chat id");
         }
 
         boolean found = false;
-        List<UUID> ls = all.get(0).getList(0, UUID.class);
+        List<UUID> ls = query1Rows.get(0).getList(0, UUID.class);
         if (!ls.contains(sender_id))
             throw new InvalidInputException("Not a chat member");
 
@@ -93,11 +93,11 @@ public class GroupMessageTable {
         String query0 = "SELECT * FROM " + "group_chats" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
         ResultSet queryResult0 = cassandra.runQuery(query0);
-        List<Row> all0 = queryResult0.all();
-        if (((all0 == null || all0.size() == 0))) {
+        List<Row> query0Rows = queryResult0.all();
+        if (((query0Rows == null || query0Rows.size() == 0))) {
             throw new InvalidInputException("Chat does not exist");
         }
-        List<UUID> members = all0.get(0).getList(4, UUID.class);
+        List<UUID> members = query0Rows.get(0).getList(4, UUID.class);
         if (!members.contains(user))
             throw new InvalidInputException("Not a chat member");
 
@@ -105,11 +105,11 @@ public class GroupMessageTable {
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet queryResult1 = cassandra.runQuery(query1);
-        List<Row> all1 = queryResult1.all();
+        List<Row> query1Rows = queryResult1.all();
 
         List<String> messages = new ArrayList<>();
-        for (int i = 0; i < all1.size(); i++) {
-            messages.add(all1.get(i).get(0, String.class));
+        for (int i = 0; i < query1Rows.size(); i++) {
+            messages.add(query1Rows.get(i).get(0, String.class));
         }
 
         return messages;

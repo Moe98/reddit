@@ -70,28 +70,28 @@ public class GroupChatTable {
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid UUID.");
         }
-        String query = "SELECT * FROM " + "group_chats" +
+        String query1 = "SELECT * FROM " + "group_chats" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
-        ResultSet queryResult = cassandra.runQuery(query);
-        List<Row> all = queryResult.all();
+        ResultSet queryResult = cassandra.runQuery(query1);
+        List<Row> query1Rows = queryResult.all();
 
-        if (((all == null || all.size() == 0))) {
+        if (((query1Rows == null || query1Rows.size() == 0))) {
             throw new InvalidInputException("Chat does not exist");
         }
 
-        String query1 = "SELECT * FROM " + "group_chats" +
+        String query2 = "SELECT * FROM " + "group_chats" +
                 " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
-        ResultSet query1Result = cassandra.runQuery(query1);
-        List<Row> all1 = query1Result.all();
-        if (((all1 == null || all1.size() == 0))) {
+        ResultSet query2Result = cassandra.runQuery(query2);
+        List<Row> query2Rows = query2Result.all();
+        if (((query2Rows == null || query2Rows.size() == 0))) {
             throw new InvalidInputException("Not the admin to add members");
         }
 
-        String name = all1.get(0).get(5, String.class);
-        String description = all1.get(0).get(3, String.class);
-        List<UUID> members = all1.get(0).getList(4, UUID.class);
-        Date date_created = all1.get(0).getTimestamp(2);
+        String name = query2Rows.get(0).get(5, String.class);
+        String description = query2Rows.get(0).get(3, String.class);
+        List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
+        Date date_created = query2Rows.get(0).getTimestamp(2);
 
         members.add(user);
 
@@ -113,24 +113,24 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query);
-        List<Row> all = queryResult.all();
+        List<Row> query1Rows = queryResult.all();
 
-        if (((all == null || all.size() == 0))) {
+        if (((query1Rows == null || query1Rows.size() == 0))) {
             throw new InvalidInputException("Chat does not exist");
         }
 
         String query1 = "SELECT * FROM " + "group_chats" +
                 " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
         ResultSet query1Result = cassandra.runQuery(query1);
-        List<Row> all1 = query1Result.all();
-        if (((all1 == null || all1.size() == 0))) {
+        List<Row> query2Rows = query1Result.all();
+        if (((query2Rows == null || query2Rows.size() == 0))) {
             throw new InvalidInputException("Not the admin to add members");
         }
 
-        String name = all1.get(0).get(5, String.class);
-        String description = all1.get(0).get(3, String.class);
-        List<UUID> members = all1.get(0).getList(4, UUID.class);
-        Date date_created = all1.get(0).getTimestamp(2);
+        String name = query2Rows.get(0).get(5, String.class);
+        String description = query2Rows.get(0).get(3, String.class);
+        List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
+        Date date_created = query2Rows.get(0).getTimestamp(2);
 
 
         if (!members.contains(user)) {

@@ -61,8 +61,8 @@ public class DirectMessageTable {
         String query0 = "SELECT * FROM " + "direct_chats" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
         ResultSet queryResult0 = cassandra.runQuery(query0);
-        List<Row> all0 = queryResult0.all();
-        if (all0 == null || all0.size() == 0)
+        List<Row> query0Rows = queryResult0.all();
+        if (query0Rows == null || query0Rows.size() == 0)
             throw new InvalidInputException("There is no chat between users");
 
         String query1 = "SELECT * FROM " + "direct_chats" +
@@ -74,10 +74,10 @@ public class DirectMessageTable {
         ResultSet queryResult2 = cassandra.runQuery(query2);
 
 
-        List<Row> all1 = queryResult1.all();
-        List<Row> all2 = queryResult2.all();
+        List<Row> query1Rows = queryResult1.all();
+        List<Row> query2Rows = queryResult2.all();
 
-        if (((all1 == null || all1.size() == 0) && (all2 == null || all2.size() == 0)))
+        if (((query1Rows == null || query1Rows.size() == 0) && (query2Rows == null || query2Rows.size() == 0)))
             throw new InvalidInputException("Not a chat member");
         mapper.save(new DirectMessage(chat_id, message_id, sender_id, content));
 
@@ -99,12 +99,12 @@ public class DirectMessageTable {
         String query0 = "SELECT * FROM " + "direct_chats" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
         ResultSet queryResult0 = cassandra.runQuery(query0);
-        List<Row> all0 = queryResult0.all();
-        if (((all0 == null || all0.size() == 0))) {
+        List<Row> query0Rows = queryResult0.all();
+        if (((query0Rows == null || query0Rows.size() == 0))) {
             throw new InvalidInputException("Chat does not exist");
         }
-        UUID first_member = all0.get(0).get(1, UUID.class);
-        UUID second_member = all0.get(0).get(2, UUID.class);
+        UUID first_member = query0Rows.get(0).get(1, UUID.class);
+        UUID second_member = query0Rows.get(0).get(2, UUID.class);
         if (!first_member.toString().equals(user.toString()) && !second_member.toString().equals(user.toString()))
             throw new InvalidInputException("Not a chat member");
 
@@ -112,11 +112,11 @@ public class DirectMessageTable {
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet queryResult1 = cassandra.runQuery(query1);
-        List<Row> all1 = queryResult1.all();
+        List<Row> query1Rows = queryResult1.all();
 
         List<String> messages = new ArrayList<>();
-        for (int i = 0; i < all1.size(); i++) {
-            messages.add(all1.get(i).get(0, String.class));
+        for (int i = 0; i < query1Rows.size(); i++) {
+            messages.add(query1Rows.get(i).get(0, String.class));
         }
 
         return messages;

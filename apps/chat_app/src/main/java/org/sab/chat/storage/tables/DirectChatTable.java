@@ -53,10 +53,10 @@ public class DirectChatTable {
         ResultSet queryResult2 = cassandra.runQuery(query2);
 
 
-        List<Row> all1 = queryResult1.all();
-        List<Row> all2 = queryResult2.all();
+        List<Row> query1Rows = queryResult1.all();
+        List<Row> query2Rows = queryResult2.all();
 
-        if (!((all1 == null || all1.size() == 0) && (all2 == null || all2.size() == 0)))
+        if (!((query1Rows == null || query1Rows.size() == 0) && (query2Rows == null || query2Rows.size() == 0)))
             throw new InvalidInputException("Chat already exist between Users");
         mapper.save(new DirectChat(chatId, first_member, second_member));
         return chatId;
