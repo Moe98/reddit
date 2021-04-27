@@ -138,7 +138,7 @@ public class GroupChatTable {
         Date date_created = all1.get(0).getTimestamp(2);
 
 
-        if(!members.contains(user)){
+        if (!members.contains(user)) {
             throw new InvalidInputException("Member not in group");
         }
         members.remove(user);
@@ -146,6 +146,45 @@ public class GroupChatTable {
 
         return user;
     }
+
+    public UUID leavesChat(UUID chat_id, UUID user) throws InvalidInputException {
+        try {
+            UUID.fromString(chat_id.toString());
+            UUID.fromString(user.toString());
+
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid UUID.");
+        }
+
+        String query = "SELECT * FROM " + "group_chats" +
+                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+
+        ResultSet queryResult = cassandra.runQuery(query);
+        List<Row> all = queryResult.all();
+
+        if (((all == null || all.size() == 0)))
+            throw new InvalidInputException("Chat does not exist");
+
+
+        String name = all.get(0).get(5, String.class);
+        List<UUID> members = all.get(0).getList(4, UUID.class);
+        String description = all.get(0).get(3, String.class);
+        Date date_created = all.get(0).getTimestamp(2);
+        UUID admin = all.get(0).get(1, UUID.class);
+
+        if (!members.contains(user) && !admin.toString().equals(user.toString())) {
+            throw new InvalidInputException("Member not in group");
+        }
+        if (members.contains(user) && admin.toString().equals(user.toString())) {
+            mapper.delete(chat_id);
+        } else if (members.contains(user)) {
+            members.remove(user);
+            mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+        }
+
+        return user;
+    }
+
     public Mapper<GroupChat> getMapper() {
         return mapper;
     }
