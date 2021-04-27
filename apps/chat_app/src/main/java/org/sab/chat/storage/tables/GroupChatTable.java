@@ -2,20 +2,15 @@ package org.sab.chat.storage.tables;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.datastax.driver.core.TimestampGenerator;
-import com.datastax.driver.core.TypeCodec;
-import com.datastax.driver.core.utils.UUIDs;
+
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
-import org.apache.cassandra.db.marshal.TimestampType;
+
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupChat;
-import org.sab.chat.storage.models.GroupMessage;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.*;
 
 public class GroupChatTable {
