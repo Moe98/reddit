@@ -168,7 +168,7 @@ public class ArangoTest {
     @Test
     public void query() {
         try {
-            ArangoCursor<?> cursor = arango.query(arangoDB, dbName, "RETURN { number: 1 }", null);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, dbName, "RETURN { number: 1 }", null);
             assertTrue(cursor.hasNext());
             cursor.next();
             assertFalse(cursor.hasNext());
