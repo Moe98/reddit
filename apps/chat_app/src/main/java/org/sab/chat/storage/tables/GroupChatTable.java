@@ -92,7 +92,9 @@ public class GroupChatTable {
         String description = query2Rows.get(0).get(3, String.class);
         List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
         Date date_created = query2Rows.get(0).getTimestamp(2);
-
+        if(members.contains(user)){
+            throw new InvalidInputException("Member already there");
+        }
         members.add(user);
 
         mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
