@@ -21,6 +21,7 @@ public class DirectChatTable {
     private Mapper<DirectChat> mapper;
 
     public DirectChatTable(CassandraConnector cassandra) {
+
         this.cassandra = cassandra;
     }
 
