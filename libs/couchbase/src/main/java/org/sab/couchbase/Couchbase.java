@@ -9,6 +9,7 @@ import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.query.QueryResult;
+import com.couchbase.client.java.query.QueryScanConsistency;
 
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
@@ -72,10 +73,14 @@ public class Couchbase {
         }
     }
 
-    public QueryResult query(Cluster cluster, String queryText){
+    public QueryResult query(Cluster cluster, String queryText) {
+        return query(cluster, queryText, false);
+    }
+
+    public QueryResult query(Cluster cluster, String queryText, boolean consistent){
         QueryResult result = null;
         try {
-            result = cluster.query(queryText, queryOptions().metrics(true));
+            result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
         } catch (CouchbaseException ex) {
             ex.printStackTrace();
         }
