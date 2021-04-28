@@ -1,0 +1,13 @@
+[
+  {
+    "name": "test",
+    "ramQuotaMB": 100,
+    "bucketType": "membase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "valueOnly",
+    "conflictResolutionType": "lww",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  }
+]
