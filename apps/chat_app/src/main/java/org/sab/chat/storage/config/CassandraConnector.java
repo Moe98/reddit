@@ -46,6 +46,9 @@ public class CassandraConnector {
         cluster = clusterBuilder.build();
 
         session = cluster.connect();
+    }
+
+    public void initializeKeySpace() {
         KeyspaceInitializer.initializeKeyspace(session, keyspaceName, replicationStrategy, replicationFactor);
     }
 
@@ -55,6 +58,10 @@ public class CassandraConnector {
 
     public Session getSession() {
         return this.session;
+    }
+
+    public String getKeyspaceName() {
+        return this.keyspaceName;
     }
 
     public void close() {
