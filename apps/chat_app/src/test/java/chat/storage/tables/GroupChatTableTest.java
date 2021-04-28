@@ -2,6 +2,7 @@ package chat.storage.tables;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
+import org.apache.cassandra.service.ClientState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,6 +90,63 @@ public class GroupChatTableTest {
 
             }
         }
+    }
+
+    @Test
+    public void whenAddingGroupMember_thenAddedCorrectly() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        UUID user = UUID.randomUUID();
+        try {
+             groupChats.addGroupMember(chat_id,admin,user);
+        } catch (InvalidInputException e) {
+            fail("Failed to add a member to the group chat: " + e.getMessage());
+        }
+
+        GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
+        List<UUID> members =  createdGroupChat.getMembers();
+        if(!members.contains(user))
+            fail("Member not added to group chat");
+
+        groupChats.getMapper().delete(chat_id);
+
+    }
+
+    @Test
+    public void whenAddingExsitingGroupMember_thenAddingFailed() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        UUID user = UUID.randomUUID();
+        try {
+            groupChats.addGroupMember(chat_id,admin,user);
+        } catch (InvalidInputException e) {
+            fail("Failed to add a member to the group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.addGroupMember(chat_id,admin,user);
+            fail("Failed to add an already existing member to the group chat");
+        } catch (InvalidInputException e) {
+
+        }
+
+
+
+        groupChats.getMapper().delete(chat_id);
+
     }
 
 }

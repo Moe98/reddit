@@ -145,7 +145,7 @@ public class DirectMessageTableTest {
     }
 
     @Test
-    public void whenGetDirectMessage_thenFailedCorrectly() {
+    public void whenGetDirectMessageWithANonMember_thenFailedCorrectly() {
 
         DirectChatTable directChat = new DirectChatTable(cassandra);
         directChat.createTable();

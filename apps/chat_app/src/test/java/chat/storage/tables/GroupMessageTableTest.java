@@ -150,7 +150,7 @@ public class GroupMessageTableTest {
     }
 
     @Test
-    public void whenGetDirectMessage_thenFailedCorrectly() {
+    public void whenGetDirectMessageWithANonMember_thenFailedCorrectly() {
 
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
