@@ -5,24 +5,22 @@ import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
 public class ArangoTest {
-    private Arango arango;
-    private ArangoDB arangoDB;
-    private String dbName;
-    private String collectionName;
-    private HashMap<String, Object> documentProperties;
+    private static Arango arango;
+    private static ArangoDB arangoDB;
+    private static String dbName;
+    private static String collectionName;
+    private static HashMap<String, Object> documentProperties;
 
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
@@ -36,20 +34,36 @@ public class ArangoTest {
 
             assertTrue(arango.createDatabase(arangoDB, dbName));
             assertTrue(arangoDB.getDatabases().contains(dbName));
-            arango.createCollection(arangoDB, dbName, collectionName);
-            assertTrue(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
         } catch (ArangoDBException e){
             fail(e.getMessage());
         }
     }
 
+    @AfterClass
+    public static void tearDown() {
+        try {
+            assertTrue(arango.dropDatabase(arangoDB, dbName));
+            arango.disconnect(arangoDB);
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Before
+    public void buildCollection() {
+        try {
+            arango.createCollection(arangoDB, dbName, collectionName);
+            assertTrue(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
     @After
-    public void tearDown() {
+    public void dropCollection() {
         try {
             arango.dropCollection(arangoDB, dbName, collectionName);
             assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
-            assertTrue(arango.dropDatabase(arangoDB, dbName));
-            arango.disconnect(arangoDB);
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
