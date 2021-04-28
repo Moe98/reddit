@@ -49,7 +49,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
-          couchbase-version: enterprise-6.6.0
+          couchbase-version: enterprise-6.6.2
           couchbase-username: ${{ secrets.ARANGO_USER }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
       - name: Build with Maven
