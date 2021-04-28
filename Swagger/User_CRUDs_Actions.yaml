@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: ''
-  version: 1.2.0
+  version: 1.2.1
   title: Beta Stories
   termsOfService: ''
 tags:
@@ -29,7 +29,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Sign-Up
+          description: signUp
         - in: body
           name: body
           description: ''
@@ -85,7 +85,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Get-User
+          description: getUser
       responses:
         '200':
           description: User Fetched successfully
@@ -127,7 +127,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Delete-User
+          description: deleteUser
       responses:
         '200':
           description: Account deleted successfully
@@ -160,7 +160,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Log-In
+          description: logIn
         - in: body
           name: body
           description: ''
@@ -210,7 +210,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Upload-Profile-Picture
+          description: uploadProfilePicture
       responses:
         '200':
           description: Profile Picture Uploaded
@@ -247,7 +247,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Delete-Profile-Picture
+          description: deleteProfilePicture
       responses:
         '200':
           description: Profile Picture Deleted
@@ -295,7 +295,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Edit-Profile
+          description: editProfile
       responses:
         '200':
           description: profile edited successfully
@@ -332,7 +332,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: View-Profile
+          description: viewProfile
       responses:
         '200':
           description: Profile Fetched successfully
@@ -375,7 +375,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Follow-User
+          description: followUser
       responses:
         '200':
           description: User succesffully followed
@@ -421,7 +421,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Unfollow-User
+          description: unfollowUser
       responses:
         '200':
           description: User succesffully unfollowed
@@ -467,7 +467,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Block-User
+          description: blockUser
       responses:
         '200':
           description: User succesffully blocked
@@ -513,7 +513,7 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: Unblock-User
+          description: unblockUser
       responses:
         '200':
           description: User succesffully unblocked
