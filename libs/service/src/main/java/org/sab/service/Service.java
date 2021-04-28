@@ -2,7 +2,7 @@ package org.sab.service;
 
 import org.json.JSONObject;
 import org.sab.rabbitmq.RPCServer;
-import org.sab.rabbitmq.TriFunction;
+import org.sab.functions.TriFunction;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
