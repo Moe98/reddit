@@ -115,4 +115,67 @@ public class GroupMessageTableTest {
         }
         groupChats.getMapper().delete(chat_id);
     }
+
+    @Test
+    public void whenGetDirectMessage_thenReturnedCorrectly() {
+        GroupChatTable groupChats = new GroupChatTable(cassandra);
+        groupChats.createTable();
+        UUID admin = UUID.randomUUID();
+        String name = "name";
+        String description = "description";
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name,description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        UUID message_id = null;
+        String content = "content";
+        try {
+            message_id = groupMessages.createGroupMessage(chat_id,admin, content);
+
+        } catch (InvalidInputException e) {
+            fail("Failed to create group message: "+ e.getMessage());
+        }
+
+        GroupMessage createdMessage = groupMessages.getMapper().get(chat_id,message_id);
+
+        assertEquals(message_id,createdMessage.getMessage_id());
+        assertEquals(admin, createdMessage.getSender_id());
+        assertEquals(content, createdMessage.getContent());
+
+
+        groupChats.getMapper().delete(chat_id);
+        groupMessages.getMapper().delete(chat_id, message_id);
+    }
+
+    @Test
+    public void whenGetDirectMessage_thenFailedCorrectly() {
+
+        GroupChatTable groupChats = new GroupChatTable(cassandra);
+        groupChats.createTable();
+        UUID admin = UUID.randomUUID();
+        String name = "name";
+        String description = "description";
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name,description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        String content = "content";
+        try {
+            groupMessages.createGroupMessage(chat_id,admin, content);
+        } catch (InvalidInputException e) {
+            fail("A nonmember failed to send a message");
+        }
+        try {
+            groupMessages.getGroupMessages(chat_id,UUID.randomUUID());
+            fail("A nonmember failed to get a message");
+        } catch (InvalidInputException e) {
+
+        }
+
+        groupChats.getMapper().delete(chat_id);
+    }
 }
