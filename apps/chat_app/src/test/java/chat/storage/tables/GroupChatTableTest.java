@@ -73,6 +73,7 @@ public class GroupChatTableTest {
         assertEquals(groupName, createdGroupChat.getName());
         assertEquals(groupDesc, createdGroupChat.getDescription());
         assertEquals(admin, createdGroupChat.getAdmin());
+        groupChats.getMapper().delete(chatId);
     }
 
     @Test
