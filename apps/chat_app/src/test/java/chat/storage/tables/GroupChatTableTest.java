@@ -105,14 +105,14 @@ public class GroupChatTableTest {
         }
         UUID user = UUID.randomUUID();
         try {
-             groupChats.addGroupMember(chat_id,admin,user);
+            groupChats.addGroupMember(chat_id, admin, user);
         } catch (InvalidInputException e) {
             fail("Failed to add a member to the group chat: " + e.getMessage());
         }
 
         GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
-        List<UUID> members =  createdGroupChat.getMembers();
-        if(!members.contains(user))
+        List<UUID> members = createdGroupChat.getMembers();
+        if (!members.contains(user))
             fail("Member not added to group chat");
 
         groupChats.getMapper().delete(chat_id);
@@ -132,21 +132,74 @@ public class GroupChatTableTest {
         }
         UUID user = UUID.randomUUID();
         try {
-            groupChats.addGroupMember(chat_id,admin,user);
+            groupChats.addGroupMember(chat_id, admin, user);
         } catch (InvalidInputException e) {
             fail("Failed to add a member to the group chat: " + e.getMessage());
         }
         try {
-            groupChats.addGroupMember(chat_id,admin,user);
+            groupChats.addGroupMember(chat_id, admin, user);
             fail("Failed to add an already existing member to the group chat");
         } catch (InvalidInputException e) {
 
         }
 
 
+        groupChats.getMapper().delete(chat_id);
+
+    }
+
+    @Test
+    public void whenRemovingGroupMember_thenRemovedCorrectly() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        UUID user = UUID.randomUUID();
+        try {
+            groupChats.addGroupMember(chat_id, admin, user);
+        } catch (InvalidInputException e) {
+            fail("Failed to add a member to the group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.removeGroupMember(chat_id, admin, user);
+        } catch (InvalidInputException e) {
+            fail("Failed to remove a member to the group chat: " + e.getMessage());
+        }
+
+        GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
+        List<UUID> members = createdGroupChat.getMembers();
+        if (members.contains(user))
+            fail("Failed to remove member");
 
         groupChats.getMapper().delete(chat_id);
 
     }
+    @Test
+    public void whenRemovingNonExistingGroupMember_thenRemovingFailed() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.removeGroupMember(chat_id, admin, UUID.randomUUID());
+            fail("Failed to remove a non existing member from the group chat");
+        } catch (InvalidInputException e) {
+
+        }
+
+        groupChats.getMapper().delete(chat_id);
+
+    }
+
 
 }
