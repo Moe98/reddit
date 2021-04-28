@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   description: ''
-  version: 1.0.0
+  version: 1.2.0
   title: Beta Stories
   termsOfService: ''
 tags:
@@ -26,10 +26,10 @@ paths:
         - application/json
       parameters:
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: signUp
+          description: Sign-Up
         - in: body
           name: body
           description: ''
@@ -82,10 +82,10 @@ paths:
           type: string
           required: true
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: getUser
+          description: Get-User
       responses:
         '200':
           description: User Fetched successfully
@@ -124,10 +124,10 @@ paths:
               password:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: deleteUser
+          description: Delete-User
       responses:
         '200':
           description: Account deleted successfully
@@ -157,10 +157,10 @@ paths:
         - application/json
       parameters:
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: logIn
+          description: Log-In
         - in: body
           name: body
           description: ''
@@ -207,10 +207,10 @@ paths:
           type: string
           required: true
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: uploadProfilePicture
+          description: Upload-Profile-Picture
       responses:
         '200':
           description: Profile Picture Uploaded
@@ -244,10 +244,10 @@ paths:
           type: string
           required: true
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: deleteProfilePicture
+          description: Delete-Profile-Picture
       responses:
         '200':
           description: Profile Picture Deleted
@@ -292,10 +292,10 @@ paths:
               newPassword:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: editProfile
+          description: Edit-Profile
       responses:
         '200':
           description: profile edited successfully
@@ -329,10 +329,10 @@ paths:
           type: string
           required: true
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: getUser
+          description: View-Profile
       responses:
         '200':
           description: Profile Fetched successfully
@@ -372,10 +372,10 @@ paths:
               username:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: followUser
+          description: Follow-User
       responses:
         '200':
           description: User succesffully followed
@@ -418,10 +418,10 @@ paths:
               username:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: unfollowUser
+          description: Unfollow-User
       responses:
         '200':
           description: User succesffully unfollowed
@@ -464,10 +464,10 @@ paths:
               username:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: blockUser
+          description: Block-User
       responses:
         '200':
           description: User succesffully blocked
@@ -510,10 +510,10 @@ paths:
               username:
                 type: string
         - in: header
-          name: functionName
+          name: Function-Name
           required: true
           type: string
-          description: unblockUser
+          description: Unblock-User
       responses:
         '200':
           description: User succesffully unblocked
