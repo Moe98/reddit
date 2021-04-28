@@ -1,6 +1,6 @@
 [
   {
-    "name": "TestBucket",
+    "name": "test",
     "ramQuotaMB": 100,
     "bucketType": "couchbase",
     "authType": "sasl",
