@@ -4,24 +4,25 @@ import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.couchbase.client.java.query.QueryResult;
+import org.junit.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 import static org.junit.Assert.*;
 
 public class CouchbaseTest {
-    private Couchbase couchbase;
-    private Cluster cluster;
-    private String bucketName;
-    private int bucketSize;
-    private HashMap<String, Object> documentProperties;
+    private static Couchbase couchbase;
+    private static Cluster cluster;
+    private static String bucketName;
+    private static int bucketSize;
+    private static HashMap<String, Object> documentProperties;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeClass
+    public static void setUp() throws Exception {
         try {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
@@ -32,26 +33,38 @@ public class CouchbaseTest {
             documentProperties.put("boolean_field", true);
             documentProperties.put("int_field", 1);
             documentProperties.put("string_field", "helloCouch");
-
-            couchbase.createBucket(cluster,bucketName,bucketSize);
-            assertTrue(cluster.buckets().getAllBuckets().containsKey(bucketName));
-
         } catch (CouchbaseException e){
             fail(e.getMessage());
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterClass
+    public static void tearDown() throws Exception {
         try {
-
-            couchbase.dropBucket(cluster,bucketName);
-            assertFalse(cluster.buckets().getAllBuckets().containsKey(bucketName));
             couchbase.disconnect(cluster);
         }catch (CouchbaseException e){
             fail(e.getMessage());
         }
+    }
 
+    @Before
+    public void buildBucket() {
+        try {
+            couchbase.createBucket(cluster,bucketName,bucketSize);
+            assertTrue(cluster.buckets().getAllBuckets().containsKey(bucketName));
+        }catch (CouchbaseException e){
+            fail(e.getMessage());
+        }
+    }
+
+    @After
+    public void dropBucket() {
+        try {
+            couchbase.dropBucket(cluster,bucketName);
+            assertFalse(cluster.buckets().getAllBuckets().containsKey(bucketName));
+        }catch (CouchbaseException e){
+            fail(e.getMessage());
+        }
     }
 
     @Test
@@ -64,43 +77,13 @@ public class CouchbaseTest {
         }
     }
 
-//    @Test
-//    public void connect() {
-//    }
-//
-//    @Test
-//    public void disconnect() {
-//    }
-
-    @Test
-    public void createBucket() {
-        try {
-            couchbase.createBucket(cluster,"TestCreateBuacke_2",bucketSize);
-            assertTrue(cluster.buckets().getAllBuckets().containsKey("TestCreateBuacke_2"));
-        } catch (CouchbaseException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void dropBucket() {
-        try {
-            cluster.buckets().createBucket(BucketSettings.create("TestDropBucket").ramQuotaMB(bucketSize));
-            cluster.query("CREATE PRIMARY INDEX on `default` : `" + "TestDropBucket" + "`;",
-                    queryOptions().metrics(true));
-            couchbase.dropBucket(cluster,"TestDropBucket");
-        } catch (CouchbaseException e) {
-            fail(e.getMessage());
-        }
-    }
-
     @Test
     public void upsertDocument() {
         try {
-            JsonObject CreatedDocument = JsonObject.create();
-            CreatedDocument.put("Key","Value");
-            couchbase.upsertDocument(cluster,bucketName,"TestDocumentKey1",CreatedDocument);
-            assertEquals(cluster.bucket(bucketName).defaultCollection().get("TestDocumentKey1").contentAsObject(),CreatedDocument);
+            JsonObject CreatedDocument = JsonObject.from(documentProperties);
+
+            couchbase.upsertDocument(cluster,bucketName,"upsert",CreatedDocument);
+            assertEquals(cluster.bucket(bucketName).defaultCollection().get("upsert").contentAsObject(),CreatedDocument);
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }
@@ -109,11 +92,11 @@ public class CouchbaseTest {
     @Test
     public void getDocument() {
         try {
-            JsonObject CreatedDocument = JsonObject.create();
-            CreatedDocument.put("Key","Value");
-            cluster.bucket(bucketName).defaultCollection().upsert("TestDocumentKey2", CreatedDocument);
-            JsonObject retreivedDocument = couchbase.getDocument(cluster,bucketName,"TestDocumentKey2");
-            assertEquals(cluster.bucket(bucketName).defaultCollection().get("TestDocumentKey2").contentAsObject(),retreivedDocument);
+            JsonObject CreatedDocument = JsonObject.from(documentProperties);
+
+            cluster.bucket(bucketName).defaultCollection().upsert("get", CreatedDocument);
+            JsonObject retrievedDocument = couchbase.getDocument(cluster,bucketName,"get");
+            assertEquals(cluster.bucket(bucketName).defaultCollection().get("get").contentAsObject(),retrievedDocument);
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }
@@ -122,12 +105,12 @@ public class CouchbaseTest {
     @Test
     public void replaceDocument() {
         try {
-            JsonObject CreatedDocument = JsonObject.create();
-            CreatedDocument.put("Key","Value");
-            cluster.bucket(bucketName).defaultCollection().upsert("TestDocumentKey3", CreatedDocument);
+            JsonObject CreatedDocument = JsonObject.from(documentProperties);
+
+            cluster.bucket(bucketName).defaultCollection().upsert("replace", CreatedDocument);
             CreatedDocument.put("AnotherKey","AnotherValue");
-            couchbase.replaceDocument(cluster,bucketName,"TestDocumentKey3",CreatedDocument);
-            assertEquals(cluster.bucket(bucketName).defaultCollection().get("TestDocumentKey3").contentAsObject(),CreatedDocument);
+            couchbase.replaceDocument(cluster,bucketName,"replace",CreatedDocument);
+            assertEquals(cluster.bucket(bucketName).defaultCollection().get("replace").contentAsObject(),CreatedDocument);
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }
@@ -136,11 +119,38 @@ public class CouchbaseTest {
     @Test
     public void deleteDocument() {
         try {
-            JsonObject CreatedDocument = JsonObject.create();
-            CreatedDocument.put("Key","Value");
-            cluster.bucket(bucketName).defaultCollection().upsert("TestDocumentKey4", CreatedDocument);
-            couchbase.deleteDocument(cluster,bucketName,"TestDocumentKey4");
-            assertFalse(cluster.bucket(bucketName).defaultCollection().exists("TestDocumentKey4").exists());
+            JsonObject CreatedDocument = JsonObject.from(documentProperties);
+
+            cluster.bucket(bucketName).defaultCollection().upsert("delete", CreatedDocument);
+            couchbase.deleteDocument(cluster,bucketName,"delete");
+            assertFalse(cluster.bucket(bucketName).defaultCollection().exists("delete").exists());
+        } catch (CouchbaseException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void query() {
+        try {
+            JsonObject document1 = JsonObject.create(1);
+            JsonObject document2 = JsonObject.create(1);
+            JsonObject document3 = JsonObject.create(1);
+
+            document1.put("flag", true);
+            document2.put("flag", true);
+            document3.put("flag", false);
+
+            couchbase.upsertDocument(cluster, bucketName,"query1", document1);
+            couchbase.upsertDocument(cluster, bucketName,"query2", document2);
+            couchbase.upsertDocument(cluster, bucketName,"query3", document3);
+
+            QueryResult result = couchbase.query(cluster, "SELECT * FROM `" + bucketName + "` WHERE `flag` = TRUE;", true);
+
+            ArrayList<JsonObject> resultList = new ArrayList<>(result.rowsAsObject());
+
+            assertEquals(resultList.size(), 2);
+            assertTrue(resultList.get(0).getObject(bucketName).getBoolean("flag"));
+            assertTrue(resultList.get(1).getObject(bucketName).getBoolean("flag"));
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }
