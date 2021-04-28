@@ -8,6 +8,7 @@ import com.datastax.driver.mapping.MappingManager;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 
+import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.models.GroupMessage;
 
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ public class GroupMessageTable {
 
     public GroupMessageTable(CassandraConnector cassandra) {
         this.cassandra = cassandra;
+    }
 
+    public void createMapper(){
         MappingManager manager = new MappingManager(cassandra.getSession());
         this.mapper = manager.mapper(GroupMessage.class);
     }
@@ -39,6 +42,7 @@ public class GroupMessageTable {
                 "PRIMARY KEY (chat_id, message_id)" +
                 ") WITH CLUSTERING ORDER BY (message_id DESC);";
         cassandra.runQuery(query);
+        createMapper();
     }
 
     public UUID createGroupMessage(UUID chat_id, UUID sender_id, String content) throws InvalidInputException {

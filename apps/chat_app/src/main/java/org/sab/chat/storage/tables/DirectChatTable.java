@@ -21,19 +21,23 @@ public class DirectChatTable {
     private Mapper<DirectChat> mapper;
 
     public DirectChatTable(CassandraConnector cassandra) {
-
         this.cassandra = cassandra;
+    }
+
+    public void createMapper(){
         MappingManager manager = new MappingManager(cassandra.getSession());
         this.mapper = manager.mapper(DirectChat.class);
     }
 
     public void createTable() {
+
         String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 "chat_id uuid, " +
                 "first_member uuid, " +
                 "second_member uuid, " +
                 "PRIMARY KEY (chat_id));";
         cassandra.runQuery(query);
+        createMapper();
     }
 
     public UUID createDirectChat(UUID first_member, UUID second_member) throws InvalidInputException {

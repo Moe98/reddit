@@ -8,6 +8,7 @@ import com.datastax.driver.mapping.MappingManager;
 
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
 import java.sql.Timestamp;
@@ -23,11 +24,12 @@ public class GroupChatTable {
 
     public GroupChatTable(CassandraConnector cassandra) {
         this.cassandra = cassandra;
+    }
 
+    public void createMapper(){
         MappingManager manager = new MappingManager(cassandra.getSession());
         this.mapper = manager.mapper(GroupChat.class);
     }
-
 
     public void createTable() {
         String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
@@ -39,6 +41,7 @@ public class GroupChatTable {
                 "date_created timestamp, " +
                 "PRIMARY KEY (chat_id));";
         cassandra.runQuery(query);
+        createMapper();
     }
 
     public UUID createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
