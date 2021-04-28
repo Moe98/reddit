@@ -33,6 +33,10 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+      couchbase:
+        image: couchbase
+        ports:
+          - 8091:8091
 
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +55,7 @@ jobs:
         with:
           couchbase-version: enterprise-6.6.0
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
-          couchbase-username: ${{ secrets.ARANGO_USER }}
+          couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
       - name: Build with Maven
         env:
