@@ -8,7 +8,7 @@ public class FutureUtil {
     private FutureUtil() {
     }
 
-    public <T> T await(Future<T> future, Function<Exception, T> onFailure) {
+    public static <T> T await(Future<T> future, Function<Exception, T> onFailure) {
         T result = null;
         try {
             result = future.get();
