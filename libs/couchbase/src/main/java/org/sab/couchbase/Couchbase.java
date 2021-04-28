@@ -49,28 +49,16 @@ public class Couchbase {
     }
 
     public JsonObject getDocument(Cluster cluster, String bucketName, String documentKey){
-        try {
-            GetResult getResult = cluster.bucket(bucketName).defaultCollection().get(documentKey);
-            return getResult.contentAsObject();
-        } catch (DocumentNotFoundException ex) {
-            throw  new DocumentNotFoundException(ex.context());
-        }
+        GetResult getResult = cluster.bucket(bucketName).defaultCollection().get(documentKey);
+        return getResult.contentAsObject();
     }
 
     public MutationResult replaceDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object){
-        try {
-            return cluster.bucket(bucketName).defaultCollection().replace(documentKey, object);
-        } catch (DocumentNotFoundException ex) {
-            throw  new DocumentNotFoundException(ex.context());
-        }
+        return cluster.bucket(bucketName).defaultCollection().replace(documentKey, object);
     }
 
     public MutationResult deleteDocument(Cluster cluster, String bucketName, String documentKey){
-        try {
-            return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
-        } catch (DocumentNotFoundException ex) {
-            throw  new DocumentNotFoundException(ex.context());
-        }
+        return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
     }
 
     public QueryResult query(Cluster cluster, String queryText) {
@@ -79,11 +67,7 @@ public class Couchbase {
 
     public QueryResult query(Cluster cluster, String queryText, boolean consistent){
         QueryResult result = null;
-        try {
-            result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
-        } catch (CouchbaseException ex) {
-            ex.printStackTrace();
-        }
+        result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
         return result;
     }
 }
