@@ -200,6 +200,76 @@ public class GroupChatTableTest {
         groupChats.getMapper().delete(chat_id);
 
     }
+    @Test
+    public void whenAdminLeavesAGroup_thenLeavesSuccessfully() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.leavesChat(chat_id, admin);
+        } catch (InvalidInputException e) {
+            fail("Failed to leave chat");
+        }
+        GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
 
+        if(createdGroupChat!=null){
+            fail("Admin failed to leave chat");
+        }
 
+    }
+
+    @Test
+    public void whenMemberLeavesAGroup_thenLeavesSuccessfuly() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        UUID user = UUID.randomUUID();
+        try {
+            groupChats.addGroupMember(chat_id, admin, user);
+        } catch (InvalidInputException e) {
+            fail("Failed to add a member to the group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.leavesChat(chat_id, user);
+        } catch (InvalidInputException e) {
+            fail("Failed to leave chat");
+        }
+        GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
+        List<UUID> members = createdGroupChat.getMembers();
+        if (members.contains(user))
+            fail("Failed to leave group chat");
+
+        groupChats.getMapper().delete(chat_id);
+    }
+    @Test
+    public void whenNonExistingMemberLeavesAGroup_thenLeavingFailed() {
+        String name = "name";
+        String description = "description";
+        UUID admin = UUID.randomUUID();
+        UUID chat_id = null;
+        try {
+            chat_id = groupChats.createGroupChat(admin, name, description);
+        } catch (InvalidInputException e) {
+            fail("Failed to create group chat: " + e.getMessage());
+        }
+        try {
+            groupChats.leavesChat(chat_id, UUID.randomUUID());
+            fail("Non existing member failed to leave chat");
+        } catch (InvalidInputException e) {
+
+        }
+        groupChats.getMapper().delete(chat_id);
+    }
 }
