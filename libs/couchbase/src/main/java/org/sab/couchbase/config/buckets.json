@@ -1,8 +1,8 @@
 [
   {
-    "name": "test",
+    "name": "TestBucket",
     "ramQuotaMB": 100,
-    "bucketType": "membase",
+    "bucketType": "couchbase",
     "authType": "sasl",
     "saslPassword": "",
     "evictionPolicy": "valueOnly",

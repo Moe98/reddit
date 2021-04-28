@@ -3,15 +3,12 @@ package org.sab.couchbase;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.query.QueryResult;
 import org.junit.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 import static org.junit.Assert.*;
 
 public class CouchbaseTest {
@@ -22,7 +19,7 @@ public class CouchbaseTest {
     private static HashMap<String, Object> documentProperties;
 
     @BeforeClass
-    public static void setUp() throws Exception {
+    public static void setUp() {
         try {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
@@ -39,7 +36,7 @@ public class CouchbaseTest {
     }
 
     @AfterClass
-    public static void tearDown() throws Exception {
+    public static void tearDown() {
         try {
             couchbase.disconnect(cluster);
         }catch (CouchbaseException e){
