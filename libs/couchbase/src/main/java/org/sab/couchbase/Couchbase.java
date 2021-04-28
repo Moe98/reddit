@@ -35,11 +35,11 @@ public class Couchbase {
 
     public void createBucket(Cluster cluster, String bucketName, int ramQuotaMB) {
         cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB));
-            cluster.query("CREATE PRIMARY INDEX on `default` : `"+bucketName+"`;",
-                    queryOptions().metrics(true));
+        cluster.query("CREATE PRIMARY INDEX on `default` : `"+bucketName+"`;");
     }
 
     public void dropBucket(Cluster cluster, String bucketName) {
+        cluster.query("DROP PRIMARY INDEX on `default` : `"+bucketName+"`;");
         cluster.buckets().dropBucket(bucketName);
     }
 
