@@ -9,6 +9,7 @@
   <modules>
     <module>example_app</module>
       <module>chat_app</module>
+      <module>user_app</module>
   </modules>
   <packaging>pom</packaging>
 
