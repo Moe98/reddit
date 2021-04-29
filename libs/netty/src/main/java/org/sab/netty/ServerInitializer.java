@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.cors.CorsConfig;
 import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import io.netty.handler.codec.http.cors.CorsHandler;
 import io.netty.handler.ssl.SslContext;
+import org.sab.netty.middleware.QueueHandler;
 import org.sab.netty.middleware.RequestHandler;
 import org.sab.netty.middleware.ResponseHandler;
 
@@ -23,17 +24,15 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     public void initChannel(SocketChannel ch) {
-        CorsConfig corsConfig =
-        CorsConfigBuilder.forAnyOrigin()
-            .allowedRequestHeaders(
-                "X-Requested-With", "Content-Type", "Content-Length", "Authorization")
-            .allowedRequestMethods(
-                HttpMethod.GET,
-                HttpMethod.POST,
-                HttpMethod.PUT,
-                HttpMethod.DELETE,
-                HttpMethod.OPTIONS)
-            .build();
+        CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
+                .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length", "Authorization")
+                .allowedRequestMethods(
+                        HttpMethod.GET,
+                        HttpMethod.POST,
+                        HttpMethod.PUT,
+                        HttpMethod.DELETE,
+                        HttpMethod.OPTIONS)
+                .build();
         ChannelPipeline p = ch.pipeline();
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc()));
@@ -42,6 +41,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpServerExpectContinueHandler());
         p.addLast(new CorsHandler(corsConfig));
         p.addLast(new RequestHandler());
+        p.addLast(new QueueHandler());
         p.addLast(new ResponseHandler());
 
     }

@@ -22,12 +22,12 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     Map<String, List<String>> uriParams;
     HttpRequest req;
     HttpHeaders headers;
+    String queueName;
 
     static Map<String, List<String>> getURIParams(String uri) {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
         return decoder.parameters();
     }
-
 
     JSONObject packRequest() {
         JSONObject request = new JSONObject();
@@ -36,7 +36,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         request.put("uriParams", uriParams);
         request.put("methodType", methodType);
         request.put("headers", headers);
-        request.put("function_name", headers.get("function_name"));
+        request.put("functionName", headers.get("Function-Name"));
 
         return request;
     }
@@ -55,6 +55,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             methodType = req.method().toString();
             uriParams = getURIParams(uri);
             headers = req.headers();
+
             ctx.channel().attr(Server.REQ_KEY).set(req);
         }
         if (msg instanceof HttpContent) {
@@ -65,22 +66,19 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 body = new JSONObject(jsonStr);
         }
         if (msg instanceof FullHttpRequest) {
+            // TODO what's the point of this?
             System.out.println("FullHttpRequest");
             System.out.println(msg);
         }
         if (msg instanceof LastHttpContent) {
             uri = uri.substring(1);
-            if (uri.equals("api")) {
-                // TODO The passed object that will generate this response be
-                //  |body|. The generated response will come from the backend app.
-                JSONObject JSONResponse = new JSONObject("{\"msg\":\"Hello World\"}");
-                ByteBuf content = Unpooled.copiedBuffer(JSONResponse.toString(), CharsetUtil.UTF_8);
-                ctx.fireChannelRead(content.copy());
-            } else {
-                String resource = uri.split("/")[1];
-                //Server Waiting Infinitely For Response   Solution: (Return RabbitMQ Response or Get ack from RabbitMQ and End the request with status message)
-                //enqueue(resource,packRequest());
-            }
+
+            queueName = uri.split("/")[1];
+            ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
+            JSONObject request = packRequest();
+            ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
+            ctx.fireChannelRead(content.copy());
+
         }
     }
 
