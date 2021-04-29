@@ -48,7 +48,12 @@ public abstract class Service {
     // function to invoke the required command using command pattern design
     public static String invokeCommand(String commandName, JSONObject req) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
         // getting the class responsible for the command
-        Class<?> commandClass = ConfigMap.getClass(commandName);
+        Class<?> commandClass;
+        try {
+            commandClass = ConfigMap.getClass(commandName);
+        } catch (NullPointerException e){
+            return "{\"statusCode\": 404, \"msg\": \"Incorrect Function-Name\"}";
+        }
         System.out.println("Command Class: " + commandClass);
         // creating an instance of the command class
         Command commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
