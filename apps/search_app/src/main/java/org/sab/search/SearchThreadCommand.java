@@ -38,7 +38,7 @@ public class SearchThreadCommand {
                     thread.setName(document.getKey());
                     thread.setDescription((String) document.getProperties().get("Description"));
                     thread.setCreator((String) document.getProperties().get("Creator"));
-                    thread.setNumOfFollowers((Integer) document.getProperties().get("NumOfFollowers"));
+                    thread.setNumOfFollowers((Long) document.getProperties().get("NumOfFollowers"));
                     thread.setDateCreated((String) document.getProperties().get("DateCreated"));
                     System.out.println("Top Results " + thread);
                 });

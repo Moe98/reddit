@@ -5,7 +5,7 @@ public class Thread {
     public String name;
     public String description;
     public String creator;
-    public int numOfFollowers;
+    public long numOfFollowers;
     public String dateCreated;
 
     public Thread(){
@@ -24,7 +24,7 @@ public class Thread {
         this.creator = creator;
     }
 
-    public void setNumOfFollowers(int numOfFollowers) {
+    public void setNumOfFollowers(long numOfFollowers) {
         this.numOfFollowers = numOfFollowers;
     }
 

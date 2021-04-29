@@ -37,7 +37,7 @@ public class UpdatePopularThreadsCommand {
                     thread.put("name", document.getKey());
                     thread.put("description", (String) document.getProperties().get("Description"));
                     thread.put("creator",(String) document.getProperties().get("Creator") );
-                    thread.put("numOfFollowers", (int) document.getProperties().get("NumOfFollowers"));
+                    thread.put("numOfFollowers", (long) document.getProperties().get("NumOfFollowers"));
                     thread.put("dateCreated", (String) document.getProperties().get("DateCreated"));
                     threads.add(thread);
                 });

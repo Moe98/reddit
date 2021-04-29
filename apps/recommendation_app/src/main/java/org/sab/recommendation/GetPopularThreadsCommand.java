@@ -25,7 +25,7 @@ public class GetPopularThreadsCommand {
                 thread.setName(o.getString("name"));
                 thread.setDescription(o.getString("description"));
                 thread.setCreator(o.getString("creator"));
-                thread.setNumOfFollowers(o.getInt("numOfFollowers"));
+                thread.setNumOfFollowers(o.getLong("numOfFollowers"));
                 thread.setDateCreated((String) o.get("dateCreated"));
                 System.out.println("Recommendation Results " + thread);
             }
