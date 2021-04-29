@@ -26,11 +26,7 @@ public class Arango {
 
     public static Arango getInstance() {
         if (instance == null) {
-            try {
-                instance = new Arango();
-            } catch (ArangoDBException e){
-                throw new ArangoDBException(e);
-            }
+            instance = new Arango();
         }
         return instance;
     }
