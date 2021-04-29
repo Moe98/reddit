@@ -14,6 +14,11 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672:5672
+          
       cassandra:
         image: cassandra
         ports:
@@ -70,4 +75,10 @@ jobs:
           ARANGO_USER: ${{ secrets.ARANGO_USER }}
           ARANGO_PASSWORD: ${{ secrets.ARANGO_PASSWORD }}
           ARANGO_DB: 'Reddit'
-        run: mvn -B package --file pom.xml
+        uses: nick-invision/retry@v2
+        with:
+          timeout_seconds: 75
+          max_attempts: 3
+          retry_on: any
+          command: mvn -B package --file pom.xml 
+
