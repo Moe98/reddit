@@ -77,7 +77,7 @@ jobs:
           ARANGO_DB: 'Reddit'
         uses: nick-invision/retry@v2
         with:
-          timeout_seconds: 75
+          timeout_seconds: 180
           max_attempts: 3
           retry_on: any
           command: mvn -B package --file pom.xml 
