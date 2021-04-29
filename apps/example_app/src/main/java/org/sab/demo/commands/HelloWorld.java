@@ -8,8 +8,8 @@ public class HelloWorld extends Command {
     @Override
     public String execute(JSONObject request) {
         // Return SUCCESS
-        return "{\"msg\":\"Hello Worlddd\", \"statusCode\": 200}";
+        return "{\"msg\":\"Hello World\", \"statusCode\": 200}";
         // Return ERROR Ex: 400 for bad request
-//        return "{\"msg\":\"Hello Worlddd\", \"statusCode\": 400}";
+//        return "{\"msg\":\"Hello World\", \"statusCode\": 400}";
     }
 }

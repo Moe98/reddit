@@ -21,7 +21,7 @@ public class ServerTest {
     int NUM_THREADS = 5;
     String queueName = "TEST_APP_REQ";
     String receivedMessage = "";
-    String expectedReplyMessage = "{\"msg\":\"Hello World\"}";
+    String expectedReplyMessage = "{\"msg\":\"Hello World\", \"statusCode\": 200}";
     static String response = "";
 
     /**
