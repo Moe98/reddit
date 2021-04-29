@@ -34,6 +34,10 @@ public class ArangoTest {
 
             assertTrue(arango.createDatabase(arangoDB, dbName));
             assertTrue(arangoDB.getDatabases().contains(dbName));
+
+            if (arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)))
+                arango.dropCollection(arangoDB, dbName, collectionName);
+            assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
         } catch (ArangoDBException e){
             fail(e.getMessage());
         }

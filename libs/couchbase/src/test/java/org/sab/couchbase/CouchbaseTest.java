@@ -30,6 +30,10 @@ public class CouchbaseTest {
             documentProperties.put("boolean_field", true);
             documentProperties.put("int_field", 1);
             documentProperties.put("string_field", "helloCouch");
+
+            if (cluster.buckets().getAllBuckets().containsKey(bucketName))
+                couchbase.dropBucket(cluster,bucketName);
+            assertFalse(cluster.buckets().getAllBuckets().containsKey(bucketName));
         } catch (CouchbaseException e){
             fail(e.getMessage());
         }
