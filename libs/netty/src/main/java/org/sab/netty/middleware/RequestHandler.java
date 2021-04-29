@@ -7,12 +7,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.netty.Server;
 
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +23,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     HttpRequest req;
     HttpHeaders headers;
     String queueName;
+    boolean badRequest;
 
     static Map<String, List<String>> getURIParams(String uri) {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -64,8 +63,13 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             HttpContent content = (HttpContent) msg;
             ByteBuf jsonBuf = content.content();
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
-            if (!methodType.equals("GET"))
-                body = new JSONObject(jsonStr);
+            if (!methodType.equals("GET") && jsonBuf.isReadable()) {
+                try {
+                    body = new JSONObject(jsonStr);
+                } catch (JSONException e){
+                    badRequest = true;
+                }
+            }
         }
         if (msg instanceof FullHttpRequest) {
             // TODO what's the point of this?
@@ -73,6 +77,9 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             System.out.println(msg);
         }
         if (msg instanceof LastHttpContent) {
+            if(badRequest){
+                errorResponse(ctx, 400, "Incorrect Body");
+            }
             uri = uri.substring(1);
 
             try {
@@ -83,9 +90,9 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                     ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
                     ctx.fireChannelRead(content.copy());
                 } else
-                    incorrectURI(ctx);
+                    errorResponse(ctx, 404, "Not Found");
             } catch (ArrayIndexOutOfBoundsException e){
-                incorrectURI(ctx);
+                errorResponse(ctx, 404, "Not Found");
             }
         }
     }
@@ -106,8 +113,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 '}';
     }
 
-    private void incorrectURI(ChannelHandlerContext ctx){
-        JSONObject response = new JSONObject().put("statusCode", 404).put("msg", "Not Found");
+    private void errorResponse(ChannelHandlerContext ctx, int code, String msg){
+        JSONObject response = new JSONObject().put("statusCode", code).put("msg", msg);
         ByteBuf content = Unpooled.copiedBuffer(response.toString(), CharsetUtil.UTF_8);
         ctx.pipeline().context("QueueHandler").fireChannelRead(content.copy());
     }
