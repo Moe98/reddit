@@ -22,7 +22,7 @@ public class ExampleAppTest {
         HelloWorld h = new HelloWorld();
         String result = h.execute(new JSONObject());
 
-        assertTrue(result.equals("{\"msg\":\"Hello Worlddd\", \"statusCode\": 200}"));
+        assertTrue(result.equals("{\"msg\":\"Hello World\", \"statusCode\": 200}"));
     }
 
     @Test

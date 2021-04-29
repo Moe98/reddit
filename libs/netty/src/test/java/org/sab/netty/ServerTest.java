@@ -21,7 +21,7 @@ public class ServerTest {
     int NUM_THREADS = 5;
     String queueName = "TEST_APP_REQ";
     String receivedMessage = "";
-    String expectedReplyMessage = "{\"msg\":\"Hello World\", \"statusCode\": 200}";
+    String expectedReplyMessage = "{\"msg\":\"Not Found\"}";
     static String response = "";
 
     /**
@@ -116,6 +116,6 @@ public class ServerTest {
         while (!shutdownServerFuture.isDone());
 
         System.out.println("Done with callables");
-        assertEquals(response, expectedReplyMessage);
+        assertEquals(expectedReplyMessage, response);
     }
 }
