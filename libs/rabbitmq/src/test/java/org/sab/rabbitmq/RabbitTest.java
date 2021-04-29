@@ -14,12 +14,12 @@ import java.util.concurrent.*;
  * I guess the turtle was faster after all...
  */
 public class RabbitTest {
-    //    static String receivedMessage;
-    String message = "Test Test";
-    String expectedReplyMessage = "Test Reply";
-    String queueName = "TEST_QUEUE";
-    String replyQueueName = "TEST_QUEUE_REPLY";
-    int NUM_THREADS = 3;
+
+    final String message = "Test Test";
+    final String expectedReplyMessage = "Test Reply";
+    final String queueName = "TEST_QUEUE_REQ";
+    final String replyQueueName = "TEST_QUEUE_RES";
+    final int NUM_THREADS = 3;
     String receivedMessage = "";
 
     /**
