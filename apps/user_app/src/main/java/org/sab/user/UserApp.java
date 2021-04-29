@@ -1,10 +1,9 @@
-package org.sab;
+package org.sab.user;
 
-/**
- * Hello world!
- *
- */
-public class App 
+
+import org.sab.service.Service;
+
+public class UserApp extends Service
 {
     public static void main( String[] args )
     {
