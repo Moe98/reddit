@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import org.sab.netty.Server;
 
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -73,12 +75,18 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         if (msg instanceof LastHttpContent) {
             uri = uri.substring(1);
 
-            queueName = uri.split("/")[1];
-            ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
-            JSONObject request = packRequest();
-            ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
-            ctx.fireChannelRead(content.copy());
-
+            try {
+                queueName = uri.split("/")[1];
+                if (Server.apps.contains(queueName)) {
+                    ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
+                    JSONObject request = packRequest();
+                    ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
+                    ctx.fireChannelRead(content.copy());
+                } else
+                    incorrectURI(ctx);
+            } catch (ArrayIndexOutOfBoundsException e){
+                incorrectURI(ctx);
+            }
         }
     }
 
@@ -96,5 +104,11 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 ", body=" + body +
                 ", uriParams=" + uriParams +
                 '}';
+    }
+
+    private void incorrectURI(ChannelHandlerContext ctx){
+        JSONObject response = new JSONObject().put("statusCode", 404).put("msg", "Not Found");
+        ByteBuf content = Unpooled.copiedBuffer(response.toString(), CharsetUtil.UTF_8);
+        ctx.pipeline().context("QueueHandler").fireChannelRead(content.copy());
     }
 }

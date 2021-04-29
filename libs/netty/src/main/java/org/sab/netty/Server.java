@@ -16,6 +16,8 @@ import io.netty.util.AttributeKey;
 import javax.net.ssl.SSLException;
 
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public final class Server {
@@ -24,6 +26,7 @@ public final class Server {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8443" : "8080"));
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
     public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
+    public static final ArrayList<String> apps = new ArrayList<String>(Arrays.asList("example_app", "threads", "subthreads", "recommendations", "notifications", "chats", "searches", "users", "authentications", "useractions"));
 
     public static EventLoopGroup bossGroup;
     public static EventLoopGroup workerGroup;
