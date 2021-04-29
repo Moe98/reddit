@@ -66,8 +66,7 @@ public class Couchbase {
     }
 
     public QueryResult query(Cluster cluster, String queryText, boolean consistent){
-        QueryResult result = null;
-        result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
+        QueryResult result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
         return result;
     }
 }
