@@ -86,9 +86,9 @@ public class RPCClient extends RPCBase implements AutoCloseable {
         return result;
     }
 
-    // Close the connection with RabbitMQ.
-    public void close() throws IOException {
-        connection.close();
+    // Close the |channel| as to not waste resources.
+    public void close() throws IOException, TimeoutException {
+        channel.close();
     }
 
 }
