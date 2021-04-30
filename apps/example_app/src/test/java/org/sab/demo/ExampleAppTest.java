@@ -21,8 +21,9 @@ public class ExampleAppTest {
 
         HelloWorld h = new HelloWorld();
         String result = h.execute(new JSONObject());
+        JSONObject jsonResult = new JSONObject(result);
 
-        assertTrue(result.equals("{\"msg\":\"Hello World\"}"));
+        assertTrue(jsonResult.getString("msg").equals("Hello World") && jsonResult.getInt("statusCode") == 200);
     }
 
     @Test

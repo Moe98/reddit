@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.CharsetUtil;
 import org.json.JSONObject;
 import org.sab.netty.Server;
@@ -18,7 +19,6 @@ import static io.netty.handler.codec.http.HttpHeaderNames.*;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderValues.CLOSE;
 import static io.netty.handler.codec.http.HttpHeaderValues.KEEP_ALIVE;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class ResponseHandler extends SimpleChannelInboundHandler<Object> {
 
@@ -33,9 +33,10 @@ public class ResponseHandler extends SimpleChannelInboundHandler<Object> {
     void returnDefaultResponse(ChannelHandlerContext ctx, JSONObject JSONResponse) {
         // Get the HTTP Request by using the AttributeKey that was used to set it in |RequestHandler|.
         HttpRequest req = ctx.channel().attr(Server.REQ_KEY).get();
+        int statusCode = (int) JSONResponse.remove("statusCode");
 
         ByteBuf bufferResponse = Unpooled.copiedBuffer(JSONResponse.toString(), CharsetUtil.UTF_8);
-        FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), OK,
+        FullHttpResponse response = new DefaultFullHttpResponse(req.protocolVersion(), HttpResponseStatus.valueOf(statusCode),
                 Unpooled.wrappedBuffer(bufferResponse));
         response.headers()
                 .set(CONTENT_TYPE, "application/json")
