@@ -16,6 +16,7 @@ public class ConfigMap {
         cmdMap.put("HELLO_WORLD", "org.sab.demo.commands.HelloWorld");
         cmdMap.put("GOOD_BYE_WORLD", "org.sab.demo.commands.GoodByeWorld");
         cmdMap.put("UPDATE_POPULAR_THREADS", "org.sab.recommendation.commands.UpdatePopularThreads");
+        cmdMap.put("GET_POPULAR_THREADS", "org.sab.recommendation.commands.GetPopularThreads");
     }
 
     public static Class<?> getClass(String command) throws ClassNotFoundException {
