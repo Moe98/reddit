@@ -24,6 +24,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     HttpHeaders headers;
     String queueName;
     boolean badRequest;
+    String[] uriFields;
 
     static Map<String, List<String>> getURIParams(String uri) {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -80,10 +81,10 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             if(badRequest){
                 errorResponse(ctx, 400, "Incorrect Body");
             }
-            uri = uri.substring(1);
+            uriFields = uri.substring(1).split("/");
 
-            try {
-                queueName = uri.split("/")[1];
+            if(uriFields.length >= 2) {
+                queueName = uriFields[1];
                 if (Server.apps.contains(queueName)) {
                     ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
                     JSONObject request = packRequest();
@@ -91,9 +92,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                     ctx.fireChannelRead(content.copy());
                 } else
                     errorResponse(ctx, 404, "Not Found");
-            } catch (ArrayIndexOutOfBoundsException e){
+            } else
                 errorResponse(ctx, 404, "Not Found");
-            }
         }
     }
 
