@@ -5,6 +5,7 @@ import org.sab.rabbitmq.RPCServer;
 import org.sab.functions.TriFunction;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.*;
 
@@ -15,18 +16,45 @@ import java.util.concurrent.*;
  */
 
 public abstract class Service {
-    private static ExecutorService threadPool;
+    public static final String DEFAULT_PROPERTIES_FILENAME = "configmap.properties";
+    private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ"; 
+    private ExecutorService threadPool;
 
     // Singleton Design Pattern
-    public static void getThreadPool(int threads) {
+    public void getThreadPool(int threads) {
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(threads);
         }
     }
 
-    public static void listenOnQueue(String queueName) throws IOException, TimeoutException {
+    public abstract String getAppUriName();
+
+    public abstract int getThreadCount();
+
+    public abstract String getConfigMapPath();
+
+    public void start() {
+        final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
+        try {
+            ConfigMap.getInstance().instantiate(configMapStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        getThreadPool(getThreadCount());
+
+        try {
+            listenOnQueue();
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void listenOnQueue() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
+        final String queueName = getAppUriName().toUpperCase() + REQUEST_QUEUE_NAME_SUFFIX;
+
         RPCServer server = RPCServer.getInstance(queueName);
 
         TriFunction<String, JSONObject, String> invokeCallback = (commandName, req) -> {
@@ -34,7 +62,6 @@ public abstract class Service {
                 return invokeCommand(commandName, req);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException
                     | ClassNotFoundException | ExecutionException | InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return null;
@@ -46,9 +73,9 @@ public abstract class Service {
     }
 
     // function to invoke the required command using command pattern design
-    public static String invokeCommand(String commandName, JSONObject req) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
+    public String invokeCommand(String commandName, JSONObject req) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
         // getting the class responsible for the command
-        Class<?> commandClass = ConfigMap.getClass(commandName);
+        Class<?> commandClass = ConfigMap.getInstance().getClass(commandName);
         System.out.println("Command Class: " + commandClass);
         // creating an instance of the command class
         Command commandInstance = (Command) commandClass.getDeclaredConstructor().newInstance();
