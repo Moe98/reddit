@@ -32,15 +32,15 @@ public class SearchThread extends Command {
 
             String query = """
                     FOR result IN ThreadsView
-                        SEARCH PHRASE(result.Description, @words, "text_en")
-                        RETURN result""";
+                         SEARCH ANALYZER(STARTS_WITH(result._key, LOWER(@words)), "text_en")
+                         RETURN result""";
             Map<String, Object> bindVars = Collections.singletonMap("words", request.getJSONObject("body").getString("searchText"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
-            Thread thread = new Thread();
             ArrayNode data = nf.arrayNode();
             if(cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
+                    Thread thread = new Thread();
                     thread.setName(document.getKey());
                     thread.setDescription((String) document.getProperties().get("Description"));
                     thread.setCreator((String) document.getProperties().get("Creator"));
