@@ -43,10 +43,10 @@ public class UpdatePopularSubThreads extends Command {
                     subThread.setParentThread((String) document.getProperties().get("ParentThread"));
                     subThread.setTitle((String) document.getProperties().get("Title"));
                     subThread.setCreator((String) document.getProperties().get("Creator"));
-                    subThread.setLikes((Long) document.getProperties().get("Likes"));
-                    subThread.setDislikes((Long) document.getProperties().get("Dislikes"));
+                    subThread.setLikes((Integer) document.getProperties().get("Likes"));
+                    subThread.setDislikes((Integer) document.getProperties().get("Dislikes"));
                     subThread.setContent((String) document.getProperties().get("Content"));
-                    subThread.setHasImage((Boolean) document.getProperties().get("hasImage"));
+                    subThread.setHasImage((Boolean) document.getProperties().get("HasImage"));
                     subThread.setTime((String) document.getProperties().get("Time"));
                     data.addPOJO(subThread);
                 });
@@ -76,6 +76,7 @@ public class UpdatePopularSubThreads extends Command {
                 JsonObject object = JsonObject.create().put("listOfSubThreads", JacksonTransformers.stringToJsonArray(response.get("data").toString()));
                 couchbase.upsertDocument(cluster, "Listings", "popSubThreads", object);
                 response.set("msg", nf.textNode("Popular SubThreads Updated Successfully!"));
+                response.set("statusCode", nf.numberNode(200));
             } catch (Exception e) {
                 response.set("msg", nf.textNode(e.getMessage()));
                 response.set("data", nf.arrayNode());

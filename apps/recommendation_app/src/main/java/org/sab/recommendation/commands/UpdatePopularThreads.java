@@ -73,6 +73,7 @@ public class UpdatePopularThreads extends Command {
                 JsonObject object = JsonObject.create().put("listOfThreads", JacksonTransformers.stringToJsonArray(response.get("data").toString()));
                 couchbase.upsertDocument(cluster, "Listings", "popThreads", object);
                 response.set("msg", nf.textNode("Popular Threads Updated Successfully!"));
+                response.set("statusCode", nf.numberNode(200));
             } catch (Exception e) {
                 response.set("msg", nf.textNode(e.getMessage()));
                 response.set("data", nf.arrayNode());
