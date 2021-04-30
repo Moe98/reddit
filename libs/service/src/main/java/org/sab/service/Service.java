@@ -76,7 +76,7 @@ public abstract class Service {
     public String invokeCommand(String commandName, JSONObject req) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ExecutionException, InterruptedException, ClassNotFoundException {
         // getting the class responsible for the command
         Class<?> commandClass;
-        commandClass = ConfigMap.getClass(commandName);
+        commandClass = ConfigMap.getInstance().getClass(commandName);
         if(commandClass == null)
             return "{\"statusCode\": 404, \"msg\": \"Incorrect Function-Name\"}";
         System.out.println("Command Class: " + commandClass);
