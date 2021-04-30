@@ -86,7 +86,7 @@ public class SignUp extends Command {
 
     public String encrypt(String plainTextPassword) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest salt = MessageDigest.getInstance("SHA-256");
-        salt.update(UUID.randomUUID().toString().getBytes("UTF-8"));
+        salt.update(plainTextPassword.toString().getBytes("UTF-8"));
         String digest = bytesToHex(salt.digest());
         return digest;
     }
