@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConfigMap {
     // TODO change this to config file.
 
-    private static ConfigMap instance = new ConfigMap(); 
+    private static ConfigMap instance = new ConfigMap();
 
     private ConcurrentHashMap<String, String> cmdMap;
 
@@ -26,12 +26,6 @@ public class ConfigMap {
     }
 
     public void instantiate(InputStream inputStream) throws IOException {
-//        cmdMap.put("HELLO_WORLD", "org.sab.demo.commands.HelloWorld");
-//        cmdMap.put("GOOD_BYE_WORLD", "org.sab.demo.commands.GoodByeWorld");
-        loadProperties(inputStream);
-    }
-
-    private void loadProperties(InputStream inputStream) throws IOException {
         final Properties properties = new Properties();
         properties.load(inputStream);
 
