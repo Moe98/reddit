@@ -6,7 +6,7 @@ import org.sab.service.Command;
 public class SignUp extends Command {
 
     @Override
-    public String execute(JSONObject request) throws Exception {
-        return null;
+    public String execute(JSONObject request) {
+        return "{\"msg\":\"You just got in!\"}";
     }
 }
