@@ -6,19 +6,29 @@ import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Command;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 public class EditProfile extends Command {
 
-    @Override
-    public String execute(JSONObject request) {
-        // String oldPassword= request.getString("oldPassword");
-        // String newPassword=request.getString("newPassword");
 
+
+    @Override
+    public String execute(JSONObject request) throws PropertiesNotLoadedException, SQLException {
+        System.out.println(request);
+        JSONObject body = request.getJSONObject("body");
+
+        String oldPassword = body.getString("oldPassword");
+        String newPassword = body.getString("newPassword");
+        PostgresConnection.call("update_user_password",new Object[]{"zoz", newPassword});
+//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
+//        ResultSet resultSet = postgresConnection.call(procedureInitializer("update_user_password", 2), postgresConnection.connect(), null, );
         return "{\"msg\":\"You are now an editor!\"}";
 
     }
 //    public String updatePassword(String oldPassword,String newPassword) throws PropertiesNotLoadedException {
-//        PostgresConnection postgresConnection=PostgresConnection.getInstance();
+//
 //        Connection connection =postgresConnection.connect();
 //        connection.prepareCall()
 //        return null;
