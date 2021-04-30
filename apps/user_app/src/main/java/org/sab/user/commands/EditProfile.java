@@ -15,13 +15,19 @@ public class EditProfile extends Command {
 
 
     @Override
-    public String execute(JSONObject request) throws PropertiesNotLoadedException, SQLException {
+    public String execute(JSONObject request)  {
         System.out.println(request);
         JSONObject body = request.getJSONObject("body");
 
         String oldPassword = body.getString("oldPassword");
         String newPassword = body.getString("newPassword");
-        PostgresConnection.call("update_user_password",new Object[]{"zoz", newPassword});
+        try {
+            PostgresConnection.call("update_user_password",new Object[]{"zoz", newPassword});
+        } catch (PropertiesNotLoadedException e) {
+            e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 //        PostgresConnection postgresConnection = PostgresConnection.getInstance();
 //        ResultSet resultSet = postgresConnection.call(procedureInitializer("update_user_password", 2), postgresConnection.connect(), null, );
         return "{\"msg\":\"You are now an editor!\"}";
