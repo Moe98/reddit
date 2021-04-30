@@ -1,4 +1,4 @@
-package org.sab.recommendation;
+package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UpdateThreadRecommendationCommand {
+public class UpdateThreadRecommendation {
     public HashMap<String, String> parameters;
     private Arango arango;
     private ArangoDB arangoDB;
@@ -110,7 +110,7 @@ public class UpdateThreadRecommendationCommand {
     }
 
     public static void main(String[] args) {
-        UpdateThreadRecommendationCommand c = new UpdateThreadRecommendationCommand();
+        UpdateThreadRecommendation c = new UpdateThreadRecommendation();
         c.parameters = new HashMap<>();
         c.parameters.put("username", "hamada");
         c.execute();

@@ -1,4 +1,4 @@
-package org.sab.recommendation;
+package org.sab.recommendation.commands;
 
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Cluster;
@@ -9,7 +9,7 @@ import org.sab.models.Thread;
 
 import java.util.HashMap;
 
-public class GetThreadRecommendationCommand {
+public class GetThreadRecommendation {
     private HashMap<String, String> parameters;
     private Couchbase couchbase;
     private Cluster cluster;
@@ -41,7 +41,7 @@ public class GetThreadRecommendationCommand {
     }
 
     public static void main(String[] args) {
-        GetThreadRecommendationCommand c = new GetThreadRecommendationCommand();
+        GetThreadRecommendation c = new GetThreadRecommendation();
         c.parameters = new HashMap<>();
         c.parameters.put("username", "hamada");
         c.execute();
