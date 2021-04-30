@@ -15,6 +15,7 @@ public class ConfigMap {
         cmdMap = new ConcurrentHashMap<>();
         cmdMap.put("HELLO_WORLD", "org.sab.demo.commands.HelloWorld");
         cmdMap.put("GOOD_BYE_WORLD", "org.sab.demo.commands.GoodByeWorld");
+        cmdMap.put("SEARCH_THREAD", "org.sab.search.commands.SearchThread");
     }
 
     public static Class<?> getClass(String command) throws ClassNotFoundException {
