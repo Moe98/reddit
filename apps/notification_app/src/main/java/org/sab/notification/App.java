@@ -8,6 +8,13 @@ public class App
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        FirebaseMessagingConnector a = null;
+        try {
+            a = FirebaseMessagingConnector.getInstance();
+        } catch (GoogleCredentialsLoadingFailedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println(a);
     }
 }
