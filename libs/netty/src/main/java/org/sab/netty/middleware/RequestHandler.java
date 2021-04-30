@@ -85,7 +85,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             if(uriFields.length >= 2) {
                 queueName = uriFields[1];
-                if (Server.apps.contains(queueName)) {
+                if (Server.apps.contains(queueName.toLowerCase())) {
                     ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
                     JSONObject request = packRequest();
                     ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
