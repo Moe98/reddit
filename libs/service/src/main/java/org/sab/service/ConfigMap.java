@@ -40,8 +40,11 @@ public class ConfigMap {
         }
     }
 
-    public Class<?> getClass(String command) throws ClassNotFoundException {
-        return Class.forName(cmdMap.get(command));
+    public static Class<?> getClass(String command) throws ClassNotFoundException {
+        String classPath = cmdMap.get(command);
+        if(classPath != null)
+            return Class.forName(classPath);
+        return null;
     }
 
     public void replaceClassWith(String key, String newClass) {
