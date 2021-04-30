@@ -22,10 +22,10 @@ public class GetRecommendedUsers extends Command {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
-            JsonObject result = couchbase.getDocument(cluster, "RecommendedUsers", "recUsers");
+            JsonObject result = couchbase.getDocument(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"));
             JsonNode data =  new ObjectMapper().readTree(result.toString()).get("listOfUsers");
             response.set("data", data);
-
+            response.set("statusCode", nf.numberNode(200));
         } catch (Exception e) {
             response.set("msg", nf.textNode(e.getMessage()));
             response.set("data", nf.arrayNode());
