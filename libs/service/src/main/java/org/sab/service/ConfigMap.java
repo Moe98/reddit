@@ -20,6 +20,7 @@ public class ConfigMap {
         cmdMap.put("UPDATE_POPULAR_SUBTHREADS", "org.sab.recommendation.commands.UpdatePopularSubThreads");
         cmdMap.put("GET_POPULAR_SUBTHREADS", "org.sab.recommendation.commands.GetPopularSubThreads");
         cmdMap.put("GET_RECOMMENDED_USERS", "org.sab.recommendation.commands.GetRecommendedUsers");
+        cmdMap.put("GET_RECOMMENDED_SUBTHREADS", "org.sab.recommendation.commands.GetRecommendedSubThreads");
     }
 
     public static Class<?> getClass(String command) throws ClassNotFoundException {
