@@ -32,7 +32,7 @@ public class SearchThread extends Command {
 
             String query = """
                     FOR result IN ThreadsView
-                         SEARCH ANALYZER(STARTS_WITH(result._key, LOWER(@words)), "text_en")
+                         SEARCH ANALYZER(STARTS_WITH(result._key, LOWER(LTRIM(@words))), "text_en")
                          RETURN result""";
             Map<String, Object> bindVars = Collections.singletonMap("words", request.getJSONObject("body").getString("searchText"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
