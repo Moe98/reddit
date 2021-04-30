@@ -1,15 +1,14 @@
 package org.sab.postgres;
 
 //import io.github.cdimascio.dotenv.Dotenv;
+
 import org.json.simple.parser.ParseException;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,7 +19,7 @@ public class PostgresConnection {
     private Properties props;
     private Connection conn;
     private final URL configPath = getClass().getClassLoader().getResource("config.json");
-    private final String[] propertiesParams = {"POSTGRES_DB","POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
+    private final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
 //    Dotenv dotenv = Dotenv.configure().load();
 
     private PostgresConnection() {
@@ -44,7 +43,7 @@ public class PostgresConnection {
         props = new Properties();
 
         for (String param : propertiesParams)
-            if (System.getenv(param)==null)
+            if (System.getenv(param) == null)
                 throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
@@ -57,7 +56,7 @@ public class PostgresConnection {
     }
 
     public Connection connect() {
-        try{
+        try {
             conn = DriverManager.getConnection(url, props);
             System.out.println("Connected to the PostgreSQL server successfully.");
         } catch (SQLException e) {
@@ -74,18 +73,40 @@ public class PostgresConnection {
         }
     }
 
-    public void run(String storedProcedure, List<Object> arguments) {
-        try {
-            final PreparedStatement stmt = conn.prepareStatement("call " + storedProcedure + "(?)");
-            for (int i = 0; i < arguments.size(); i++) {
-                stmt.setObject(i + 1, arguments.get(i));
-            }
-            stmt.execute();
-            stmt.close();
-        } catch (Exception err) {
-            System.out.println("An error has occurred.");
-            System.out.println("See full details below.");
-            err.printStackTrace();
+    public static String procedureInitializer(String procedureName, int numParams) {
+        StringBuilder ans = new StringBuilder("{").append("call");
+        ans.append(" ").append(procedureName).append("(");
+        for (int i = 0; i < numParams; i++)
+            ans.append("?").append(i == numParams - 1 ? ")" : ",");
+
+        ans.append("}");
+        return ans.toString();
+
+    }
+
+    public static ResultSet call(String procedureName, Object... params) throws PropertiesNotLoadedException, SQLException {
+
+        PostgresConnection postgresConnection = getInstance();
+        Connection connection = postgresConnection.connect();
+        ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, null, params);
+        postgresConnection.closeConnection(connection);
+        return  resultSet;
+    }
+
+    public ResultSet call(String sql, Connection connection, int[] types, Object... params) throws SQLException {
+
+
+        // DbUtils does not support calling procedures?
+        CallableStatement callableStatement = connection.prepareCall(sql);
+
+        for (int i = 0; i < params.length; i++) {
+            callableStatement.setObject(i + 1, params[i]);
         }
+        boolean containsResults = callableStatement.execute();
+        ResultSet resultSet = null;
+        if (containsResults) {
+            resultSet = callableStatement.getResultSet();
+        }
+        return resultSet;
     }
 }
