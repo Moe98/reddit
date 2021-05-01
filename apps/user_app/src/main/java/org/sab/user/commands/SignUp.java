@@ -34,17 +34,17 @@ public class SignUp extends UserCommand {
     protected String execute() {
 
         // retrieving the body objects
-        String username = body.getString("username");
+        String username = body.getString(USERNAME);
         String userId = UUID.randomUUID().toString();
         String hashedPassword;
         try {
-            hashedPassword = Auth.encrypt(body.getString("password"));
+            hashedPassword = Auth.encrypt(body.getString(PASSWORD));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             return makeErrorResponse(e.getMessage(), 404).toString();
         }
-        String email = body.getString("email");
-        String photoUrl = body.keySet().contains("photo_url") ? body.getString("photo_url") : null;
-        Date birthdate = Date.valueOf(body.getString("birthdate"));
+        String email = body.getString(EMAIL);
+        String photoUrl = body.keySet().contains(PHOTO_URL) ? body.getString(PHOTO_URL) : null;
+        Date birthdate = Date.valueOf(body.getString(BIRTHDATE));
 
         //calling the appropriate SQL procedure
         try {
@@ -65,10 +65,10 @@ public class SignUp extends UserCommand {
             user = new User();
 
             user.setUserId(resultSet.getString("user_id"));
-            user.setUsername(resultSet.getString("username"));
-            user.setEmail(resultSet.getString("email"));
-            user.setPassword(resultSet.getString("password"));
-            user.setBirthdate(resultSet.getString("birthdate"));
+            user.setUsername(resultSet.getString(USERNAME));
+            user.setEmail(resultSet.getString(EMAIL));
+            user.setPassword(resultSet.getString(PASSWORD));
+            user.setBirthdate(resultSet.getString(BIRTHDATE));
             user.setPhotoUrl(resultSet.getString("photo_url"));
 
         } catch (PropertiesNotLoadedException | SQLException e) {

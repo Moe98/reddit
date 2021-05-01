@@ -24,12 +24,12 @@ public class ChooseProfilePhoto extends UserCommand {
     @Override
     protected String execute() {
         // retrieving the body objects
-        String username = body.getString("username");
+        String username = body.getString(USERNAME);
         String photoUrl = "";
-        if(body.keySet().contains("photo_url") && body.getString("photo_url").length() >0){
-            photoUrl = body.getString("photo_url");
+        if(body.keySet().contains(PHOTO_URL) && body.getString(PHOTO_URL).length() >0){
+            photoUrl = body.getString(PHOTO_URL);
             try {
-                photoUrl = CloudUtilities.uploadImage(photoUrl,username);
+                photoUrl = CloudUtilities.uploadImage(photoUrl, username);
             } catch (IOException e) {
                 return makeErrorResponse("An error occurred while uploading your image!", 400).toString();
             }
@@ -59,10 +59,10 @@ public class ChooseProfilePhoto extends UserCommand {
 
             user = new User();
             user.setUserId(resultSet.getString("user_id"));
-            user.setUsername(resultSet.getString("username"));
-            user.setEmail(resultSet.getString("email"));
-            user.setBirthdate(resultSet.getString("birthdate"));
-            user.setPhotoUrl(resultSet.getString("photo_url"));
+            user.setUsername(resultSet.getString(USERNAME));
+            user.setEmail(resultSet.getString(EMAIL));
+            user.setBirthdate(resultSet.getString(BIRTHDATE));
+            user.setPhotoUrl(resultSet.getString(PHOTO_URL));
         } catch (PropertiesNotLoadedException | SQLException e) {
             return makeErrorResponse("An error occurred while submitting your request!", 502).toString();
         }

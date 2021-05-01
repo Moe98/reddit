@@ -8,6 +8,13 @@ import org.sab.service.Command;
 
 
 public abstract class UserCommand extends Command {
+    protected static final String USERNAME = "username";
+    protected static final String EMAIL = "email";
+    protected static final String PASSWORD = "password";
+    protected static final String BIRTHDATE = "birthdate";
+    protected static final String PHOTO_URL = "photoUrl";
+
+
     protected JSONObject body;
 
     @Override
