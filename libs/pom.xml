@@ -16,8 +16,10 @@
     <module>rabbitmq</module>
     <module>service</module>
     <module>postgres</module>
+    <module>couchbase</module>
+    <module>arango</module>
+    <module>models</module>
     <module>utilities</module>
-
   </modules>
     
   <packaging>pom</packaging>
