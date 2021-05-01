@@ -35,12 +35,12 @@ public class Arango {
         return builder.build();
     }
 
-    public void disconnect(ArangoDB arangoDB){
+    public void disconnect(ArangoDB arangoDB) {
         arangoDB.shutdown();
     }
 
 
-    public boolean createDatabase(ArangoDB arangoDB, String dbName){
+    public boolean createDatabase(ArangoDB arangoDB, String dbName) {
         return arangoDB.createDatabase(dbName);
 
     }
@@ -62,7 +62,7 @@ public class Arango {
         return readDocument(arangoDB, dbName, collectionName, baseDocument.getKey());
     }
 
-    public BaseDocument readDocument(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
+    public BaseDocument readDocument(ArangoDB arangoDB, String dbName, String collectionName, String documentKey) {
         return arangoDB.db(dbName).collection(collectionName).getDocument(documentKey, BaseDocument.class);
     }
 
@@ -71,21 +71,21 @@ public class Arango {
         return readDocument(arangoDB, dbName, collectionName, updatedDocument.getKey());
     }
 
-    public boolean deleteDocument(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
+    public boolean deleteDocument(ArangoDB arangoDB, String dbName, String collectionName, String documentKey) {
         arangoDB.db(dbName).collection(collectionName).deleteDocument(documentKey);
         return true;
     }
 
-    public ObjectNode readDocumentAsJSON(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
+    public ObjectNode readDocumentAsJSON(ArangoDB arangoDB, String dbName, String collectionName, String documentKey) {
         return arangoDB.db(dbName).collection(collectionName).getDocument(documentKey, ObjectNode.class);
     }
 
-    public ViewEntity createView(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields){
+    public ViewEntity createView(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) {
 
         ArangoSearchCreateOptions options = new ArangoSearchCreateOptions();
 
         FieldLink[] fieldLinks = new FieldLink[fields.length];
-        for (int i = 0 ; i < fields.length; i++) {
+        for (int i = 0; i < fields.length; i++) {
             FieldLink fieldLink = FieldLink.on(fields[i]);
             fieldLink.analyzers("text_en");
             fieldLinks[i] = fieldLink;
