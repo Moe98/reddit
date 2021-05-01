@@ -1,3 +1,5 @@
+package org.sab.search;
+
 import org.sab.service.ConfigMap;
 import org.sab.service.Service;
 

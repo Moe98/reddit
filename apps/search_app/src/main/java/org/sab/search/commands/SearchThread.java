@@ -27,7 +27,7 @@ public class SearchThread extends Command {
             arangoDB = arango.connect();
 
             if(!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()){
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"Description"});
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"_key"});
             }
 
             String query = """
