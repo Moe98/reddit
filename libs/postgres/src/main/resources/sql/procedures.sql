@@ -29,12 +29,12 @@ BEGIN
 END; $$
 LANGUAGE PLPGSQL;
 
-CCREATE OR REPLACE FUNCTION get_user(in_username VARCHAR)
-     RETURNS Table(user_id VARCHAR, username VARCHAR, email VARCHAR,birthdate date,photo_url text,password VARCHAR) AS $$
- BEGIN
-   Return Query (Select u.user_id,u.username,u.email ,u.birthdate, u.photo_url,u.password from users u WHERE u.username = in_username);
- END; $$
- LANGUAGE PLPGSQL;
+CREATE OR REPLACE FUNCTION get_user(in_username VARCHAR)
+    RETURNS Table(user_id VARCHAR, username VARCHAR, email VARCHAR,birthdate date,photo_url text,password VARCHAR) AS $$
+    BEGIN
+        Return Query (Select u.user_id,u.username,u.email ,u.birthdate, u.photo_url,u.password from users u WHERE u.username = in_username);
+    END; $$
+LANGUAGE PLPGSQL;
 
 CREATE OR REPLACE FUNCTION update_profile_picture(in_username VARCHAR, new_photo_url VARCHAR)
     RETURNS VOID AS $$
