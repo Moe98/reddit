@@ -51,14 +51,14 @@ public abstract class UserCommand extends Command {
     
     private void checkForMissingAttributes() throws RequestVerificationException {
 
-        final Predicate<Attribute> isNotFoundInBody = attribute -> !isFoundInBody(attribute);
+        final Predicate<Attribute> isMissing = attribute -> !isFoundInBody(attribute);
 
-        final List<Attribute> missingAttributes = schema.getAttributeList().stream().filter(isNotFoundInBody)
+        final List<Attribute> missingRequiredAttributes = schema.getAttributeList().stream().filter(isMissing)
                 .filter(Attribute::isRequired).collect(Collectors.toList());
 
-        if (!missingAttributes.isEmpty()) {
+        if (!missingRequiredAttributes.isEmpty()) {
             final String exceptionMessage = "Some attributes were missing: "
-                    + missingAttributes.stream().map(Attribute::getAttributeName).collect(Collectors.joining(", "));
+                    + missingRequiredAttributes.stream().map(Attribute::getAttributeName).collect(Collectors.joining(", "));
             throw new RequestVerificationException(exceptionMessage);
         }
 
