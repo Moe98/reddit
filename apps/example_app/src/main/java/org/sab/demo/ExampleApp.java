@@ -11,10 +11,22 @@ public class ExampleApp extends Service {
     // TODO get this from config file
     private static final String EXAMPLE_APP_QUEUE = "EXAMPLE_APP_REQ";
 
-    public static void main(String[] args) throws IOException, TimeoutException {
-        ConfigMap.instantiate();
-        getThreadPool(10);
-        listenOnQueue(EXAMPLE_APP_QUEUE);
+    @Override
+    public String getAppUriName() {
+        return "EXAMPLE_APP";
+    }
 
+    @Override
+    public int getThreadCount() {
+        return 10;
+    }
+
+    @Override
+    public String getConfigMapPath() {
+        return DEFAULT_PROPERTIES_FILENAME;
+    }
+
+    public static void main(String[] args){
+        new ExampleApp().start();
     }
 }
