@@ -8,10 +8,8 @@ import com.datastax.driver.mapping.MappingManager;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 
-import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.models.GroupMessage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +17,7 @@ public class GroupMessageTable {
 
     public static final String TABLE_NAME = "group_messages";
 
-    private CassandraConnector cassandra;
+    private final CassandraConnector cassandra;
 
 
     private Mapper<GroupMessage> mapper;
@@ -67,11 +65,10 @@ public class GroupMessageTable {
 
         ResultSet queryResult = cassandra.runQuery(query1);
         List<Row> query1Rows = queryResult.all();
-        if (((query1Rows == null || query1Rows.size() == 0))) {
+        if (TableUtils.isEmpty(query1Rows)) {
             throw new InvalidInputException("Invalid chat id");
         }
 
-        boolean found = false;
         List<UUID> ls = query1Rows.get(0).getList(0, UUID.class);
         if (!ls.contains(sender_id))
             throw new InvalidInputException("Not a chat member");
@@ -82,7 +79,7 @@ public class GroupMessageTable {
 
     }
 
-    public List<String> getGroupMessages(UUID chat_id, UUID user) throws InvalidInputException {
+    public List<GroupMessage> getGroupMessages(UUID chat_id, UUID user) throws InvalidInputException {
         try {
             UUID.fromString(user.toString());
         } catch (IllegalArgumentException e) {
@@ -98,7 +95,7 @@ public class GroupMessageTable {
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
         ResultSet queryResult0 = cassandra.runQuery(query0);
         List<Row> query0Rows = queryResult0.all();
-        if (((query0Rows == null || query0Rows.size() == 0))) {
+        if (TableUtils.isEmpty(query0Rows)) {
             throw new InvalidInputException("Chat does not exist");
         }
         List<UUID> members = query0Rows.get(0).getList(4, UUID.class);
@@ -108,16 +105,8 @@ public class GroupMessageTable {
         String query1 = "SELECT content FROM " + "group_messages" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
-        ResultSet queryResult1 = cassandra.runQuery(query1);
-        List<Row> query1Rows = queryResult1.all();
-
-        List<String> messages = new ArrayList<>();
-        for (int i = 0; i < query1Rows.size(); i++) {
-            messages.add(query1Rows.get(i).get(0, String.class));
-        }
-
-        return messages;
-
+        ResultSet messages = cassandra.runQuery(query1);
+        return mapper.map(messages).all();
     }
 
     public Mapper<GroupMessage> getMapper() {

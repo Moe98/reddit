@@ -93,10 +93,6 @@ public class DirectChatTableTest {
 
         }
 
-
         directChats.getMapper().delete(chat_id);
-
-
-
     }
 }

@@ -8,7 +8,6 @@ import com.datastax.driver.mapping.MappingManager;
 
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
-import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
 import java.sql.Timestamp;
@@ -18,7 +17,7 @@ public class GroupChatTable {
 
     public static final String TABLE_NAME = "group_chats";
 
-    private CassandraConnector cassandra;
+    private final CassandraConnector cassandra;
 
     private Mapper<GroupChat> mapper;
 
@@ -77,9 +76,8 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query1);
-        List<Row> query1Rows = queryResult.all();
 
-        if (((query1Rows == null || query1Rows.size() == 0))) {
+        if (TableUtils.isEmpty(queryResult.all())) {
             throw new InvalidInputException("Chat does not exist");
         }
 
@@ -87,7 +85,7 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
         ResultSet query2Result = cassandra.runQuery(query2);
         List<Row> query2Rows = query2Result.all();
-        if (((query2Rows == null || query2Rows.size() == 0))) {
+        if (TableUtils.isEmpty(query2Rows)) {
             throw new InvalidInputException("Not the admin to add members");
         }
 
@@ -95,6 +93,7 @@ public class GroupChatTable {
         String description = query2Rows.get(0).get(3, String.class);
         List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
         Date date_created = query2Rows.get(0).getTimestamp(2);
+
         if(members.contains(user)){
             throw new InvalidInputException("Member already there");
         }
@@ -120,7 +119,7 @@ public class GroupChatTable {
         ResultSet queryResult = cassandra.runQuery(query);
         List<Row> query1Rows = queryResult.all();
 
-        if (((query1Rows == null || query1Rows.size() == 0))) {
+        if (TableUtils.isEmpty(query1Rows)) {
             throw new InvalidInputException("Chat does not exist");
         }
 
@@ -128,7 +127,7 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
         ResultSet query1Result = cassandra.runQuery(query1);
         List<Row> query2Rows = query1Result.all();
-        if (((query2Rows == null || query2Rows.size() == 0))) {
+        if (TableUtils.isEmpty(query2Rows)) {
             throw new InvalidInputException("Not the admin to add members");
         }
 
@@ -136,7 +135,6 @@ public class GroupChatTable {
         String description = query2Rows.get(0).get(3, String.class);
         List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
         Date date_created = query2Rows.get(0).getTimestamp(2);
-
 
         if (!members.contains(user)) {
             throw new InvalidInputException("Member not in group");
@@ -172,10 +170,10 @@ public class GroupChatTable {
         Date date_created = all.get(0).getTimestamp(2);
         UUID admin = all.get(0).get(1, UUID.class);
 
-        if (!members.contains(user) && !admin.toString().equals(user.toString())) {
+        if (!members.contains(user) && !admin.equals(user)) {
             throw new InvalidInputException("Member not in group");
         }
-        if (members.contains(user) && admin.toString().equals(user.toString())) {
+        if (members.contains(user) && admin.equals(user)) {
             mapper.delete(chat_id);
         } else if (members.contains(user)) {
             members.remove(user);

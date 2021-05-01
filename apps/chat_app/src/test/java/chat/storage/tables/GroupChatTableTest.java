@@ -2,7 +2,6 @@ package chat.storage.tables;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
-import org.apache.cassandra.service.ClientState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +84,7 @@ public class GroupChatTableTest {
             UUID admin = UUID.randomUUID();
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
-                fail("Created group chat with invalid data");
+                fail("Created group chat with invalid data.");
             } catch (InvalidInputException ignored) {
 
             }
@@ -113,7 +112,7 @@ public class GroupChatTableTest {
         GroupChat createdGroupChat = groupChats.getMapper().get(chat_id);
         List<UUID> members = createdGroupChat.getMembers();
         if (!members.contains(user))
-            fail("Member not added to group chat");
+            fail("Member not added to group chat.");
 
         groupChats.getMapper().delete(chat_id);
 
@@ -138,14 +137,12 @@ public class GroupChatTableTest {
         }
         try {
             groupChats.addGroupMember(chat_id, admin, user);
-            fail("Failed to add an already existing member to the group chat");
-        } catch (InvalidInputException e) {
+            fail("Added an already existing member to the group chat.");
+        } catch (InvalidInputException ignored) {
 
         }
 
-
         groupChats.getMapper().delete(chat_id);
-
     }
 
     @Test
@@ -193,7 +190,7 @@ public class GroupChatTableTest {
         try {
             groupChats.removeGroupMember(chat_id, admin, UUID.randomUUID());
             fail("Failed to remove a non existing member from the group chat");
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException ignored) {
 
         }
 
@@ -267,7 +264,7 @@ public class GroupChatTableTest {
         try {
             groupChats.leavesChat(chat_id, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException ignored) {
 
         }
         groupChats.getMapper().delete(chat_id);

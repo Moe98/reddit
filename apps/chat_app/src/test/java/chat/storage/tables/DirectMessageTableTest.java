@@ -8,10 +8,8 @@ import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectMessage;
-import org.sab.chat.storage.models.GroupMessage;
 import org.sab.chat.storage.tables.DirectChatTable;
 import org.sab.chat.storage.tables.DirectMessageTable;
-import org.sab.chat.storage.tables.GroupChatTable;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,20 +64,20 @@ public class DirectMessageTableTest {
         UUID second_member = UUID.randomUUID();
         UUID chat_id = null;
         try {
-            chat_id = directChats.createDirectChat( first_member, second_member);
+            chat_id = directChats.createDirectChat(first_member, second_member);
         } catch (InvalidInputException e) {
             fail("Failed to create direct chat: " + e.getMessage());
         }
         UUID message_id = null;
         String content = "content";
         try {
-            message_id = directMessages.createDirectMessage(chat_id,first_member,content);
+            message_id = directMessages.createDirectMessage(chat_id,first_member, content);
 
         } catch (InvalidInputException e) {
             fail("Failed to create direct message: "+ e.getMessage());
         }
 
-        DirectMessage createdMessage = directMessages.getMapper().get(chat_id,message_id);
+        DirectMessage createdMessage = directMessages.getMapper().get(chat_id, message_id);
 
         assertEquals(message_id,createdMessage.getMessage_id());
         assertEquals(first_member, createdMessage.getSender_id());
@@ -102,12 +100,11 @@ public class DirectMessageTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to create direct chat: " + e.getMessage());
         }
-        UUID message_id = null;
         String content = "content";
         try {
-            message_id = directMessages.createDirectMessage(chat_id,UUID.randomUUID(),content);
+            directMessages.createDirectMessage(chat_id,UUID.randomUUID(),content);
             fail("A nonmember failed to send a message");
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException ignored) {
 
         }
         directChats.getMapper().delete(chat_id);
@@ -128,12 +125,11 @@ public class DirectMessageTableTest {
         String content = "content";
         try {
             message_id = directMessages.createDirectMessage(chat_id,first_member, content);
-
         } catch (InvalidInputException e) {
             fail("Failed to create direct message: "+ e.getMessage());
         }
 
-        DirectMessage createdMessage = directMessages.getMapper().get(chat_id,message_id);
+        DirectMessage createdMessage = directMessages.getMapper().get(chat_id, message_id);
 
         assertEquals(message_id,createdMessage.getMessage_id());
         assertEquals(first_member, createdMessage.getSender_id());
@@ -164,9 +160,9 @@ public class DirectMessageTableTest {
             fail("A nonmember failed to send a message");
         }
         try {
-            directMessages.getDirectMessages(chat_id,UUID.randomUUID());
+            directMessages.getDirectMessages(chat_id, UUID.randomUUID());
             fail("A nonmember failed to get a message");
-        } catch (InvalidInputException e) {
+        } catch (InvalidInputException ignored) {
 
         }
 

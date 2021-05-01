@@ -7,10 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
-import org.sab.chat.storage.models.DirectMessage;
-import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.models.GroupMessage;
-import org.sab.chat.storage.tables.DirectChatTable;
 import org.sab.chat.storage.tables.GroupChatTable;
 import org.sab.chat.storage.tables.GroupMessageTable;
 
@@ -45,7 +42,7 @@ public class GroupMessageTableTest {
     @Test
     public void whenCreatingMessageTable_thenCreatedCorrectly() {
         ResultSet result = cassandra.runQuery(
-                "SELECT * FROM " + groupMessages.TABLE_NAME + ";");
+                "SELECT * FROM " + GroupMessageTable.TABLE_NAME + ";");
 
         List<String> columnNames =
                 result.getColumnDefinitions().asList().stream()
@@ -76,7 +73,6 @@ public class GroupMessageTableTest {
         String content = "content";
         try {
             message_id = groupMessages.createGroupMessage(chat_id,admin, content);
-
         } catch (InvalidInputException e) {
             fail("Failed to create group message: "+ e.getMessage());
         }
@@ -108,9 +104,9 @@ public class GroupMessageTableTest {
         }
         String content = "content";
         try {
-            groupMessages.createGroupMessage(chat_id,UUID.randomUUID(), content);
-            fail("A nonmember failed to send a message");
-        } catch (InvalidInputException e) {
+            groupMessages.createGroupMessage(chat_id, UUID.randomUUID(), content);
+            fail("A nonmember was able to send a message.");
+        } catch (InvalidInputException ignored) {
 
         }
         groupChats.getMapper().delete(chat_id);
@@ -133,7 +129,6 @@ public class GroupMessageTableTest {
         String content = "content";
         try {
             message_id = groupMessages.createGroupMessage(chat_id,admin, content);
-
         } catch (InvalidInputException e) {
             fail("Failed to create group message: "+ e.getMessage());
         }
@@ -165,14 +160,14 @@ public class GroupMessageTableTest {
         }
         String content = "content";
         try {
-            groupMessages.createGroupMessage(chat_id,admin, content);
+            groupMessages.createGroupMessage(chat_id, admin, content);
         } catch (InvalidInputException e) {
-            fail("A nonmember failed to send a message");
+            fail("A member failed to send a message.");
         }
         try {
-            groupMessages.getGroupMessages(chat_id,UUID.randomUUID());
-            fail("A nonmember failed to get a message");
-        } catch (InvalidInputException e) {
+            groupMessages.getGroupMessages(chat_id, UUID.randomUUID());
+            fail("A nonmember was able to get a message.");
+        } catch (InvalidInputException ignored) {
 
         }
 

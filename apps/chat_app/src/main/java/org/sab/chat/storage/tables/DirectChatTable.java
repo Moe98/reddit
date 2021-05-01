@@ -2,22 +2,19 @@ package org.sab.chat.storage.tables;
 
 
 import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 import com.datastax.driver.mapping.Mapper;
 import com.datastax.driver.mapping.MappingManager;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
 
-
-import java.util.List;
 import java.util.UUID;
 
 public class DirectChatTable {
 
     public static final String TABLE_NAME = "direct_chats";
 
-    private CassandraConnector cassandra;
+    private final CassandraConnector cassandra;
     private Mapper<DirectChat> mapper;
 
     public DirectChatTable(CassandraConnector cassandra) {
@@ -57,11 +54,7 @@ public class DirectChatTable {
         ResultSet queryResult1 = cassandra.runQuery(query1);
         ResultSet queryResult2 = cassandra.runQuery(query2);
 
-
-        List<Row> query1Rows = queryResult1.all();
-        List<Row> query2Rows = queryResult2.all();
-
-        if (!((query1Rows == null || query1Rows.size() == 0) && (query2Rows == null || query2Rows.size() == 0)))
+        if (!TableUtils.isEmpty(queryResult1.all()) || !TableUtils.isEmpty(queryResult2.all()))
             throw new InvalidInputException("Chat already exist between Users");
         mapper.save(new DirectChat(chatId, first_member, second_member));
         return chatId;
