@@ -1,0 +1,8 @@
+{
+  "COUCHBASE_HOST": "127.0.0.1",
+  "COUCHBASE_USERNAME": "",
+  "COUCHBASE_PASSWORD": "",
+  "ARANGO_USER": "",
+  "ARANGO_PASSWORD": "",
+  "ARANGO_DB": "Reddit"
+}

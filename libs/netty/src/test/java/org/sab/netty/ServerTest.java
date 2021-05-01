@@ -2,6 +2,7 @@ package org.sab.netty;
 
 import com.rabbitmq.client.*;
 import org.junit.Test;
+import org.sab.demo.ExampleApp;
 
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class ServerTest {
     int NUM_THREADS = 5;
     String queueName = "TEST_APP_REQ";
     String receivedMessage = "";
-    String expectedReplyMessage = "{\"msg\":\"Hello World\"}";
+    String expectedReplyMessage = "{\"msg\":\"Not Found\"}";
     static String response = "";
 
     /**
@@ -36,12 +37,11 @@ public class ServerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
         return response.body();
     }
 
     @Test
-    public void serverWorking() {
+    public void serverReturnsNotFound() {
         final int numThreads = NUM_THREADS;
         final ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);
 
@@ -116,6 +116,39 @@ public class ServerTest {
         while (!shutdownServerFuture.isDone());
 
         System.out.println("Done with callables");
-        assertEquals(response, expectedReplyMessage);
+        assertEquals(expectedReplyMessage, response);
+    }
+
+    public void runServer(){
+        new Thread(() -> {
+            try {
+                Server.main(null);
+            } catch (Exception e) {
+                fail("Server did not start\n" +e.getMessage());
+            }
+        }).start();
+    }
+    public void runExampleApp(){
+        new Thread(() -> {
+            try {
+                ExampleApp.main(null);
+            } catch (Exception e) {
+                fail("Example App did not start\n" +e.getMessage());
+            }
+        }).start();
+    }
+
+    @Test
+    public void callingExampleAppAPI() {
+        runServer();
+        runExampleApp();
+        String response= null;
+        try {
+            response = get("http://localhost:8080/api/example_app","HELLO_WORLD");
+        } catch (IOException | InterruptedException e) {
+            fail(e.getMessage());
+        }
+        assertEquals(response, "{\"msg\":\"Hello World\"}");
+
     }
 }
