@@ -23,7 +23,7 @@ public abstract class UserCommand extends Command {
     protected JSONObject body;
     protected Schema schema;
     @Override
-    public String execute(JSONObject request) {
+    public final String execute(JSONObject request) {
         body = request.getJSONObject("body");
         schema = getSchema();
         try {
