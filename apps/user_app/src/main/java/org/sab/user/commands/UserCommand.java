@@ -23,7 +23,7 @@ public abstract class UserCommand extends Command {
     //abstract methods
     protected abstract String execute();
 
-    protected abstract String verifyBody();
+    protected abstract Schema getSchema();
 
     //instance methods
     protected boolean isInBody(String attribute) {

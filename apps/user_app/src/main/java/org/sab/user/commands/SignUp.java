@@ -19,20 +19,16 @@ import java.util.UUID;
 
 public class SignUp extends UserCommand {
 
+    @Override
+    protected Schema getSchema() {
+        Attribute username = new Attribute(USERNAME, DataType.STRING, true);
+        Attribute email = new Attribute(EMAIL, DataType.EMAIL, true);
+        Attribute password = new Attribute(PASSWORD, DataType.STRING, true);
+        Attribute birthdate = new Attribute(BIRTHDATE, DataType.SQL_DATE, true);
+        Attribute photoUrl = new Attribute(PHOTO_URL, DataType.STRING);
 
-    static Schema initSchema() {
-        Attribute username = new Attribute("username", DataType.String, true);
-        Attribute email = new Attribute("email", DataType.Email, true);
-        Attribute password = new Attribute("password", DataType.String, true);
-        Attribute birthdate = new Attribute("birthdate", DataType.SQLDate, true);
-        Attribute photoUrl = new Attribute("photoUrl", DataType.String);
-
-        schema = new Schema(List.of(username, email, password, birthdate, photoUrl));
-        return schema;
+        return new Schema(List.of(username, email, password, birthdate, photoUrl));
     }
-
-    static Schema schema = initSchema();
-
 
     @Override
     protected String execute() {

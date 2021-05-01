@@ -14,16 +14,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ChooseProfilePhoto extends UserCommand {
-
-    static Schema initSchema() {
-        Attribute username = new Attribute("username", DataType.String, true);
-        Attribute photoUrl = new Attribute("photoUrl", DataType.String);
-
-        schema = new Schema(List.of(username,photoUrl));
-        return schema;
+    @Override
+    protected Schema getSchema() {
+        Attribute username = new Attribute(USERNAME, DataType.STRING, true);
+        Attribute photoUrl = new Attribute(PHOTO_URL, DataType.STRING);
+        return new Schema(List.of(username, photoUrl));
     }
-
-    static Schema schema = initSchema();
 
     @Override
     protected String execute() {
