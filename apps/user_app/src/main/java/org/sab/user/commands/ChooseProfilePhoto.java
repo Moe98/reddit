@@ -43,7 +43,7 @@ public class ChooseProfilePhoto extends UserCommand {
         }
         //calling the appropriate SQL procedure
         try {
-            PostgresConnection.call("update_profile_picture", new Object[]{username, photoUrl});
+            PostgresConnection.call("update_profile_picture", username, photoUrl);
         } catch (PropertiesNotLoadedException | SQLException e) {
             return makeErrorResponse(e.getMessage(), 404).toString();
         }
@@ -51,7 +51,7 @@ public class ChooseProfilePhoto extends UserCommand {
         //retrieving the result from SQL into a User Object
         User user;
         try {
-            ResultSet resultSet = PostgresConnection.call("get_user", new Object[]{username});
+            ResultSet resultSet = PostgresConnection.call("get_user", username);
 
             if (resultSet == null || !resultSet.next()) {
                 return makeErrorResponse("User not found!", 404).toString();

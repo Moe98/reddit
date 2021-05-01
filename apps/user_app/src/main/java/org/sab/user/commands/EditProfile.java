@@ -22,7 +22,7 @@ public class EditProfile extends Command {
         String oldPassword = body.getString("oldPassword");
         String newPassword = body.getString("newPassword");
         try {
-            PostgresConnection.call("update_user_password",new Object[]{"zoz", newPassword});
+            PostgresConnection.call("update_user_password", "zoz", newPassword);
         } catch (PropertiesNotLoadedException e) {
             e.printStackTrace();
         } catch (SQLException throwables) {

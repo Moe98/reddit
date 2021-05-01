@@ -48,7 +48,7 @@ public class SignUp extends UserCommand {
 
         //calling the appropriate SQL procedure
         try {
-            PostgresConnection.call("create_user", new Object[]{userId, username, email, hashedPassword, birthdate, photoUrl});
+            PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate, photoUrl);
         } catch (PropertiesNotLoadedException | SQLException e) {
             return makeErrorResponse(e.getMessage(), 404).toString();
         }
@@ -56,7 +56,7 @@ public class SignUp extends UserCommand {
         //retrieving the result from SQL into a User Object
         User user;
         try {
-            ResultSet resultSet = PostgresConnection.call("get_user", new Object[]{username});
+            ResultSet resultSet = PostgresConnection.call("get_user", username);
 
             if (resultSet == null || !resultSet.next()) {
                 return makeErrorResponse("ResultSet is Empty!", 404).toString();
