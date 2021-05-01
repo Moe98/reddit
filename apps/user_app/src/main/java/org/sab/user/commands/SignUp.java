@@ -1,74 +1,70 @@
 package org.sab.user.commands;
 
-import org.json.JSONObject;
+import org.sab.functions.Auth;
+import org.sab.functions.TypeUtilities;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
-import org.sab.service.Command;
 
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import java.util.UUID;
 
-public class SignUp extends Command {
 
-    public JSONObject error(String msg,int statusCode){
-        JSONObject error=new JSONObject().put("msg",msg).put("statusCode",statusCode);
-        return error;
-    }
-    //TODO, introduce constraints on the inputs
-    public String verifyBody(JSONObject body){
-        Set<String> keySet=body.keySet();
-        String[]params={"username","email","password","birthdate"};
-        String missing="";
-        for(String param:params)
-            if(!keySet.contains(param)){
-                if(!missing.equals(""))
-                    missing+=", ";
-                missing+=param;
-            }
-        return missing.equals("")?null:String.format("You must insert %s in the request body",missing);
+public class SignUp extends UserCommand {
 
+
+    static void initSchema() {
+        params = new String[]{"username", "email", "password", "birthdate", "photoUrl"};
+        types = new TypeUtilities.Type[]{TypeUtilities.Type.String, TypeUtilities.Type.String, TypeUtilities.Type.String, TypeUtilities.Type.SQLDate, TypeUtilities.Type.String};
+        isRequired = new boolean[]{true, true, true, true, false};
     }
+
+    static {
+        initSchema();
+    }
+
+
+    static String[] params;
+    static TypeUtilities.Type[] types;
+    static boolean[] isRequired;
+
+
     @Override
-    public String execute(JSONObject request) {
+    protected String getResponse() {
 
-        JSONObject body = request.getJSONObject("body");
-        String verifyBody=verifyBody(body);
-
-        if(verifyBody!=null)
-            return error(verifyBody,404).toString();
-        String userId = UUID.randomUUID().toString();
-
+        // retrieving the body objects
         String username = body.getString("username");
-        String hashedPassword = null;
+        String userId = UUID.randomUUID().toString();
+        String hashedPassword;
         try {
-            hashedPassword = encrypt(body.getString("password"));
-        } catch (NoSuchAlgorithmException |UnsupportedEncodingException e) {
-           return error(e.getMessage(),404).toString();
+            hashedPassword = Auth.encrypt(body.getString("password"));
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            return sendError(e.getMessage(), 404).toString();
         }
         String email = body.getString("email");
         String photoUrl = body.keySet().contains("photo_url") ? body.getString("photo_url") : null;
-
         Date birthdate = Date.valueOf(body.getString("birthdate"));
+
+        //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("create_user", new Object[]{userId, username, email, hashedPassword, birthdate, photoUrl});
-        } catch (PropertiesNotLoadedException|SQLException e) {
-            return error(e.getMessage(),404).toString();
+        } catch (PropertiesNotLoadedException | SQLException e) {
+            return sendError(e.getMessage(), 404).toString();
         }
-        User user = null;
+
+        //retrieving the result from SQL into a User Object
+        User user;
         try {
             ResultSet resultSet = PostgresConnection.call("get_user", new Object[]{username});
 
             if (resultSet == null || !resultSet.next()) {
-                return error("ResultSet is Empty!",404).toString();
+                return sendError("ResultSet is Empty!", 404).toString();
             }
-            //TODO: use builder pattern
+
             user = new User();
 
             user.setUserId(resultSet.getString("user_id"));
@@ -78,28 +74,18 @@ public class SignUp extends Command {
             user.setBirthdate(resultSet.getString("birthdate"));
             user.setPhotoUrl(resultSet.getString("photo_url"));
 
-        } catch (PropertiesNotLoadedException|SQLException e) {
-            return error("ResultSet is Empty!",404).toString();
+        } catch (PropertiesNotLoadedException | SQLException e) {
+            return UserCommand.sendError("ResultSet is Empty!", 404).toString();
         }
-        return String.format("{\"data\":%s,\"statusCode\":200}", user.toJSON());
+
+        return sendData(user.toJSON()).toString();
     }
 
-    public String encrypt(String plainTextPassword) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest salt = MessageDigest.getInstance("SHA-256");
-        salt.update(plainTextPassword.toString().getBytes("UTF-8"));
-        String digest = bytesToHex(salt.digest());
-        return digest;
+    @Override
+    protected String verifyBody() {
+        String verifyBody = verifyBody(params, types, isRequired);
+        return verifyBody;
     }
 
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
+
 }
