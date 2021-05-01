@@ -37,7 +37,7 @@ public class UpdatePopularThreads extends Command {
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, null);
 
             ArrayNode data = nf.arrayNode();
-            if(cursor.hasNext()) {
+            if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
                     Thread thread = new Thread();
                     thread.setName(document.getKey());
@@ -48,12 +48,11 @@ public class UpdatePopularThreads extends Command {
                     data.addPOJO(thread);
                 });
                 response.set("data", data);
-            }
-            else {
+            } else {
                 response.set("msg", nf.textNode("No Result"));
                 response.set("data", nf.arrayNode());
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             response.set("msg", nf.textNode(e.getMessage()));
             response.set("data", nf.arrayNode());
             response.set("statusCode", nf.numberNode(500));
@@ -61,12 +60,12 @@ public class UpdatePopularThreads extends Command {
             arango.disconnect(arangoDB);
         }
 
-        if(response.get("data").size() != 0) {
+        if (response.get("data").size() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if(!cluster.buckets().getAllBuckets().containsKey("Listings")){
+                if (!cluster.buckets().getAllBuckets().containsKey("Listings")) {
                     couchbase.createBucket(cluster, "Listings", 100);
                 }
 

@@ -15,12 +15,15 @@ public class ConfigMap {
         cmdMap = new ConcurrentHashMap<>();
         cmdMap.put("HELLO_WORLD", "org.sab.demo.commands.HelloWorld");
         cmdMap.put("GOOD_BYE_WORLD", "org.sab.demo.commands.GoodByeWorld");
-        cmdMap.put("UPDATE_POPULAR_THREADS", "org.sab.recommendation.commands.UpdatePopularThreads");
         cmdMap.put("GET_POPULAR_THREADS", "org.sab.recommendation.commands.GetPopularThreads");
-        cmdMap.put("UPDATE_POPULAR_SUBTHREADS", "org.sab.recommendation.commands.UpdatePopularSubThreads");
+        cmdMap.put("UPDATE_POPULAR_THREADS", "org.sab.recommendation.commands.UpdatePopularThreads");
         cmdMap.put("GET_POPULAR_SUBTHREADS", "org.sab.recommendation.commands.GetPopularSubThreads");
-        cmdMap.put("GET_RECOMMENDED_USERS", "org.sab.recommendation.commands.GetRecommendedUsers");
+        cmdMap.put("UPDATE_POPULAR_SUBTHREADS", "org.sab.recommendation.commands.UpdatePopularSubThreads");
         cmdMap.put("GET_RECOMMENDED_SUBTHREADS", "org.sab.recommendation.commands.GetRecommendedSubThreads");
+        cmdMap.put("UPDATE_RECOMMENDED_SUBTHREADS", "org.sab.recommendation.commands.UpdateRecommendedSubThreads");
+        cmdMap.put("GET_RECOMMENDED_THREADS", "org.sab.recommendation.commands.GetRecommendedThreads");
+        cmdMap.put("UPDATE_RECOMMENDED_THREADS", "org.sab.recommendation.commands.UpdateRecommendedThreads");
+        cmdMap.put("GET_RECOMMENDED_USERS", "org.sab.recommendation.commands.GetRecommendedUsers");
     }
 
     public static Class<?> getClass(String command) throws ClassNotFoundException {

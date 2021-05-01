@@ -1,4 +1,5 @@
 package org.sab.recommendation.commands;
+
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
@@ -36,7 +37,7 @@ public class UpdatePopularSubThreads extends Command {
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, null);
 
             ArrayNode data = nf.arrayNode();
-            if(cursor.hasNext()) {
+            if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
                     SubThread subThread = new SubThread();
                     subThread.set_key(document.getKey());
@@ -51,12 +52,11 @@ public class UpdatePopularSubThreads extends Command {
                     data.addPOJO(subThread);
                 });
                 response.set("data", data);
-            }
-            else {
+            } else {
                 response.set("msg", nf.textNode("No Result"));
                 response.set("data", nf.arrayNode());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             response.set("msg", nf.textNode(e.getMessage()));
             response.set("data", nf.arrayNode());
             response.set("statusCode", nf.numberNode(500));
@@ -64,12 +64,12 @@ public class UpdatePopularSubThreads extends Command {
             arango.disconnect(arangoDB);
         }
 
-        if(response.get("data").size() != 0) {
+        if (response.get("data").size() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if(!cluster.buckets().getAllBuckets().containsKey("Listings")){
+                if (!cluster.buckets().getAllBuckets().containsKey("Listings")) {
                     couchbase.createBucket(cluster, "Listings", 100);
                 }
 

@@ -23,9 +23,9 @@ public class GetPopularThreads extends Command {
             cluster = couchbase.connect();
 
             JsonObject result = couchbase.getDocument(cluster, "Listings", "popThreads");
-            JsonNode data =  new ObjectMapper().readTree(result.toString()).get("listOfThreads");
+            JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfThreads");
             response.set("data", data);
-
+            response.set("statusCode", nf.numberNode(200));
         } catch (Exception e) {
             response.set("msg", nf.textNode(e.getMessage()));
             response.set("data", nf.arrayNode());

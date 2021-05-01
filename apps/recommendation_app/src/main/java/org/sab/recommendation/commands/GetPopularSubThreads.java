@@ -23,7 +23,7 @@ public class GetPopularSubThreads extends Command {
             cluster = couchbase.connect();
 
             JsonObject result = couchbase.getDocument(cluster, "Listings", "popSubThreads");
-            JsonNode data =  new ObjectMapper().readTree(result.toString()).get("listOfSubThreads");
+            JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfSubThreads");
             response.set("data", data);
             response.set("statusCode", nf.numberNode(200));
         } catch (Exception e) {
