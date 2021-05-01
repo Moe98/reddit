@@ -27,4 +27,8 @@ public class Attribute {
         this.dataType = dataType;
         this.isRequired = isRequired;
     }
+
+    public boolean isValidlyTyped() {
+        return dataType.isOfValidType(this);
+    }
 }

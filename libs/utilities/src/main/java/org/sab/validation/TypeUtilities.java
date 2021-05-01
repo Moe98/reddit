@@ -42,13 +42,13 @@ public class TypeUtilities {
 
     public static String isType(Object object, DataType dataType) {
         switch (dataType) {
-            case Int:
+            case INT:
                 return isInt(object);
-            case SQLDate:
+            case SQL_DATE:
                 return isSQLDate(object);
-            case String:
+            case STRING:
                 return isString(object);
-            case Email:
+            case EMAIL:
                 return isEmail(object);
         }
         return ERROR;
