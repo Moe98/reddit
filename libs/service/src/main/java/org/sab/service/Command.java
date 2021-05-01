@@ -10,7 +10,7 @@ public abstract class Command {
     private static double classVersion = 1.0;
 
     // The function that will be invoked by all classes implementing Command.
-    public abstract String execute(JSONObject request) throws Exception;
+    public abstract String execute(JSONObject request);
 
     public static double getClassVersion() {
         return classVersion;
