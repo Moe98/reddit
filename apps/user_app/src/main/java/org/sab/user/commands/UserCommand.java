@@ -8,7 +8,7 @@ import java.util.Set;
 
 public abstract class UserCommand extends Command {
     protected JSONObject body;
-    
+
     @Override
     public String execute(JSONObject request) {
         body = request.getJSONObject("body");
@@ -45,8 +45,13 @@ public abstract class UserCommand extends Command {
                 missing += param;
 
             }
-            if (contains && !TypeUtilities.isType(body.get(param), types[i]))
-                return String.format("%s must be of type %s", param, types[i]);
+            if (contains) {
+                String typeStatus = TypeUtilities.isType(body.get(param), types[i]);
+                if (typeStatus != null)
+                    return String.format("%s must be of type %s.%s", param, types[i], typeStatus.isEmpty() ? "" : " " + typeStatus);
+
+            }
+
         }
         return missing == null ? null : String.format("You must insert %s in the request body", missing);
 
