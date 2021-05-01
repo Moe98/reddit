@@ -28,7 +28,7 @@ public class Attribute {
         this.isRequired = isRequired;
     }
 
-    public boolean isValidlyTyped() {
-        return dataType.isOfValidType(this);
+    public boolean isValidlyTyped(Object object) {
+        return dataType.isOfValidType(object);
     }
 }

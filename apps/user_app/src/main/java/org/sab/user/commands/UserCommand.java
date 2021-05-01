@@ -1,15 +1,15 @@
 package org.sab.user.commands;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.json.JSONObject;
+import org.sab.service.Command;
+import org.sab.user.RequestVerificationException;
 import org.sab.user.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.Schema;
-import org.sab.service.Command;
-import org.sab.user.RequestVerificationException;
+
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 
 public abstract class UserCommand extends Command {
@@ -65,7 +65,7 @@ public abstract class UserCommand extends Command {
     }
     
     private void checkForInvalidlyTypedAttributes() throws RequestVerificationException {
-        final Predicate<Attribute> isInvalidlyTyped = attribute -> !attribute.isValidlyTyped();
+        final Predicate<Attribute> isInvalidlyTyped = attribute -> !attribute.isValidlyTyped(body.get(attribute.getAttributeName()));
 
         final List<Attribute> invalidlyTypedAttributes = schema.getAttributeList().stream().filter(this::isFoundInBody)
                 .filter(isInvalidlyTyped).collect(Collectors.toList());
