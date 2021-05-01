@@ -5,32 +5,33 @@ import org.sab.validation.DataType;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+import org.sab.validation.Schema;
+import org.sab.validation.Attribute;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 
 public class SignUp extends UserCommand {
 
 
-    static void initSchema() {
-        params = new String[]{"username", "email", "password", "birthdate", "photoUrl"};
-        dataTypes = new DataType[]{DataType.String, DataType.Email, DataType.String, DataType.SQLDate, DataType.String};
-        isRequired = new boolean[]{true, true, true, true, false};
+    static Schema initSchema() {
+        Attribute username = new Attribute("username", DataType.String, true);
+        Attribute email = new Attribute("email", DataType.Email, true);
+        Attribute password = new Attribute("password", DataType.String, true);
+        Attribute birthdate = new Attribute("birthdate", DataType.SQLDate, true);
+        Attribute photoUrl = new Attribute("photoUrl", DataType.String);
+
+        schema = new Schema(List.of(username, email, password, birthdate, photoUrl));
+        return schema;
     }
 
-    static {
-        initSchema();
-    }
-
-
-    static String[] params;
-    static DataType[] dataTypes;
-    static boolean[] isRequired;
+    static Schema schema = initSchema();
 
 
     @Override
@@ -83,7 +84,7 @@ public class SignUp extends UserCommand {
 
     @Override
     protected String verifyBody() {
-        String verifyBody = verifyBody(params, dataTypes, isRequired);
+        String verifyBody = verifyBody(schema);
         return verifyBody;
     }
 

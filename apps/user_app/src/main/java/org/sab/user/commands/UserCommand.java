@@ -1,11 +1,11 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.validation.DataType;
+import org.sab.validation.Attribute;
+import org.sab.validation.Schema;
 import org.sab.validation.TypeUtilities;
 import org.sab.service.Command;
 
-import java.util.Set;
 
 public abstract class UserCommand extends Command {
     protected JSONObject body;
@@ -30,14 +30,13 @@ public abstract class UserCommand extends Command {
         return body.keySet().contains(attribute);
     }
 
-    protected String verifyBody(String[] params, DataType[] dataTypes, boolean[] isRequired) {
-        Set<String> keySet = body.keySet();
+    protected String verifyBody(Schema schema) {
 
         String missing = null;
-        for (int i = 0; i < params.length; i++) {
-            String param = params[i];
-            boolean contains = keySet.contains(param);
-            if (!contains && isRequired[i]) {
+        for (Attribute attribute : schema.getAttributeList()) {
+            String param = attribute.getAttributeName();
+            boolean contains = isInBody(param);
+            if (!contains && attribute.isRequired()) {
                 if (missing == null)
                     missing = "";
                 else
@@ -47,9 +46,9 @@ public abstract class UserCommand extends Command {
 
             }
             if (contains) {
-                String typeStatus = TypeUtilities.isType(body.get(param), dataTypes[i]);
+                String typeStatus = TypeUtilities.isType(body.get(param), attribute.getDataType());
                 if (typeStatus != null)
-                    return String.format("%s must be of type %s.%s", param, dataTypes[i], typeStatus.isEmpty() ? "" : " " + typeStatus);
+                    return String.format("%s must be of type %s.%s", param, attribute.getDataType(), typeStatus.isEmpty() ? "" : " " + typeStatus);
 
             }
 
