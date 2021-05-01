@@ -1,10 +1,14 @@
 package org.sab.user.commands;
 
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.json.JSONObject;
 import org.sab.validation.Attribute;
 import org.sab.validation.Schema;
-import org.sab.validation.TypeUtilities;
 import org.sab.service.Command;
+import org.sab.user.RequestVerificationException;
 
 
 public abstract class UserCommand extends Command {
@@ -20,11 +24,12 @@ public abstract class UserCommand extends Command {
     @Override
     public String execute(JSONObject request) {
         body = request.getJSONObject("body");
-        String verifyBody = verifyBody();
-        if (verifyBody != null)
-            return sendError(verifyBody, 400).toString();
+        try {
+            verifyBody();
+        } catch (RequestVerificationException e) {
+            return makeErrorResponse(e.getMessage(), 400).toString();
+        }
         return execute();
-
     }
 
     //abstract methods
@@ -33,35 +38,48 @@ public abstract class UserCommand extends Command {
     protected abstract Schema getSchema();
 
     //instance methods
-    protected boolean isInBody(String attribute) {
-        return body.keySet().contains(attribute);
+    private boolean isFoundInBody(Attribute attribute) {
+        return body.keySet().contains(attribute.getAttributeName());
     }
 
-    protected String verifyBody(Schema schema) {
+    private void verifyBody() throws RequestVerificationException {
+        checkForMissingAttributes();
+        checkForInvalidlyTypedAttributes();
+    }
+    
+    private void checkForMissingAttributes() throws RequestVerificationException {
+        final Schema schema = getSchema();
 
-        String missing = null;
-        for (Attribute attribute : schema.getAttributeList()) {
-            String param = attribute.getAttributeName();
-            boolean contains = isInBody(param);
-            if (!contains && attribute.isRequired()) {
-                if (missing == null)
-                    missing = "";
-                else
-                    missing += ", ";
+        final Predicate<Attribute> isNotFoundInBody = attribute -> !isFoundInBody(attribute);
 
-                missing += param;
+        final List<Attribute> missingAttributes = schema.getAttributeList().stream().filter(isNotFoundInBody)
+                .filter(Attribute::isRequired).collect(Collectors.toList());
 
-            }
-            if (contains) {
-                String typeStatus = TypeUtilities.isType(body.get(param), attribute.getDataType());
-                if (typeStatus != null)
-                    return String.format("%s must be of type %s.%s", param, attribute.getDataType(), typeStatus.isEmpty() ? "" : " " + typeStatus);
-
-            }
-
+        if (!missingAttributes.isEmpty()) {
+            final String exceptionMessage = "Some attributes were missing: "
+                    + missingAttributes.stream().map(Attribute::getAttributeName).collect(Collectors.joining(", "));
+            throw new RequestVerificationException(exceptionMessage);
         }
-        return missing == null ? null : String.format("You must insert %s in the request body", missing);
 
+    }
+    
+    private void checkForInvalidlyTypedAttributes() throws RequestVerificationException {
+        final Schema schema = getSchema();
+        final Predicate<Attribute> isInvalidlyTyped = attribute -> !attribute.isValidlyTyped();
+
+        final List<Attribute> invalidlyTypedAttributes = schema.getAttributeList().stream().filter(this::isFoundInBody)
+                .filter(isInvalidlyTyped).collect(Collectors.toList());
+
+        if (!invalidlyTypedAttributes.isEmpty()) {
+            final String exceptionMessage = invalidlyTypedAttributes.stream().map(this::makeInvalidlyTypedAttributeMessage)
+                    .collect(Collectors.joining("\n "));
+            throw new RequestVerificationException(exceptionMessage);
+        }
+    }
+
+    private String makeInvalidlyTypedAttributeMessage(Attribute attribute) {
+        return String.format("%s must be of type %s.%s", attribute.getAttributeName(),
+                attribute.getDataType().toString(), attribute.getDataType().getAdditionalErrorMessage());
     }
 
 

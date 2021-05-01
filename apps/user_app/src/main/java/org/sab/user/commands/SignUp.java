@@ -78,11 +78,4 @@ public class SignUp extends UserCommand {
         return makeDataResponse(user.toJSON()).toString();
     }
 
-    @Override
-    protected String verifyBody() {
-        String verifyBody = verifyBody(schema);
-        return verifyBody;
-    }
-
-
 }
