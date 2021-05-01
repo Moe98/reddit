@@ -31,9 +31,9 @@ public class CouchbaseTest {
             documentProperties.put("int_field", 1);
             documentProperties.put("string_field", "helloCouch");
 
-            if (cluster.buckets().getAllBuckets().containsKey(bucketName))
+            if (couchbase.bucketExists(cluster, bucketName))
                 couchbase.dropBucket(cluster,bucketName);
-            assertFalse(cluster.buckets().getAllBuckets().containsKey(bucketName));
+            assertFalse(couchbase.bucketExists(cluster, bucketName));
         } catch (CouchbaseException e){
             fail(e.getMessage());
         }
@@ -52,7 +52,7 @@ public class CouchbaseTest {
     public void buildBucket() {
         try {
             couchbase.createBucket(cluster,bucketName,bucketSize);
-            assertTrue(cluster.buckets().getAllBuckets().containsKey(bucketName));
+            assertTrue(couchbase.bucketExists(cluster, bucketName));
         }catch (CouchbaseException e){
             fail(e.getMessage());
         }
@@ -62,7 +62,7 @@ public class CouchbaseTest {
     public void dropBucket() {
         try {
             couchbase.dropBucket(cluster,bucketName);
-            assertFalse(cluster.buckets().getAllBuckets().containsKey(bucketName));
+            assertFalse(couchbase.bucketExists(cluster, bucketName));
         }catch (CouchbaseException e){
             fail(e.getMessage());
         }
@@ -98,6 +98,17 @@ public class CouchbaseTest {
             cluster.bucket(bucketName).defaultCollection().upsert("get", CreatedDocument);
             JsonObject retrievedDocument = couchbase.getDocument(cluster,bucketName,"get");
             assertEquals(cluster.bucket(bucketName).defaultCollection().get("get").contentAsObject(),retrievedDocument);
+        } catch (CouchbaseException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void documentExists(){
+        try {
+            JsonObject createdDocument = JsonObject.from(documentProperties);
+            couchbase.upsertDocument(cluster, bucketName, "exists", createdDocument);
+            assertTrue(couchbase.documentExists(cluster, bucketName, "exists"));
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }

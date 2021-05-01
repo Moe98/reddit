@@ -44,6 +44,10 @@ public class Couchbase {
         cluster.buckets().dropBucket(bucketName);
     }
 
+    public boolean bucketExists(Cluster cluster, String bucketName){
+        return cluster.buckets().getAllBuckets().containsKey(bucketName);
+    }
+
     public MutationResult upsertDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object){
         return cluster.bucket(bucketName).defaultCollection().upsert(documentKey, object);
     }
@@ -51,6 +55,10 @@ public class Couchbase {
     public JsonObject getDocument(Cluster cluster, String bucketName, String documentKey){
         GetResult getResult = cluster.bucket(bucketName).defaultCollection().get(documentKey);
         return getResult.contentAsObject();
+    }
+
+    public boolean documentExists(Cluster cluster, String bucketName, String documentKey){
+        return cluster.bucket(bucketName).defaultCollection().exists(documentKey).exists();
     }
 
     public MutationResult replaceDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object){
