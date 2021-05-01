@@ -31,7 +31,9 @@ public class UpdatePopularSubThreads extends Command {
 
             String query = """
                     FOR subThread IN SubThreads
-                        SORT subThread.Likes DESC
+                        SORT subThread.Time DESC
+                        LIMIT 200
+                        SORT SUM([subThread.Likes, subThread.Dislikes]) DESC
                         LIMIT 100
                         RETURN subThread""";
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, null);
