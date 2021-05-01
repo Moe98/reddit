@@ -19,7 +19,7 @@ public class SignUp extends UserCommand {
 
     static void initSchema() {
         params = new String[]{"username", "email", "password", "birthdate", "photoUrl"};
-        types = new TypeUtilities.Type[]{TypeUtilities.Type.String, TypeUtilities.Type.String, TypeUtilities.Type.String, TypeUtilities.Type.SQLDate, TypeUtilities.Type.String};
+        types = new TypeUtilities.Type[]{TypeUtilities.Type.String, TypeUtilities.Type.Email, TypeUtilities.Type.String, TypeUtilities.Type.SQLDate, TypeUtilities.Type.String};
         isRequired = new boolean[]{true, true, true, true, false};
     }
 
