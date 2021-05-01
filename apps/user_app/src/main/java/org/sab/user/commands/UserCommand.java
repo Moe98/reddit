@@ -21,10 +21,11 @@ public abstract class UserCommand extends Command {
 
 
     protected JSONObject body;
-
+    protected Schema schema;
     @Override
     public String execute(JSONObject request) {
         body = request.getJSONObject("body");
+        schema = getSchema();
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
@@ -49,7 +50,6 @@ public abstract class UserCommand extends Command {
     }
     
     private void checkForMissingAttributes() throws RequestVerificationException {
-        final Schema schema = getSchema();
 
         final Predicate<Attribute> isNotFoundInBody = attribute -> !isFoundInBody(attribute);
 
@@ -65,7 +65,6 @@ public abstract class UserCommand extends Command {
     }
     
     private void checkForInvalidlyTypedAttributes() throws RequestVerificationException {
-        final Schema schema = getSchema();
         final Predicate<Attribute> isInvalidlyTyped = attribute -> !attribute.isValidlyTyped();
 
         final List<Attribute> invalidlyTypedAttributes = schema.getAttributeList().stream().filter(this::isFoundInBody)
