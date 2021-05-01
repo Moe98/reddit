@@ -57,17 +57,15 @@ public abstract class UserCommand extends Command {
 
     }
 
-    //static methods
-    protected static JSONObject sendError(String msg, int statusCode) {
+
+    protected JSONObject makeErrorResponse(String msg, int statusCode) {
         JSONObject error = new JSONObject().put("msg", msg).put("statusCode", statusCode);
         return error;
     }
 
-    protected static JSONObject sendData(JSONObject data) {
+    protected JSONObject makeDataResponse(JSONObject data) {
         JSONObject response = new JSONObject().put("data", data);
         response.put("statusCode", 200);
         return response;
     }
-
-
 }

@@ -31,21 +31,21 @@ public class ChooseProfilePhoto extends UserCommand {
             try {
                 photoUrl = CloudUtilities.uploadImage(photoUrl,username);
             } catch (IOException e) {
-                return sendError("An error occurred while uploading your image!", 400).toString();
+                return makeErrorResponse("An error occurred while uploading your image!", 400).toString();
             }
         }
         else{
             try {
                 CloudUtilities.destroyImage(username);
             } catch (IOException e) {
-                return sendError("An error occurred while updating your image!", 400).toString();
+                return makeErrorResponse("An error occurred while updating your image!", 400).toString();
             }
         }
         //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("update_profile_picture", new Object[]{username, photoUrl});
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return sendError(e.getMessage(), 404).toString();
+            return makeErrorResponse(e.getMessage(), 404).toString();
         }
 
         //retrieving the result from SQL into a User Object
@@ -54,7 +54,7 @@ public class ChooseProfilePhoto extends UserCommand {
             ResultSet resultSet = PostgresConnection.call("get_user", new Object[]{username});
 
             if (resultSet == null || !resultSet.next()) {
-                return sendError("User not found!", 404).toString();
+                return makeErrorResponse("User not found!", 404).toString();
             }
 
             user = new User();
@@ -64,10 +64,10 @@ public class ChooseProfilePhoto extends UserCommand {
             user.setBirthdate(resultSet.getString("birthdate"));
             user.setPhotoUrl(resultSet.getString("photo_url"));
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return sendError("An error occurred while submitting your request!", 502).toString();
+            return makeErrorResponse("An error occurred while submitting your request!", 502).toString();
         }
 
-        return sendData(user.toJSON()).toString();
+        return makeDataResponse(user.toJSON()).toString();
     }
 
     @Override

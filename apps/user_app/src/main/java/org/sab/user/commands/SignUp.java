@@ -40,7 +40,7 @@ public class SignUp extends UserCommand {
         try {
             hashedPassword = Auth.encrypt(body.getString("password"));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            return sendError(e.getMessage(), 404).toString();
+            return makeErrorResponse(e.getMessage(), 404).toString();
         }
         String email = body.getString("email");
         String photoUrl = body.keySet().contains("photo_url") ? body.getString("photo_url") : null;
@@ -50,7 +50,7 @@ public class SignUp extends UserCommand {
         try {
             PostgresConnection.call("create_user", new Object[]{userId, username, email, hashedPassword, birthdate, photoUrl});
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return sendError(e.getMessage(), 404).toString();
+            return makeErrorResponse(e.getMessage(), 404).toString();
         }
 
         //retrieving the result from SQL into a User Object
@@ -59,7 +59,7 @@ public class SignUp extends UserCommand {
             ResultSet resultSet = PostgresConnection.call("get_user", new Object[]{username});
 
             if (resultSet == null || !resultSet.next()) {
-                return sendError("ResultSet is Empty!", 404).toString();
+                return makeErrorResponse("ResultSet is Empty!", 404).toString();
             }
 
             user = new User();
@@ -72,10 +72,10 @@ public class SignUp extends UserCommand {
             user.setPhotoUrl(resultSet.getString("photo_url"));
 
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return UserCommand.sendError("ResultSet is Empty!", 404).toString();
+            return makeErrorResponse("ResultSet is Empty!", 404).toString();
         }
 
-        return sendData(user.toJSON()).toString();
+        return makeDataResponse(user.toJSON()).toString();
     }
 
     @Override
