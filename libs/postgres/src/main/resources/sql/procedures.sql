@@ -36,7 +36,7 @@ CREATE OR REPLACE FUNCTION get_user(in_username VARCHAR)
     END; $$
 LANGUAGE PLPGSQL;
 
-CREATE OR REPLACE FUNCTION update_profile_picture(in_username VARCHAR, new_photo_url VARCHAR)
+CREATE OR REPLACE FUNCTION update_profile_picture(in_username VARCHAR, new_photo_url text)
     RETURNS VOID AS $$
 BEGIN
 
