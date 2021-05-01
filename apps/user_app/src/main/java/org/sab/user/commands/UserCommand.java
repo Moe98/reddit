@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
+import org.sab.user.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.Schema;
 import org.sab.service.Command;
@@ -27,7 +28,7 @@ public abstract class UserCommand extends Command {
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
-            return makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         }
         return execute();
     }
@@ -83,14 +84,5 @@ public abstract class UserCommand extends Command {
     }
 
 
-    protected JSONObject makeErrorResponse(String msg, int statusCode) {
-        JSONObject error = new JSONObject().put("msg", msg).put("statusCode", statusCode);
-        return error;
-    }
 
-    protected JSONObject makeDataResponse(JSONObject data) {
-        JSONObject response = new JSONObject().put("data", data);
-        response.put("statusCode", 200);
-        return response;
-    }
 }

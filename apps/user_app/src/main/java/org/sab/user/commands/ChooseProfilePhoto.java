@@ -4,6 +4,7 @@ import org.sab.functions.CloudUtilities;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+import org.sab.user.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -31,21 +32,21 @@ public class ChooseProfilePhoto extends UserCommand {
             try {
                 photoUrl = CloudUtilities.uploadImage(photoUrl, username);
             } catch (IOException e) {
-                return makeErrorResponse("An error occurred while uploading your image!", 400).toString();
+                return Responder.makeErrorResponse("An error occurred while uploading your image!", 400).toString();
             }
         }
         else{
             try {
                 CloudUtilities.destroyImage(username);
             } catch (IOException e) {
-                return makeErrorResponse("An error occurred while updating your image!", 400).toString();
+                return Responder.makeErrorResponse("An error occurred while updating your image!", 400).toString();
             }
         }
         //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("update_profile_picture", username, photoUrl);
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
 
         //retrieving the result from SQL into a User Object
@@ -54,7 +55,7 @@ public class ChooseProfilePhoto extends UserCommand {
             ResultSet resultSet = PostgresConnection.call("get_user", username);
 
             if (resultSet == null || !resultSet.next()) {
-                return makeErrorResponse("User not found!", 404).toString();
+                return Responder.makeErrorResponse("User not found!", 404).toString();
             }
 
             user = new User();
@@ -64,9 +65,9 @@ public class ChooseProfilePhoto extends UserCommand {
             user.setBirthdate(resultSet.getString(BIRTHDATE));
             user.setPhotoUrl(resultSet.getString(PHOTO_URL));
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return makeErrorResponse("An error occurred while submitting your request!", 502).toString();
+            return Responder.makeErrorResponse("An error occurred while submitting your request!", 502).toString();
         }
 
-        return makeDataResponse(user.toJSON()).toString();
+        return Responder.makeDataResponse(user.toJSON()).toString();
     }
 }

@@ -1,6 +1,8 @@
 package org.sab.user.commands;
 
+import org.json.JSONObject;
 import org.sab.functions.Auth;
+import org.sab.user.Responder;
 import org.sab.validation.DataType;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
@@ -40,7 +42,7 @@ public class SignUp extends UserCommand {
         try {
             hashedPassword = Auth.encrypt(body.getString(PASSWORD));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            return makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         String email = body.getString(EMAIL);
         String photoUrl = body.keySet().contains(PHOTO_URL) ? body.getString(PHOTO_URL) : null;
@@ -50,7 +52,7 @@ public class SignUp extends UserCommand {
         try {
             PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate, photoUrl);
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
 
         //retrieving the result from SQL into a User Object
@@ -59,7 +61,7 @@ public class SignUp extends UserCommand {
             ResultSet resultSet = PostgresConnection.call("get_user", username);
 
             if (resultSet == null || !resultSet.next()) {
-                return makeErrorResponse("ResultSet is Empty!", 404).toString();
+                return Responder.makeErrorResponse("ResultSet is Empty!", 404).toString();
             }
 
             user = new User();
@@ -72,10 +74,10 @@ public class SignUp extends UserCommand {
             user.setPhotoUrl(resultSet.getString("photo_url"));
 
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return makeErrorResponse("ResultSet is Empty!", 404).toString();
+            return Responder.makeErrorResponse("ResultSet is Empty!", 404).toString();
         }
 
-        return makeDataResponse(user.toJSON()).toString();
+        return Responder.makeDataResponse(user.toJSON()).toString();
     }
 
 }
