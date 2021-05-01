@@ -65,7 +65,7 @@ public class UpdatePopularThreads extends Command {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if (!cluster.buckets().getAllBuckets().containsKey("Listings")) {
+                if (!couchbase.bucketExists(cluster, "Listings")) {
                     couchbase.createBucket(cluster, "Listings", 100);
                 }
 

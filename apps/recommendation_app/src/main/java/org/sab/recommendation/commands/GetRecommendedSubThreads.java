@@ -22,6 +22,12 @@ public class GetRecommendedSubThreads extends Command {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
+            if (!couchbase.bucketExists(cluster, "RecommendedSubThreads") || !couchbase.documentExists(cluster, "RecommendedSubThreads", request.getJSONObject("body").getString("username"))) {
+                String externalCommandResponseString = new UpdateRecommendedSubThreads().execute(request);
+                if (new JSONObject(externalCommandResponseString).getInt("statusCode") != 200)
+                    return externalCommandResponseString;
+            }
+
             JsonObject result = couchbase.getDocument(cluster, "RecommendedSubThreads", request.getJSONObject("body").getString("username"));
             JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfSubThreads");
             response.set("data", data);

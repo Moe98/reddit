@@ -64,7 +64,7 @@ public class UpdateRecommendedThreads extends Command {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if (!cluster.buckets().getAllBuckets().containsKey("RecommendedThreads")) {
+                if (!couchbase.bucketExists(cluster, "RecommendedThreads")) {
                     couchbase.createBucket(cluster, "RecommendedThreads", 100);
                 }
 

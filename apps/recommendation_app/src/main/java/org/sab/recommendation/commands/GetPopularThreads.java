@@ -22,6 +22,12 @@ public class GetPopularThreads extends Command {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
+            if (!couchbase.bucketExists(cluster, "Listings") || !couchbase.documentExists(cluster, "Listings", "popThreads")) {
+                String externalCommandResponseString = new UpdatePopularThreads().execute(null);
+                if (new JSONObject(externalCommandResponseString).getInt("statusCode") != 200)
+                    return externalCommandResponseString;
+            }
+
             JsonObject result = couchbase.getDocument(cluster, "Listings", "popThreads");
             JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfThreads");
             response.set("data", data);
