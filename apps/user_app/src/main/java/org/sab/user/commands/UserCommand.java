@@ -1,7 +1,8 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.functions.TypeUtilities;
+import org.sab.validation.DataType;
+import org.sab.validation.TypeUtilities;
 import org.sab.service.Command;
 
 import java.util.Set;
@@ -29,7 +30,7 @@ public abstract class UserCommand extends Command {
         return body.keySet().contains(attribute);
     }
 
-    protected String verifyBody(String[] params, TypeUtilities.Type[] types, boolean[] isRequired) {
+    protected String verifyBody(String[] params, DataType[] dataTypes, boolean[] isRequired) {
         Set<String> keySet = body.keySet();
 
         String missing = null;
@@ -46,9 +47,9 @@ public abstract class UserCommand extends Command {
 
             }
             if (contains) {
-                String typeStatus = TypeUtilities.isType(body.get(param), types[i]);
+                String typeStatus = TypeUtilities.isType(body.get(param), dataTypes[i]);
                 if (typeStatus != null)
-                    return String.format("%s must be of type %s.%s", param, types[i], typeStatus.isEmpty() ? "" : " " + typeStatus);
+                    return String.format("%s must be of type %s.%s", param, dataTypes[i], typeStatus.isEmpty() ? "" : " " + typeStatus);
 
             }
 

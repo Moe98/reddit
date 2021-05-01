@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.sab.functions.Auth;
-import org.sab.functions.TypeUtilities;
+import org.sab.validation.DataType;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
@@ -19,7 +19,7 @@ public class SignUp extends UserCommand {
 
     static void initSchema() {
         params = new String[]{"username", "email", "password", "birthdate", "photoUrl"};
-        types = new TypeUtilities.Type[]{TypeUtilities.Type.String, TypeUtilities.Type.Email, TypeUtilities.Type.String, TypeUtilities.Type.SQLDate, TypeUtilities.Type.String};
+        dataTypes = new DataType[]{DataType.String, DataType.Email, DataType.String, DataType.SQLDate, DataType.String};
         isRequired = new boolean[]{true, true, true, true, false};
     }
 
@@ -29,7 +29,7 @@ public class SignUp extends UserCommand {
 
 
     static String[] params;
-    static TypeUtilities.Type[] types;
+    static DataType[] dataTypes;
     static boolean[] isRequired;
 
 
@@ -83,7 +83,7 @@ public class SignUp extends UserCommand {
 
     @Override
     protected String verifyBody() {
-        String verifyBody = verifyBody(params, types, isRequired);
+        String verifyBody = verifyBody(params, dataTypes, isRequired);
         return verifyBody;
     }
 

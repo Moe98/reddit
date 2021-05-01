@@ -1,12 +1,8 @@
-package org.sab.functions;
+package org.sab.validation;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TypeUtilities {
-    public enum Type {
-        String, Int, SQLDate, Email;
-    }
 
     final static String ERROR = "";
     final static String OK = null;
@@ -44,8 +40,8 @@ public class TypeUtilities {
     }
 
 
-    public static String isType(Object object, Type type) {
-        switch (type) {
+    public static String isType(Object object, DataType dataType) {
+        switch (dataType) {
             case Int:
                 return isInt(object);
             case SQLDate:
