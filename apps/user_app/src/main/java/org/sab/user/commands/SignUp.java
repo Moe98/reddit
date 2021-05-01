@@ -34,7 +34,7 @@ public class SignUp extends UserCommand {
 
 
     @Override
-    protected String getResponse() {
+    protected String execute() {
 
         // retrieving the body objects
         String username = body.getString("username");

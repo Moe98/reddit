@@ -15,12 +15,12 @@ public abstract class UserCommand extends Command {
         String verifyBody = verifyBody();
         if (verifyBody != null)
             return sendError(verifyBody, 400).toString();
-        return getResponse();
+        return execute();
 
     }
 
     //abstract methods
-    protected abstract String getResponse();
+    protected abstract String execute();
 
     protected abstract String verifyBody();
 
