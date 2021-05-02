@@ -6,13 +6,10 @@ import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-import org.sab.models.SubThread;
 import org.sab.service.Command;
 
 import java.util.Collections;
@@ -26,11 +23,17 @@ public class UpdateRecommendedSubThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JsonNodeFactory nf = JsonNodeFactory.instance;
-        ObjectNode response = nf.objectNode();
+        JSONObject response = new JSONObject();
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
+
+            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key"});
+            }
+            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("SubThreadsView").exists()) {
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
+            }
 
             String query = """
                     LET followedSample = (
@@ -75,51 +78,51 @@ public class UpdateRecommendedSubThreads extends Command {
             Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
-            ArrayNode data = nf.arrayNode();
+            JSONArray data = new JSONArray();
             if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
-                    SubThread subThread = new SubThread();
-                    subThread.set_key(document.getKey());
-                    subThread.setParentThread((String) document.getProperties().get("ParentThread"));
-                    subThread.setTitle((String) document.getProperties().get("Title"));
-                    subThread.setCreator((String) document.getProperties().get("Creator"));
-                    subThread.setLikes((Integer) document.getProperties().get("Likes"));
-                    subThread.setDislikes((Integer) document.getProperties().get("Dislikes"));
-                    subThread.setContent((String) document.getProperties().get("Content"));
-                    subThread.setHasImage((Boolean) document.getProperties().get("HasImage"));
-                    subThread.setTime((String) document.getProperties().get("Time"));
-                    data.addPOJO(subThread);
+                    JSONObject subThread = new JSONObject();
+                    subThread.put("_key", document.getKey());
+                    subThread.put("ParentThread", document.getProperties().get("ParentThread"));
+                    subThread.put("Title", document.getProperties().get("Title"));
+                    subThread.put("Creator", document.getProperties().get("Creator"));
+                    subThread.put("Likes", document.getProperties().get("Likes"));
+                    subThread.put("Dislikes", document.getProperties().get("Dislikes"));
+                    subThread.put("Content", document.getProperties().get("Content"));
+                    subThread.put("HasImage", document.getProperties().get("HasImage"));
+                    subThread.put("Time", document.getProperties().get("Time"));
+                    data.put(subThread);
                 });
-                response.set("data", data);
+                response.put("data", data);
             } else {
-                response.set("msg", nf.textNode("No Result"));
-                response.set("data", nf.arrayNode());
+                response.put("msg", "No Result");
+                response.put("data", new JSONArray());
             }
         } catch (Exception e) {
-            response.set("msg", nf.textNode(e.getMessage()));
-            response.set("data", nf.arrayNode());
-            response.set("statusCode", nf.numberNode(500));
+            response.put("msg", e.getMessage());
+            response.put("data", new JSONArray());
+            response.put("statusCode", 500);
         } finally {
             arango.disconnect(arangoDB);
         }
 
-        if (response.get("data").size() != 0) {
+        if (response.getJSONArray("data").length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
                 if (!couchbase.bucketExists(cluster, "RecommendedSubThreads")) {
-                    couchbase.createBucket(cluster, "RecommendedSubThreads", 50);
+                    couchbase.createBucket(cluster, "RecommendedSubThreads", 100);
                 }
 
-                JsonObject object = JsonObject.create().put("listOfSubThreads", JacksonTransformers.stringToJsonArray(response.get("data").toString()));
+                JsonObject object = JsonObject.create().put("listOfSubThreads", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
                 couchbase.upsertDocument(cluster, "RecommendedSubThreads", request.getJSONObject("body").getString("username"), object);
-                response.set("msg", nf.textNode("Recommended SubThreads Updated Successfully!"));
-                response.set("statusCode", nf.numberNode(200));
+                response.put("msg", "Recommended SubThreads Updated Successfully!");
+                response.put("statusCode", 200);
             } catch (Exception e) {
-                response.set("msg", nf.textNode(e.getMessage()));
-                response.set("data", nf.arrayNode());
-                response.set("statusCode", nf.numberNode(500));
+                response.put("msg", e.getMessage());
+                response.put("data", new JSONArray());
+                response.put("statusCode", 500);
             } finally {
                 couchbase.disconnect(cluster);
             }

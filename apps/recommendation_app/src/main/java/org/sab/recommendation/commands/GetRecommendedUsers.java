@@ -4,8 +4,7 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.couchbase.Couchbase;
 import org.sab.service.Command;
@@ -16,8 +15,7 @@ public class GetRecommendedUsers extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JsonNodeFactory nf = JsonNodeFactory.instance;
-        ObjectNode response = nf.objectNode();
+        JSONObject response = new JSONObject();
         try {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
@@ -30,12 +28,12 @@ public class GetRecommendedUsers extends Command {
 
             JsonObject result = couchbase.getDocument(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"));
             JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfUsers");
-            response.set("data", data);
-            response.set("statusCode", nf.numberNode(200));
+            response.put("data", new JSONArray(data.toString()));
+            response.put("statusCode", 200);
         } catch (Exception e) {
-            response.set("msg", nf.textNode(e.getMessage()));
-            response.set("data", nf.arrayNode());
-            response.set("statusCode", nf.numberNode(500));
+            response.put("msg", e.getMessage());
+            response.put("data", new JSONArray());
+            response.put("statusCode", 500);
         } finally {
             couchbase.disconnect(cluster);
         }

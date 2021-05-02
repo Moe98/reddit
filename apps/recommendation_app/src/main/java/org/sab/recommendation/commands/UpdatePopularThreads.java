@@ -6,13 +6,10 @@ import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.json.JacksonTransformers;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-import org.sab.models.Thread;
 import org.sab.service.Command;
 
 public class UpdatePopularThreads extends Command {
@@ -23,8 +20,7 @@ public class UpdatePopularThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JsonNodeFactory nf = JsonNodeFactory.instance;
-        ObjectNode response = nf.objectNode();
+        JSONObject response = new JSONObject();
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
@@ -36,31 +32,31 @@ public class UpdatePopularThreads extends Command {
                         RETURN thread""";
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, null);
 
-            ArrayNode data = nf.arrayNode();
+            JSONArray data = new JSONArray();
             if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
-                    Thread thread = new Thread();
-                    thread.setName(document.getKey());
-                    thread.setDescription((String) document.getProperties().get("Description"));
-                    thread.setCreator((String) document.getProperties().get("Creator"));
-                    thread.setNumOfFollowers((Integer) document.getProperties().get("NumOfFollowers"));
-                    thread.setDateCreated((String) document.getProperties().get("DateCreated"));
-                    data.addPOJO(thread);
+                    JSONObject thread = new JSONObject();
+                    thread.put("_key", document.getKey());
+                    thread.put("Description", document.getProperties().get("Description"));
+                    thread.put("Creator", document.getProperties().get("Creator"));
+                    thread.put("NumOfFollowers", document.getProperties().get("NumOfFollowers"));
+                    thread.put("DateCreated", document.getProperties().get("DateCreated"));
+                    data.put(thread);
                 });
-                response.set("data", data);
+                response.put("data", data);
             } else {
-                response.set("msg", nf.textNode("No Result"));
-                response.set("data", nf.arrayNode());
+                response.put("msg", "No Result");
+                response.put("data", new JSONArray());
             }
         } catch (Exception e) {
-            response.set("msg", nf.textNode(e.getMessage()));
-            response.set("data", nf.arrayNode());
-            response.set("statusCode", nf.numberNode(500));
+            response.put("msg", e.getMessage());
+            response.put("data", new JSONArray());
+            response.put("statusCode", 500);
         } finally {
             arango.disconnect(arangoDB);
         }
 
-        if (response.get("data").size() != 0) {
+        if (response.getJSONArray("data").length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
@@ -69,14 +65,14 @@ public class UpdatePopularThreads extends Command {
                     couchbase.createBucket(cluster, "Listings", 100);
                 }
 
-                JsonObject object = JsonObject.create().put("listOfThreads", JacksonTransformers.stringToJsonArray(response.get("data").toString()));
+                JsonObject object = JsonObject.create().put("listOfThreads", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
                 couchbase.upsertDocument(cluster, "Listings", "popThreads", object);
-                response.set("msg", nf.textNode("Popular Threads Updated Successfully!"));
-                response.set("statusCode", nf.numberNode(200));
+                response.put("msg", "Popular Threads Updated Successfully!");
+                response.put("statusCode", 200);
             } catch (Exception e) {
-                response.set("msg", nf.textNode(e.getMessage()));
-                response.set("data", nf.arrayNode());
-                response.set("statusCode", nf.numberNode(500));
+                response.put("msg", e.getMessage());
+                response.put("data", new JSONArray());
+                response.put("statusCode", 500);
             } finally {
                 couchbase.disconnect(cluster);
             }

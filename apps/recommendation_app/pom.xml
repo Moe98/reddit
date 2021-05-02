@@ -61,12 +61,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.sab</groupId>
-            <artifactId>models</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.sab.libs</groupId>
             <artifactId>service</artifactId>
             <version>1.0-SNAPSHOT</version>
