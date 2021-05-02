@@ -10,7 +10,7 @@ public class Thread {
     public long numOfFollowers;
     public String dateCreated;
 
-    public Thread(){
+    public Thread() {
         // Empty constructor used in the recommendation app.
         super();
     }

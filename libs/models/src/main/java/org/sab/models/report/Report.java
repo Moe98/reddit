@@ -1,7 +1,5 @@
 package org.sab.models.report;
 
-import java.util.Date;
-
 public abstract class Report {
     private String userName;
     private TypeOfReport typeOfReport;
@@ -12,28 +10,28 @@ public abstract class Report {
         return userName;
     }
 
-    public TypeOfReport getTypeOfReport() {
-        return typeOfReport;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getReportDescription() {
-        return reportDescription;
-    }
-
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public TypeOfReport getTypeOfReport() {
+        return typeOfReport;
     }
 
     public void setTypeOfReport(TypeOfReport typeOfReport) {
         this.typeOfReport = typeOfReport;
     }
 
+    public String getDate() {
+        return date;
+    }
+
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getReportDescription() {
+        return reportDescription;
     }
 
     public void setReportDescription(String reportDescription) {

@@ -11,12 +11,12 @@ public class SubThreadReport extends Report {
         setSubThreadId(subThreadID);
     }
 
-    public void setSubThreadId(String subThreadId) {
-        this.subThreadId = subThreadId;
-    }
-
     public String getSubThreadId() {
         return subThreadId;
+    }
+
+    public void setSubThreadId(String subThreadId) {
+        this.subThreadId = subThreadId;
     }
 
     @Override
