@@ -26,8 +26,8 @@ public class SearchThread extends Command {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            if(!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()){
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"_key"});
+            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key"});
             }
 
             String query = """
@@ -38,7 +38,7 @@ public class SearchThread extends Command {
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
             JSONArray data = new JSONArray();
-            if(cursor.hasNext()) {
+            if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
                     JSONObject thread = new JSONObject();
                     thread.put("_key", document.getKey());
@@ -49,18 +49,16 @@ public class SearchThread extends Command {
                     data.put(thread);
                 });
                 response.put("data", data);
-            }
-            else{
+            } else {
                 response.put("msg", "No Result");
                 response.put("data", new JSONArray());
             }
             response.put("statusCode", 200);
-        } catch (Exception e){
+        } catch (Exception e) {
             response.put("msg", e.getMessage());
             response.put("data", new JSONArray());
             response.put("statusCode", 500);
-        }
-        finally {
+        } finally {
             arango.disconnect(arangoDB);
         }
         return response.toString();
