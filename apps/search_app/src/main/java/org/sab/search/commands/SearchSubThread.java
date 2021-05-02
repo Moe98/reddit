@@ -3,9 +3,7 @@ package org.sab.search.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Command;
@@ -19,8 +17,7 @@ public class SearchSubThread extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JsonNodeFactory nf = JsonNodeFactory.instance;
-        ObjectNode response = nf.objectNode();
+        JSONObject response = new JSONObject();
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
@@ -36,32 +33,32 @@ public class SearchSubThread extends Command {
             Map<String, Object> bindVars = Collections.singletonMap("words", request.getJSONObject("body").getString("searchText"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
-            ArrayNode data = nf.arrayNode();
+            JSONArray data = new JSONArray();
             if(cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
-                    ObjectNode subThread = nf.objectNode();
+                    JSONObject subThread = new JSONObject();
                     subThread.put("_key", document.getKey());
-                    subThread.put("ParentThread", (String) document.getProperties().get("ParentThread"));
-                    subThread.put("Title", (String) document.getProperties().get("Title"));
-                    subThread.put("Creator", (String) document.getProperties().get("Creator"));
-                    subThread.put("Likes", (Integer) document.getProperties().get("Likes"));
-                    subThread.put("Dislikes", (Integer) document.getProperties().get("Dislikes"));
-                    subThread.put("Content", (String) document.getProperties().get("Content"));
-                    subThread.put("HasImage", (Boolean) document.getProperties().get("HasImage"));
-                    subThread.put("Time", (String) document.getProperties().get("Time"));
-                    data.add(subThread);
+                    subThread.put("ParentThread", document.getProperties().get("ParentThread"));
+                    subThread.put("Title", document.getProperties().get("Title"));
+                    subThread.put("Creator", document.getProperties().get("Creator"));
+                    subThread.put("Likes", document.getProperties().get("Likes"));
+                    subThread.put("Dislikes", document.getProperties().get("Dislikes"));
+                    subThread.put("Content", document.getProperties().get("Content"));
+                    subThread.put("HasImage", document.getProperties().get("HasImage"));
+                    subThread.put("Time", document.getProperties().get("Time"));
+                    data.put(subThread);
                 });
-                response.set("data", data);
+                response.put("data", data);
             }
             else{
-                response.set("msg", nf.textNode("No Result"));
-                response.set("data", nf.arrayNode());
+                response.put("msg", "No Result");
+                response.put("data", new JSONArray());
             }
-            response.set("statusCode", nf.numberNode(200));
+            response.put("statusCode", 200);
         } catch (Exception e){
-            response.set("msg", nf.textNode(e.getMessage()));
-            response.set("data", nf.arrayNode());
-            response.set("statusCode", nf.numberNode(500));
+            response.put("msg", e.getMessage());
+            response.put("data", new JSONArray());
+            response.put("statusCode", 500);
         }
         finally {
             arango.disconnect(arangoDB);
