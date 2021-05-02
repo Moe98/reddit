@@ -3,13 +3,13 @@ package org.sab.models.report;
 import java.util.Date;
 
 public abstract class Report {
-    private String userId;
+    private String userName;
     private TypeOfReport typeOfReport;
     private String date;
     private String reportDescription;
 
-    public String getUserId() {
-        return userId;
+    public String getUserName() {
+        return userName;
     }
 
     public TypeOfReport getTypeOfReport() {
@@ -24,8 +24,8 @@ public abstract class Report {
         return reportDescription;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public void setTypeOfReport(TypeOfReport typeOfReport) {
