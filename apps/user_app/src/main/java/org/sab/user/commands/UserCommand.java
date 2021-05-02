@@ -21,10 +21,16 @@ public abstract class UserCommand extends Command {
     protected static final String New_PASSWORD = "newPassword";
 
 
-    protected JSONObject body;
+    protected JSONObject body, uriParams;
     protected Schema schema;
+
+    protected String getFromUriParams(String attribute) {
+        return (String) uriParams.getJSONArray(attribute).get(0);
+    }
+
     @Override
     public final String execute(JSONObject request) {
+        uriParams = request.getJSONObject("uriParams");
         body = request.getJSONObject("body");
         schema = getSchema();
         try {
