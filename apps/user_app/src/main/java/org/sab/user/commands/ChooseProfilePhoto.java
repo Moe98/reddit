@@ -63,7 +63,7 @@ public class ChooseProfilePhoto extends UserCommand {
             user.setUsername(resultSet.getString(USERNAME));
             user.setEmail(resultSet.getString(EMAIL));
             user.setBirthdate(resultSet.getString(BIRTHDATE));
-            user.setPhotoUrl(resultSet.getString(PHOTO_URL));
+            user.setPhotoUrl(resultSet.getString("photo_url"));
         } catch (PropertiesNotLoadedException | SQLException e) {
             return Responder.makeErrorResponse("An error occurred while submitting your request!", 502).toString();
         }

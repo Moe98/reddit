@@ -1,5 +1,7 @@
 package org.sab.functions;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -22,5 +24,13 @@ public class Auth {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public static String hash(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    public static boolean verifyHash(String password, String hash) {
+        return BCrypt.checkpw(password, hash);
     }
 }

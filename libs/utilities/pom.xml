@@ -30,6 +30,12 @@
       <artifactId>cloudinary-http44</artifactId>
       <version>1.29.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+      <version>0.3m</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>

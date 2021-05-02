@@ -18,6 +18,7 @@ public abstract class UserCommand extends Command {
     protected static final String PASSWORD = "password";
     protected static final String BIRTHDATE = "birthdate";
     protected static final String PHOTO_URL = "photoUrl";
+    protected static final String New_PASSWORD = "newPassword";
 
 
     protected JSONObject body;

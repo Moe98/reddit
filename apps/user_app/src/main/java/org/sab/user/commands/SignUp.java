@@ -1,17 +1,14 @@
 package org.sab.user.commands;
 
-import org.json.JSONObject;
 import org.sab.functions.Auth;
-import org.sab.user.Responder;
-import org.sab.validation.DataType;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
-import org.sab.validation.Schema;
+import org.sab.user.Responder;
 import org.sab.validation.Attribute;
+import org.sab.validation.DataType;
+import org.sab.validation.Schema;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,11 +36,7 @@ public class SignUp extends UserCommand {
         String username = body.getString(USERNAME);
         String userId = UUID.randomUUID().toString();
         String hashedPassword;
-        try {
-            hashedPassword = Auth.encrypt(body.getString(PASSWORD));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }
+        hashedPassword = Auth.hash(body.getString(PASSWORD));
         String email = body.getString(EMAIL);
         String photoUrl = body.keySet().contains(PHOTO_URL) ? body.getString(PHOTO_URL) : null;
         Date birthdate = Date.valueOf(body.getString(BIRTHDATE));
