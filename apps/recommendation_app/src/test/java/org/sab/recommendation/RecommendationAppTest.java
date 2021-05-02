@@ -86,7 +86,7 @@ public class RecommendationAppTest {
                     arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]);
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(threads[i]);
-                thread.addAttribute("Title", threadsDesc[i]);
+                thread.addAttribute("Description", threadsDesc[i]);
                 thread.addAttribute("Creator", "hamada");
                 thread.addAttribute("NumOfFollowers", 1000000000 + i);
                 thread.addAttribute("DateCreated", Timestamp.valueOf(LocalDateTime.now()));
