@@ -13,11 +13,14 @@ import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.recommendation.commands.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Timestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +47,7 @@ public class RecommendationAppTest {
             toBeDeleted.put("ThreadContainSubThread", new ArrayList<>());
 
             // Dummy Data
-            users = new String[15];
+            users = new String[10];
             threads = new String[]{"ComputersTEST98789", "PCPartsTEST98789", "MoviesTEST98789", "SeriesTEST98789"};
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
@@ -248,5 +251,20 @@ public class RecommendationAppTest {
         JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length-1]));
+    }
+
+    @Test
+    public void TestConfigMap() {
+        try {
+            final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(new RecommendationApp().getConfigMapPath());
+            final Properties properties = new Properties();
+            properties.load(configMapStream);
+
+            for (final String key : properties.stringPropertyNames()) {
+                Class.forName(properties.get(key).toString());
+            }
+        } catch (IOException | ClassNotFoundException e){
+            fail(e.getMessage());
+        }
     }
 }

@@ -1,17 +1,24 @@
 package org.sab.recommendation;
 
-import org.sab.service.ConfigMap;
 import org.sab.service.Service;
 
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 public class RecommendationApp extends Service {
-    private static final String RECOMMENDATION_APP_QUEUE = "RECOMMENDATION_REQ";
+    @Override
+    public String getAppUriName() {
+        return "RECOMMENDATION";
+    }
 
-    public static void main(String[] args) throws IOException, TimeoutException {
-        ConfigMap.instantiate();
-        getThreadPool(10);
-        listenOnQueue(RECOMMENDATION_APP_QUEUE);
+    @Override
+    public int getThreadCount() {
+        return 10;
+    }
+
+    @Override
+    public String getConfigMapPath() {
+        return DEFAULT_PROPERTIES_FILENAME;
+    }
+
+    public static void main(String[] args){
+        new RecommendationApp().start();
     }
 }
