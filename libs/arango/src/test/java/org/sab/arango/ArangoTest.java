@@ -56,7 +56,7 @@ public class ArangoTest {
     @Before
     public void buildCollection() {
         try {
-            arango.createCollection(arangoDB, dbName, collectionName);
+            arango.createCollection(arangoDB, dbName, collectionName, false);
             assertTrue(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
         } catch (ArangoDBException e) {
             fail(e.getMessage());

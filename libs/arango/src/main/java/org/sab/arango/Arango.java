@@ -49,7 +49,7 @@ public class Arango {
         return arangoDB.db(dbName).drop();
     }
 
-    public void createCollection(ArangoDB arangoDB, String dbName, String collectionName) {
+    public void createCollection(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
         CollectionEntity myArangoCollection = arangoDB.db(dbName).createCollection(collectionName);
     }
 
