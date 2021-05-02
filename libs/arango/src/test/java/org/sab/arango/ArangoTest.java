@@ -56,7 +56,7 @@ public class ArangoTest {
     @Before
     public void buildCollection() {
         try {
-            arango.createCollection(arangoDB, dbName, collectionName);
+            arango.createCollection(arangoDB, dbName, collectionName, false);
             assertTrue(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
@@ -68,6 +68,30 @@ public class ArangoTest {
         try {
             arango.dropCollection(arangoDB, dbName, collectionName);
             assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void databaseExists() {
+        try {
+            arango.createDatabase(arangoDB, "testDB");
+            assertTrue(arango.databaseExists(arangoDB, "testDB"));
+            arango.dropDatabase(arangoDB, "testDB");
+            assertFalse(arango.databaseExists(arangoDB, "testDB"));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void collectionExists() {
+        try {
+            arango.createCollection(arangoDB, dbName, "testCollectionExists", false);
+            assertTrue(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
+            arango.dropCollection(arangoDB, dbName, "testCollectionExists");
+            assertFalse(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
