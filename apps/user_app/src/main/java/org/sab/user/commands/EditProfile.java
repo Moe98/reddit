@@ -1,43 +1,62 @@
 package org.sab.user.commands;
 
-import org.json.JSONObject;
+import org.sab.functions.Auth;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
-import org.sab.service.Command;
+import org.sab.user.Responder;
+import org.sab.validation.Attribute;
+import org.sab.validation.DataType;
+import org.sab.validation.Schema;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class EditProfile extends Command {
+public class EditProfile extends UserCommand {
 
 
+
+    protected Schema getSchema() {
+        Attribute username = new Attribute(USERNAME, DataType.STRING, true);
+        Attribute password = new Attribute(PASSWORD, DataType.STRING,true);
+        Attribute newPassword = new Attribute(New_PASSWORD, DataType.STRING,true);
+        return new Schema(List.of(username, password));
+    }
 
     @Override
-    public String execute(JSONObject request)  {
-        System.out.println(request);
-        JSONObject body = request.getJSONObject("body");
+    protected String execute() {
+        // retrieving the body objects
+        String username = body.getString(USERNAME);
+        String password = body.getString(PASSWORD);
+        String newPassword = body.getString(New_PASSWORD);
 
-        String oldPassword = body.getString("oldPassword");
-        String newPassword = body.getString("newPassword");
+        Boolean checkPassword = false;
+        //retrieving the result from SQL into a User Object
         try {
-            PostgresConnection.call("update_user_password", "zoz", newPassword);
-        } catch (PropertiesNotLoadedException e) {
-            e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-//        PostgresConnection postgresConnection = PostgresConnection.getInstance();
-//        ResultSet resultSet = postgresConnection.call(procedureInitializer("update_user_password", 2), postgresConnection.connect(), null, );
-        return "{\"msg\":\"You are now an editor!\"}";
+            ResultSet resultSet = PostgresConnection.call("get_user", username);
 
+            if (resultSet == null || !resultSet.next()) {
+                return Responder.makeErrorResponse("User not found!", 404).toString();
+            }
+
+            String hashedPassword = resultSet.getString("password");
+            checkPassword = Auth.verifyHash(password,hashedPassword);
+        } catch (PropertiesNotLoadedException | SQLException e) {
+            return Responder.makeErrorResponse("An error occurred while submitting your request!", 502).toString();
+        }
+        if(!checkPassword){
+            return Responder.makeErrorResponse("Error Occurred While Confirming Your Password", 401).toString();
+        }
+        //calling the appropriate SQL procedure
+        try {
+            newPassword = Auth.hash(newPassword);
+            PostgresConnection.call("update_user_password", username, newPassword);
+        } catch (PropertiesNotLoadedException | SQLException e) {
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        }
+
+
+        return Responder.makeErrorResponse("Account Updated Successfully!",200).toString();
     }
-//    public String updatePassword(String oldPassword,String newPassword) throws PropertiesNotLoadedException {
-//
-//        Connection connection =postgresConnection.connect();
-//        connection.prepareCall()
-//        return null;
-//    }
 
 }
