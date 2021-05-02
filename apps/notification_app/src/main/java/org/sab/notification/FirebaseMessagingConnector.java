@@ -55,7 +55,7 @@ public class FirebaseMessagingConnector {
         final Notification notification = createNotification(title, body);
 
         if(registrationTokens.isEmpty()) {
-            return "No tokens to send to!";
+            throw new NotificationSendingFailedException("No tokens to send to ", null);
         }
 
         if (registrationTokens.size() == 1) {
