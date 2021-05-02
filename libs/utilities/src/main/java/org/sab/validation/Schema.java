@@ -12,4 +12,8 @@ public class Schema {
     public List<Attribute> getAttributeList() {
         return attributeList;
     }
+
+    public boolean isEmpty() {
+        return attributeList.isEmpty();
+    }
 }
