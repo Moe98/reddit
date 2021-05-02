@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Table(keyspace = "chat_app", name = "chats")
-public class Chat {
+@Table(keyspace = "chat_app", name = "group_chats")
+public class GroupChat {
 
     @PartitionKey
     private UUID chat_id;
@@ -18,16 +18,15 @@ public class Chat {
     private UUID admin;
     private Date date_created;
 
-    public Chat() {
+    public GroupChat() {
     }
-
-    public Chat(UUID chat_id, String name, String description, List<UUID> members, UUID admin) {
+    public GroupChat(UUID chat_id, String name, String description, List<UUID> members, UUID admin,Date date_created) {
         this.chat_id = chat_id;
         this.name = name;
         this.description = description;
         this.members = members;
         this.admin = admin;
-        this.date_created = new Date();
+        this.date_created = date_created;
     }
 
     public UUID getChat_id() {

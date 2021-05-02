@@ -6,8 +6,8 @@ import com.datastax.driver.mapping.annotations.Table;
 
 import java.util.UUID;
 
-@Table(keyspace = "chat_app", name = "messages")
-public class Message {
+@Table(keyspace = "chat_app", name = "group_messages")
+public class GroupMessage {
 
     @PartitionKey
     private UUID chat_id;
@@ -16,10 +16,10 @@ public class Message {
     private UUID sender_id;
     private String content;
 
-    public Message() {
+    public GroupMessage() {
     }
 
-    public Message(UUID chat_id, UUID message_id, UUID sender_id, String content) {
+    public GroupMessage(UUID chat_id, UUID message_id, UUID sender_id, String content) {
         this.chat_id = chat_id;
         this.message_id = message_id;
         this.sender_id = sender_id;
