@@ -30,9 +30,15 @@ public abstract class UserCommand extends Command {
 
     @Override
     public final String execute(JSONObject request) {
-        uriParams = request.getJSONObject("uriParams");
-        body = request.getJSONObject("body");
+
         schema = getSchema();
+        uriParams = request.getJSONObject("uriParams");
+        if (request.getString("methodType").equals("GET")) {
+            if (!schema.isEmpty())
+                return Responder.makeErrorResponse(String.format("%s expects a body. Don't use a GET Request!", getClass().getSimpleName()), 500).toString();
+            body = new JSONObject();
+        } else
+            body = request.getJSONObject("body");
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
@@ -55,7 +61,7 @@ public abstract class UserCommand extends Command {
         checkForMissingAttributes();
         checkForInvalidlyTypedAttributes();
     }
-    
+
     private void checkForMissingAttributes() throws RequestVerificationException {
 
         final Predicate<Attribute> isMissing = attribute -> !isFoundInBody(attribute);
@@ -70,7 +76,7 @@ public abstract class UserCommand extends Command {
         }
 
     }
-    
+
     private void checkForInvalidlyTypedAttributes() throws RequestVerificationException {
         final Predicate<Attribute> isInvalidlyTyped = attribute -> !attribute.isValidlyTyped(body.get(attribute.getAttributeName()));
 
@@ -88,7 +94,6 @@ public abstract class UserCommand extends Command {
         return String.format("%s must be of type %s.%s", attribute.getAttributeName(),
                 attribute.getDataType().toString(), attribute.getDataType().getAdditionalErrorMessage());
     }
-
 
 
 }
