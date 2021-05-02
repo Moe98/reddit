@@ -25,6 +25,12 @@ public class SearchAppTest {
             if (!arangoDB.db(System.getenv("ARANGO_DB")).exists()) {
                 arango.createDatabase(arangoDB, System.getenv("ARANGO_DB"));
             }
+            if (!arangoDB.db(System.getenv("ARANGO_DB")).collection("Threads").exists()) {
+                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "Threads", false);
+            }
+            if (!arangoDB.db(System.getenv("ARANGO_DB")).collection("SubThreads").exists()) {
+                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "SubThreads", false);
+            }
         } catch (Exception e) {
             fail(e.getMessage());
         }
