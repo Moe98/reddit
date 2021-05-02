@@ -135,30 +135,18 @@ public class RecommendationAppTest {
                 created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
                 toBeDeleted.get("UserFollowUser").add(created.getKey());
             }
-            edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setFrom("Users/" + users[1]);
-            edgeDocument.setTo("Users/" + users[10]);
-            created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-            toBeDeleted.get("UserFollowUser").add(created.getKey());
-            edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setFrom("Users/" + users[1]);
-            edgeDocument.setTo("Users/" + users[11]);
-            created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-            toBeDeleted.get("UserFollowUser").add(created.getKey());
-            for (int i = 0; i < 9; i++) {
+            for (int i = 1; i < 5; i++) {
                 edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setFrom("Users/" + users[10]);
-                edgeDocument.setTo("Users/" + users[i]);
+                edgeDocument.setFrom("Users/" + users[i]);
+                edgeDocument.setTo("Users/" + users[i + 5]);
                 created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
                 toBeDeleted.get("UserFollowUser").add(created.getKey());
             }
-            for (int i = 0; i < 3; i++) {
-                edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setFrom("Users/" + users[11]);
-                edgeDocument.setTo("Users/" + users[i]);
-                created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-                toBeDeleted.get("UserFollowUser").add(created.getKey());
-            }
+            edgeDocument = new BaseEdgeDocument();
+            edgeDocument.setFrom("Users/" + users[1]);
+            edgeDocument.setTo("Users/" + users[users.length-1]);
+            created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
+            toBeDeleted.get("UserFollowUser").add(created.getKey());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -174,11 +162,11 @@ public class RecommendationAppTest {
                     arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), key, _key);
                 }
             });
-            couchbase.deleteDocument(cluster, "RecommendedThreads", users[0]);
-            couchbase.deleteDocument(cluster, "Listings", "popThreads");
-            couchbase.deleteDocument(cluster, "Listings", "popSubThreads");
-            couchbase.deleteDocument(cluster, "RecommendedSubThreads", users[0]);
-//            couchbase.deleteDocument(cluster, "RecommendedUsers", users[0]);
+//            couchbase.deleteDocument(cluster, "RecommendedThreads", users[0]);
+//            couchbase.deleteDocument(cluster, "Listings", "popThreads");
+//            couchbase.deleteDocument(cluster, "Listings", "popSubThreads");
+//            couchbase.deleteDocument(cluster, "RecommendedSubThreads", users[0]);
+            couchbase.deleteDocument(cluster, "RecommendedUsers", users[0]);
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
@@ -220,6 +208,14 @@ public class RecommendationAppTest {
     }
 
     @Test
+    public void GetRecommendedUsers() {
+        new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
+        JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length-1]));
+    }
+
+    @Test
     public void UpdatePopularSubThreads() {
         JSONObject responseJson = new JSONObject(new UpdatePopularSubThreads().execute(new JSONObject()));
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -245,5 +241,12 @@ public class RecommendationAppTest {
         JSONObject responseJson = new JSONObject(new UpdateRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
+    }
+
+    @Test
+    public void UpdateRecommendedUsers() {
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length-1]));
     }
 }
