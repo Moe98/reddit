@@ -25,7 +25,7 @@ public class GetRecommendedUsers extends Command {
             }
 
             JsonObject result = couchbase.getDocument(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"));
-            JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfUsers");
+            JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfUsernames");
             response.put("data", new JSONArray(data.toString()));
             response.put("statusCode", 200);
         } catch (Exception e) {
