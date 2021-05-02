@@ -73,6 +73,8 @@ public class RecommendationAppTest {
                 arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "ThreadContainSubThread", true);
             }
             for (int i = 0; i < users.length; i++) {
+                if(arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i))
+                    arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i);
                 BaseDocument user = new BaseDocument();
                 user.setKey("user" + i);
                 arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", user);
@@ -80,6 +82,8 @@ public class RecommendationAppTest {
                 users[i] = "user" + i;
             }
             for (int i = 0; i < threads.length; i++) {
+                if(arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]))
+                    arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]);
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(threads[i]);
                 thread.addAttribute("Title", threadsDesc[i]);
