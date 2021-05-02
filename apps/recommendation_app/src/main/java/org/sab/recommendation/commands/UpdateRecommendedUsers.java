@@ -24,18 +24,20 @@ public class UpdateRecommendedUsers extends Command {
     @Override
     public String execute(JSONObject request) {
         JSONObject response = new JSONObject();
-
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
             String query = """
+                    LET followed = (
+                        FOR user IN 1..1 OUTBOUND @username UserFollowUser
+                            RETURN user
+                    )
                     FOR user IN 2..2 OUTBOUND @username UserFollowUser
-                                         Filter user._id != @username
-                                         COLLECT friend = user._key
-                                         WITH COUNT INTO mutual_number
-                                         SORT mutual_number DESC
-                                         LIMIT 25
-                                         RETURN {username:friend}""";
+                         Filter user._id != @username AND user NOT IN followed
+                         COLLECT friend = user._key WITH COUNT INTO mutual_number
+                         SORT mutual_number DESC
+                         LIMIT 25
+                         RETURN {username:friend}""";
             Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 
@@ -64,7 +66,7 @@ public class UpdateRecommendedUsers extends Command {
                     couchbase.createBucket(cluster, "RecommendedUsers", 100);
                 }
 
-                JsonObject object = JsonObject.create().put("listOfUsernames", JacksonTransformers.stringToJsonArray(response.get("data").toString()));
+                JsonObject object = JsonObject.create().put("listOfUsernames", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
                 couchbase.upsertDocument(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"), object);
                 response.put("msg", "Recommended Users Updated Successfully!");
                 response.put("statusCode", 200);
