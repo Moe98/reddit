@@ -162,10 +162,10 @@ public class RecommendationAppTest {
                     arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), key, _key);
                 }
             });
-//            couchbase.deleteDocument(cluster, "RecommendedThreads", users[0]);
-//            couchbase.deleteDocument(cluster, "Listings", "popThreads");
-//            couchbase.deleteDocument(cluster, "Listings", "popSubThreads");
-//            couchbase.deleteDocument(cluster, "RecommendedSubThreads", users[0]);
+            couchbase.deleteDocument(cluster, "RecommendedThreads", users[0]);
+            couchbase.deleteDocument(cluster, "Listings", "popThreads");
+            couchbase.deleteDocument(cluster, "Listings", "popSubThreads");
+            couchbase.deleteDocument(cluster, "RecommendedSubThreads", users[0]);
             couchbase.deleteDocument(cluster, "RecommendedUsers", users[0]);
         } catch (Exception e) {
             fail(e.getMessage());
