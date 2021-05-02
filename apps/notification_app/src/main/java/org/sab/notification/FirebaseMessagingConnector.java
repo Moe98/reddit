@@ -38,7 +38,7 @@ public class FirebaseMessagingConnector {
         return Notification.builder().setTitle(title).setBody(body).build();
     }
 
-    private String notify1(String registrationToken, Notification notification)
+    private String notifySingleToken(String registrationToken, Notification notification)
             throws NotificationSendingFailedException {
         final Message message = Message.builder().setNotification(notification).setToken(registrationToken).build();
         final String response;
@@ -59,7 +59,7 @@ public class FirebaseMessagingConnector {
         }
 
         if (registrationTokens.size() == 1) {
-            return notify1(registrationTokens.get(0), notification);
+            return notifySingleToken(registrationTokens.get(0), notification);
         }
 
         final MulticastMessage message = MulticastMessage.builder()
