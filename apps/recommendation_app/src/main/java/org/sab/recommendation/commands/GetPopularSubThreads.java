@@ -21,9 +21,7 @@ public class GetPopularSubThreads extends Command {
             cluster = couchbase.connect();
 
             if (!couchbase.bucketExists(cluster, "Listings") || !couchbase.documentExists(cluster, "Listings", "popSubThreads")) {
-                String externalCommandResponseString = new UpdatePopularSubThreads().execute(null);
-                if (new JSONObject(externalCommandResponseString).getInt("statusCode") != 200)
-                    return externalCommandResponseString;
+                return new UpdatePopularSubThreads().execute(null);
             }
 
             JsonObject result = couchbase.getDocument(cluster, "Listings", "popSubThreads");

@@ -21,9 +21,7 @@ public class GetRecommendedThreads extends Command {
             cluster = couchbase.connect();
 
             if (!couchbase.bucketExists(cluster, "RecommendedThreads") || !couchbase.documentExists(cluster, "RecommendedThreads", request.getJSONObject("body").getString("username"))) {
-                String externalCommandResponseString = new UpdateRecommendedThreads().execute(request);
-                if (new JSONObject(externalCommandResponseString).getInt("statusCode") != 200)
-                    return externalCommandResponseString;
+                return new UpdateRecommendedThreads().execute(request);
             }
 
             JsonObject result = couchbase.getDocument(cluster, "RecommendedThreads", request.getJSONObject("body").getString("username"));

@@ -21,9 +21,7 @@ public class GetRecommendedUsers extends Command {
             cluster = couchbase.connect();
 
             if (!couchbase.bucketExists(cluster, "RecommendedUsers") || !couchbase.documentExists(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"))) {
-//                String externalCommandResponseString = new UpdateRecommendedUsers().execute(request);
-//                if(new JSONObject(externalCommandResponseString).getInt("statusCode") != 200)
-//                    return externalCommandResponseString;
+                return new UpdateRecommendedUsers().execute(request);
             }
 
             JsonObject result = couchbase.getDocument(cluster, "RecommendedUsers", request.getJSONObject("body").getString("username"));
