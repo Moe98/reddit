@@ -106,7 +106,6 @@ public class Arango {
     }
 
     public ViewEntity createView(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) {
-
         ArangoSearchCreateOptions options = new ArangoSearchCreateOptions();
 
         FieldLink[] fieldLinks = new FieldLink[fields.length];
