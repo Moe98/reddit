@@ -5,36 +5,46 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Thread;
-import org.sab.service.Command;
+import org.sab.service.Responder;
+import org.sab.validation.Attribute;
+import org.sab.validation.DataType;
+import org.sab.validation.Schema;
+import java.util.List;
 
-public class CreateThreadCommand extends Command {
+public class CreateThreadCommand extends ThreadCommand {
+
+    @Override
+    protected Schema getSchema() {
+        Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
+        Attribute description = new Attribute(DESCRIPTION, DataType.STRING, true);
+        Attribute creatorId = new Attribute(CREATOR_ID, DataType.STRING, true);
+        Attribute dateCreated = new Attribute(DATE_CREATED, DataType.SQL_DATE, true);
+        Attribute numOfFollowers = new Attribute(NUM_OF_FOLLOWERS, DataType.LONG);
+
+        return new Schema(List.of(threadName, description, creatorId, dateCreated, numOfFollowers));
+    }
+
     private Arango arango;
     private ArangoDB arangoDB;
     private String collectionName;
     private String DBName;
 
-    public static void main(String[] args) {
-        CreateThreadCommand tc = new CreateThreadCommand();
-        JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-22-9\",\"name\":\"klklk\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"}}");
-        System.out.println(tc.execute(request));
-    }
-
     @Override
-    public String execute(JSONObject request) {
-        JSONObject body = request.getJSONObject("body");
-        String name = body.getString("name");
-        String description = body.getString("description");
-        String creatorId = body.getString("creatorId");
-        String date = body.getString("dateCreated");
+    public String execute() {
+        String name = body.getString(THREAD_NAME);
+        String description = body.getString(DESCRIPTION);
+        String creatorId = body.getString(CREATOR_ID);
+        String date = body.getString(DATE_CREATED);
         long numOfFollowers = 0;
+
         Thread thread = new Thread();
 
-        JSONObject response = new JSONObject();
+        collectionName = "Thread";
+        DBName = "ARANGO_DB";
+
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
-            collectionName = "Thread";
-            DBName = "ARANGO_DB";
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(arangoDB, DBName, collectionName)) {
@@ -50,6 +60,7 @@ public class CreateThreadCommand extends Command {
             myObject.addAttribute("NumOfFollowers", numOfFollowers);
 
             BaseDocument res = arango.createDocument(arangoDB, DBName, collectionName, myObject);
+
             thread.setName((String) res.getAttribute("Name"));
             thread.setDescription((String) res.getAttribute("Description"));
             thread.setCreatorId((String) res.getAttribute("CreatorId"));
@@ -57,10 +68,20 @@ public class CreateThreadCommand extends Command {
             thread.setNumOfFollowers(Long.parseLong(res.getAttribute("NumOfFollowers").toString()));
 
         } catch (Exception e) {
-            System.err.println(e);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             arango.disconnect(arangoDB);
         }
-        return thread.toJSON().toString();
+        return Responder.makeDataResponse(thread.toJSON()).toString();
     }
+
+
+
+
+    public static void main(String[] args) {
+        CreateThreadCommand tc = new CreateThreadCommand();
+        JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-2-9\",\"name\":\"asmakElRayes7amido\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"},\"uriParams\":{},\"methodType\":\"POST\"}");
+        System.out.println(tc.execute(request));
+    }
+
 }
