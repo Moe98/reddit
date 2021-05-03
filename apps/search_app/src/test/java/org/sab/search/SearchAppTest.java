@@ -45,7 +45,6 @@ public class SearchAppTest {
         try {
             JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchText", "ThreadForTestSearch"))));
             assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(responseJson.getString("msg").equals("No Result"));
         } catch (JSONException e) {
             fail(e.getMessage());
         }
@@ -56,7 +55,6 @@ public class SearchAppTest {
         try {
             JSONObject responseJson = new JSONObject(new SearchSubThread().execute(new JSONObject().put("body", new JSONObject().put("searchText", "ice cream"))));
             assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(responseJson.getString("msg").equals("No Result"));
         } catch (JSONException e) {
             fail(e.getMessage());
         }
