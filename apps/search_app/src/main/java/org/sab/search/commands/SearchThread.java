@@ -3,13 +3,9 @@ package org.sab.search.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.Thread;
 import org.sab.service.Command;
 
 import java.util.Collections;

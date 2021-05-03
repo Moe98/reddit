@@ -10,7 +10,8 @@ import org.sab.arango.Arango;
 import org.sab.search.commands.SearchSubThread;
 import org.sab.search.commands.SearchThread;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class SearchAppTest {
     private static Arango arango;
@@ -40,6 +41,7 @@ public class SearchAppTest {
     public static void tearDown() {
         arango.disconnect(arangoDB);
     }
+
     @Test
     public void SearchThread() {
         try {

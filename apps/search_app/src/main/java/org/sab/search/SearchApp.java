@@ -3,6 +3,10 @@ package org.sab.search;
 import org.sab.service.Service;
 
 public class SearchApp extends Service {
+    public static void main(String[] args) {
+        new SearchApp().start();
+    }
+
     @Override
     public String getAppUriName() {
         return "SEARCH";
@@ -16,9 +20,5 @@ public class SearchApp extends Service {
     @Override
     public String getConfigMapPath() {
         return DEFAULT_PROPERTIES_FILENAME;
-    }
-
-    public static void main(String[] args){
-        new SearchApp().start();
     }
 }
