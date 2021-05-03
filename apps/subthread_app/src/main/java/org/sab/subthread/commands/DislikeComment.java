@@ -12,7 +12,7 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-public class LikeComment extends CommentCommand{
+public class DislikeComment extends CommentCommand{
     @Override
     protected Schema getSchema() {
         Attribute parentSubthreadId = new Attribute(COMMENT_ID, DataType.STRING, true);
@@ -38,6 +38,7 @@ public class LikeComment extends CommentCommand{
 
         JSONObject response = new JSONObject();
         String msg = "";
+
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
@@ -54,37 +55,38 @@ public class LikeComment extends CommentCommand{
             }
 
             String edgeKey = userId+commentId;
-            // if user already likes the comment, then remove his like and update like count
-            if(arango.documentExists(arangoDB, DBName, UserLikeCommentCollection,edgeKey)){
-                arango.deleteDocument(arangoDB, DBName, UserLikeCommentCollection, edgeKey);
+            // if user already dislikes the comment, then remove his dislike and update dislike count
+            if(arango.documentExists(arangoDB, DBName, UserDislikeCommentCollection,edgeKey)){
+                arango.deleteDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeKey);
 
                 BaseDocument originalComment = arango.readDocument(arangoDB, DBName, CommentCollectionName, commentId);
-                int newLikes =  (int)originalComment.getAttribute(LIKES)-1;
-                originalComment.updateAttribute(LIKES,newLikes);
-                // putting the comment with the updated amount of likes
+                int newDisikes =  (int)originalComment.getAttribute(DISLIKES)-1;
+                originalComment.updateAttribute(LIKES,newDisikes);
+                // putting the comment with the updated amount of dislikes
                 arango.updateDocument(arangoDB,DBName,CommentCollectionName,originalComment,commentId);
 
-                msg = "removed your like on the comment";
+                msg = "removed your dislike on the comment";
             }
-            else { // then user wants to like this comment, so we create an edge and update the number of likes
-                msg = "added your like on the comment";
+            else { // then user wants to dilike this comment, so we create an edge and update the number of dilikes
+                msg = "added your dislike on the comment";
+
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
                 edgeDocument.setFrom("Users" + userId);
                 edgeDocument.setTo("Threads" + commentId);
 
-                // adding new edgeDocument representing that a user likes a comment
-                arango.createEdgeDocument(arangoDB, DBName, UserLikeCommentCollection, edgeDocument);
+                // adding new edgeDocument representing that a user dislikes a comment
+                arango.createEdgeDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
                 BaseDocument originalComment = arango.readDocument(arangoDB, DBName, CommentCollectionName, commentId);
-                int newLikes = (int) originalComment.getAttribute(LIKES) + 1;
-                int newDislikes = (int) originalComment.getAttribute(DISLIKES);
-                //checking if the user dislikes this content to remove his dislike
-                if (arango.documentExists(arangoDB, DBName, UserDislikeCommentCollection, edgeKey)) {
-                    arango.deleteDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeKey);
-                    newDislikes -= 1;
-                    msg += " & removed your dislike";
+                int newDislikes = (int) originalComment.getAttribute(DISLIKES)+1;
+                int newLikes = (int) originalComment.getAttribute(LIKES);
+                //checking if the user likes this content to remove his like
+                if (arango.documentExists(arangoDB, DBName, UserLikeCommentCollection, edgeKey)) {
+                    arango.deleteDocument(arangoDB, DBName, UserLikeCommentCollection, edgeKey);
+                    newLikes -= 1;
+                    msg += " & removed your like";
                 }
                 originalComment.updateAttribute(LIKES, newLikes);
                 originalComment.updateAttribute(LIKES, newDislikes);
@@ -104,8 +106,8 @@ public class LikeComment extends CommentCommand{
 
 
     public static void main(String[] args) {
-        LikeComment lc = new LikeComment();
+        DislikeComment dc = new DislikeComment();
         JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"1998-2-9\"},\"uriParams\":{\"userId\":\"asdasda\"},\"methodType\":\"PUT\"}");
-        System.out.println(lc.execute(request));
+        System.out.println(dc.execute(request));
     }
 }
