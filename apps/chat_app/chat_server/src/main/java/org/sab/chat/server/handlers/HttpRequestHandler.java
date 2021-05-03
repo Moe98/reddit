@@ -46,7 +46,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                     request.protocolVersion(), HttpResponseStatus.OK);
             response.headers().set(
                     HttpHeaderNames.CONTENT_TYPE,
-                    "text/plain; charset=UTF-8");
+                    "text/html; charset=UTF-8");
             boolean keepAlive = HttpUtil.isKeepAlive(request);
             if (keepAlive) {
                 response.headers().set(
