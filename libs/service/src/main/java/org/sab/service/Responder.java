@@ -1,4 +1,4 @@
-package org.sab.service.validation;
+package org.sab.service;
 
 import org.json.JSONObject;
 

@@ -2,6 +2,7 @@ package org.sab.service.validation;
 
 import org.json.JSONObject;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.Schema;
 
