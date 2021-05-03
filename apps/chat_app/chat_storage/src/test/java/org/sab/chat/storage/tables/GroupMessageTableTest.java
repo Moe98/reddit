@@ -1,4 +1,4 @@
-package chat.storage.tables;
+package org.sab.chat.storage.tables;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;

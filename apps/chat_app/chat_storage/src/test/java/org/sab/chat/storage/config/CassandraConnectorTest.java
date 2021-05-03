@@ -1,4 +1,4 @@
-package chat.storage.config;
+package org.sab.chat.storage.config;
 
 import com.datastax.driver.core.ResultSet;
 import org.junit.After;
