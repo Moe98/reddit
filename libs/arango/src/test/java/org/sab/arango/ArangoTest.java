@@ -74,6 +74,30 @@ public class ArangoTest {
     }
 
     @Test
+    public void databaseExists() {
+        try {
+            arango.createDatabase(arangoDB, "testDB");
+            assertTrue(arango.databaseExists(arangoDB, "testDB"));
+            arango.dropDatabase(arangoDB, "testDB");
+            assertFalse(arango.databaseExists(arangoDB, "testDB"));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void collectionExists() {
+        try {
+            arango.createCollection(arangoDB, dbName, "testCollectionExists", false);
+            assertTrue(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
+            arango.dropCollection(arangoDB, dbName, "testCollectionExists");
+            assertFalse(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void getInstance() {
         try {
             Arango arango1 = Arango.getInstance();

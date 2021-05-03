@@ -1,12 +1,11 @@
 package org.sab.arango;
 
 import com.arangodb.*;
-import com.arangodb.entity.BaseDocument;
-import com.arangodb.entity.CollectionEntity;
-import com.arangodb.entity.ViewEntity;
+import com.arangodb.entity.*;
 import com.arangodb.entity.arangosearch.CollectionLink;
 import com.arangodb.entity.arangosearch.FieldLink;
 import com.arangodb.mapping.ArangoJack;
+import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -45,16 +44,24 @@ public class Arango {
 
     }
 
+    public boolean databaseExists(ArangoDB arangoDB, String dbName) {
+        return arangoDB.db(dbName).exists();
+    }
+
     public boolean dropDatabase(ArangoDB arangoDB, String dbName) {
         return arangoDB.db(dbName).drop();
     }
 
     public void createCollection(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
-        CollectionEntity myArangoCollection = arangoDB.db(dbName).createCollection(collectionName);
+        arangoDB.db(dbName).createCollection(collectionName, new CollectionCreateOptions().type(isEdgeCollection ? CollectionType.EDGES : CollectionType.DOCUMENT));
     }
 
     public void dropCollection(ArangoDB arangoDB, String dbName, String collectionName) {
         arangoDB.db(dbName).collection(collectionName).drop();
+    }
+
+    public boolean collectionExists(ArangoDB arangoDB, String dbName, String collectionName) {
+        return arangoDB.db(dbName).collection(collectionName).exists();
     }
 
     public BaseDocument createDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseDocument baseDocument) {
@@ -62,8 +69,17 @@ public class Arango {
         return readDocument(arangoDB, dbName, collectionName, baseDocument.getKey());
     }
 
+    public BaseEdgeDocument createEdgeDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseEdgeDocument baseEdgeDocument) {
+        arangoDB.db(dbName).collection(collectionName).insertDocument(baseEdgeDocument);
+        return readEdgeDocument(arangoDB, dbName, collectionName, baseEdgeDocument.getKey());
+    }
+
     public BaseDocument readDocument(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
         return arangoDB.db(dbName).collection(collectionName).getDocument(documentKey, BaseDocument.class);
+    }
+
+    public BaseEdgeDocument readEdgeDocument(ArangoDB arangoDB, String dbName, String collectionName, String documentKey) {
+        return arangoDB.db(dbName).collection(collectionName).getDocument(documentKey, BaseEdgeDocument.class);
     }
 
     public BaseDocument updateDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseDocument updatedDocument, String documentKey) {
@@ -71,9 +87,18 @@ public class Arango {
         return readDocument(arangoDB, dbName, collectionName, updatedDocument.getKey());
     }
 
+    public BaseEdgeDocument updateEdgeDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseEdgeDocument updatedDocument, String documentKey) {
+        arangoDB.db(dbName).collection(collectionName).updateDocument(documentKey, updatedDocument);
+        return readEdgeDocument(arangoDB, dbName, collectionName, updatedDocument.getKey());
+    }
+
     public boolean deleteDocument(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
         arangoDB.db(dbName).collection(collectionName).deleteDocument(documentKey);
         return true;
+    }
+
+    public boolean documentExists(ArangoDB arangoDB, String dbName, String collectionName, String documentKey) {
+        return arangoDB.db(dbName).collection(collectionName).documentExists(documentKey);
     }
 
     public ObjectNode readDocumentAsJSON(ArangoDB arangoDB, String dbName, String collectionName,String documentKey) {
