@@ -29,7 +29,7 @@ public class UpdateRecommendedThreads extends Command {
             arangoDB = arango.connect();
 
             if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key"});
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
             }
 
             Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));

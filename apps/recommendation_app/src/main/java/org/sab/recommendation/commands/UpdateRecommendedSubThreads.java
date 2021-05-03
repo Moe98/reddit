@@ -29,7 +29,7 @@ public class UpdateRecommendedSubThreads extends Command {
             arangoDB = arango.connect();
 
             if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key"});
+                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
             }
             if (!arangoDB.db(System.getenv("ARANGO_DB")).view("SubThreadsView").exists()) {
                 arango.createView(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
