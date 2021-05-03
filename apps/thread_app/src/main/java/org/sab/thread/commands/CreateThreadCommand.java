@@ -1,22 +1,23 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.sab.service.Command;
 import org.sab.arango.Arango;
 import org.sab.models.Thread;
-
-import java.sql.Date;
+import org.sab.service.Command;
 
 public class CreateThreadCommand extends Command {
     private Arango arango;
     private ArangoDB arangoDB;
     private String collectionName;
     private String DBName;
+
+    public static void main(String[] args) {
+        CreateThreadCommand tc = new CreateThreadCommand();
+        JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-22-9\",\"name\":\"klklk\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"}}");
+        System.out.println(tc.execute(request));
+    }
 
     @Override
     public String execute(JSONObject request) {
@@ -61,11 +62,5 @@ public class CreateThreadCommand extends Command {
             arango.disconnect(arangoDB);
         }
         return thread.toJSON().toString();
-    }
-
-    public static void main(String[] args) {
-        CreateThreadCommand tc = new CreateThreadCommand();
-        JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-22-9\",\"name\":\"klklk\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"}}");
-        System.out.println(tc.execute(request));
     }
 }

@@ -15,31 +15,45 @@ public class Comment {
         return creatorId;
     }
 
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
+    }
+
     public String getParentId() {
         return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
     }
 
     public String getDateCreated() {
         return dateCreated;
     }
 
-    public String getContent() {return content;}
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-    public long getLikes() {return likes;}
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public long getLikes() {
+        return likes;
+    }
+
+    public void setLikes(long likes) {
+        this.likes = likes;
+    }
 
     public long getDislikes() {
         return dislikes;
     }
-
-    public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
-
-    public void setParentId(String parentId) { this.parentId = parentId; }
-
-    public void setDateCreated(String dateCreated) {this.dateCreated = dateCreated;}
-
-    public void setContent(String content) {this.content = content;}
-
-    public void setLikes(long likes) {this.likes = likes;}
 
     public void setDislikes(long dislikes) {
         this.dislikes = dislikes;
@@ -57,14 +71,14 @@ public class Comment {
                 '}';
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject comment = new JSONObject();
-        comment.put("creatorId",creatorId);
-        comment.put("dateCreated",dateCreated);
-        comment.put("content",content);
-        comment.put("parentId",parentId);
-        comment.put("likes",likes);
-        comment.put("dislikes",dislikes);
+        comment.put("creatorId", creatorId);
+        comment.put("dateCreated", dateCreated);
+        comment.put("content", content);
+        comment.put("parentId", parentId);
+        comment.put("likes", likes);
+        comment.put("dislikes", dislikes);
         return comment;
     }
 }
