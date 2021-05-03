@@ -58,23 +58,23 @@ public class UpdateRecommendedSubThreads extends Command {
                     """ +
                     UpdateRecommendedThreads.getQuery() +
                     """
-                    )
-                    LET recommendationsFromRecommendedThreads = (
-                        FOR thread IN recommendedThreads
-                            SORT RAND()
-                            LIMIT 5
-                            LET sortedRecommendedThreadsRecommendation = (
-                                FOR subThread IN 1..1 OUTBOUND CONCAT('Threads/', thread._key) ThreadContainSubThread
-                                    SORT subThread.Time DESC
-                                    LIMIT 100
-                                    SORT SUM([subThread.Likes, -subThread.Dislikes]) DESC
-                                    LIMIT 5
-                                    RETURN subThread
                             )
-                            RETURN sortedRecommendedThreadsRecommendation
-                    )
-                    FOR subThread IN SLICE(APPEND(FLATTEN(recommendationsFromFollowed), FLATTEN(recommendationsFromRecommendedThreads)), 0, 50)
-                            RETURN subThread""";
+                            LET recommendationsFromRecommendedThreads = (
+                                FOR thread IN recommendedThreads
+                                    SORT RAND()
+                                    LIMIT 5
+                                    LET sortedRecommendedThreadsRecommendation = (
+                                        FOR subThread IN 1..1 OUTBOUND CONCAT('Threads/', thread._key) ThreadContainSubThread
+                                            SORT subThread.Time DESC
+                                            LIMIT 100
+                                            SORT SUM([subThread.Likes, -subThread.Dislikes]) DESC
+                                            LIMIT 5
+                                            RETURN subThread
+                                    )
+                                    RETURN sortedRecommendedThreadsRecommendation
+                            )
+                            FOR subThread IN SLICE(APPEND(FLATTEN(recommendationsFromFollowed), FLATTEN(recommendationsFromRecommendedThreads)), 0, 50)
+                                    RETURN subThread""";
             Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
 

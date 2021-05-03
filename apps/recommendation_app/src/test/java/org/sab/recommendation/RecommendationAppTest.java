@@ -73,7 +73,7 @@ public class RecommendationAppTest {
                 arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "ThreadContainSubThread", true);
             }
             for (int i = 0; i < users.length; i++) {
-                if(arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i))
+                if (arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i))
                     arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i);
                 BaseDocument user = new BaseDocument();
                 user.setKey("user" + i);
@@ -82,7 +82,7 @@ public class RecommendationAppTest {
                 users[i] = "user" + i;
             }
             for (int i = 0; i < threads.length; i++) {
-                if(arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]))
+                if (arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]))
                     arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]);
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(threads[i]);
@@ -151,7 +151,7 @@ public class RecommendationAppTest {
             }
             edgeDocument = new BaseEdgeDocument();
             edgeDocument.setFrom("Users/" + users[1]);
-            edgeDocument.setTo("Users/" + users[users.length-1]);
+            edgeDocument.setTo("Users/" + users[users.length - 1]);
             created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
             toBeDeleted.get("UserFollowUser").add(created.getKey());
         } catch (Exception e) {
@@ -219,7 +219,7 @@ public class RecommendationAppTest {
         new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
         JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length-1]));
+        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
 
     @Test
@@ -254,7 +254,7 @@ public class RecommendationAppTest {
     public void UpdateRecommendedUsers() {
         JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length-1]));
+        assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
 
     @Test
@@ -267,7 +267,7 @@ public class RecommendationAppTest {
             for (final String key : properties.stringPropertyNames()) {
                 Class.forName(properties.get(key).toString());
             }
-        } catch (IOException | ClassNotFoundException e){
+        } catch (IOException | ClassNotFoundException e) {
             fail(e.getMessage());
         }
     }

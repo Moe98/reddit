@@ -18,7 +18,7 @@ public class RecommendationApp extends Service {
         return DEFAULT_PROPERTIES_FILENAME;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         new RecommendationApp().start();
     }
 }
