@@ -4,12 +4,12 @@ import org.json.JSONObject;
 
 @SuppressWarnings("unused")
 public class Comment {
+    private String parentSubthreadId;
     private String creatorId;
-    private String parentId;
-    private String dateCreated;
-    private String content;
     private long likes;
     private long dislikes;
+    private String content;
+    private String dateCreated;
 
     public String getCreatorId() {
         return creatorId;
@@ -20,11 +20,11 @@ public class Comment {
     }
 
     public String getParentId() {
-        return parentId;
+        return parentSubthreadId;
     }
 
     public void setParentId(String parentId) {
-        this.parentId = parentId;
+        this.parentSubthreadId = parentId;
     }
 
     public String getDateCreated() {
@@ -62,23 +62,23 @@ public class Comment {
     @Override
     public String toString() {
         return "Comment{" +
-                "creatorId='" + creatorId + '\'' +
-                ", dateCreated='" + dateCreated + '\'' +
-                ", content='" + content + '\'' +
-                ", parentId='" + parentId + '\'' +
+                "parentSubthreadId='" + parentSubthreadId + '\'' +
+                ",creatorId='" + creatorId + '\'' +
                 ", likes=" + likes +
                 ", dislikes=" + dislikes +
+                ", content='" + content + '\'' +
+                ", dateCreated='" + dateCreated + '\'' +
                 '}';
     }
 
     public JSONObject toJSON() {
         JSONObject comment = new JSONObject();
+        comment.put("parentId", parentSubthreadId);
         comment.put("creatorId", creatorId);
-        comment.put("dateCreated", dateCreated);
-        comment.put("content", content);
-        comment.put("parentId", parentId);
         comment.put("likes", likes);
         comment.put("dislikes", dislikes);
+        comment.put("content", content);
+        comment.put("dateCreated", dateCreated);
         return comment;
     }
 }

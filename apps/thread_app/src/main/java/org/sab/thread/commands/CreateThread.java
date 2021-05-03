@@ -11,7 +11,7 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 import java.util.List;
 
-public class CreateThreadCommand extends ThreadCommand {
+public class CreateThread extends ThreadCommand {
 
     @Override
     protected Schema getSchema() {
@@ -19,7 +19,7 @@ public class CreateThreadCommand extends ThreadCommand {
         Attribute description = new Attribute(DESCRIPTION, DataType.STRING, true);
         Attribute creatorId = new Attribute(CREATOR_ID, DataType.STRING, true);
         Attribute dateCreated = new Attribute(DATE_CREATED, DataType.SQL_DATE, true);
-        Attribute numOfFollowers = new Attribute(NUM_OF_FOLLOWERS, DataType.LONG);
+        Attribute numOfFollowers = new Attribute(NUM_OF_FOLLOWERS, DataType.INT);
 
         return new Schema(List.of(threadName, description, creatorId, dateCreated, numOfFollowers));
     }
@@ -50,7 +50,7 @@ public class CreateThreadCommand extends ThreadCommand {
             if (!arango.collectionExists(arangoDB, DBName, collectionName)) {
                 arango.createCollection(arangoDB, DBName, collectionName, false);
             }
-
+            // TODO:
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(name);
             myObject.addAttribute("Name", name);
@@ -65,7 +65,7 @@ public class CreateThreadCommand extends ThreadCommand {
             thread.setDescription((String) res.getAttribute("Description"));
             thread.setCreatorId((String) res.getAttribute("CreatorId"));
             thread.setDateCreated((String) res.getAttribute("DateCreated"));
-            thread.setNumOfFollowers(Long.parseLong(res.getAttribute("NumOfFollowers").toString()));
+            thread.setNumOfFollowers(Integer.parseInt(res.getAttribute("NumOfFollowers").toString()));
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
@@ -79,7 +79,7 @@ public class CreateThreadCommand extends ThreadCommand {
 
 
     public static void main(String[] args) {
-        CreateThreadCommand tc = new CreateThreadCommand();
+        CreateThread tc = new CreateThread();
         JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-2-9\",\"name\":\"asmakElRayes7amido\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"},\"uriParams\":{},\"methodType\":\"POST\"}");
         System.out.println(tc.execute(request));
     }

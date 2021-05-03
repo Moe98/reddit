@@ -39,9 +39,6 @@ public enum DataType {
 
             return pattern.matcher(email).matches();
         }
-    },  LONG("") {
-        @Override
-        public boolean isOfValidType(Object object) {return object instanceof Long;}
     };
 
     private String additionalErrorMessage;
