@@ -1,27 +1,18 @@
 package org.sab.models;
 
+import org.json.JSONObject;
+
+import java.util.Date;
+
 @SuppressWarnings("unused")
 public class Thread {
-    public String name;
-    public String description;
+    private String name;
+    private String description;
     // TODO change |creator| to be final, as the creator of the thread
     //  cannot change.
-    public String creator;
-    public long numOfFollowers;
-    public String dateCreated;
-
-    public Thread() {
-        // Empty constructor used in the recommendation app.
-        super();
-    }
-
-    public Thread(String name, String description, String creator, long numOfFollowers, String dateCreated) {
-        this.name = name;
-        this.description = description;
-        this.creator = creator;
-        this.numOfFollowers = numOfFollowers;
-        this.dateCreated = dateCreated;
-    }
+    private String creatorId;
+    private long numOfFollowers;
+    private String dateCreated;
 
     public void setName(String name) {
         this.name = name;
@@ -31,8 +22,8 @@ public class Thread {
         this.description = description;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
     public void setNumOfFollowers(long numOfFollowers) {
@@ -43,14 +34,42 @@ public class Thread {
         this.dateCreated = dateCreated;
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public String getCreatorId() { return this.creatorId; }
+
+    public long getNumOfFollowers() {
+        return this.numOfFollowers;
+    }
+
+    public String getDateCreated() {
+        return this.dateCreated;
+    }
+
     @Override
     public String toString() {
         return "Thread{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", creator='" + creator + '\'' +
+                ", creator='" + creatorId + '\'' +
                 ", numOfFollowers=" + numOfFollowers +
                 ", dateCreated='" + dateCreated + '\'' +
                 '}';
+    }
+
+    public JSONObject toJSON(){
+        JSONObject thread = new JSONObject();
+        thread.put("name",name);
+        thread.put("description",description);
+        thread.put("creatorId",creatorId);
+        thread.put("numOfFollowers",numOfFollowers);
+        thread.put("dateCreated",dateCreated);
+        return thread;
     }
 }

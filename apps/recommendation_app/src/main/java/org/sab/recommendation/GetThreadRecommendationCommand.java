@@ -28,7 +28,7 @@ public class GetThreadRecommendationCommand {
                 JsonObject o = resultThreads.getObject(i);
                 thread.setName(o.getString("name"));
                 thread.setDescription(o.getString("description"));
-                thread.setCreator(o.getString("creator"));
+                thread.setCreatorId(o.getString("creator"));
                 thread.setNumOfFollowers(o.getLong("numOfFollowers"));
                 thread.setDateCreated((String) o.get("dateCreated"));
                 System.out.println("Recommendation Results " + thread);

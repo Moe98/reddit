@@ -1,32 +1,72 @@
 package org.sab.models.report;
 
-public class SubThreadReport extends Report {
-    private String subThreadId;
+import org.json.JSONObject;
 
-    public SubThreadReport(String userName, TypeOfReport typeOfReport, String data, String reportDescription, String subThreadID) {
-        setUserName(userName);
-        setTypeOfReport(typeOfReport);
-        setDate(data);
-        setReportDescription(reportDescription);
-        setSubThreadId(subThreadID);
-    }
+public class SubThreadReport {
+    private String subThreadId;
+    private String userName;
+    private TypeOfReport typeOfReport;
+    private String date;
+    private String reportDescription;
 
     public String getSubThreadId() {
         return subThreadId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public TypeOfReport getTypeOfReport() {
+        return typeOfReport;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getReportDescription() {
+        return reportDescription;
     }
 
     public void setSubThreadId(String subThreadId) {
         this.subThreadId = subThreadId;
     }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setTypeOfReport(TypeOfReport typeOfReport) {
+        this.typeOfReport = typeOfReport;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setReportDescription(String reportDescription) {
+        this.reportDescription = reportDescription;
+    }
+
     @Override
     public String toString() {
         return "SubThreadReport:{" +
-                "userId='" + getUserName() + '\'' +
+                "subThreadId='" + getSubThreadId() + '\'' +
+                ", userName='" + getUserName() + '\'' +
                 ", typeOfReport='" + getTypeOfReport() + '\'' +
                 ", date='" + getDate() + '\'' +
-                ", numOfFollowers=" + getReportDescription() + '\'' +
-                ", subThreadId='" + getSubThreadId() + '\'' +
+                ", reportDescription=" + getReportDescription() + '\'' +
                 '}';
+    }
+
+    public JSONObject toJSON(){
+        JSONObject subThreadReport = new JSONObject();
+        subThreadReport.put("subThreadId",subThreadId);
+        subThreadReport.put("userName",userName);
+        subThreadReport.put("typeOfReport",typeOfReport);
+        subThreadReport.put("date",date);
+        subThreadReport.put("reportDescription",reportDescription);
+        return subThreadReport;
     }
 }
