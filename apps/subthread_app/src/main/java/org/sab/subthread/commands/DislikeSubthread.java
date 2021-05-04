@@ -71,8 +71,8 @@ public class DislikeSubthread extends SubThreadCommand{
 
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("Users" + userId);
-                edgeDocument.setTo("Threads" + subthreadId);
+                edgeDocument.setFrom("Users/" + userId);
+                edgeDocument.setTo("Threads/" + subthreadId);
 
                 // adding new edgeDocument representing that a user dislikes a subthread
                 arango.createEdgeDocument(arangoDB, DBName, UserDislikeSubthreadCollection, edgeDocument);

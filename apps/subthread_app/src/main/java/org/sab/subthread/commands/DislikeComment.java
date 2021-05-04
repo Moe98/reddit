@@ -72,8 +72,8 @@ public class DislikeComment extends CommentCommand{
 
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("Users" + userId);
-                edgeDocument.setTo("Threads" + commentId);
+                edgeDocument.setFrom("Users/" + userId);
+                edgeDocument.setTo("Comments/" + commentId);
 
                 // adding new edgeDocument representing that a user dislikes a comment
                 arango.createEdgeDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeDocument);

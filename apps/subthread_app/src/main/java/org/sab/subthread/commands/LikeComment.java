@@ -70,8 +70,8 @@ public class LikeComment extends CommentCommand{
                 msg = "added your like on the comment";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("Users" + userId);
-                edgeDocument.setTo("Threads" + commentId);
+                edgeDocument.setFrom("Users/" + userId);
+                edgeDocument.setTo("Comments/" + commentId);
 
                 // adding new edgeDocument representing that a user likes a comment
                 arango.createEdgeDocument(arangoDB, DBName, UserLikeCommentCollection, edgeDocument);

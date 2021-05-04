@@ -70,8 +70,8 @@ public class LikeSubThread extends SubThreadCommand{
                 msg = "added your like on the subthread";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("Users" + userId);
-                edgeDocument.setTo("Threads" + subthreadId);
+                edgeDocument.setFrom("Users/" + userId);
+                edgeDocument.setTo("Threads/" + subthreadId);
 
                 // adding new edgeDocument representing that a user likes a comment
                 arango.createEdgeDocument(arangoDB, DBName, UserLikeSubthreadCollection, edgeDocument);
