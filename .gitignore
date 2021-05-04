@@ -219,6 +219,12 @@ buildNumber.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/java,maven,intellij,visualstudiocode,eclipse
 
+# Client
+node_modules
+dist
+package-lock.json
+
+# Team
 .classpath
 *.env
 config.json
