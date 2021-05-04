@@ -15,12 +15,11 @@ import java.util.List;
 public class EditProfile extends UserCommand {
 
 
-
     protected Schema getSchema() {
         Attribute username = new Attribute(USERNAME, DataType.STRING, true);
-        Attribute password = new Attribute(PASSWORD, DataType.STRING,true);
-        Attribute newPassword = new Attribute(New_PASSWORD, DataType.STRING,true);
-        return new Schema(List.of(username, password));
+        Attribute password = new Attribute(PASSWORD, DataType.STRING, true);
+        Attribute newPassword = new Attribute(New_PASSWORD, DataType.STRING, true);
+        return new Schema(List.of(username, password, newPassword));
     }
 
     @Override
@@ -40,11 +39,11 @@ public class EditProfile extends UserCommand {
             }
 
             String hashedPassword = resultSet.getString("password");
-            checkPassword = Auth.verifyHash(password,hashedPassword);
+            checkPassword = Auth.verifyHash(password, hashedPassword);
         } catch (PropertiesNotLoadedException | SQLException e) {
             return Responder.makeErrorResponse("An error occurred while submitting your request!", 502).toString();
         }
-        if(!checkPassword){
+        if (!checkPassword) {
             return Responder.makeErrorResponse("Error Occurred While Confirming Your Password", 401).toString();
         }
         //calling the appropriate SQL procedure
@@ -56,7 +55,7 @@ public class EditProfile extends UserCommand {
         }
 
 
-        return Responder.makeErrorResponse("Account Updated Successfully!",200).toString();
+        return Responder.makeErrorResponse("Account Updated Successfully!", 200).toString();
     }
 
 }

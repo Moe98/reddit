@@ -62,7 +62,6 @@ public class SignUp extends UserCommand {
             user.setUserId(resultSet.getString("user_id"));
             user.setUsername(resultSet.getString(USERNAME));
             user.setEmail(resultSet.getString(EMAIL));
-            user.setPassword(resultSet.getString(PASSWORD));
             user.setBirthdate(resultSet.getString(BIRTHDATE));
             user.setPhotoUrl(resultSet.getString("photo_url"));
 
