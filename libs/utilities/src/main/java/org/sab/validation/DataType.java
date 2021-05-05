@@ -33,15 +33,39 @@ public enum DataType {
             if (!STRING.isOfValidType(object)) {
                 return false;
             }
-            
+
             final String email = (String) object;
             final Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
 
             return pattern.matcher(email).matches();
         }
+
+    },
+    PASSWORD("Passwords must be at least 6 characters long") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            if (!STRING.isOfValidType(object)) {
+                return false;
+            }
+            String password = (String) object;
+            return password.length() >= 6;
+        }
+    },
+
+    USERNAME("Usernames must be at least 3 characters long.") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            if (!STRING.isOfValidType(object)) {
+                return false;
+            }
+            String username = (String) object;
+            return username.length() >= 3;
+        }
     };
 
+
     private String additionalErrorMessage;
+
     public abstract boolean isOfValidType(Object object);
 
     private DataType(String additionalErrorMessage) {
