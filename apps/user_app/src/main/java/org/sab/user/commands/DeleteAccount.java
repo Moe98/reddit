@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.functions.Auth;
+import org.sab.functions.CloudUtilities;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
@@ -9,7 +9,7 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.sql.ResultSet;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -43,6 +43,12 @@ public class DeleteAccount extends UserCommand {
             deleteFromArango(username);
         } catch (PropertiesNotLoadedException | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
+        }
+        // Deleting profile picture from Cloudinary
+        try {
+            CloudUtilities.destroyImage(username);
+        } catch (IOException e) {
+            return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
         }
 
 
