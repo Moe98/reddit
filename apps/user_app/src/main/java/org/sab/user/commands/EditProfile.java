@@ -1,5 +1,6 @@
 package org.sab.user.commands;
 
+import org.json.JSONObject;
 import org.sab.functions.Auth;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
@@ -16,46 +17,37 @@ public class EditProfile extends UserCommand {
 
 
     protected Schema getSchema() {
-        Attribute username = new Attribute(USERNAME, DataType.STRING, true);
-        Attribute password = new Attribute(PASSWORD, DataType.STRING, true);
-        Attribute newPassword = new Attribute(New_PASSWORD, DataType.STRING, true);
-        return new Schema(List.of(username, password, newPassword));
+        Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
+        Attribute oldPassword = new Attribute(OLD_PASSWORD, DataType.PASSWORD, true);
+        Attribute newPassword = new Attribute(NEW_PASSWORD, DataType.PASSWORD, true);
+        return new Schema(List.of(username, oldPassword, newPassword));
     }
 
     @Override
     protected String execute() {
+
         // retrieving the body objects
         String username = body.getString(USERNAME);
-        String password = body.getString(PASSWORD);
-        String newPassword = body.getString(New_PASSWORD);
+        String oldPassword = body.getString(OLD_PASSWORD);
+        String newPassword = body.getString(NEW_PASSWORD);
 
-        Boolean checkPassword = false;
-        //retrieving the result from SQL into a User Object
-        try {
-            ResultSet resultSet = PostgresConnection.call("get_user", username);
+        if (oldPassword.equals(newPassword))
+            return Responder.makeErrorResponse("Your new password cannot match your last one.", 400);
+        // Authentication
+        JSONObject userAuth = authenticateUser(username, oldPassword);
+        if (userAuth.getInt("statusCode") != 200)
+            return userAuth.toString();
 
-            if (resultSet == null || !resultSet.next()) {
-                return Responder.makeErrorResponse("User not found!", 404).toString();
-            }
-
-            String hashedPassword = resultSet.getString("password");
-            checkPassword = Auth.verifyHash(password, hashedPassword);
-        } catch (PropertiesNotLoadedException | SQLException e) {
-            return Responder.makeErrorResponse("An error occurred while submitting your request!", 502).toString();
-        }
-        if (!checkPassword) {
-            return Responder.makeErrorResponse("Error Occurred While Confirming Your Password", 401).toString();
-        }
         //calling the appropriate SQL procedure
         try {
             newPassword = Auth.hash(newPassword);
             PostgresConnection.call("update_user_password", username, newPassword);
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
 
-        return Responder.makeErrorResponse("Account Updated Successfully!", 200).toString();
+        return Responder.makeMsgResponse("Account Updated Successfully!");
     }
 
 }

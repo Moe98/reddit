@@ -20,13 +20,12 @@ public class SignUp extends UserCommand {
 
     @Override
     protected Schema getSchema() {
-        Attribute username = new Attribute(USERNAME, DataType.STRING, true);
+        Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute email = new Attribute(EMAIL, DataType.EMAIL, true);
-        Attribute password = new Attribute(PASSWORD, DataType.STRING, true);
+        Attribute password = new Attribute(PASSWORD, DataType.PASSWORD, true);
         Attribute birthdate = new Attribute(BIRTHDATE, DataType.SQL_DATE, true);
-        Attribute photoUrl = new Attribute(PHOTO_URL, DataType.STRING);
 
-        return new Schema(List.of(username, email, password, birthdate, photoUrl));
+        return new Schema(List.of(username, email, password, birthdate));
     }
 
     @Override
@@ -35,41 +34,33 @@ public class SignUp extends UserCommand {
         // retrieving the body objects
         String username = body.getString(USERNAME);
         String userId = UUID.randomUUID().toString();
-        String hashedPassword;
-        hashedPassword = Auth.hash(body.getString(PASSWORD));
+        String hashedPassword = Auth.hash(body.getString(PASSWORD));
         String email = body.getString(EMAIL);
-        String photoUrl = body.keySet().contains(PHOTO_URL) ? body.getString(PHOTO_URL) : null;
         Date birthdate = Date.valueOf(body.getString(BIRTHDATE));
 
-        //calling the appropriate SQL procedure
+        // Calling the create_user SQL procedure
         try {
-            PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate, photoUrl);
+            PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate);
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        //retrieving the result from SQL into a User Object
-        User user;
+        InsertUserInArango(username);
+
+        // getting the user
         try {
-            ResultSet resultSet = PostgresConnection.call("get_user", username);
-
-            if (resultSet == null || !resultSet.next()) {
-                return Responder.makeErrorResponse("ResultSet is Empty!", 404).toString();
-            }
-
-            user = new User();
-
-            user.setUserId(resultSet.getString("user_id"));
-            user.setUsername(resultSet.getString(USERNAME));
-            user.setEmail(resultSet.getString(EMAIL));
-            user.setBirthdate(resultSet.getString(BIRTHDATE));
-            user.setPhotoUrl(resultSet.getString("photo_url"));
-
+            User user = getUser(username, USER_ID, USERNAME, EMAIL, BIRTHDATE);
+            return Responder.makeDataResponse(user.toJSON());
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return Responder.makeErrorResponse("ResultSet is Empty!", 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        return Responder.makeDataResponse(user.toJSON()).toString();
+
     }
+
+    private void InsertUserInArango(String username) {
+        //TODO
+    }
+
 
 }
