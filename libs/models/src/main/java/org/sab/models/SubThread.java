@@ -3,16 +3,33 @@ package org.sab.models;
 import org.json.JSONObject;
 
 public class SubThread {
-    private String parentThreadId;
     private String id;
-    private String title;
+    private String parentThreadId;
     private String creatorId;
+    private String title;
+    private String content;
     private int likes;
     private int dislikes;
-    private String content;
     private Boolean hasImage;
     private String dateCreated;
 
+    private SubThread(String parentThreadId, String creatorId,
+                      String title, String content,
+                      Boolean hasImage) {
+
+        this.parentThreadId = parentThreadId;
+        this.creatorId = creatorId;
+        this.title = title;
+        this.content = content;
+        this.hasImage = hasImage;
+    }
+
+    public static SubThread createNewSubThread(String parentThreadId, String creatorId,
+                                            String title, String content,
+                                            Boolean hasImage) {
+
+        return new SubThread(parentThreadId, creatorId, title, content, hasImage);
+    }
 
     public String getParentThreadId() {
         return parentThreadId;
