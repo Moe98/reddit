@@ -31,6 +31,11 @@ public class Auth {
     }
 
     public static boolean verifyHash(String password, String hash) {
-        return BCrypt.checkpw(password, hash);
+        try {
+            return BCrypt.checkpw(password, hash);
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 }
