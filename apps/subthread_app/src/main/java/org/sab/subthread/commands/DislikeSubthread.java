@@ -13,10 +13,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class DislikeSubthread extends SubThreadCommand{
-
+    @Override
     protected Schema getSchema() {
-        Attribute parentSubthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
-        return new Schema(List.of(parentSubthreadId));
+        Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
+        return new Schema(List.of(subthreadId));
     }
 
     private Arango arango;
@@ -53,16 +53,16 @@ public class DislikeSubthread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DBName, UserDislikeSubthreadCollection, true);
             }
 
-            String edgeKey = userId+subthreadId;
+            String edgeKey = userId+"/"+subthreadId;
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if(arango.documentExists(arangoDB, DBName, UserDislikeSubthreadCollection,edgeKey)){
                 arango.deleteDocument(arangoDB, DBName, UserDislikeSubthreadCollection, edgeKey);
 
-                BaseDocument originalComment = arango.readDocument(arangoDB, DBName, SubthreadCollectionName, subthreadId);
-                int newDisikes =  (int)originalComment.getAttribute(DISLIKES)-1;
-                originalComment.updateAttribute(LIKES,newDisikes);
+                BaseDocument originalSubthread = arango.readDocument(arangoDB, DBName, SubthreadCollectionName, subthreadId);
+                int newDisikes =  (int)originalSubthread.getAttribute(DISLIKES)-1;
+                originalSubthread.updateAttribute(LIKES,newDisikes);
                 // putting the comment with the updated amount of dislikes
-                arango.updateDocument(arangoDB,DBName,SubthreadCollectionName,originalComment,subthreadId);
+                arango.updateDocument(arangoDB,DBName,SubthreadCollectionName,originalSubthread,subthreadId);
 
                 msg = "removed your dislike on the subthread";
             }
@@ -72,7 +72,7 @@ public class DislikeSubthread extends SubThreadCommand{
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
                 edgeDocument.setFrom("Users/" + userId);
-                edgeDocument.setTo("Threads/" + subthreadId);
+                edgeDocument.setTo("SubThreads/" + subthreadId);
 
                 // adding new edgeDocument representing that a user dislikes a subthread
                 arango.createEdgeDocument(arangoDB, DBName, UserDislikeSubthreadCollection, edgeDocument);

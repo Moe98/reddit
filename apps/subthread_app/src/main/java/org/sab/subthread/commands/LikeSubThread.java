@@ -13,10 +13,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class LikeSubThread extends SubThreadCommand{
-
+    @Override
     protected Schema getSchema() {
-        Attribute parentSubthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
-        return new Schema(List.of(parentSubthreadId));
+        Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
+        return new Schema(List.of(subthreadId));
     }
 
     private Arango arango;
@@ -53,16 +53,16 @@ public class LikeSubThread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DBName, UserDislikeSubthreadCollection, true);
             }
 
-            String edgeKey = userId+subthreadId;
+            String edgeKey = userId+"/"+subthreadId;
             // if user already likes the subthread, then remove his like and update like count
             if(arango.documentExists(arangoDB, DBName, UserLikeSubthreadCollection,edgeKey)){
                 arango.deleteDocument(arangoDB, DBName, UserLikeSubthreadCollection, edgeKey);
 
-                BaseDocument originalComment = arango.readDocument(arangoDB, DBName, SubthreadCollectionName, subthreadId);
-                int newLikes =  (int)originalComment.getAttribute(LIKES)-1;
-                originalComment.updateAttribute(LIKES,newLikes);
+                BaseDocument originalSubthread = arango.readDocument(arangoDB, DBName, SubthreadCollectionName, subthreadId);
+                int newLikes =  (int)originalSubthread.getAttribute(LIKES)-1;
+                originalSubthread.updateAttribute(LIKES,newLikes);
                 // putting the comment with the updated amount of likes
-                arango.updateDocument(arangoDB,DBName,SubthreadCollectionName,originalComment,subthreadId);
+                arango.updateDocument(arangoDB,DBName,SubthreadCollectionName,originalSubthread,subthreadId);
 
                 msg = "removed your like on the subthread";
             }
@@ -71,7 +71,7 @@ public class LikeSubThread extends SubThreadCommand{
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
                 edgeDocument.setFrom("Users/" + userId);
-                edgeDocument.setTo("Threads/" + subthreadId);
+                edgeDocument.setTo("SubThreads/" + subthreadId);
 
                 // adding new edgeDocument representing that a user likes a comment
                 arango.createEdgeDocument(arangoDB, DBName, UserLikeSubthreadCollection, edgeDocument);

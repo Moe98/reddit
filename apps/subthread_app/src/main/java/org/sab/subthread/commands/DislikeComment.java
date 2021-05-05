@@ -15,8 +15,8 @@ import java.util.List;
 public class DislikeComment extends CommentCommand{
     @Override
     protected Schema getSchema() {
-        Attribute parentSubthreadId = new Attribute(COMMENT_ID, DataType.STRING, true);
-        return new Schema(List.of(parentSubthreadId));
+        Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);
+        return new Schema(List.of(commentId));
     }
 
     private Arango arango;
@@ -54,7 +54,7 @@ public class DislikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DBName, UserDislikeCommentCollection, true);
             }
 
-            String edgeKey = userId+commentId;
+            String edgeKey = userId+"/"+commentId;
             // if user already dislikes the comment, then remove his dislike and update dislike count
             if(arango.documentExists(arangoDB, DBName, UserDislikeCommentCollection,edgeKey)){
                 arango.deleteDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeKey);
