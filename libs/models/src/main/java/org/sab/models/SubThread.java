@@ -119,16 +119,18 @@ public class SubThread {
     }
 
     public JSONObject toJSON() {
-        JSONObject thread = new JSONObject();
-        thread.put("name", parentThreadId);
-        thread.put("description", id);
-        thread.put("creatorId", title);
-        thread.put("creatorId", creatorId);
-        thread.put("creatorId", likes);
-        thread.put("creatorId", dislikes);
-        thread.put("creatorId", content);
-        thread.put("numOfFollowers", hasImage);
-        thread.put("dateCreated", dateCreated);
-        return thread;
+
+        JSONObject subThread = new JSONObject();
+        subThread.put("id", id);
+        subThread.put("parentThread", parentThreadId);
+        subThread.put("creatorId", creatorId);
+        subThread.put("title", title);
+        subThread.put("likes", likes);
+        subThread.put("dislikes", dislikes);
+        subThread.put("content", content);
+        subThread.put("hasImage", hasImage);
+        subThread.put("dateCreated", dateCreated);
+
+        return subThread;
     }
 }
