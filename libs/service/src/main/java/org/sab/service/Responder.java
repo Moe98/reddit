@@ -5,15 +5,21 @@ import org.json.JSONObject;
 public class Responder {
     private Responder() {
     }
-    // To Be Renamed To Handle All Responses Without Data (msg , statusCode)Only!
-    public static JSONObject makeErrorResponse(String msg, int statusCode) {
+
+    public static String makeErrorResponse(String msg, int statusCode) {
         JSONObject error = new JSONObject().put("msg", msg).put("statusCode", statusCode);
-        return error;
+        return error.toString();
     }
 
-    public static JSONObject makeDataResponse(JSONObject data) {
+    public static String makeDataResponse(JSONObject data) {
         JSONObject response = new JSONObject().put("data", data);
         response.put("statusCode", 200);
-        return response;
+        return response.toString();
+    }
+
+    public static String makeMsgResponse(String msg) {
+        JSONObject response = new JSONObject().put("msg", msg);
+        response.put("statusCode", 200);
+        return response.toString();
     }
 }
