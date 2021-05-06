@@ -1,5 +1,8 @@
 package org.sab.user.commands;
 
+import com.arangodb.ArangoDB;
+import com.arangodb.entity.BaseDocument;
+import org.sab.arango.Arango;
 import org.sab.functions.Auth;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
@@ -12,6 +15,7 @@ import org.sab.validation.Schema;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +49,12 @@ public class SignUp extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        InsertUserInArango(username);
+        try {
+            InsertUserInArango(username);
+        } catch (Exception e) {
+            return Responder.makeErrorResponse(e.getMessage(), 500);
+        }
+
 
         // getting the user
         try {
@@ -59,7 +68,14 @@ public class SignUp extends UserCommand {
     }
 
     private void InsertUserInArango(String username) {
-        //TODO
+        HashMap<String, Object> documentProperties = new HashMap<>();
+        documentProperties.put("is_deleted", false);
+        BaseDocument user = new BaseDocument(documentProperties);
+        user.setKey(username);
+        Arango arango = Arango.getInstance();
+        ArangoDB arangoDB = arango.connect();
+        arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", user);
+
     }
 
 
