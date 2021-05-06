@@ -19,11 +19,6 @@ public class ConfigMap {
 
     private ConfigMap() {
         cmdMap = new ConcurrentHashMap<>();
-        cmdMap.put("HELLO_WORLD", "org.sab.demo.commands.HelloWorld");
-        cmdMap.put("GOOD_BYE_WORLD", "org.sab.demo.commands.GoodByeWorld");
-        cmdMap.put("SEARCH_THREAD", "org.sab.search.commands.SearchThread");
-        cmdMap.put("SEARCH_SUBTHREAD", "org.sab.search.commands.SearchSubThread");
-
     }
 
     public static ConfigMap getInstance() {
