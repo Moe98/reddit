@@ -8,4 +8,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String CREATOR_ID = "creatorId";
     protected static final String NUM_OF_FOLLOWERS = "numOfFollowers";
     protected static final String DATE_CREATED = "dateCreated";
+
+    protected static final String ASSIGNER_ID = "assignerId";
+    protected static final String MODERATOR_ID = "moderatorId";
 }
