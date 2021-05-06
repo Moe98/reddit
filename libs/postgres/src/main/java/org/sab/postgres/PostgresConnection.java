@@ -117,7 +117,9 @@ public class PostgresConnection {
                 "psql",
                 "-f",
                 scriptPath,
-                "postgresql://postgres:12345678@localhost:5432/postgres"
+                String.format("postgresql://%s:%s@%s:%s/%s", System.getenv("POSTGRES_USER"),
+                        System.getenv("POSTGRES_PASSWORD"), System.getenv("POSTGRES_HOST"),
+                        System.getenv("POSTGRES_PORT"), System.getenv("POSTGRES_DB"))
         };
 
         ProcessBuilder pb = new ProcessBuilder(command);
