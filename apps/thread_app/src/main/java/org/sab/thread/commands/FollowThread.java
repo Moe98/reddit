@@ -37,15 +37,15 @@ public class FollowThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        JSONObject response = new JSONObject();
+        final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            String threadName = body.getString(THREAD_NAME);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
+            final String threadName = body.getString(THREAD_NAME);
+            final String userId = uriParams.getString(ACTION_MAKER_ID);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
@@ -57,7 +57,7 @@ public class FollowThread extends ThreadCommand {
 
             final String edgeKey = userId + threadName;
 
-            BaseDocument threadDocument = arango.readDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName);
+            final BaseDocument threadDocument = arango.readDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName);
             int followerCount = (int) threadDocument.getAttribute(NUM_OF_FOLLOWERS_DB);
 
             if (arango.documentExists(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, edgeKey)) {
@@ -89,7 +89,7 @@ public class FollowThread extends ThreadCommand {
 
     @Override
     protected Schema getSchema() {
-        Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
+        final Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
 
         return new Schema(List.of(threadName));
     }

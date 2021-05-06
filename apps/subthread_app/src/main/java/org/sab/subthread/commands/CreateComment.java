@@ -48,7 +48,7 @@ public class CreateComment extends CommentCommand {
         String parentContentType = body.getString(PARENT_CONTENT_TYPE);
         String userId = uriParams.getString(ACTION_MAKER_ID);
 
-        Comment comment;
+        final Comment comment;
 
         try {
             arango = Arango.getInstance();
@@ -59,7 +59,7 @@ public class CreateComment extends CommentCommand {
                 arango.createCollection(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, false);
             }
 
-            BaseDocument myObject = new BaseDocument();
+            final BaseDocument myObject = new BaseDocument();
 
             myObject.addAttribute(PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
             myObject.addAttribute(ACTION_MAKER_ID, userId);
@@ -70,19 +70,19 @@ public class CreateComment extends CommentCommand {
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
-            BaseDocument res = arango.createDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, myObject);
+            final BaseDocument res = arango.createDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, myObject);
 
             System.out.println(res);
             System.out.println("=========");
 
-            String commentId = res.getKey();
+            final String commentId = res.getKey();
             parentSubThreadId = (String) res.getAttribute(PARENT_SUBTHREAD_ID_DB);
             userId = (String) res.getAttribute(ACTION_MAKER_ID);
             content = (String) res.getAttribute(CONTENT_DB);
             parentContentType = (String) res.getAttribute(PARENT_CONTENT_TYPE_DB);
             final int likes = (int) res.getAttribute(LIKES_DB);
             final int dislikes = (int) res.getAttribute(DISLIKES_DB);
-            String dateCreated = (String) res.getAttribute(DATE_CREATED_DB);
+            final String dateCreated = (String) res.getAttribute(DATE_CREATED_DB);
 
             comment = new Comment();
             comment.setId(commentId);
@@ -95,10 +95,10 @@ public class CreateComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
 
             // Create an edge between content and comment.
-            BaseEdgeDocument edgeDocumentFromContentToComment = addEdgeFromContentToComment(comment);
+            final BaseEdgeDocument edgeDocumentFromContentToComment = addEdgeFromContentToComment(comment);
 
             // Create an edge between user and comment.
-            BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment);
+            final BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment);
 
             // Create the edge collections if they do not already exist.
             if (!arango.collectionExists(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME)) {

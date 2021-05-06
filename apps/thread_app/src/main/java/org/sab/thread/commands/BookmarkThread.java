@@ -12,6 +12,7 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class BookmarkThread extends ThreadCommand {
+    private Arango arango;
     private ArangoDB arangoDB;
 
     public static void main(String[] args) {
@@ -35,11 +36,11 @@ public class BookmarkThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        JSONObject response = new JSONObject();
+        final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
             arangoDB = arango.connect();
 
             final String threadName = body.getString(THREAD_NAME);
@@ -66,7 +67,7 @@ public class BookmarkThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arangoDB.shutdown();
+            arango.disconnect(arangoDB);
             response.put("msg", responseMessage);
         }
 
@@ -75,7 +76,7 @@ public class BookmarkThread extends ThreadCommand {
 
     @Override
     protected Schema getSchema() {
-        Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
+        final Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
 
         return new Schema(List.of(threadName));
     }
