@@ -31,7 +31,9 @@ public abstract class CommentCommand extends CommandWithVerification {
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
     protected static final String COMMENT_COLLECTION_NAME = "Comment";
+    protected static final String CONTENT_COMMENT_COLLECTION_NAME = "ContentComment";
     protected static final String USER_COLLECTION_NAME = "User";
+    protected static final String USER_CREATE_COMMENT_COLLECTION_NAME = "UserCreateComment";
     protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = "UserLikeComment";
     protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = "UserDislikeComment";
 }

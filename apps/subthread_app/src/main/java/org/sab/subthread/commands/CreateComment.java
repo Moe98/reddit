@@ -13,14 +13,14 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-public class AddComment extends CommentCommand {
+public class CreateComment extends CommentCommand {
     private Arango arango;
     private ArangoDB arangoDB;
 
     public static void main(String[] args) {
-        AddComment addComment = new AddComment();
+        CreateComment addComment = new CreateComment();
         JSONObject body = new JSONObject();
-        body.put(PARENT_SUBTHREAD_ID, "12345");
+        body.put(PARENT_SUBTHREAD_ID, "33029");
         body.put(CREATOR_ID, "67890");
         body.put(CONTENT, "I think their fish is bad!");
         body.put(PARENT_CONTENT_TYPE, "SubThread");
@@ -42,9 +42,6 @@ public class AddComment extends CommentCommand {
     protected String execute() {
         final int INITIAL_LIKES = 0;
         final int INITIAL_DISLIKES = 0;
-        final String collectionName = "Comment";
-        final String userCollectionName = "User";
-        final String DBName = "ARANGO_DB";
 
         String parentSubThreadId = body.getString(PARENT_SUBTHREAD_ID);
         String creatorId = body.getString(CREATOR_ID);
@@ -58,8 +55,8 @@ public class AddComment extends CommentCommand {
             arangoDB = arango.connect();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DBName, collectionName)) {
-                arango.createCollection(arangoDB, DBName, collectionName, false);
+            if (!arango.collectionExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, false);
             }
 
             BaseDocument myObject = new BaseDocument();
@@ -73,7 +70,7 @@ public class AddComment extends CommentCommand {
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
             myObject.addAttribute("DateCreated", sqlDate);
 
-            BaseDocument res = arango.createDocument(arangoDB, DBName, collectionName, myObject);
+            BaseDocument res = arango.createDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, myObject);
 
             System.out.println(res);
             System.out.println("=========");
@@ -88,6 +85,7 @@ public class AddComment extends CommentCommand {
             String dateCreated = (String) res.getAttribute("DateCreated");
 
             comment = new Comment();
+            comment.setId(commentId);
             comment.setParentId(parentSubThreadId);
             comment.setCreatorId(creatorId);
             comment.setContent(content);
@@ -97,26 +95,25 @@ public class AddComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
 
             // Create an edge between content and comment.
-            BaseEdgeDocument edgeDocumentFromContentToComment = addEdgeFromContentToComment(comment, commentId);
+            BaseEdgeDocument edgeDocumentFromContentToComment = addEdgeFromContentToComment(comment);
 
             // Create an edge between user and comment.
-            BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment, commentId);
-
-            final String contentCollectionName = getCollectionName(parentContentType);
+            BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment);
 
             // Create the edge collections if they do not already exist.
-            if (!arango.collectionExists(arangoDB, DBName, contentCollectionName)) {
-                arango.createCollection(arangoDB, DBName, contentCollectionName, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
             }
 
-            if (!arango.collectionExists(arangoDB, DBName, userCollectionName)) {
-                arango.createCollection(arangoDB, DBName, userCollectionName, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
             }
 
             // Add the edge documents.
-            arango.createEdgeDocument(arangoDB, DBName, contentCollectionName, edgeDocumentFromContentToComment);
-            arango.createEdgeDocument(arangoDB, DBName, userCollectionName, edgeDocumentFromUserToComment);
+            arango.createEdgeDocument(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
+            arango.createEdgeDocument(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
         } catch (Exception e) {
+            e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             arango.disconnect(arangoDB);
@@ -134,50 +131,37 @@ public class AddComment extends CommentCommand {
         return new Schema(List.of(parentSubThreadId, creatorId, content, parentContentType));
     }
 
-    private BaseEdgeDocument addEdgeFromContentToComment(Comment comment, String commentId) {
+    private BaseEdgeDocument addEdgeFromContentToComment(Comment comment) {
         final String parentContentType = comment.getParentContentType();
+        final String commentId = comment.getId();
         final String parentId = comment.getParentId();
-        final String edgeKey = createEdgeKey(parentId, commentId);
 
-        String from = "SubThread/" + parentId;
-        final String to = "Comment/" + commentId;
+        String from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;
+        final String to = COMMENT_COLLECTION_NAME + "/" + commentId;
 
         // TODO The collection names should come from a config file.
         switch (parentContentType) {
-            case "Comment" -> from = "Comment/" + parentId;
-            case "SubThread" -> from = "SubThread/" + parentId;
+            case "Comment" -> from = COMMENT_COLLECTION_NAME + "/" + parentId;
+            case "SubThread" -> from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;
         }
 
-        return addEdgeFromToWithKey(from, to, edgeKey);
+        return addEdgeFromTo(from, to);
     }
 
-    private BaseEdgeDocument addEdgeFromUserToComment(Comment comment, String commentId) {
+    private BaseEdgeDocument addEdgeFromUserToComment(Comment comment) {
         final String creatorId = comment.getCreatorId();
-        final String from = "User/" + creatorId;
-        final String to = "Comment/" + commentId;
-        final String edgeKey = createEdgeKey(creatorId, commentId);
+        final String commentId = comment.getId();
+        final String from = USER_COLLECTION_NAME + "/" + creatorId;
+        final String to = COMMENT_COLLECTION_NAME + "/" + commentId;
 
-        return addEdgeFromToWithKey(from, to, edgeKey);
+        return addEdgeFromTo(from, to);
     }
 
-    private BaseEdgeDocument addEdgeFromToWithKey(String from, String to, String key) {
+    private BaseEdgeDocument addEdgeFromTo(String from, String to) {
         BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
         edgeDocument.setFrom(from);
         edgeDocument.setTo(to);
-        edgeDocument.setTo(key);
 
         return edgeDocument;
-    }
-
-    private String createEdgeKey(String creatorId, String commentId) {
-        return creatorId + commentId;
-    }
-
-    private String getCollectionName(String collection) {
-        return switch (collection) {
-            case "SubThread" -> "SubThread";
-            case "Comment" -> "Comment";
-            default -> "";
-        };
     }
 }
