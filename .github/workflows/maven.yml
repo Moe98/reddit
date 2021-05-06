@@ -75,6 +75,10 @@ jobs:
           ARANGO_USER: ${{ secrets.ARANGO_USER }}
           ARANGO_PASSWORD: ${{ secrets.ARANGO_PASSWORD }}
           ARANGO_DB: 'Reddit'
+          # Cloudinary
+          COLOUDINARY_CLOUD_NAME: ${{ secrets.COLOUDINARY_CLOUD_NAME }}
+          COLOUDINARY_API_SECRET: ${{ secrets.COLOUDINARY_API_SECRET }}
+          COLOUDINARY_API_KEY: ${{ secrets.COLOUDINARY_API_KEY }}
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 180
