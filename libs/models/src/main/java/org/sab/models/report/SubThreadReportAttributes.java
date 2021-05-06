@@ -1,6 +1,6 @@
 package org.sab.models.report;
 
-public enum SunThreadReportAttributes {
+public enum SubThreadReportAttributes {
 
     // variables in a Report object
     Report_Id("id", null),
@@ -10,17 +10,17 @@ public enum SunThreadReportAttributes {
     DATE_CREATED("dateCreated", "DateCreated"),
 
     REPORTER_ID("userId", "UserId"),
-    TYPE_OF_REPORT ("typeOfReport", "TypeOfReport"), // TODO ReportType
+    TYPE_OF_REPORT ("typeOfReport", "TypeOfReport"),
 
 
-    PARENT_THREAD_ID("threadId", "ThreadId"), // TODO should be subthread report
+    PARENT_THREAD_ID("threadId", "ThreadId"),
     REPORT_MSG("reportMsg", "ReportMessage");
 
 
     private final String http;
     private final String db;
 
-    SunThreadReportAttributes(String http, String db) {
+    SubThreadReportAttributes(String http, String db) {
         this.http = http;
         this.db = db;
     }

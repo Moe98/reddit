@@ -46,12 +46,12 @@ public class ReportSubThread extends SubThreadCommand{
             }
 
             BaseDocument myObject = new BaseDocument();
-            myObject.addAttribute("User", userId);
-            myObject.addAttribute("TypeOfReport", typeOfReport);
-            myObject.addAttribute("ReportedContent", threadId);
-            myObject.addAttribute("Date", dateCreated);
-            myObject.addAttribute("Report", reportMsg);
-            myObject.addAttribute("SubThreadID", subthreadId);
+            myObject.addAttribute(REPORTER_ID_DB, userId);
+            myObject.addAttribute(TYPE_OF_REPORT_DB, typeOfReport);
+            myObject.addAttribute(THREAD_ID_DB, threadId);
+            myObject.addAttribute(DATE_CREATED_DB, dateCreated);
+            myObject.addAttribute(REPORT_MSG, reportMsg);
+            myObject.addAttribute(SUBTHREAD_ID, subthreadId);
 
             BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
 

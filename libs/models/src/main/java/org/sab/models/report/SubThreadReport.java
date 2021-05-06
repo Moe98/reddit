@@ -64,12 +64,12 @@ public class SubThreadReport {
 
     public JSONObject toJSON() {
         JSONObject subThreadReport = new JSONObject();
-        subThreadReport.put(SunThreadReportAttributes.SUBTHREAD_Id.getHTTP(), subThreadId);
-        subThreadReport.put(SunThreadReportAttributes.REPORTER_ID.getHTTP(), userName);
-        subThreadReport.put(SunThreadReportAttributes.PARENT_THREAD_ID.getHTTP(), parentThreadId);
-        subThreadReport.put(SunThreadReportAttributes.TYPE_OF_REPORT.getHTTP(), typeOfReport);
-        subThreadReport.put(SunThreadReportAttributes.DATE_CREATED.getHTTP(), date);
-        subThreadReport.put(SunThreadReportAttributes.REPORT_MSG.getHTTP(), reportMessage);
+        subThreadReport.put(SubThreadReportAttributes.SUBTHREAD_Id.getHTTP(), subThreadId);
+        subThreadReport.put(SubThreadReportAttributes.REPORTER_ID.getHTTP(), userName);
+        subThreadReport.put(SubThreadReportAttributes.PARENT_THREAD_ID.getHTTP(), parentThreadId);
+        subThreadReport.put(SubThreadReportAttributes.TYPE_OF_REPORT.getHTTP(), typeOfReport);
+        subThreadReport.put(SubThreadReportAttributes.DATE_CREATED.getHTTP(), date);
+        subThreadReport.put(SubThreadReportAttributes.REPORT_MSG.getHTTP(), reportMessage);
         return subThreadReport;
     }
 
