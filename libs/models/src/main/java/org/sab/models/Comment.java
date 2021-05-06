@@ -10,6 +10,7 @@ public class Comment {
     private long dislikes;
     private String content;
     private String dateCreated;
+    private String parentContentType;
 
     public String getCreatorId() {
         return creatorId;
@@ -57,6 +58,14 @@ public class Comment {
 
     public void setDislikes(long dislikes) {
         this.dislikes = dislikes;
+    }
+
+    public String getParentContentType() {
+        return parentContentType;
+    }
+
+    public void setParentContentType(String parentContentType) {
+        this.parentContentType = parentContentType;
     }
 
     @Override
