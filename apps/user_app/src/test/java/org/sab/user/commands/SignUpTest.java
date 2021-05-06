@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.sab.postgres.PostgresConnection;
 
 import java.sql.Connection;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -21,7 +22,7 @@ public class SignUpTest {
     @BeforeClass
     public static void connectToSql() {
         try {
-            sqlConnection = PostgresConnection.getInstance().connect();
+//            sqlConnection = PostgresConnection.getInstance().connect();
             PostgresConnection.dbInit();
         } catch (Exception e) {
             fail(e.getMessage());
@@ -34,12 +35,13 @@ public class SignUpTest {
     public void SignUpCreatesAnEntryInDB() {
 
         JSONObject body = new JSONObject();
-
+        long time = new Date().getTime();
+        System.out.println(time);
         JSONObject request = new JSONObject();
 
-        String username = "scaleabull";
+        String username = "scaleabull" + time;
         String password = "to_the_moon";
-        String email = "scaleabul@gmail.com";
+        String email = "scaleabul" + time + "@gmail.com";
         String birthdate = "1997-12-14";
 
         body.put("username", username);
@@ -50,11 +52,11 @@ public class SignUpTest {
 
         request.put("body", body);
         request.put("uriParams", new JSONObject());
-        request.put("methodType","POST");
+        request.put("methodType", "POST");
         SignUp signUpCommand = new SignUp();
 
         JSONObject response = new JSONObject(signUpCommand.execute(request));
-
+        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = null;
         try {
