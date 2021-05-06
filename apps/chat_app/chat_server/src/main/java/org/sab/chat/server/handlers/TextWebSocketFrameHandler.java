@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.sab.chat.server.ChatServer.clients;
-import static org.sab.chat.server.ChatServer.randomChatIds;
 
 public class TextWebSocketFrameHandler extends
         SimpleChannelInboundHandler<TextWebSocketFrame> {
@@ -34,11 +33,11 @@ public class TextWebSocketFrameHandler extends
             ctx.pipeline().remove(HttpRequestHandler.class);
             group.writeAndFlush(new TextWebSocketFrame("Client " +
                     ctx.channel() + " joined"));
-            ArrayList<UUID> chatIds = new ArrayList<>();
-            Collections.shuffle(randomChatIds);
-            chatIds.add(randomChatIds.get(0));
-            chatIds.add(randomChatIds.get(1));
-            clients.put(ctx.channel().id(), chatIds);
+//            ArrayList<UUID> chatIds = new ArrayList<>();
+//            Collections.shuffle(randomChatIds);
+//            chatIds.add(randomChatIds.get(0));
+//            chatIds.add(randomChatIds.get(1));
+//            clients.put(ctx.channel().id(), chatIds);
             group.add(ctx.channel());
         } else {
             super.userEventTriggered(ctx, evt);
@@ -50,40 +49,7 @@ public class TextWebSocketFrameHandler extends
         msg.retain();
         JSONParser parser = new JSONParser();
         JSONObject messageJson = (JSONObject) parser.parse(msg.text());
-//        UUID chatId = UUID.fromString((String) messageJson.get("chatId"));
-        String type = (String) messageJson.get("type");
-        switch (type) {
-            case "Auth":
-                ClientManager.authenticate((String) messageJson.get("userName"));
-                break;
-            case "AddGroupMember":
-                ClientManager.addGroupMember((String) messageJson.get("admin"), (String) messageJson.get("chatId"), (String) messageJson.get("user"));
-                break;
-            case "RemoveGroupMember":
-                ClientManager.removeGroupMember((String) messageJson.get("admin"), (String) messageJson.get("chatId"), (String) messageJson.get("user"));
-                break;
-            case "LeaveChat":
-                ClientManager.leaveChat((String) messageJson.get("chatId"), (String) messageJson.get("user"));
-                break;
-            case "GetDirectMessages":
-                ClientManager.getDirectMessages((String) messageJson.get("chatId"), (String) messageJson.get("user"));
-                break;
-            case "GetGroupMessages":
-                ClientManager.getGroupMessages((String) messageJson.get("chatId"), (String) messageJson.get("user"));
-                break;
-            case "CreateGroupMessage":
-                ClientManager.createGroupMessage((String) messageJson.get("chatId"), (String) messageJson.get("sender_id"), (String) messageJson.get("content"));
-                break;
-            case "CreateGroupChat":
-                ClientManager.createGroupChat((String) messageJson.get("creator"), (String) messageJson.get("name"), (String) messageJson.get("description"));
-                break;
-            case "CreateDirectChat":
-                ClientManager.createDirectChat((String) messageJson.get("first_member"), (String) messageJson.get("second_member"));
-                break;
-            default: //CreateDirectMessage
-                ClientManager.createDirectMessage((String) messageJson.get("chatId"), (String) messageJson.get("sender_id"), (String) messageJson.get("content"));
-                break;
-        }
+        ClientManager.routeRequest(messageJson, ctx);
 //        TextWebSocketFrame message = new TextWebSocketFrame((String) messageJson.get("message"));
 //        group.writeAndFlush(message.retain(), new ChannelMatcher() {
 //            @Override
