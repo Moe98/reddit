@@ -1,7 +1,14 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
+import com.arangodb.ArangoDB;
+import com.arangodb.entity.BaseDocument;
+import org.sab.arango.Arango;
 import org.sab.models.CommentAttributes;
 import org.sab.service.validation.CommandWithVerification;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class CommentCommand extends CommandWithVerification {
 
@@ -34,4 +41,6 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String USER_COLLECTION_NAME = "User";
     protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = "UserLikeComment";
     protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = "UserDislikeComment";
+
+
 }

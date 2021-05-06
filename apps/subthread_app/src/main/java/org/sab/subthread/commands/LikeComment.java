@@ -1,8 +1,10 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
@@ -10,7 +12,10 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LikeComment extends CommentCommand{
     @Override
@@ -44,10 +49,11 @@ public class LikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
             }
 
-            String edgeKey = userId+"-"+commentId;
+            String likeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+
             // if user already likes the comment, then remove his like and update like count
-            if(arango.documentExists(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME,edgeKey)){
-                arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, edgeKey);
+            if(!likeEdgeId.equals("")){
+                arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
 
                 BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 int newLikes =  (int)originalComment.getAttribute(LIKES_DB)-1;
@@ -60,7 +66,6 @@ public class LikeComment extends CommentCommand{
             else { // then user wants to like this comment, so we create an edge and update the number of likes
                 msg = "added your like on the comment";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setKey(edgeKey);
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
                 edgeDocument.setTo(COMMENT_COLLECTION_NAME+ "/" + commentId);
 
@@ -72,8 +77,9 @@ public class LikeComment extends CommentCommand{
                 int newLikes = (int) originalComment.getAttribute(LIKES_DB) + 1;
                 int newDislikes = (int) originalComment.getAttribute(DISLIKES_DB);
                 //checking if the user dislikes this content to remove his dislike
-                if (arango.documentExists(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeKey)) {
-                    arango.deleteDocument(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeKey);
+                String dislikeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+                if (!dislikeEdgeId.equals("")) {
+                    arango.deleteDocument(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, dislikeEdgeId);
                     newDislikes -= 1;
                     msg += " & removed your dislike";
                 }
@@ -93,7 +99,23 @@ public class LikeComment extends CommentCommand{
 
     public static void main(String[] args) {
         LikeComment lc = new LikeComment();
-        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
+//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
+
+
+        JSONObject body = new JSONObject();
+        body.put(COMMENT_ID, "21289");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "asdafsda");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
         System.out.println(lc.execute(request));
     }
 }
