@@ -15,8 +15,8 @@ import java.util.List;
 public class LikeComment extends CommentCommand{
     @Override
     protected Schema getSchema() {
-        Attribute parentSubthreadId = new Attribute(COMMENT_ID, DataType.STRING, true);
-        return new Schema(List.of(parentSubthreadId));
+        Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);
+        return new Schema(List.of(commentId));
     }
 
     private Arango arango;
@@ -53,7 +53,7 @@ public class LikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DBName, UserDislikeCommentCollection, true);
             }
 
-            String edgeKey = userId+commentId;
+            String edgeKey = userId+"/"+commentId;
             // if user already likes the comment, then remove his like and update like count
             if(arango.documentExists(arangoDB, DBName, UserLikeCommentCollection,edgeKey)){
                 arango.deleteDocument(arangoDB, DBName, UserLikeCommentCollection, edgeKey);
