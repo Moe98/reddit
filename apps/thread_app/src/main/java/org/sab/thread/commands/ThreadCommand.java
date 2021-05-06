@@ -13,6 +13,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
 
     protected static final String ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
     protected static final String MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
+    protected static final String ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
 
     protected static final String DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
@@ -25,5 +26,6 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String THREAD_COLLECTION_NAME = "Thread";
     protected static final String USER_COLLECTION_NAME = "User";
     protected static final String USER_THREAD_MOD_COLLECTION_NAME = "UserThreadMod";
+    protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = "UserFollowThread";
 
 }
