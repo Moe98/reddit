@@ -1,16 +1,14 @@
 package org.sab.postgres;
 
-//import io.github.cdimascio.dotenv.Dotenv;
 
 import org.json.simple.parser.ParseException;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
-import java.io.IOException;
-import java.net.URL;
+import java.io.*;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.List;
+
 import java.util.Properties;
+
 
 public class PostgresConnection {
     private static PostgresConnection instance = null;
@@ -18,9 +16,7 @@ public class PostgresConnection {
     private String url;
     private Properties props;
     private Connection conn;
-    private final URL configPath = getClass().getClassLoader().getResource("config.json");
     private final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
-//    Dotenv dotenv = Dotenv.configure().load();
 
     private PostgresConnection() {
     }
@@ -39,7 +35,6 @@ public class PostgresConnection {
     }
 
     private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
-        //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
         props = new Properties();
 
         for (String param : propertiesParams)
@@ -90,13 +85,12 @@ public class PostgresConnection {
         Connection connection = postgresConnection.connect();
         ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, null, params);
         postgresConnection.closeConnection(connection);
-        return  resultSet;
+        return resultSet;
     }
 
     public ResultSet call(String sql, Connection connection, int[] types, Object... params) throws SQLException {
 
 
-        // DbUtils does not support calling procedures?
         CallableStatement callableStatement = connection.prepareCall(sql);
 
         for (int i = 0; i < params.length; i++) {
@@ -109,4 +103,33 @@ public class PostgresConnection {
         }
         return resultSet;
     }
+
+    private static void createUsersTable() throws IOException {
+        runScript("../../libs/postgres/src/main/resources/sql/CreateTable.sql");
+    }
+
+    private static void createUsersProcedures() throws IOException {
+        runScript("../../libs/postgres/src/main/resources/sql/procedures.sql");
+    }
+
+    private static void runScript(String scriptPath) throws IOException {
+        String[] command = new String[]{
+                "psql",
+                "-f",
+                scriptPath,
+                "postgresql://postgres:12345678@localhost:5432/postgres"
+        };
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true);
+        pb.start();
+    }
+
+    public static void dbInit() throws IOException {
+        createUsersTable();
+        createUsersProcedures();
+
+    }
+
+
 }
