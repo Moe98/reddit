@@ -1,7 +1,6 @@
 package org.sab.models;
 
 public enum ThreadAttributes {
-
     // variables in a thread object
     THREAD_NAME("name", "Name"),
     DESCRIPTION("description", "Description"),
@@ -11,7 +10,8 @@ public enum ThreadAttributes {
 
     // additional request parameters
     ASSIGNER_ID("assignerId", null),
-    MODERATOR_ID("moderatorId", null);
+    MODERATOR_ID("moderatorId", null),
+    ACTION_MAKER_ID("userId", "UserId");
 
 
     private final String http;
