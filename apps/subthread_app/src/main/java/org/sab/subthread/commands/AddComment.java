@@ -96,7 +96,7 @@ public class AddComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
 
             // Create an edge between content and comment
-            BaseEdgeDocument edgeDocument = addEdgeFromContentToComment(comment, parentContentType, commentId);
+            BaseEdgeDocument edgeDocument = addEdgeFromContentToComment(comment, commentId);
 
             arango.createEdgeDocument(arangoDB, DBName, collectionName, edgeDocument);
         } catch (Exception e) {
@@ -117,7 +117,8 @@ public class AddComment extends CommentCommand {
         return new Schema(List.of(parentSubThreadId, creatorId, content, parentContentType));
     }
 
-    private BaseEdgeDocument addEdgeFromContentToComment(Comment comment, String parentContentType, String commentId) {
+    private BaseEdgeDocument addEdgeFromContentToComment(Comment comment, String commentId) {
+        final String parentContentType = comment.getParentContentType();
         final String parentId = comment.getParentId();
         final String creatorId = comment.getCreatorId();
         final String edgeKey = createEdgeKey(creatorId, commentId);
