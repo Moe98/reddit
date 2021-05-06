@@ -15,12 +15,12 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
     protected static final String MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
     protected static final String ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
 
     protected static final String DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
-
 
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
@@ -29,6 +29,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String USER_THREAD_MOD_COLLECTION_NAME = "UserThreadMod";
     protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = "UserFollowThread";
     protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = "UserBookmarkThread";
+    protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = "UserBannedFromThread";
 
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName, String key) {

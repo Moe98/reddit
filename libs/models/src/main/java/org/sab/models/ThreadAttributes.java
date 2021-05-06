@@ -11,7 +11,8 @@ public enum ThreadAttributes {
     // additional request parameters
     ASSIGNER_ID("assignerId", null),
     MODERATOR_ID("moderatorId", null),
-    ACTION_MAKER_ID("userId", "UserId");
+    ACTION_MAKER_ID("userId", "UserId"),
+    BANNED_USER_ID("bannedUserId", "BannedUserId");
 
 
     private final String http;
