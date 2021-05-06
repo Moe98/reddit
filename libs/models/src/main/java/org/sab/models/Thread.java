@@ -63,11 +63,11 @@ public class Thread {
 
     public JSONObject toJSON() {
         JSONObject thread = new JSONObject();
-        thread.put("name", name);
-        thread.put("description", description);
-        thread.put("creatorId", creatorId);
-        thread.put("numOfFollowers", numOfFollowers);
-        thread.put("dateCreated", dateCreated);
+        thread.put(ThreadAttributes.THREAD_NAME.getHTTP(), name);
+        thread.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
+        thread.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
+        thread.put(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP(), numOfFollowers);
+        thread.put(ThreadAttributes.DATE_CREATED.getHTTP(), dateCreated);
         return thread;
     }
 }

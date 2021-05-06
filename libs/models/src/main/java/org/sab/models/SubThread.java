@@ -121,15 +121,15 @@ public class SubThread {
     public JSONObject toJSON() {
 
         JSONObject subThread = new JSONObject();
-        subThread.put("id", id);
-        subThread.put("parentThread", parentThreadId);
-        subThread.put("creatorId", creatorId);
-        subThread.put("title", title);
-        subThread.put("likes", likes);
-        subThread.put("dislikes", dislikes);
-        subThread.put("content", content);
-        subThread.put("hasImage", hasImage);
-        subThread.put("dateCreated", dateCreated);
+        subThread.put(SubThreadAttributes.SUBTHREAD_ID.getHTTP(), id);
+        subThread.put(SubThreadAttributes.PARENT_THREAD_ID.getHTTP(), parentThreadId);
+        subThread.put(SubThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
+        subThread.put(SubThreadAttributes.TITLE.getHTTP(), title);
+        subThread.put(SubThreadAttributes.LIKES.getHTTP(), likes);
+        subThread.put(SubThreadAttributes.DISLIKES.getHTTP(), dislikes);
+        subThread.put(SubThreadAttributes.CONTENT.getHTTP(), content);
+        subThread.put(SubThreadAttributes.HAS_IMAGE.getHTTP(), hasImage);
+        subThread.put(SubThreadAttributes.DATE_CREATED.getHTTP(), dateCreated);
 
         return subThread;
     }

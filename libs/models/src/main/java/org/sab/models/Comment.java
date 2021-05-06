@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 @SuppressWarnings("unused")
 public class Comment {
+    private String id;
     private String parentSubthreadId;
     private String creatorId;
     private long likes;
@@ -81,13 +82,16 @@ public class Comment {
     }
 
     public JSONObject toJSON() {
+
         JSONObject comment = new JSONObject();
-        comment.put("parentId", parentSubthreadId);
-        comment.put("creatorId", creatorId);
-        comment.put("likes", likes);
-        comment.put("dislikes", dislikes);
-        comment.put("content", content);
-        comment.put("dateCreated", dateCreated);
+        comment.put(CommentAttributes.COMMENT_ID.getHTTP(), comment);
+        comment.put(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP(), parentSubthreadId);
+        comment.put(CommentAttributes.CREATOR_ID.getHTTP(), creatorId);
+        comment.put(CommentAttributes.LIKES.getHTTP(), likes);
+        comment.put(CommentAttributes.DISLIKES.getHTTP(), dislikes);
+        comment.put(CommentAttributes.CONTENT.getHTTP(), content);
+        comment.put(CommentAttributes.DATE_CREATED.getHTTP(), dateCreated);
+        comment.put(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP(), parentContentType);
         return comment;
     }
 }

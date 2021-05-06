@@ -4,10 +4,11 @@ import org.json.JSONObject;
 
 public class SubThreadReport {
     private String subThreadId;
+    private String parentThreadId;
     private String userName;
     private TypeOfReport typeOfReport;
     private String date;
-    private String reportDescription;
+    private String reportMessage;
 
     public String getSubThreadId() {
         return subThreadId;
@@ -41,12 +42,12 @@ public class SubThreadReport {
         this.date = date;
     }
 
-    public String getReportDescription() {
-        return reportDescription;
+    public String getReportMessage() {
+        return reportMessage;
     }
 
-    public void setReportDescription(String reportDescription) {
-        this.reportDescription = reportDescription;
+    public void setReportMessage(String reportMessage) {
+        this.reportMessage = reportMessage;
     }
 
     @Override
@@ -56,17 +57,27 @@ public class SubThreadReport {
                 ", userName='" + getUserName() + '\'' +
                 ", typeOfReport='" + getTypeOfReport() + '\'' +
                 ", date='" + getDate() + '\'' +
-                ", reportDescription=" + getReportDescription() + '\'' +
+                ", reportDescription='" + getReportMessage() + '\'' +
+                ", parentThreadId='" + getParentThreadId() + '\'' +
                 '}';
     }
 
     public JSONObject toJSON() {
         JSONObject subThreadReport = new JSONObject();
-        subThreadReport.put("subThreadId", subThreadId);
-        subThreadReport.put("userName", userName);
-        subThreadReport.put("typeOfReport", typeOfReport);
-        subThreadReport.put("date", date);
-        subThreadReport.put("reportDescription", reportDescription);
+        subThreadReport.put(SunThreadReportAttributes.SUBTHREAD_Id.getHTTP(), subThreadId);
+        subThreadReport.put(SunThreadReportAttributes.REPORTER_ID.getHTTP(), userName);
+        subThreadReport.put(SunThreadReportAttributes.PARENT_THREAD_ID.getHTTP(), parentThreadId);
+        subThreadReport.put(SunThreadReportAttributes.TYPE_OF_REPORT.getHTTP(), typeOfReport);
+        subThreadReport.put(SunThreadReportAttributes.DATE_CREATED.getHTTP(), date);
+        subThreadReport.put(SunThreadReportAttributes.REPORT_MSG.getHTTP(), reportMessage);
         return subThreadReport;
+    }
+
+    public String getParentThreadId() {
+        return parentThreadId;
+    }
+
+    public void setParentThreadId(String parentThreadId) {
+        this.parentThreadId = parentThreadId;
     }
 }
