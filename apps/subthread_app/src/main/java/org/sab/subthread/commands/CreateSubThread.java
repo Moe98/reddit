@@ -5,13 +5,11 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.SubThread;
-import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.Date;
 import java.util.List;
 
 public class CreateSubThread extends SubThreadCommand {
@@ -33,12 +31,11 @@ public class CreateSubThread extends SubThreadCommand {
 
     private Arango arango;
     private ArangoDB arangoDB;
-    private String collectionName;
-    private String DBName;
 
     @Override
     protected String execute() {
         String parentThreadId = body.getString(PARENT_THREAD_ID);
+        // TODO from URI
         String creatorId = body.getString(CREATOR_ID);
 
         String title = body.getString(TITLE);
@@ -47,9 +44,6 @@ public class CreateSubThread extends SubThreadCommand {
         boolean hasImage = body.getBoolean(HASIMAGE);
 
         SubThread subThread;
-
-        collectionName = "Subthread";
-        DBName = "ARANGO_DB";
 
 
         try {
@@ -60,39 +54,40 @@ public class CreateSubThread extends SubThreadCommand {
             // TODO check creator exists
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DBName, collectionName)) {
-                arango.createCollection(arangoDB, DBName, collectionName, false);
+            if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             }
 
             BaseDocument myObject = new BaseDocument();
 
-            myObject.addAttribute("ParentThreadId", parentThreadId);
-            myObject.addAttribute("CreatorId", creatorId);
-            myObject.addAttribute("Title", title);
-            myObject.addAttribute("Content", content);
-            myObject.addAttribute("Likes", INITIAL_LIKES);
-            myObject.addAttribute("Dislikes", INITIAL_DISLIKES);
-            myObject.addAttribute("HasImage", hasImage);
+            myObject.addAttribute(PARENT_THREAD_ID_DB, parentThreadId);
+            myObject.addAttribute(CREATOR_ID_DB, creatorId);
+            myObject.addAttribute(TITLE_DB, title);
+            myObject.addAttribute(CONTENT_DB, content);
+            myObject.addAttribute(LIKES_DB, INITIAL_LIKES);
+            myObject.addAttribute(DISLIKES_DB, INITIAL_DISLIKES);
+            // TODO handle adding the image to the DB
+            myObject.addAttribute(HASIMAGE_DB, hasImage);
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-            myObject.addAttribute("DateCreated", sqlDate);
+            myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
-            BaseDocument res = arango.createDocument(arangoDB, DBName, collectionName, myObject);
+            BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, myObject);
 
             System.out.println(res);
             System.out.println("----------");
 
             String subThreadId = res.getKey();
-            parentThreadId = (String) res.getAttribute("ParentThreadId");
-            creatorId = (String) res.getAttribute("CreatorId");
+            parentThreadId = (String) res.getAttribute(PARENT_THREAD_ID_DB);
+            creatorId = (String) res.getAttribute(CONTENT_DB);
 
-            title = (String) res.getAttribute("Title");
-            content = (String) res.getAttribute("Content");
+            title = (String) res.getAttribute(TITLE_DB);
+            content = (String) res.getAttribute(CONTENT_DB);
 
-            String date = (String) res.getAttribute("DateCreated");
-            hasImage = (Boolean) res.getAttribute("HasImage");
+            String date = (String) res.getAttribute(DATE_CREATED_DB);
+            hasImage = (Boolean) res.getAttribute(HASIMAGE_DB);
 
-            int likes = (int) res.getAttribute("Likes");
-            int dislikes = (int) res.getAttribute("Dislikes");
+            int likes = (int) res.getAttribute(LIKES_DB);
+            int dislikes = (int) res.getAttribute(DISLIKES_DB);
 
             // TODO validate correct insertion
 

@@ -21,17 +21,10 @@ public class BookmarkSubThread extends SubThreadCommand {
 
     private Arango arango;
     private ArangoDB arangoDB;
-    private String SubThreadCollectionName;
-    private String UserBookmarkSubThreadCollection;
-    private String DBName;
+
 
     @Override
     protected String execute() {
-
-        SubThreadCollectionName = "Subthread";
-        UserBookmarkSubThreadCollection = "UserBookmarkSubthread";
-
-        DBName = "ARANGO_DB";
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -39,35 +32,37 @@ public class BookmarkSubThread extends SubThreadCommand {
         try {
 
             String subthreadId = body.getString(SUBTHREAD_ID);
-            String userId = uriParams.getString(USER_ID);
+            String userId = uriParams.getString(REPORTER_ID);
 
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
+            // TODO check subthread and user exist
+
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DBName, SubThreadCollectionName)) {
+            if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
-                arango.createCollection(arangoDB, DBName, SubThreadCollectionName, false);
+                arango.createCollection(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DBName, UserBookmarkSubThreadCollection)) {
-                arango.createCollection(arangoDB, DBName, UserBookmarkSubThreadCollection, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
             }
 
             String edgeKey = userId + subthreadId;
 
-            if(arango.documentExists(arangoDB, DBName, UserBookmarkSubThreadCollection, edgeKey)){
+            if(arango.documentExists(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeKey)){
                 msg = "Removed Subthread from Bookmarks";
                 // unbookmark
-                arango.deleteDocument(arangoDB, DBName, UserBookmarkSubThreadCollection, edgeKey);
+                arango.deleteDocument(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeKey);
 
             } else {
                 // bookmark
                 msg = "Bookmarked Subthread";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("User/" + userId);
-                edgeDocument.setTo("Subthread/" + subthreadId);
-                arango.createEdgeDocument(arangoDB, DBName, UserBookmarkSubThreadCollection, edgeDocument);
+                edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
+                edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
+                arango.createEdgeDocument(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
             }
 
@@ -85,24 +80,54 @@ public class BookmarkSubThread extends SubThreadCommand {
 
     }
 
-    public static void main(String[] args) {
-        BookmarkSubThread tc = new BookmarkSubThread();
+//    public static void main(String[] args) {
+//        String query = """
+//                            let arr = (
+//                            FOR v IN 1..1 OUTBOUND "User/%s" UserDislikeComment
+//                                FILTER v._id == "Comment/%s"
+//                                RETURN DISTINCT v._key
+//                            )
+//
+//                            return LENGTH(arr)""".formatted("33366", "44494");
+//        System.out.println(query);
+//        String DBName = "ARANGO_DB";
+//        Arango arango = Arango.getInstance();
+//        ArangoDB arangoDB = arango.connect();
+//
+//        ArangoCursor<BaseDocument> cursor = arango.query(arangoDB,DBName, query, null);
+//        BaseDocument baseDoc;
+//        System.out.println(cursor.hasNext());
+//        while (cursor.hasNext()) {
+//            baseDoc = cursor.next();
+////            Map <String, Object> map = baseDoc.getProperties();
+////            for(Map.Entry<String, Object> entry : map.entrySet()) {
+////
+////                System.out.println(entry.getKey() + ": " + entry.getValue());
+////            }
+//
+//        }
+//
+//
+//    }
 
-        JSONObject body = new JSONObject();
-        body.put("Id", "32750");
+   public static void main(String[] args) {
+       BookmarkSubThread tc = new BookmarkSubThread();
 
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("userId", "32930");
+       JSONObject body = new JSONObject();
+       body.put("Id", "32750");
 
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
+       JSONObject uriParams = new JSONObject();
+       uriParams.put("userId", "32930");
 
-        System.out.println(request);
-        System.out.println("----------");
+       JSONObject request = new JSONObject();
+       request.put("body", body);
+       request.put("methodType", "POST");
+       request.put("uriParams", uriParams);
 
-        System.out.println(tc.execute(request));
-    }
+       System.out.println(request);
+       System.out.println("----------");
+
+       System.out.println(tc.execute(request));
+   }
 
 }

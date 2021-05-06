@@ -23,18 +23,9 @@ public class AssignThreadModerator extends ThreadCommand {
 
     private Arango arango;
     private ArangoDB arangoDB;
-    private String ThreadCollectionName;
-    private String UserCollectionName;
-    private String UserThreadModCollection;
-    private String DBName;
 
     @Override
     protected String execute() {
-        ThreadCollectionName = "Thread";
-        UserCollectionName = "User";
-        UserThreadModCollection = "UserThreadMod";
-
-        DBName = "ARANGO_DB";
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -48,15 +39,15 @@ public class AssignThreadModerator extends ThreadCommand {
 
             arango = Arango.getInstance();
             arangoDB = arango.connect();
-            if (!arango.collectionExists(arangoDB, DBName, ThreadCollectionName)) {
+            if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
-                arango.createCollection(arangoDB, DBName, ThreadCollectionName, false);
+                arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DBName, UserCollectionName)) {
-                arango.createCollection(arangoDB, DBName, UserCollectionName, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, true);
             }
-            if (!arango.collectionExists(arangoDB, DBName, UserThreadModCollection)) {
-                arango.createCollection(arangoDB, DBName, UserThreadModCollection, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, true);
             }
 
             // TODO check if assigner, mod and thread exist
@@ -66,7 +57,7 @@ public class AssignThreadModerator extends ThreadCommand {
 
             String edgeKey = modId + threadId;
 
-            if (arango.documentExists(arangoDB, DBName, UserThreadModCollection, edgeKey)) {
+            if (arango.documentExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, edgeKey)) {
                 msg = "User already moderates this thread";
                 return Responder.makeErrorResponse(msg, 404).toString();
                 // TODO error
@@ -77,9 +68,9 @@ public class AssignThreadModerator extends ThreadCommand {
                 msg = "Assigned Moderator";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("User/" + modId);
-                edgeDocument.setTo("Subthread/" + threadId);
-                arango.createEdgeDocument(arangoDB, DBName, UserThreadModCollection, edgeDocument);
+                edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + modId);
+                edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + threadId);
+                arango.createEdgeDocument(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, edgeDocument);
 
             }
 

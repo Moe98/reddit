@@ -29,7 +29,7 @@ public class LikeComment extends CommentCommand{
     @Override
     public String execute() {
         String commentId = body.getString(COMMENT_ID);
-        String userId = uriParams.getString(USER_ID);
+        String userId = uriParams.getString(ACTION_MAKER_ID);
 
         CommentCollectionName = "Comment";
         UserLikeCommentCollection = "UserLikeComment";

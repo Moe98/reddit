@@ -29,7 +29,7 @@ public class DislikeComment extends CommentCommand{
     @Override
     public String execute() {
         String commentId = body.getString(COMMENT_ID);
-        String userId = uriParams.getString(USER_ID);
+        String userId = uriParams.getString(ACTION_MAKER_ID);
 
         CommentCollectionName = "Comment";
         UserLikeCommentCollection = "UserLikeComment";
@@ -45,6 +45,7 @@ public class DislikeComment extends CommentCommand{
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(arangoDB, DBName, CommentCollectionName)) {
+                // TODO if this doesn't exist something is wrong!
                 arango.createCollection(arangoDB, DBName, CommentCollectionName, false);
             }
             if (!arango.collectionExists(arangoDB, DBName, UserLikeCommentCollection)) {
@@ -54,12 +55,17 @@ public class DislikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DBName, UserDislikeCommentCollection, true);
             }
 
+            // TODO check user exists
+            // TODO why not let it autogenerate a key?
             String edgeKey = userId+"/"+commentId;
             // if user already dislikes the comment, then remove his dislike and update dislike count
             if(arango.documentExists(arangoDB, DBName, UserDislikeCommentCollection,edgeKey)){
+                System.out.println("Here 1");
                 arango.deleteDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeKey);
 
                 BaseDocument originalComment = arango.readDocument(arangoDB, DBName, CommentCollectionName, commentId);
+                // TODO make this thread safe
+                //  I feel like this var is unnecessary to begin with
                 int newDisikes =  (int)originalComment.getAttribute(DISLIKES)-1;
                 originalComment.updateAttribute(LIKES,newDisikes);
                 // putting the comment with the updated amount of dislikes
@@ -70,10 +76,13 @@ public class DislikeComment extends CommentCommand{
             else { // then user wants to dilike this comment, so we create an edge and update the number of dilikes
                 msg = "added your dislike on the comment";
 
+
+                System.out.println("here");
+
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setKey(edgeKey);
-                edgeDocument.setFrom("Users/" + userId);
-                edgeDocument.setTo("Comments/" + commentId);
+                edgeDocument.setFrom("User/" + userId);
+                edgeDocument.setTo("Comment/" + commentId);
 
                 // adding new edgeDocument representing that a user dislikes a comment
                 arango.createEdgeDocument(arangoDB, DBName, UserDislikeCommentCollection, edgeDocument);
@@ -81,6 +90,7 @@ public class DislikeComment extends CommentCommand{
                 // retrieving the original comment with the old amount of likes
                 BaseDocument originalComment = arango.readDocument(arangoDB, DBName, CommentCollectionName, commentId);
                 int newDislikes = (int) originalComment.getAttribute(DISLIKES)+1;
+                // TODO why update likes?
                 int newLikes = (int) originalComment.getAttribute(LIKES);
                 //checking if the user likes this content to remove his like
                 if (arango.documentExists(arangoDB, DBName, UserLikeCommentCollection, edgeKey)) {
@@ -94,7 +104,9 @@ public class DislikeComment extends CommentCommand{
                 arango.updateDocument(arangoDB, DBName, CommentCollectionName, originalComment, commentId);
             }
         } catch (Exception e) {
+            System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+
         } finally {
             arango.disconnect(arangoDB);
             response.put("msg", msg);
@@ -107,7 +119,7 @@ public class DislikeComment extends CommentCommand{
 
     public static void main(String[] args) {
         DislikeComment dc = new DislikeComment();
-        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"1998-2-9\"},\"uriParams\":{\"userId\":\"asdasda\"},\"methodType\":\"PUT\"}");
+        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"33588\"},\"uriParams\":{\"userId\":\"33366\"},\"methodType\":\"PUT\"}");
         System.out.println(dc.execute(request));
     }
 }
