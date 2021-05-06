@@ -67,10 +67,8 @@ public class FollowThread extends ThreadCommand {
                 --followerCount;
             } else {
                 responseMessage = "You are now following this Thread!";
-                final String from = USER_COLLECTION_NAME + "/" + userId;
-                final String to = THREAD_COLLECTION_NAME + "/" + threadName;
 
-                BaseEdgeDocument userFollowsThreadEdge = addEdgeFromToWithKey(from, to, edgeKey);
+                final BaseEdgeDocument userFollowsThreadEdge = addEdgeFromUserToThread(userId, threadName, edgeKey);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, userFollowsThreadEdge);
 
                 ++followerCount;
@@ -94,14 +92,5 @@ public class FollowThread extends ThreadCommand {
         Attribute threadName = new Attribute(THREAD_NAME, DataType.STRING, true);
 
         return new Schema(List.of(threadName));
-    }
-
-    private BaseEdgeDocument addEdgeFromToWithKey(String from, String to, String key) {
-        BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
-        edgeDocument.setFrom(from);
-        edgeDocument.setTo(to);
-        edgeDocument.setKey(key);
-
-        return edgeDocument;
     }
 }
