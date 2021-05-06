@@ -73,9 +73,6 @@ public class CreateSubThread extends SubThreadCommand {
 
             BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, myObject);
 
-            System.out.println(res);
-            System.out.println("----------");
-
             String subThreadId = res.getKey();
             parentThreadId = (String) res.getAttribute(PARENT_THREAD_ID_DB);
             creatorId = (String) res.getAttribute(CONTENT_DB);
@@ -129,5 +126,4 @@ public class CreateSubThread extends SubThreadCommand {
 
         System.out.println(tc.execute(request));
     }
-
 }

@@ -52,6 +52,10 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_ID_DB = SubThreadReportAttributes.PARENT_THREAD_ID.getDb();
     protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
+
+    protected static final String ACTION_MAKER_ID = "userId";
+
+
     // Database attributes
     protected static final String DB_Name = "ARANGO_DB";
 
