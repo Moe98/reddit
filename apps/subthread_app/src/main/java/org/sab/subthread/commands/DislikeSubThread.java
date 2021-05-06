@@ -12,7 +12,7 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-public class DislikeSubthread extends SubThreadCommand{
+public class DislikeSubThread extends SubThreadCommand{
     @Override
     protected Schema getSchema() {
         Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
@@ -45,14 +45,14 @@ public class DislikeSubthread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             }
 
-            String edgeKey = userId+"/"+subthreadId;
+            String edgeKey = userId+"-"+subthreadId;
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if(arango.documentExists(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,edgeKey)){
                 arango.deleteDocument(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, edgeKey);
 
                 BaseDocument originalSubthread = arango.readDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newDisikes =  (int)originalSubthread.getAttribute(DISLIKES)-1;
-                originalSubthread.updateAttribute(LIKES,newDisikes);
+                int newDisikes =  (int)originalSubthread.getAttribute(DISLIKES_DB)-1;
+                originalSubthread.updateAttribute(DISLIKES_DB,newDisikes);
                 // putting the comment with the updated amount of dislikes
                 arango.updateDocument(arangoDB, DB_Name,SUBTHREAD_COLLECTION_NAME,originalSubthread,subthreadId);
 
@@ -71,16 +71,16 @@ public class DislikeSubthread extends SubThreadCommand{
 
                 // retrieving the original comment with the old amount of dislikes and likes
                 BaseDocument originalSubthread = arango.readDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newDislikes = (int) originalSubthread.getAttribute(DISLIKES)+1;
-                int newLikes = (int) originalSubthread.getAttribute(LIKES);
+                int newDislikes = (int) originalSubthread.getAttribute(DISLIKES_DB)+1;
+                int newLikes = (int) originalSubthread.getAttribute(LIKES_DB);
                 //checking if the user likes this subthread to remove his like
                 if (arango.documentExists(arangoDB, DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, edgeKey)) {
                     arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, edgeKey);
                     newLikes -= 1;
                     msg += " & removed your like";
                 }
-                originalSubthread.updateAttribute(LIKES, newLikes);
-                originalSubthread.updateAttribute(LIKES, newDislikes);
+                originalSubthread.updateAttribute(LIKES_DB, newLikes);
+                originalSubthread.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
             }
@@ -91,5 +91,25 @@ public class DislikeSubthread extends SubThreadCommand{
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
+    }
+
+    public static void main(String[] args) {
+        DislikeSubThread tc = new DislikeSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put(SUBTHREAD_ID, "16871");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "67890");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
     }
 }

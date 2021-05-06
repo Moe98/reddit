@@ -11,7 +11,7 @@ import org.sab.validation.Schema;
 import java.util.Collections;
 import java.util.Map;
 
-public class ModeratorSeeReorts extends SubThreadCommand {
+public class ModeratorSeeReports extends SubThreadCommand {
     @Override
     protected Schema getSchema() {
         return null;
