@@ -51,13 +51,15 @@ public class DeleteAccount extends UserCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 500);
         }
-        // Deleting profile picture from Cloudinary
-        try {
-            CloudUtilities.destroyImage(username);
-        } catch (IOException e) {
-            return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
-        }
-
+        /* TODO
+            Commenting this block due to to the limit on the number of Cloudinary calls :(
+            // Deleting profile picture from Cloudinary
+             try {
+                 CloudUtilities.destroyImage(username);
+             } catch (IOException e) {
+                 return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
+             }
+        */
 
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
@@ -67,7 +69,7 @@ public class DeleteAccount extends UserCommand {
         HashMap<String, Object> documentProperties = new HashMap<>();
         documentProperties.put("is_deleted", true);
         BaseDocument user = new BaseDocument(documentProperties);
-        user.setKey(username+"deleted");
+        user.setKey(username + "deleted");
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
         String dbName = System.getenv("ARANGO_DB");
