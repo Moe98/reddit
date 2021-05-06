@@ -20,17 +20,10 @@ public class ModeratorSeeReorts extends SubThreadCommand {
 
     private Arango arango;
     private ArangoDB arangoDB;
-    private String CollectionName;
-    private String DBName;
-
 
     @Override
     protected String execute() {
         String threadId = uriParams.getString(THREAD_ID);
-
-        CollectionName = "SubthreadReports";
-
-        DBName = "ARANGO_DB";
 
         JSONObject response = new JSONObject();
 
@@ -38,9 +31,11 @@ public class ModeratorSeeReorts extends SubThreadCommand {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
+            // TODO can we bind the collection name in the query to SUBTHREAD_REPORTS_COLLECTION_NAME
+            //  Same for the ThreadId attribute
             String query = """
                     FOR subthread IN SubThreadReports
-                        FILTER subthread.ReportedContent == @threadId 
+                        FILTER subthread.ThreadId == @threadId 
                         
                         RETURN subthread""";
 
@@ -52,12 +47,14 @@ public class ModeratorSeeReorts extends SubThreadCommand {
             if (cursor.hasNext()) {
                 cursor.forEachRemaining(document -> {
                     JSONObject subthread = new JSONObject();
-                    subthread.put("User", document.getProperties().get("User"));
-                    subthread.put("TypeOfReport", document.getProperties().get("TypeOfReport"));
-                    subthread.put("ReportedContent", document.getProperties().get("ReportedContent"));
-                    subthread.put("Date", document.getProperties().get("Date"));
-                    subthread.put("Report", document.getProperties().get("Report"));
-                    subthread.put("SubThreadID", document.getProperties().get("SubThreadID"));
+                    subthread.put(REPORTER_ID_DB, document.getProperties().get(REPORTER_ID_DB));
+                    subthread.put(TYPE_OF_REPORT_DB, document.getProperties().get(TYPE_OF_REPORT_DB));
+//                    subthread.put("ReportedContent", document.getProperties().get("ReportedContent")); // thread id
+                    subthread.put(THREAD_ID_DB, document.getProperties().get(THREAD_ID_DB));
+                    subthread.put(DATE_CREATED_DB, document.getProperties().get(DATE_CREATED_DB));
+//                    subthread.put("Report", document.getProperties().get("Report")); // message
+                    subthread.put(REPORT_MSG_DB, document.getProperties().get(REPORT_MSG_DB));
+                    subthread.put(REPORTED_SUBTHREAD_ID_DB, document.getProperties().get(REPORTED_SUBTHREAD_ID_DB));
                     data.put(subthread);
                 });
                 response.put("data", data);
