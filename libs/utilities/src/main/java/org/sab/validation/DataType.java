@@ -33,7 +33,6 @@ public enum DataType {
             if (!STRING.isOfValidType(object)) {
                 return false;
             }
-
             final String email = (String) object;
             final Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
 
