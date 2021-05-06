@@ -55,8 +55,6 @@ public class FollowThread extends ThreadCommand {
                 arango.createCollection(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
             }
 
-            // TODO Update followers count.
-            // TODO Unfollow if already following.
             final String edgeKey = userId + threadName;
 
             BaseDocument threadDocument = arango.readDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName);
