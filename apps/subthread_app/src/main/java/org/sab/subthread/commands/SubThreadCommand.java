@@ -1,7 +1,7 @@
 package org.sab.subthread.commands;
 
 import org.sab.models.SubThreadAttributes;
-import org.sab.models.report.SunThreadReportAttributes;
+import org.sab.models.report.SubThreadReportAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class SubThreadCommand extends CommandWithVerification {
@@ -36,21 +36,21 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     // Report atributes
     // http
-    protected static final String REPORTED_SUBTHREAD_ID = SunThreadReportAttributes.SUBTHREAD_Id.getHTTP();
-    protected static final String REPORTER_ID = SunThreadReportAttributes.REPORTER_ID.getHTTP();
-    protected static final String TYPE_OF_REPORT = SunThreadReportAttributes.TYPE_OF_REPORT.getHTTP();
+    protected static final String REPORTED_SUBTHREAD_ID = SubThreadReportAttributes.SUBTHREAD_Id.getHTTP();
+    protected static final String REPORTER_ID = SubThreadReportAttributes.REPORTER_ID.getHTTP();
+    protected static final String TYPE_OF_REPORT = SubThreadReportAttributes.TYPE_OF_REPORT.getHTTP();
 
-    protected static final String THREAD_ID = SunThreadReportAttributes.PARENT_THREAD_ID.getHTTP();
-    protected static final String REPORT_MSG = SunThreadReportAttributes.REPORT_MSG.getHTTP();
+    protected static final String THREAD_ID = SubThreadReportAttributes.PARENT_THREAD_ID.getHTTP();
+    protected static final String REPORT_MSG = SubThreadReportAttributes.REPORT_MSG.getHTTP();
     
     // Report atributes
     // db
-    protected static final String REPORTED_SUBTHREAD_ID_DB = SunThreadReportAttributes.SUBTHREAD_Id.getDb();
-    protected static final String REPORTER_ID_DB = SunThreadReportAttributes.REPORTER_ID.getDb();
-    protected static final String TYPE_OF_REPORT_DB = SunThreadReportAttributes.TYPE_OF_REPORT.getDb();
+    protected static final String REPORTED_SUBTHREAD_ID_DB = SubThreadReportAttributes.SUBTHREAD_Id.getDb();
+    protected static final String REPORTER_ID_DB = SubThreadReportAttributes.REPORTER_ID.getDb();
+    protected static final String TYPE_OF_REPORT_DB = SubThreadReportAttributes.TYPE_OF_REPORT.getDb();
 
-    protected static final String THREAD_ID_DB = SunThreadReportAttributes.PARENT_THREAD_ID.getDb();
-    protected static final String REPORT_MSG_DB = SunThreadReportAttributes.REPORT_MSG.getDb();
+    protected static final String THREAD_ID_DB = SubThreadReportAttributes.PARENT_THREAD_ID.getDb();
+    protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
     // Database attributes
     protected static final String DB_Name = "ARANGO_DB";
