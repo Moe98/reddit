@@ -20,10 +20,10 @@ public class AddComment extends CommentCommand {
     public static void main(String[] args) {
         AddComment addComment = new AddComment();
         JSONObject body = new JSONObject();
-        body.put("parentSubThreadId", "12345");
-        body.put("creatorId", "67890");
-        body.put("content", "I think their fish is bad!");
-        body.put("parentContentType", "SubThread");
+        body.put(PARENT_SUBTHREAD_ID, "12345");
+        body.put(CREATOR_ID, "67890");
+        body.put(CONTENT, "I think their fish is bad!");
+        body.put(PARENT_CONTENT_TYPE, "SubThread");
 
         JSONObject uriParams = new JSONObject();
 
