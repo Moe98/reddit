@@ -21,10 +21,17 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String DISLIKES_DB = CommentAttributes.DISLIKES.getDb();
     protected static final String CONTENT_DB = CommentAttributes.CONTENT.getDb();
     protected static final String DATE_CREATED_DB = CommentAttributes.DATE_CREATED.getDb();
-;    protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
+    protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
     protected static final String PARENT_CONTENT_TYPE_DB = CommentAttributes.PARENT_CONTENT_TYPE.getDb();
 
     protected static final String ACTION_MAKER_ID = "userId";
 
     // TODO add attribs from enums
+
+    // TODO get from env vars
+    protected static final String DB_Name = "ARANGO_DB";
+    protected static final String COMMENT_COLLECTION_NAME = "Comment";
+    protected static final String USER_COLLECTION_NAME = "User";
+    protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = "UserLikeComment";
+    protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = "UserDislikeComment";
 }
