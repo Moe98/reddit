@@ -1,6 +1,9 @@
 package org.sab.user.commands;
 
+import com.arangodb.ArangoDB;
+import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
+import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
@@ -11,6 +14,7 @@ import org.sab.validation.Schema;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 public class DeleteAccount extends UserCommand {
@@ -39,10 +43,13 @@ public class DeleteAccount extends UserCommand {
         //calling the delete SQL procedure
         try {
             PostgresConnection.call("delete_user", username);
-            deleteProfilePicture(username);
-            deleteFromArango(username);
         } catch (PropertiesNotLoadedException | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
+        }
+        try {
+            deleteFromArango(username);
+        } catch (Exception e) {
+            return Responder.makeErrorResponse(e.getMessage(), 500);
         }
         // Deleting profile picture from Cloudinary
         try {
@@ -55,11 +62,16 @@ public class DeleteAccount extends UserCommand {
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
 
-    private void deleteProfilePicture(String username) {
-        //TODO
-    }
 
     private void deleteFromArango(String username) {
-        //TODO
+        HashMap<String, Object> documentProperties = new HashMap<>();
+        documentProperties.put("is_deleted", true);
+        BaseDocument user = new BaseDocument(documentProperties);
+        user.setKey(username+"deleted");
+        Arango arango = Arango.getInstance();
+        ArangoDB arangoDB = arango.connect();
+        String dbName = System.getenv("ARANGO_DB");
+        arango.updateDocument(arangoDB, dbName, "Users", user, username);
+        arango.createDocument(arangoDB, dbName, "Users", user);
     }
 }

@@ -5,7 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sab.postgres.PostgresConnection;
+import org.sab.user.UserApp;
 
 import java.sql.Connection;
 import java.util.Date;
@@ -17,13 +17,12 @@ import static org.junit.Assert.fail;
 
 public class SignUpTest {
 
-    static Connection sqlConnection;
+    static String createdUsername;
 
     @BeforeClass
     public static void connectToSql() {
         try {
-//            sqlConnection = PostgresConnection.getInstance().connect();
-            PostgresConnection.dbInit();
+            UserApp.dbInit();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -36,10 +35,9 @@ public class SignUpTest {
 
         JSONObject body = new JSONObject();
         long time = new Date().getTime();
-        System.out.println(time);
         JSONObject request = new JSONObject();
-
-        String username = "scaleabull" + time;
+        createdUsername = "scaleabull" + time;
+        String username = createdUsername;
         String password = "to_the_moon";
         String email = "scaleabul" + time + "@gmail.com";
         String birthdate = "1997-12-14";
@@ -70,16 +68,29 @@ public class SignUpTest {
 
     }
 
-//    @After
-//    public void deleteTable() {
-//        try {
-//            PostgresConnection.deleteProcedures(sqlConnection);
-//            PostgresConnection.deleteUsersTable(sqlConnection);
-//        } catch (Exception e) {
-//            fail(e.getMessage());
-//        }
-//
-//
-//    }
+    @After
+    public void delete() {
+
+        JSONObject body = new JSONObject();
+        JSONObject request = new JSONObject();
+        String username = createdUsername;
+        String password = "to_the_moon";
+
+        body.put("username", username);
+        body.put("password", password);
+
+        request.put("body", body);
+        request.put("uriParams", new JSONObject());
+        request.put("methodType", "DELETE");
+        DeleteAccount deleteAccountCommand = new DeleteAccount();
+
+        JSONObject response = new JSONObject(deleteAccountCommand.execute(request));
+        System.out.println(response);
+        assertEquals(200, response.getInt("statusCode"));
+
+        assertEquals(response.getString("msg"), "Account Deleted Successfully!");
+
+
+    }
 
 }
