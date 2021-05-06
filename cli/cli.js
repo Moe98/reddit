@@ -7,16 +7,34 @@ const meow = require('meow')
 
 const App = importJsx('./app')
 
-const cli = meow(`
+const cli = meow(
+	`
 	Usage
-	  $ cli
+	  $ reddit-cli <command>
 
-	Options
-		--name  Your name
+	Commands
+	  $ reddit-cli welcome
+	  $ reddit-cli chat
+
+	Flags
+		--rainbow, -r  Add rainbow welcome title
 
 	Examples
-	  $ cli --name=Jane
-	  Hello, Jane
-`)
+	  $ reddit-cli welcome -r
+`,
+	{
+		flags: {
+			rainbow: {
+				type: 'boolean',
+				alias: 'r'
+			}
+		}
+	}
+)
 
-render(React.createElement(App, cli.flags))
+render(
+	React.createElement(App, {
+		command: cli.input[0],
+		rainbow: cli.flags.rainbow
+	})
+)
