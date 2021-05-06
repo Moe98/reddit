@@ -21,11 +21,11 @@ public class CreateComment extends CommentCommand {
         CreateComment addComment = new CreateComment();
         JSONObject body = new JSONObject();
         body.put(PARENT_SUBTHREAD_ID, "33029");
-        body.put(CREATOR_ID, "67890");
         body.put(CONTENT, "I think their fish is bad!");
         body.put(PARENT_CONTENT_TYPE, "SubThread");
 
         JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "67890");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -44,9 +44,9 @@ public class CreateComment extends CommentCommand {
         final int INITIAL_DISLIKES = 0;
 
         String parentSubThreadId = body.getString(PARENT_SUBTHREAD_ID);
-        String creatorId = body.getString(CREATOR_ID);
         String content = body.getString(CONTENT);
         String parentContentType = body.getString(PARENT_CONTENT_TYPE);
+        String userId = uriParams.getString(ACTION_MAKER_ID);
 
         Comment comment;
 
@@ -61,14 +61,14 @@ public class CreateComment extends CommentCommand {
 
             BaseDocument myObject = new BaseDocument();
 
-            myObject.addAttribute("ParentSubThreadId", parentSubThreadId);
-            myObject.addAttribute("CreatorId", creatorId);
-            myObject.addAttribute("Content", content);
-            myObject.addAttribute("ParentContentType", parentContentType);
-            myObject.addAttribute("Likes", INITIAL_LIKES);
-            myObject.addAttribute("Dislikes", INITIAL_DISLIKES);
+            myObject.addAttribute(PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
+            myObject.addAttribute(ACTION_MAKER_ID, userId);
+            myObject.addAttribute(CONTENT_DB, content);
+            myObject.addAttribute(PARENT_CONTENT_TYPE_DB, parentContentType);
+            myObject.addAttribute(LIKES_DB, INITIAL_LIKES);
+            myObject.addAttribute(DISLIKES_DB, INITIAL_DISLIKES);
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-            myObject.addAttribute("DateCreated", sqlDate);
+            myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
             BaseDocument res = arango.createDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, myObject);
 
@@ -76,18 +76,18 @@ public class CreateComment extends CommentCommand {
             System.out.println("=========");
 
             String commentId = res.getKey();
-            parentSubThreadId = (String) res.getAttribute("ParentSubThreadId");
-            creatorId = (String) res.getAttribute("CreatorId");
-            content = (String) res.getAttribute("Content");
-            parentContentType = (String) res.getAttribute("ParentContentType");
-            final int likes = (int) res.getAttribute("Likes");
-            final int dislikes = (int) res.getAttribute("Dislikes");
-            String dateCreated = (String) res.getAttribute("DateCreated");
+            parentSubThreadId = (String) res.getAttribute(PARENT_SUBTHREAD_ID_DB);
+            userId = (String) res.getAttribute(ACTION_MAKER_ID);
+            content = (String) res.getAttribute(CONTENT_DB);
+            parentContentType = (String) res.getAttribute(PARENT_CONTENT_TYPE_DB);
+            final int likes = (int) res.getAttribute(LIKES_DB);
+            final int dislikes = (int) res.getAttribute(DISLIKES_DB);
+            String dateCreated = (String) res.getAttribute(DATE_CREATED_DB);
 
             comment = new Comment();
             comment.setId(commentId);
             comment.setParentId(parentSubThreadId);
-            comment.setCreatorId(creatorId);
+            comment.setCreatorId(userId);
             comment.setContent(content);
             comment.setParentContentType(parentContentType);
             comment.setLikes(likes);
@@ -124,11 +124,10 @@ public class CreateComment extends CommentCommand {
     @Override
     protected Schema getSchema() {
         final Attribute parentSubThreadId = new Attribute(PARENT_SUBTHREAD_ID, DataType.STRING, true);
-        final Attribute creatorId = new Attribute(CREATOR_ID, DataType.STRING, true);
         final Attribute content = new Attribute(CONTENT, DataType.STRING, true);
         final Attribute parentContentType = new Attribute(PARENT_CONTENT_TYPE, DataType.STRING, true);
 
-        return new Schema(List.of(parentSubThreadId, creatorId, content, parentContentType));
+        return new Schema(List.of(parentSubThreadId, content, parentContentType));
     }
 
     private BaseEdgeDocument addEdgeFromContentToComment(Comment comment) {
