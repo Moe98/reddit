@@ -23,9 +23,7 @@ public class SearchThread extends Command {
             arangoDB = arango.connect();
 
             // Create an ArangoSearchView on collection Threads using english text analyzer on _key & Description attributes.
-            if (!arango.viewExists(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView")) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
-            }
+            arango.createViewIfNotExists(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
 
             String query = """
                     FOR result IN ThreadsView

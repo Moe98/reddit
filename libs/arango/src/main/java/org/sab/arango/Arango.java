@@ -133,6 +133,12 @@ public class Arango {
         return arangoDB.db(dbName).view(viewName).exists();
     }
 
+    public void createViewIfNotExists(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) {
+        if (!viewExists(arangoDB, dbName, viewName)) {
+            createView(arangoDB, dbName, viewName, collectionName, fields);
+        }
+    }
+
     public ArangoCursor<BaseDocument> query(ArangoDB arangoDB, String dbName, String query, Map<String, Object> bindVars) {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
     }

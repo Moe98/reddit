@@ -23,9 +23,7 @@ public class SearchSubThread extends Command {
             arangoDB = arango.connect();
 
             // Create an ArangoSearchView on collection SubThreads using english text analyzer on Title & Content attributes.
-            if (!arango.viewExists(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView")) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
-            }
+            arango.createViewIfNotExists(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
 
             String query = """
                     FOR result IN SubThreadsView
