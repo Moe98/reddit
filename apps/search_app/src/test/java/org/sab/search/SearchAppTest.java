@@ -93,6 +93,7 @@ public class SearchAppTest {
     public void SearchThread() {
         try {
             JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearchApp"))));
+            assertEquals("test", responseJson.getString("msg"));
             assertEquals(200, responseJson.getInt("statusCode"));
         } catch (JSONException e) {
             fail(e.getMessage());
