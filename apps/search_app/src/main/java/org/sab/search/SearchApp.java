@@ -55,6 +55,7 @@ public class SearchApp extends Service {
             arangoDB = arango.connect();
             arango.createDatabaseIfNotExists(arangoDB, dbName);
             arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
             arango.createViewIfNotExists(arangoDB, dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
             arango.createViewIfNotExists(arangoDB, dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
         } catch (ArangoDBException e) {
