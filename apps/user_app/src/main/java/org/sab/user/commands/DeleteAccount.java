@@ -79,6 +79,6 @@ public class DeleteAccount extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
-        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username + "abs");
+        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username);
     }
 }
