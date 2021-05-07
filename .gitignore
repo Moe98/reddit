@@ -228,3 +228,7 @@ package-lock.json
 .classpath
 *.env
 config.json
+
+# Mac OS
+.DS_Store
+
