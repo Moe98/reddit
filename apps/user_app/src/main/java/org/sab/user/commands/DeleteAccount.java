@@ -74,11 +74,10 @@ public class DeleteAccount extends UserCommand {
         HashMap<String, Object> documentProperties = new HashMap<>();
         documentProperties.put("is_deleted", true);
         BaseDocument user = new BaseDocument(documentProperties);
-        user.setKey(username + "deleted");
+        user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
         String dbName = System.getenv("ARANGO_DB");
         arango.updateDocument(arangoDB, dbName, "Users", user, username);
-        arango.createDocument(arangoDB, dbName, "Users", user);
     }
 }
