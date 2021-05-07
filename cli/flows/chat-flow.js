@@ -5,7 +5,6 @@ const LoadingSpinner = importJsx('../components/loading-spinner')
 const ChatsList = importJsx('../components/chats-list')
 const ChatView = importJsx('../components/chat-view')
 
-
 const { useState, useEffect } = React
 
 const chatsData = [
@@ -30,7 +29,7 @@ const ChatFlow = () => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setChats(chatsData)
-		}, 2000)
+		}, 1000)
 
 		return () => {
 			clearTimeout(timer)
@@ -38,12 +37,14 @@ const ChatFlow = () => {
 	}, [])
 
 	const onChatSelect = (chat) => setSelectedChat(chat)
+	const onChatExit = () => setSelectedChat(null)
+
 	return (
 		<React.Fragment>
 			{chats.length > 0 ? (
 				<React.Fragment>
 					{selectedChat ? (
-						<ChatView chat={selectedChat} />
+						<ChatView chat={selectedChat} onChatExit={onChatExit} />
 					) : (
 						<ChatsList chats={chats} onChatSelect={onChatSelect} />
 					)}
