@@ -12,7 +12,7 @@ import org.sab.validation.Schema;
 import java.sql.SQLException;
 import java.util.List;
 
-public class EditProfile extends UserCommand {
+public class UpdatePassword extends UserCommand {
 
 
     protected Schema getSchema() {

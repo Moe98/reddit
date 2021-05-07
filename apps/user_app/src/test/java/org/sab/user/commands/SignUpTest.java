@@ -102,9 +102,9 @@ public class SignUpTest {
         body.put("newPassword", "123456");
         body.put("oldPassword", password);
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
-        EditProfile editProfileCommand = new EditProfile();
+        UpdatePassword updatePasswordCommand = new UpdatePassword();
 
-        JSONObject response = new JSONObject(editProfileCommand.execute(request));
+        JSONObject response = new JSONObject(updatePasswordCommand.execute(request));
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
@@ -118,9 +118,9 @@ public class SignUpTest {
         body.put("newPassword", password);
         body.put("oldPassword", "123456");
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
-        EditProfile editProfileCommand = new EditProfile();
+        UpdatePassword updatePasswordCommand = new UpdatePassword();
 
-        JSONObject response = new JSONObject(editProfileCommand.execute(request));
+        JSONObject response = new JSONObject(updatePasswordCommand.execute(request));
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
