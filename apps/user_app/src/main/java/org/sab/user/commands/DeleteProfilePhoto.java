@@ -9,6 +9,7 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -44,8 +45,8 @@ public class DeleteProfilePhoto extends UserCommand {
         // Deleting from Cloudinary
         try {
             CloudUtilities.destroyImage(username);
-        } catch (IOException e) {
-            return Responder.makeErrorResponse("An error occurred while updating your image!", 400);
+        } catch (IOException | EnvironmentVariableNotLoaded e) {
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         }
 
         //calling the appropriate SQL procedure

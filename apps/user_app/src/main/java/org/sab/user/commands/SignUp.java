@@ -80,7 +80,7 @@ public class SignUp extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
-        arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", user);
+        arango.createDocument(arangoDB, ARANGO_DB_NAME, "Users", user);
 
     }
 

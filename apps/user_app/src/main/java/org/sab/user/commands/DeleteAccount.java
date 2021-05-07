@@ -13,6 +13,7 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -61,8 +62,8 @@ public class DeleteAccount extends UserCommand {
             // Deleting profile picture from Cloudinary
             try {
                 CloudUtilities.destroyImage(username);
-            } catch (IOException e) {
-                return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
+            } catch (IOException | EnvironmentVariableNotLoaded e) {
+                return Responder.makeErrorResponse(e.getMessage(), 400);
             }
         }
 
@@ -77,7 +78,6 @@ public class DeleteAccount extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
-        String dbName = System.getenv("ARANGO_DB");
-        arango.updateDocument(arangoDB, dbName, "Users", user, username);
+        arango.updateDocument(arangoDB, ARANGO_DB_NAME, "Users", user, username);
     }
 }
