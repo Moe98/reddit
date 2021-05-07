@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 import org.sab.functions.Auth;
+import org.sab.functions.Utilities;
 import org.sab.user.UserApp;
 
 import java.util.*;
@@ -131,12 +132,9 @@ public class SignUpTest {
 
     @Test
     public void e_updateProfilePicture() {
-        //ENV_TYPE: Development OR Production
-        String photoUrl = "https://picsum.photos/200";
-        String mode = System.getenv("ENV_TYPE");
-        System.out.println(mode);
-        if (mode == null || !mode.equals("Development"))
+        if (!Utilities.isDevelopmentMode())
             return;
+        String photoUrl = "https://picsum.photos/200";
         JSONObject body = new JSONObject();
         body.put("username", username);
         body.put("photoUrl", photoUrl);
@@ -153,8 +151,7 @@ public class SignUpTest {
 
     @Test
     public void f_deleteProfilePicture() {
-        String mode = System.getenv("ENV_TYPE");
-        if (mode == null || !mode.equals("Development"))
+        if (!Utilities.isDevelopmentMode())
             return;
         JSONObject body = new JSONObject();
         body.put("username", username);

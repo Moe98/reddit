@@ -28,6 +28,8 @@ public class CloudUtilities {
     }
 
     public static String uploadImage(String photoUrl, String username) throws IOException, EnvironmentVariableNotLoaded {
+        if (!Utilities.isDevelopmentMode())
+            return null;
         String publicId = username.replaceAll("[-]", "");
         Cloudinary cloudinary = new CloudUtilities().cloudinary;
         System.out.println("Uploading Image!");
@@ -37,6 +39,8 @@ public class CloudUtilities {
     }
 
     public static void destroyImage(String username) throws IOException, EnvironmentVariableNotLoaded {
+        if (!Utilities.isDevelopmentMode())
+            return;
         String publicId = username.replaceAll("[-]", "");
         Cloudinary cloudinary = new CloudUtilities().cloudinary;
         Map deleteParams = ObjectUtils.asMap("invalidate", true);

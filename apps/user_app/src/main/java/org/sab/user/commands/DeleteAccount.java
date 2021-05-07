@@ -1,11 +1,11 @@
 package org.sab.user.commands;
 
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
-import org.sab.functions.Utilities;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
@@ -56,17 +56,17 @@ public class DeleteAccount extends UserCommand {
         }
         try {
             deleteFromArango(username);
-        } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 500);
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
         }
-        if (Utilities.isDevelopmentMode()) {
-            // Deleting profile picture from Cloudinary
-            try {
-                CloudUtilities.destroyImage(username);
-            } catch (IOException | EnvironmentVariableNotLoaded e) {
-                return Responder.makeErrorResponse(e.getMessage(), 400);
-            }
+
+        // Deleting profile picture from Cloudinary
+        try {
+            CloudUtilities.destroyImage(username);
+        } catch (IOException | EnvironmentVariableNotLoaded e) {
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         }
+
 
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
@@ -79,6 +79,6 @@ public class DeleteAccount extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
-        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username);
+        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username + "abs");
     }
 }

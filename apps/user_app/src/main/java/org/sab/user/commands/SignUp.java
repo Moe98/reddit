@@ -1,6 +1,7 @@
 package org.sab.user.commands;
 
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.functions.Auth;
@@ -15,7 +16,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -58,8 +58,8 @@ public class SignUp extends UserCommand {
 
         try {
             InsertUserInArango(username);
-        } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 500);
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
         }
 
 
