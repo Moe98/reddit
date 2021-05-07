@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
+import org.sab.functions.Utilities;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
@@ -56,15 +57,14 @@ public class DeleteAccount extends UserCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 500);
         }
-        /* TODO
-            Commenting this block due to to the limit on the number of Cloudinary calls :(
+        if (Utilities.isDevelopmentMode()) {
             // Deleting profile picture from Cloudinary
-             try {
-                 CloudUtilities.destroyImage(username);
-             } catch (IOException e) {
-                 return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
-             }
-        */
+            try {
+                CloudUtilities.destroyImage(username);
+            } catch (IOException e) {
+                return Responder.makeErrorResponse("An error occurred while deleting your profile image!", 400);
+            }
+        }
 
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
