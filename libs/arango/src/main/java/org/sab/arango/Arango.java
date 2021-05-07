@@ -38,18 +38,21 @@ public class Arango {
         arangoDB.shutdown();
     }
 
-
     public boolean createDatabase(ArangoDB arangoDB, String dbName) {
         return arangoDB.createDatabase(dbName);
+    }
 
+    public boolean dropDatabase(ArangoDB arangoDB, String dbName) {
+        return arangoDB.db(dbName).drop();
     }
 
     public boolean databaseExists(ArangoDB arangoDB, String dbName) {
         return arangoDB.db(dbName).exists();
     }
 
-    public boolean dropDatabase(ArangoDB arangoDB, String dbName) {
-        return arangoDB.db(dbName).drop();
+    public void createDatabaseIfNotExists(ArangoDB arangoDB, String dbName) {
+        if (!databaseExists(arangoDB, dbName))
+            createDatabase(arangoDB, dbName);
     }
 
     public void createCollection(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
@@ -62,6 +65,11 @@ public class Arango {
 
     public boolean collectionExists(ArangoDB arangoDB, String dbName, String collectionName) {
         return arangoDB.db(dbName).collection(collectionName).exists();
+    }
+
+    public void createCollectionIfNotExists(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
+        if (!collectionExists(arangoDB, dbName, collectionName))
+            createCollection(arangoDB, dbName, collectionName, isEdgeCollection);
     }
 
     public BaseDocument createDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseDocument baseDocument) {

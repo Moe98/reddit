@@ -2,13 +2,17 @@ package org.sab.search.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.search.SearchApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SearchThread extends Command {
@@ -17,45 +21,45 @@ public class SearchThread extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
         try {
+            String searchKeywords = request.getJSONObject("body").getString("searchKeyword");
+            if (searchKeywords == null)
+                return Responder.makeErrorResponse("searchKeyword must not be null", 400).toString();
+            if (searchKeywords.isBlank())
+                return Responder.makeErrorResponse("searchKeyword must not be blank", 400).toString();
+
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            // Create an ArangoSearchView on collection Threads using english text analyzer on _key & Description attributes.
-            arango.createViewIfNotExists(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
-
             String query = """
-                    FOR result IN ThreadsView
-                         SEARCH ANALYZER(STARTS_WITH(result._key, LOWER(LTRIM(@words))) OR PHRASE(result._key, @words), "text_en")
+                    FOR result IN @viewName
+                         SEARCH ANALYZER(STARTS_WITH(result.@nameAttribute, LOWER(LTRIM(@words))) OR PHRASE(result.@nameAttribute, @words), "text_en")
                          RETURN result""";
-            Map<String, Object> bindVars = Collections.singletonMap("words", request.getJSONObject("body").getString("searchText"));
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
+            Map<String, Object> bindVars = new HashMap<>();
+            bindVars.put("words", searchKeywords);
+            bindVars.put("viewName", SearchApp.getViewName(SearchApp.threadsCollectionName));
+            bindVars.put("nameAttribute", SearchApp.threadName);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
 
             JSONArray data = new JSONArray();
-            if (cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    JSONObject thread = new JSONObject();
-                    thread.put("_key", document.getKey());
-                    thread.put("Description", document.getProperties().get("Description"));
-                    thread.put("Creator", document.getProperties().get("Creator"));
-                    thread.put("NumOfFollowers", document.getProperties().get("NumOfFollowers"));
-                    thread.put("DateCreated", document.getProperties().get("DateCreated"));
-                    data.put(thread);
-                });
-                response.put("data", data);
-            } else {
-                response.put("msg", "No Result");
-                response.put("data", new JSONArray());
-            }
-            response.put("statusCode", 200);
+            cursor.forEachRemaining(document -> {
+                JSONObject thread = new JSONObject();
+                thread.put(SearchApp.threadName, document.getKey());
+                thread.put(SearchApp.threadDescription, document.getProperties().get(SearchApp.threadDescription));
+                thread.put(SearchApp.threadCreator, document.getProperties().get(SearchApp.threadCreator));
+                thread.put(SearchApp.threadFollowers, document.getProperties().get(SearchApp.threadFollowers));
+                thread.put(SearchApp.threadDate, document.getProperties().get(SearchApp.threadDate));
+                data.put(thread);
+            });
+            return Responder.makeDataResponse(data).toString();
+        } catch (JSONException e) {
+            return Responder.makeErrorResponse("Request doesn't have a body.", 400).toString();
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong.", 500).toString();
         } finally {
             arango.disconnect(arangoDB);
         }
-        return response.toString();
     }
 }

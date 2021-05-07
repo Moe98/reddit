@@ -8,7 +8,7 @@ public class Thread {
     public long numOfFollowers;
     public String dateCreated;
 
-    public Thread(){
+    public Thread() {
         super();
     }
 
@@ -30,6 +30,30 @@ public class Thread {
 
     public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public static String getCollectionName() {
+        return "Threads";
+    }
+
+    public static String getNameAttributeName() {
+        return "_key";
+    }
+
+    public static String getDescriptionAttributeName() {
+        return "Description";
+    }
+
+    public static String getCreatorAttributeName() {
+        return "Creator";
+    }
+
+    public static String getNumOfFollowersAttributeName() {
+        return "NumOfFollowers";
+    }
+
+    public static String getDateCreatedAttributeName() {
+        return "DateCreated";
     }
 
     @Override
