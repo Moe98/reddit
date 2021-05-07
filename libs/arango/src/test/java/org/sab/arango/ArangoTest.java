@@ -17,6 +17,7 @@ public class ArangoTest {
     private static String dbName;
     private static String collectionName;
     private static HashMap<String, Object> documentProperties;
+    private static String viewName;
 
 
     @BeforeClass
@@ -27,6 +28,7 @@ public class ArangoTest {
 
             dbName = "TestDB";
             collectionName = "TestCollection";
+            viewName = "TestView";
             documentProperties = new HashMap<>();
             documentProperties.put("boolean_field", true);
             documentProperties.put("int_field", 1);
@@ -202,6 +204,17 @@ public class ArangoTest {
             assertTrue(arangoDB.db(dbName).view("DropViewTest").exists());
             arango.dropView(arangoDB, dbName, "DropViewTest");
             assertFalse(arangoDB.db(dbName).view("DropViewTest").exists());
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void viewExists() {
+        try {
+            assertFalse(arango.viewExists(arangoDB, dbName, viewName));
+            arango.createView(arangoDB, dbName, viewName, collectionName, new String[]{});
+            assertTrue(arango.viewExists(arangoDB, dbName, viewName));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }

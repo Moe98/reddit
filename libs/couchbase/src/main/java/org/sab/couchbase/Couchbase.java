@@ -1,8 +1,5 @@
 package org.sab.couchbase;
 
-
-import com.couchbase.client.core.error.CouchbaseException;
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
@@ -48,6 +45,11 @@ public class Couchbase {
         return cluster.buckets().getAllBuckets().containsKey(bucketName);
     }
 
+    public void createBucketIfNotExists(Cluster cluster, String bucketName, int ramQuotaMB) {
+        if (!bucketExists(cluster, bucketName))
+            createBucket(cluster, bucketName, ramQuotaMB);
+    }
+
     public MutationResult upsertDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object) {
         return cluster.bucket(bucketName).defaultCollection().upsert(documentKey, object);
     }
@@ -74,7 +76,6 @@ public class Couchbase {
     }
 
     public QueryResult query(Cluster cluster, String queryText, boolean consistent) {
-        QueryResult result = cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
-        return result;
+        return cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
     }
 }

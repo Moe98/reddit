@@ -38,18 +38,21 @@ public class Arango {
         arangoDB.shutdown();
     }
 
-
     public boolean createDatabase(ArangoDB arangoDB, String dbName) {
         return arangoDB.createDatabase(dbName);
+    }
 
+    public boolean dropDatabase(ArangoDB arangoDB, String dbName) {
+        return arangoDB.db(dbName).drop();
     }
 
     public boolean databaseExists(ArangoDB arangoDB, String dbName) {
         return arangoDB.db(dbName).exists();
     }
 
-    public boolean dropDatabase(ArangoDB arangoDB, String dbName) {
-        return arangoDB.db(dbName).drop();
+    public void createDatabaseIfNotExists(ArangoDB arangoDB, String dbName) {
+        if (!databaseExists(arangoDB, dbName))
+            createDatabase(arangoDB, dbName);
     }
 
     public void createCollection(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
@@ -62,6 +65,11 @@ public class Arango {
 
     public boolean collectionExists(ArangoDB arangoDB, String dbName, String collectionName) {
         return arangoDB.db(dbName).collection(collectionName).exists();
+    }
+
+    public void createCollectionIfNotExists(ArangoDB arangoDB, String dbName, String collectionName, boolean isEdgeCollection) {
+        if (!collectionExists(arangoDB, dbName, collectionName))
+            createCollection(arangoDB, dbName, collectionName, isEdgeCollection);
     }
 
     public BaseDocument createDocument(ArangoDB arangoDB, String dbName, String collectionName, BaseDocument baseDocument) {
@@ -106,6 +114,7 @@ public class Arango {
     }
 
     public ViewEntity createView(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) {
+
         ArangoSearchCreateOptions options = new ArangoSearchCreateOptions();
 
         FieldLink[] fieldLinks = new FieldLink[fields.length];
@@ -126,6 +135,16 @@ public class Arango {
 
     public void dropView(ArangoDB arangoDB, String dbName, String viewName) {
         arangoDB.db(dbName).view(viewName).drop();
+    }
+
+    public boolean viewExists(ArangoDB arangoDB, String dbName, String viewName) {
+        return arangoDB.db(dbName).view(viewName).exists();
+    }
+
+    public void createViewIfNotExists(ArangoDB arangoDB, String dbName, String viewName, String collectionName, String[] fields) {
+        if (!viewExists(arangoDB, dbName, viewName)) {
+            createView(arangoDB, dbName, viewName, collectionName, fields);
+        }
     }
 
     public ArangoCursor<BaseDocument> query(ArangoDB arangoDB, String dbName, String query, Map<String, Object> bindVars) {

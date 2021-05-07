@@ -1,97 +1,137 @@
 package org.sab.models;
 
+@SuppressWarnings("unused")
 public class SubThread {
-
-    String _key;
+    String id;
     String parentThread;
     String title;
     String creator;
-    long likes;
-    long dislikes;
+    int likes;
+    int dislikes;
     String content;
     boolean hasImage;
-    String time;
+    String date;
 
-    public SubThread(){
+    public SubThread() {
         super();
     }
 
-    public void setParentThread(String parentThread) {
-        this.parentThread = parentThread;
+    public String getId() {
+        return id;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public void setLikes(long likes) {
-        this.likes = likes;
-    }
-
-    public void setDislikes(long dislikes) {
-        this.dislikes = dislikes;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setHasImage(boolean hasImage) {
-        this.hasImage = hasImage;
-    }
-
-    public void setTime(String time) {
-        time = time;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getParentThread() {
         return parentThread;
     }
 
+    public void setParentThread(String parentThread) {
+        this.parentThread = parentThread;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getCreator() {
         return creator;
     }
 
-    public long getLikes() {
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public int getLikes() {
         return likes;
     }
 
-    public long getDislikes() {
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getDislikes() {
         return dislikes;
+    }
+
+    public void setDislikes(int dislikes) {
+        this.dislikes = dislikes;
     }
 
     public String getContent() {
         return content;
     }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public boolean isHasImage() {
         return hasImage;
     }
 
-    public String getTime() {
-        return time;
+    public void setHasImage(boolean hasImage) {
+        this.hasImage = hasImage;
     }
 
-    public String get_key() {
-        return _key;
+    public String getDate() {
+        return date;
     }
 
-    public void set_key(String _key) {
-        this._key = _key;
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public static String getCollectionName() {
+        return "SubThreads";
+    }
+
+    public static String getIdAttributeName() {
+        return "_key";
+    }
+
+    public static String getParentThreadAttributeName() {
+        return "ParentThread";
+    }
+
+    public static String getTitleAttributeName() {
+        return "Title";
+    }
+
+    public static String getCreatorAttributeName() {
+        return "Creator";
+    }
+
+    public static String getLikesAttributeName() {
+        return "Likes";
+    }
+
+    public static String getDislikesAttributeName() {
+        return "Dislikes";
+    }
+
+    public static String getContentAttributeName() {
+        return "Content";
+    }
+
+    public static String getHasImageAttributeName() {
+        return "HasImage";
+    }
+
+    public static String getDateAttributeName() {
+        return "Time";
     }
 
     @Override
     public String toString() {
         return "SubThread{" +
-                "_key='" + _key + '\'' +
+                "id='" + id + '\'' +
                 ", parentThread='" + parentThread + '\'' +
                 ", title='" + title + '\'' +
                 ", creator='" + creator + '\'' +
@@ -99,7 +139,7 @@ public class SubThread {
                 ", dislikes=" + dislikes +
                 ", content='" + content + '\'' +
                 ", hasImage=" + hasImage +
-                ", time='" + time + '\'' +
+                ", date='" + date + '\'' +
                 '}';
     }
 }
