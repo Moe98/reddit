@@ -38,6 +38,8 @@ public class SearchAppTest {
             arango.createDatabaseIfNotExists(arangoDB, dbName);
             arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
+            arango.createViewIfNotExists(arangoDB, dbName, SearchApp.getViewName(threadsCollectionName), threadsCollectionName, new String[]{Thread.getNameAttributeName(), Thread.getDescriptionAttributeName()});
+            arango.createViewIfNotExists(arangoDB, dbName, SearchApp.getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{SubThread.getTitleAttributeName(), SubThread.getContentAttributeName()});
 
             // Dummy Data
             toBeDeleted = new HashMap<>();
@@ -93,7 +95,6 @@ public class SearchAppTest {
     public void SearchThread() {
         try {
             JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearchApp"))));
-            assertEquals("test", responseJson.getString("msg"));
             assertEquals(200, responseJson.getInt("statusCode"));
         } catch (JSONException e) {
             fail(e.getMessage());
