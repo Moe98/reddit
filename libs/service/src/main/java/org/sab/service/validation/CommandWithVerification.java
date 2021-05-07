@@ -83,7 +83,7 @@ public abstract class CommandWithVerification extends Command {
     }
 
     private String makeInvalidlyTypedAttributeMessage(Attribute attribute) {
-        return String.format("%s must be of type %s.%s", attribute.getAttributeName(),
+        return String.format("%s must be of type %s. %s", attribute.getAttributeName(),
                 attribute.getDataType().toString(), attribute.getDataType().getAdditionalErrorMessage());
     }
 }
