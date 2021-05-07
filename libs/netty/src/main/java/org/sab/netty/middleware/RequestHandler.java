@@ -22,12 +22,12 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     JSONObject body;
     JSONObject uriParams;
     HttpRequest req;
-    HttpHeaders headers;
+    JSONObject headers;
     String queueName;
     boolean badRequest;
     String[] uriFields;
 
-    JSONObject getURIParams(String uri) {
+    JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
         uriParams = new JSONObject();
         Set<Map.Entry<String, List<String>>> uriParamsSet = decoder.parameters().entrySet();
@@ -42,8 +42,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         request.put("uriParams", uriParams);
         request.put("methodType", methodType);
         request.put("headers", headers);
-        request.put("functionName", headers.get("Function-Name"));
-
+        request.put("functionName", headers.getString("Function-Name"));
         return request;
     }
 
@@ -59,8 +58,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             req = (HttpRequest) msg;
             uri = req.uri();
             methodType = req.method().toString();
-            uriParams = getURIParams(uri);
-            headers = req.headers();
+            uriParams = getURIParams();
+            headers = getHeaders();
             ctx.channel().attr(Server.REQ_KEY).set(req);
         }
         if (msg instanceof HttpContent) {
@@ -99,6 +98,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         }
     }
 
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
@@ -125,4 +125,11 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         int questionMark = queueName.indexOf("?");
         return queueName.substring(0, questionMark == -1 ? queueName.length() : questionMark);
     }
+
+    private JSONObject getHeaders() {
+        headers = new JSONObject();
+        req.headers().entries().forEach(entry -> headers.put(entry.getKey(), entry.getValue()));
+        return headers;
+    }
+
 }
