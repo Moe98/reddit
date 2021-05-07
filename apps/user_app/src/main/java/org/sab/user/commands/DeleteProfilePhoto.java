@@ -5,6 +5,7 @@ import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -21,8 +22,8 @@ public class DeleteProfilePhoto extends UserCommand {
     }
 
     @Override
-    protected String getMethodType() {
-        return "DELETE";
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.DELETE;
     }
 
     @Override

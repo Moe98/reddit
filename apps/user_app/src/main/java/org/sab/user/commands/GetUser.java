@@ -3,6 +3,7 @@ package org.sab.user.commands;
 import org.sab.models.User;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ public class GetUser extends UserCommand {
     }
 
     @Override
-    protected String getMethodType() {
-        return "GET";
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
     }
 }

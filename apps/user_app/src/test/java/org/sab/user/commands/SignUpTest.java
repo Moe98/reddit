@@ -39,12 +39,14 @@ public class SignUpTest {
         JSONObject request = makeRequest(new JSONObject(), "GET", uriParams);
         return request;
     }
-    public JSONObject getUserRequest(){
+
+    public JSONObject getUserRequest() {
         JSONObject request = makeGETRequest(username);
         GetUser getUserCommand = new GetUser();
         JSONObject response = new JSONObject(getUserCommand.execute(request));
         return response;
     }
+
     @Test
     public void a_SignUpCreatesAnEntryInDB() {
 
@@ -88,7 +90,7 @@ public class SignUpTest {
             fail(e.getMessage());
         }
         assertEquals(data.getString("username"), username);
-        assertTrue(Auth.verifyHash(password,data.getString("password")));
+        assertTrue(Auth.verifyHash(password, data.getString("password")));
 
 
     }
@@ -109,6 +111,7 @@ public class SignUpTest {
 
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
     }
+
     @Test
     public void d_updatePasswordBack() {
 
@@ -144,7 +147,6 @@ public class SignUpTest {
         JSONObject response = new JSONObject(updateProfilePhotoCommand.execute(request));
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Profile Picture uploaded successfully");
-
 
 
     }
@@ -187,5 +189,6 @@ public class SignUpTest {
 
         assertEquals(response.getString("msg"), "Account Deleted Successfully!");
     }
+
 
 }
