@@ -10,7 +10,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -19,6 +18,11 @@ public class DeleteProfilePhoto extends UserCommand {
     protected Schema getSchema() {
         Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         return new Schema(List.of(username));
+    }
+
+    @Override
+    protected String getMethodType() {
+        return "DELETE";
     }
 
     @Override

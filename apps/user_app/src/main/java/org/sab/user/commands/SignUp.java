@@ -33,6 +33,11 @@ public class SignUp extends UserCommand {
     }
 
     @Override
+    protected String getMethodType() {
+        return "POST";
+    }
+
+    @Override
     protected String execute() {
 
         // retrieving the body objects

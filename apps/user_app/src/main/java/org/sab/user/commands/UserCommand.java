@@ -22,6 +22,7 @@ public abstract class UserCommand extends CommandWithVerification {
     protected static final String NEW_PASSWORD = "newPassword";
     protected static final String USER_ID = "userId";
     protected static final String OLD_PASSWORD = "oldPassword";
+
     protected JSONObject authenticateUser(String username, String password) {
         boolean checkPassword;
         try {

@@ -24,6 +24,11 @@ public class EditProfile extends UserCommand {
     }
 
     @Override
+    protected String getMethodType() {
+        return "PUT";
+    }
+
+    @Override
     protected String execute() {
 
         // retrieving the body objects

@@ -2,13 +2,11 @@ package org.sab.user;
 
 
 import com.arangodb.ArangoDB;
-import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 public class UserApp extends Service {
     public static void main(String[] args) throws IOException {

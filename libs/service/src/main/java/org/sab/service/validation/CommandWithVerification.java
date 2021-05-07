@@ -24,16 +24,19 @@ public abstract class CommandWithVerification extends Command {
 
         schema = getSchema();
         uriParams = request.getJSONObject("uriParams");
-        if (request.getString("methodType").equals("GET")) {
+        String methodType = getMethodType();
+        if (!methodType.equals(request.getString("methodType")))
+            return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
+        if (methodType.equals("GET")) {
             if (!schema.isEmpty())
-                return Responder.makeErrorResponse(String.format("%s expects a body. Don't use a GET Request!", getClass().getSimpleName()), 500).toString();
+                return Responder.makeErrorResponse("GET Requests don't have a body!!", 500);
             body = new JSONObject();
         } else
             body = request.getJSONObject("body");
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         }
         return execute();
     }
@@ -42,6 +45,8 @@ public abstract class CommandWithVerification extends Command {
     protected abstract String execute();
 
     protected abstract Schema getSchema();
+
+    protected abstract String getMethodType();
 
     //instance methods
     private boolean isFoundInBody(Attribute attribute) {

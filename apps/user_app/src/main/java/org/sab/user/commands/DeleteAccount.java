@@ -29,6 +29,11 @@ public class DeleteAccount extends UserCommand {
     }
 
     @Override
+    protected String getMethodType() {
+        return "DELETE";
+    }
+
+    @Override
     protected String execute() {
         // retrieving the body objects
 

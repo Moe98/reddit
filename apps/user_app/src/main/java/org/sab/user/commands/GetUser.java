@@ -25,4 +25,9 @@ public class GetUser extends UserCommand {
     protected Schema getSchema() {
         return new Schema(List.of());
     }
+
+    @Override
+    protected String getMethodType() {
+        return "GET";
+    }
 }
