@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.netty.Server;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,10 +26,12 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     JSONObject headers;
     String queueName;
     boolean badRequest;
-    String[] uriFields;
 
     JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
+        String[] uriPathFields = decoder.path().substring(1).split("/");
+        if (uriPathFields.length >= 2)
+            queueName = uriPathFields[1];
         uriParams = new JSONObject();
         Set<Map.Entry<String, List<String>>> uriParamsSet = decoder.parameters().entrySet();
         uriParamsSet.forEach(entry -> uriParams.put(entry.getKey(), entry.getValue().get(0)));
@@ -83,18 +86,14 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (badRequest) {
                 errorResponse(ctx, 400, "Incorrect Body");
             }
-            uriFields = uri.substring(1).split("/");
-            if (uriFields.length >= 2) {
-                queueName = removeUriParamsFromQueueName(uriFields[1]);
-                if (Server.apps.contains(queueName.toLowerCase())) {
-                    ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
-                    JSONObject request = packRequest();
-                    ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
-                    ctx.fireChannelRead(content.copy());
-                } else
-                    errorResponse(ctx, 404, "Not Found");
+            if (queueName != null && Server.apps.contains(queueName.toLowerCase())) {
+                ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
+                JSONObject request = packRequest();
+                ByteBuf content = Unpooled.copiedBuffer(request.toString(), CharsetUtil.UTF_8);
+                ctx.fireChannelRead(content.copy());
             } else
                 errorResponse(ctx, 404, "Not Found");
+
         }
     }
 
@@ -119,11 +118,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         JSONObject response = new JSONObject().put("statusCode", code).put("msg", msg);
         ByteBuf content = Unpooled.copiedBuffer(response.toString(), CharsetUtil.UTF_8);
         ctx.pipeline().context("QueueHandler").fireChannelRead(content.copy());
-    }
-
-    private static String removeUriParamsFromQueueName(String queueName) {
-        int questionMark = queueName.indexOf("?");
-        return queueName.substring(0, questionMark == -1 ? queueName.length() : questionMark);
     }
 
     private JSONObject getHeaders() {
