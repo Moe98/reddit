@@ -4,19 +4,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.ChannelMatcher;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.sab.chat.server.ChatServer;
 import org.sab.chat.server.models.ClientManager;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.UUID;
-
-import static org.sab.chat.server.ChatServer.clients;
 
 public class TextWebSocketFrameHandler extends
         SimpleChannelInboundHandler<TextWebSocketFrame> {
@@ -33,15 +30,22 @@ public class TextWebSocketFrameHandler extends
             ctx.pipeline().remove(HttpRequestHandler.class);
             group.writeAndFlush(new TextWebSocketFrame("Client " +
                     ctx.channel() + " joined"));
-//            ArrayList<UUID> chatIds = new ArrayList<>();
-//            Collections.shuffle(randomChatIds);
-//            chatIds.add(randomChatIds.get(0));
-//            chatIds.add(randomChatIds.get(1));
-//            clients.put(ctx.channel().id(), chatIds);
             group.add(ctx.channel());
         } else {
             super.userEventTriggered(ctx, evt);
         }
+    }
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        UUID user = ChatServer.clients.channelToUser.remove(ctx.channel());
+        ArrayList<Channel> userChannels = ChatServer.clients.activeUsers.get(user);
+        userChannels.remove(ctx.channel());
+        if(userChannels.size()==0)
+            ChatServer.clients.activeUsers.remove(user);
+        else{
+            ChatServer.clients.activeUsers.put(user,userChannels);
+        }
+        super.channelInactive(ctx);
     }
 
     @Override
@@ -50,15 +54,6 @@ public class TextWebSocketFrameHandler extends
         JSONParser parser = new JSONParser();
         JSONObject messageJson = (JSONObject) parser.parse(msg.text());
         ClientManager.routeRequest(messageJson, ctx);
-//        TextWebSocketFrame message = new TextWebSocketFrame((String) messageJson.get("message"));
-//        group.writeAndFlush(message.retain(), new ChannelMatcher() {
-//            @Override
-//            public boolean matches(Channel channel) {
-//                System.out.println(channel.id());
-//                ArrayList<UUID> memberChats = clients.get(channel.id());
-//                return memberChats.contains(chatId);
-//            }
-//        });
     }
 
 }
