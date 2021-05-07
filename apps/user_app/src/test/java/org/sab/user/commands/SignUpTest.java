@@ -139,7 +139,7 @@ public class SignUpTest {
         body.put("photoUrl", photoUrl);
 
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
-        ChooseProfilePhoto updateProfilePhotoCommand = new ChooseProfilePhoto();
+        UpdateProfilePhoto updateProfilePhotoCommand = new UpdateProfilePhoto();
 
         JSONObject response = new JSONObject(updateProfilePhotoCommand.execute(request));
         assertEquals(200, response.getInt("statusCode"));

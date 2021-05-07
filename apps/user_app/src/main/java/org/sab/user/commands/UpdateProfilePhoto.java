@@ -1,7 +1,6 @@
 package org.sab.user.commands;
 
 import org.sab.functions.CloudUtilities;
-import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
@@ -9,12 +8,11 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.io.IOException;
-import java.sql.ResultSet;
+
 import java.sql.SQLException;
 import java.util.List;
 
-public class ChooseProfilePhoto extends UserCommand {
+public class UpdateProfilePhoto extends UserCommand {
     @Override
     protected Schema getSchema() {
         Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
