@@ -15,9 +15,6 @@ public abstract class CommandWithVerification extends Command {
     protected JSONObject body, uriParams;
     protected Schema schema;
 
-    protected String getFromUriParams(String attribute) {
-        return uriParams.getString(attribute);
-    }
 
     @Override
     public final String execute(JSONObject request) {
@@ -27,12 +24,7 @@ public abstract class CommandWithVerification extends Command {
         String methodType = getMethodType().toString();
         if (!methodType.equals(request.getString("methodType")))
             return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
-        if (methodType.equals("GET")) {
-            if (!schema.isEmpty())
-                return Responder.makeErrorResponse("GET Requests don't have a body!", 500);
-            body = new JSONObject();
-        } else
-            body = request.getJSONObject("body");
+        body = methodType.equals("GET") ? new JSONObject() : request.getJSONObject("body");
         try {
             verifyBody();
         } catch (RequestVerificationException e) {

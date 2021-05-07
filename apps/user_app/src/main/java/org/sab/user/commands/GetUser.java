@@ -14,7 +14,7 @@ public class GetUser extends UserCommand {
     protected String execute() {
         if (!uriParams.keySet().contains(USERNAME))
             return Responder.makeErrorResponse("You must add username in URIParams!", 400);
-        String username = getFromUriParams(USERNAME);
+        String username = uriParams.getString(USERNAME);
         try {
             User user = getUser(username, USERNAME, PASSWORD, EMAIL, BIRTHDATE, PHOTO_URL, USER_ID);
             return Responder.makeDataResponse(user.toJSON());
