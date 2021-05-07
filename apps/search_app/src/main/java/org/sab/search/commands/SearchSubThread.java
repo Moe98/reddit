@@ -2,13 +2,17 @@ package org.sab.search.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.search.SearchApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SearchSubThread extends Command {
@@ -17,49 +21,50 @@ public class SearchSubThread extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
         try {
+            String searchKeywords = request.getJSONObject("body").getString("searchKeywords");
+            if (searchKeywords == null)
+                return Responder.makeErrorResponse("searchKeywords must not be null", 400).toString();
+            if (searchKeywords.isBlank())
+                return Responder.makeErrorResponse("searchKeywords must not be blank", 400).toString();
+
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            // Create an ArangoSearchView on collection SubThreads using english text analyzer on Title & Content attributes.
-            arango.createViewIfNotExists(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
-
             String query = """
-                    FOR result IN SubThreadsView
-                         SEARCH ANALYZER(result.Title IN TOKENS(@words, "text_en") OR result.Content IN TOKENS(@words, "text_en"), "text_en")
+                    FOR result IN @viewName
+                         SEARCH ANALYZER(result.@titleAttribute IN TOKENS(@keywords, "text_en") OR result.@contentAttribute IN TOKENS(@keywords, "text_en"), "text_en")
                          RETURN result""";
-            Map<String, Object> bindVars = Collections.singletonMap("words", request.getJSONObject("body").getString("searchText"));
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
+            Map<String, Object> bindVars = new HashMap<>();
+            bindVars.put("keywords", searchKeywords);
+            bindVars.put("viewName", SearchApp.getViewName(SearchApp.subThreadsCollectionName));
+            bindVars.put("titleAttribute", SearchApp.subThreadTitle);
+            bindVars.put("contentAttribute", SearchApp.subThreadContent);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
 
             JSONArray data = new JSONArray();
-            if (cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    JSONObject subThread = new JSONObject();
-                    subThread.put("_key", document.getKey());
-                    subThread.put("ParentThread", document.getProperties().get("ParentThread"));
-                    subThread.put("Title", document.getProperties().get("Title"));
-                    subThread.put("Creator", document.getProperties().get("Creator"));
-                    subThread.put("Likes", document.getProperties().get("Likes"));
-                    subThread.put("Dislikes", document.getProperties().get("Dislikes"));
-                    subThread.put("Content", document.getProperties().get("Content"));
-                    subThread.put("HasImage", document.getProperties().get("HasImage"));
-                    subThread.put("Time", document.getProperties().get("Time"));
-                    data.put(subThread);
-                });
-                response.put("data", data);
-            } else {
-                response.put("msg", "No Result");
-                response.put("data", new JSONArray());
-            }
-            response.put("statusCode", 200);
+            cursor.forEachRemaining(document -> {
+                JSONObject subThread = new JSONObject();
+                subThread.put(SearchApp.subThreadId, document.getKey());
+                subThread.put(SearchApp.subThreadParentThread, document.getProperties().get(SearchApp.subThreadParentThread));
+                subThread.put(SearchApp.subThreadTitle, document.getProperties().get(SearchApp.subThreadTitle));
+                subThread.put(SearchApp.subThreadCreator, document.getProperties().get(SearchApp.subThreadCreator));
+                subThread.put(SearchApp.subThreadLikes, document.getProperties().get(SearchApp.subThreadLikes));
+                subThread.put(SearchApp.subThreadDislikes, document.getProperties().get(SearchApp.subThreadDislikes));
+                subThread.put(SearchApp.subThreadContent, document.getProperties().get(SearchApp.subThreadContent));
+                subThread.put(SearchApp.subThreadHasImage, document.getProperties().get(SearchApp.subThreadHasImage));
+                subThread.put(SearchApp.subThreadTime, document.getProperties().get(SearchApp.subThreadTime));
+                data.put(subThread);
+            });
+            return Responder.makeDataResponse(data).toString();
+        } catch (JSONException e) {
+            return Responder.makeErrorResponse("Request doesn't have a body.", 400).toString();
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong.", 500).toString();
         } finally {
             arango.disconnect(arangoDB);
         }
-        return response.toString();
     }
 }

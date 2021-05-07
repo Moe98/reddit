@@ -22,10 +22,10 @@ public class SearchThread extends Command {
     @Override
     public String execute(JSONObject request) {
         try {
-            String searchKeywords = request.getJSONObject("body").getString("searchKeyword");
-            if (searchKeywords == null)
+            String searchKeyword = request.getJSONObject("body").getString("searchKeyword");
+            if (searchKeyword == null)
                 return Responder.makeErrorResponse("searchKeyword must not be null", 400).toString();
-            if (searchKeywords.isBlank())
+            if (searchKeyword.isBlank())
                 return Responder.makeErrorResponse("searchKeyword must not be blank", 400).toString();
 
             arango = Arango.getInstance();
@@ -33,10 +33,10 @@ public class SearchThread extends Command {
 
             String query = """
                     FOR result IN @viewName
-                         SEARCH ANALYZER(STARTS_WITH(result.@nameAttribute, LOWER(LTRIM(@words))) OR PHRASE(result.@nameAttribute, @words), "text_en")
+                         SEARCH ANALYZER(STARTS_WITH(result.@nameAttribute, LOWER(LTRIM(@keyword))) OR PHRASE(result.@nameAttribute, @keyword), "text_en")
                          RETURN result""";
             Map<String, Object> bindVars = new HashMap<>();
-            bindVars.put("words", searchKeywords);
+            bindVars.put("keyword", searchKeyword);
             bindVars.put("viewName", SearchApp.getViewName(SearchApp.threadsCollectionName));
             bindVars.put("nameAttribute", SearchApp.threadName);
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
