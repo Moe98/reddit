@@ -24,8 +24,8 @@ public abstract class CommandWithVerification extends Command {
 
         schema = getSchema();
         uriParams = request.getJSONObject("uriParams");
-        HTTPMethod methodType = getMethodType();
-        if (!methodType.toString().equals(request.getString("methodType")))
+        String methodType = getMethodType().toString();
+        if (!methodType.equals(request.getString("methodType")))
             return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
         if (methodType.equals("GET")) {
             if (!schema.isEmpty())
