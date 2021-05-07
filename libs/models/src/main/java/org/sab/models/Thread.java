@@ -2,11 +2,11 @@ package org.sab.models;
 
 @SuppressWarnings("unused")
 public class Thread {
-    public String name;
-    public String description;
-    public String creator;
-    public long numOfFollowers;
-    public String dateCreated;
+    String name;
+    String description;
+    String creator;
+    long numOfFollowers;
+    String dateCreated;
 
     public Thread() {
         super();

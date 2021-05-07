@@ -2,15 +2,15 @@ package org.sab.models;
 
 @SuppressWarnings("unused")
 public class SubThread {
-    public String id;
-    public String parentThread;
-    public String title;
-    public String creator;
-    public int likes;
-    public int dislikes;
-    public String content;
-    public boolean hasImage;
-    public String date;
+    String id;
+    String parentThread;
+    String title;
+    String creator;
+    int likes;
+    int dislikes;
+    String content;
+    boolean hasImage;
+    String date;
 
     public SubThread() {
         super();
