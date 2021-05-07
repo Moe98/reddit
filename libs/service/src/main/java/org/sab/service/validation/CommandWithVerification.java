@@ -16,7 +16,7 @@ public abstract class CommandWithVerification extends Command {
     protected Schema schema;
 
     protected String getFromUriParams(String attribute) {
-        return (String) uriParams.getJSONArray(attribute).get(0);
+        return uriParams.getString(attribute);
     }
 
     @Override
