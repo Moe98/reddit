@@ -39,7 +39,12 @@ public class SignUpTest {
         JSONObject request = makeRequest(new JSONObject(), "GET", uriParams);
         return request;
     }
-
+    public JSONObject getUserRequest(){
+        JSONObject request = makeGETRequest(username);
+        GetUser getUserCommand = new GetUser();
+        JSONObject response = new JSONObject(getUserCommand.execute(request));
+        return response;
+    }
     @Test
     public void a_SignUpCreatesAnEntryInDB() {
 
@@ -73,10 +78,7 @@ public class SignUpTest {
     @Test
     public void b_GetUser() {
 
-        JSONObject request = makeGETRequest(username);
-        GetUser getUserCommand = new GetUser();
-
-        JSONObject response = new JSONObject(getUserCommand.execute(request));
+        JSONObject response = getUserRequest();
         System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = null;
@@ -94,41 +96,84 @@ public class SignUpTest {
     @Test
     public void c_updatePassword() {
 
-        //assert message is correct
+        JSONObject body = new JSONObject();
 
-        JSONObject getRequest = makeGETRequest(username);
-        //make get request and assert that the password has been updated
+        body.put("username", username);
+        body.put("newPassword", "123456");
+        body.put("oldPassword", password);
+        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+        EditProfile editProfileCommand = new EditProfile();
+
+        JSONObject response = new JSONObject(editProfileCommand.execute(request));
+        assertEquals(200, response.getInt("statusCode"));
+
+        assertEquals(response.getString("msg"), "Account Updated Successfully!");
+    }
+    @Test
+    public void d_updatePasswordBack() {
+
+        JSONObject body = new JSONObject();
+
+        body.put("username", username);
+        body.put("newPassword", password);
+        body.put("oldPassword", "123456");
+        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+        EditProfile editProfileCommand = new EditProfile();
+
+        JSONObject response = new JSONObject(editProfileCommand.execute(request));
+        assertEquals(200, response.getInt("statusCode"));
+
+        assertEquals(response.getString("msg"), "Account Updated Successfully!");
     }
 
     @Test
-    public void d_updateProfilePicture() {
+    public void e_updateProfilePicture() {
         //ENV_TYPE: Development OR Production
         String photoUrl = "https://picsum.photos/200";
         String mode = System.getenv("ENV_TYPE");
+        System.out.println(mode);
         if (mode == null || !mode.equals("Development"))
             return;
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("photoUrl", photoUrl);
 
-        //execute ProfilePictureUpdate
-        //assert msg  is updated succseffuly
+        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+        ChooseProfilePhoto updateProfilePhotoCommand = new ChooseProfilePhoto();
+
+        JSONObject response = new JSONObject(updateProfilePhotoCommand.execute(request));
+        assertEquals(200, response.getInt("statusCode"));
+        assertEquals(response.getString("msg"), "Profile Picture uploaded successfully");
+
 
 
     }
 
     @Test
-    public void e_deleteProfilePicture() {
+    public void f_deleteProfilePicture() {
         String mode = System.getenv("ENV_TYPE");
         if (mode == null || !mode.equals("Development"))
             return;
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        JSONObject request = makeRequest(body, "DELETE", new JSONObject());
+        DeleteProfilePhoto deleteProfilePhotoCommand = new DeleteProfilePhoto();
 
-        //execute ProfilePictureDelete
-        //assert msg  is deleted succeffuly
-
-        JSONObject getRequest = makeGETRequest(username);
-        //make get request and assert that the photoUrl is null
+        JSONObject response = new JSONObject(deleteProfilePhotoCommand.execute(request));
+        JSONObject userData = getUserRequest();
+        JSONObject data = null;
+        try {
+            data = userData.getJSONObject("data");
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        assertEquals(200, response.getInt("statusCode"));
+        assertEquals(response.getString("msg"), "Profile Picture deleted successfully");
+        assertFalse(data.has("photo_url"));
     }
 
     @Test
-    public void f_delete() {
+    public void g_delete() {
 
         JSONObject body = new JSONObject();
 
