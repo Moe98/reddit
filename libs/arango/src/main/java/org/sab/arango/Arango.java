@@ -5,6 +5,7 @@ import com.arangodb.entity.*;
 import com.arangodb.entity.arangosearch.CollectionLink;
 import com.arangodb.entity.arangosearch.FieldLink;
 import com.arangodb.mapping.ArangoJack;
+import com.arangodb.model.AqlQueryOptions;
 import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;

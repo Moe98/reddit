@@ -12,7 +12,7 @@ import org.sab.search.SearchApp;
 import org.sab.service.Command;
 import org.sab.service.Responder;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 public class SearchThread extends Command {
@@ -32,13 +32,10 @@ public class SearchThread extends Command {
             arangoDB = arango.connect();
 
             String query = """
-                    FOR result IN @viewName
-                         SEARCH ANALYZER(STARTS_WITH(result.@nameAttribute, LOWER(LTRIM(@keyword))) OR PHRASE(result.@nameAttribute, @keyword), "text_en")
-                         RETURN result""";
-            Map<String, Object> bindVars = new HashMap<>();
-            bindVars.put("keyword", searchKeyword);
-            bindVars.put("viewName", SearchApp.getViewName(SearchApp.threadsCollectionName));
-            bindVars.put("nameAttribute", SearchApp.threadName);
+                    FOR result IN %s
+                         SEARCH ANALYZER(STARTS_WITH(result.%s, LOWER(LTRIM(@keyword))) OR PHRASE(result.%s, @keyword), "text_en")
+                         RETURN result""".formatted(SearchApp.getViewName(SearchApp.threadsCollectionName), SearchApp.threadName, SearchApp.threadName);
+            Map<String, Object> bindVars = Collections.singletonMap("keyword", searchKeyword);
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
 
             JSONArray data = new JSONArray();

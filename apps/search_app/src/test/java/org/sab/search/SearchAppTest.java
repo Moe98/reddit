@@ -87,13 +87,12 @@ public class SearchAppTest {
         } finally {
             arango.disconnect(arangoDB);
         }
-        arango.disconnect(arangoDB);
     }
 
     @Test
     public void SearchThread() {
         try {
-            JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearch"))));
+            JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearchApp"))));
             assertEquals(200, responseJson.getInt("statusCode"));
         } catch (JSONException e) {
             fail(e.getMessage());
