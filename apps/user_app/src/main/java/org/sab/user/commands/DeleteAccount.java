@@ -10,6 +10,7 @@ import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.user.UserApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -78,6 +79,6 @@ public class DeleteAccount extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         ArangoDB arangoDB = arango.connect();
-        arango.updateDocument(arangoDB, ARANGO_DB_NAME, "Users", user, username);
+        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username);
     }
 }

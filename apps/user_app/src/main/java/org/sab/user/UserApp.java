@@ -10,7 +10,7 @@ import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 import java.io.IOException;
 
 public class UserApp extends Service {
-    static final String ARANGO_DB_NAME = System.getenv("ARANGO_DB");
+    public static final String ARANGO_DB_NAME = System.getenv("ARANGO_DB");
 
     public static void main(String[] args) throws IOException, EnvironmentVariableNotLoaded {
 
