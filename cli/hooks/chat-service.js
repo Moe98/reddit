@@ -26,7 +26,7 @@ const useChatService = (onMessage, onError) => {
 	}
 
 	const send = (message) => {
-		if (!ws.current) return false
+		if (!ws.current || ws.current.readyState != 1) return false
 		ws.current.send(message)
 		return true
 	}
