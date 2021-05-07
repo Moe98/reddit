@@ -54,7 +54,8 @@ public class SearchThread extends Command {
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong.", 500).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            if(arango != null)
+                arango.disconnect(arangoDB);
         }
     }
 }
