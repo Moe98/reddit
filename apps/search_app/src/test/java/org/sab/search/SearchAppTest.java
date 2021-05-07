@@ -8,10 +8,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.models.SubThread;
+import org.sab.models.Thread;
 import org.sab.search.commands.SearchSubThread;
 import org.sab.search.commands.SearchThread;
-import org.sab.models.Thread;
-import org.sab.models.SubThread;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -22,12 +22,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class SearchAppTest {
-    private static Arango arango;
-    private static ArangoDB arangoDB;
-    private static HashMap<String, ArrayList<String>> toBeDeleted;
     final private static String dbName = System.getenv("ARANGO_DB");
     final private static String threadsCollectionName = Thread.getCollectionName();
     final private static String subThreadsCollectionName = SubThread.getCollectionName();
+    private static Arango arango;
+    private static ArangoDB arangoDB;
+    private static HashMap<String, ArrayList<String>> toBeDeleted;
 
     @BeforeClass
     public static void setUp() {

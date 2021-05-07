@@ -4,21 +4,17 @@ import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
 import org.sab.models.SubThread;
-import org.sab.service.Service;
 import org.sab.models.Thread;
+import org.sab.service.Service;
 
 public class SearchApp extends Service {
-    private Arango arango;
-    private ArangoDB arangoDB;
     final public static String dbName = System.getenv("ARANGO_DB");
-
     final public static String threadsCollectionName = Thread.getCollectionName();
     final public static String threadName = Thread.getNameAttributeName();
     final public static String threadDescription = Thread.getDescriptionAttributeName();
     final public static String threadCreator = Thread.getCreatorAttributeName();
     final public static String threadFollowers = Thread.getNumOfFollowersAttributeName();
     final public static String threadDate = Thread.getDateCreatedAttributeName();
-
     final public static String subThreadsCollectionName = SubThread.getCollectionName();
     final public static String subThreadId = SubThread.getIdAttributeName();
     final public static String subThreadParentThread = SubThread.getParentThreadAttributeName();
@@ -29,6 +25,8 @@ public class SearchApp extends Service {
     final public static String subThreadContent = SubThread.getContentAttributeName();
     final public static String subThreadHasImage = SubThread.getHasImageAttributeName();
     final public static String subThreadTime = SubThread.getDateAttributeName();
+    private Arango arango;
+    private ArangoDB arangoDB;
 
     @Override
     public String getAppUriName() {
@@ -61,7 +59,8 @@ public class SearchApp extends Service {
         } catch (ArangoDBException e) {
             e.printStackTrace();
         } finally {
-            arango.disconnect(arangoDB);
+            if (arango != null)
+                arango.disconnect(arangoDB);
         }
     }
 

@@ -32,7 +32,10 @@ public class SearchThread extends Command {
             String query = """
                     FOR result IN %s
                          SEARCH ANALYZER(STARTS_WITH(result.%s, LOWER(LTRIM(@keyword))) OR PHRASE(result.%s, @keyword), "text_en")
-                         RETURN result""".formatted(SearchApp.getViewName(SearchApp.threadsCollectionName), SearchApp.threadName, SearchApp.threadName);
+                         RETURN result"""
+                    .formatted(SearchApp.getViewName(SearchApp.threadsCollectionName),
+                            SearchApp.threadName,
+                            SearchApp.threadName);
             Map<String, Object> bindVars = Collections.singletonMap("keyword", searchKeyword);
             ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
 
@@ -54,7 +57,7 @@ public class SearchThread extends Command {
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong.", 500).toString();
         } finally {
-            if(arango != null)
+            if (arango != null)
                 arango.disconnect(arangoDB);
         }
     }
