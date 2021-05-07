@@ -25,7 +25,6 @@ public class DeleteAccount extends UserCommand {
 
         Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute password = new Attribute(PASSWORD, DataType.PASSWORD, true);
-
         return new Schema(List.of(username, password));
     }
 

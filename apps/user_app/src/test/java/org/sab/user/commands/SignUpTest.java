@@ -183,7 +183,6 @@ public class SignUpTest {
         DeleteAccount deleteAccountCommand = new DeleteAccount();
 
         JSONObject response = new JSONObject(deleteAccountCommand.execute(request));
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Deleted Successfully!");

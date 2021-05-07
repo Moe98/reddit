@@ -79,6 +79,8 @@ jobs:
           COLOUDINARY_CLOUD_NAME: ${{ secrets.COLOUDINARY_CLOUD_NAME }}
           COLOUDINARY_API_SECRET: ${{ secrets.COLOUDINARY_API_SECRET }}
           COLOUDINARY_API_KEY: ${{ secrets.COLOUDINARY_API_KEY }}
+          # ENV_TYPE
+          ENV_TYPE: ${{ secrets.ENV_TYPE }}
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 180
