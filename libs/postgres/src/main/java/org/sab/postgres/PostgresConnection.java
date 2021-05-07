@@ -79,16 +79,21 @@ public class PostgresConnection {
 
     }
 
-    public static ResultSet call(String procedureName, Object... params) throws PropertiesNotLoadedException, SQLException {
+    public static ResultSet call(String procedureName, Object... params) throws SQLException, PropertiesNotLoadedException {
 
         PostgresConnection postgresConnection = getInstance();
         Connection connection = postgresConnection.connect();
-        ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, null, params);
-        postgresConnection.closeConnection(connection);
-        return resultSet;
+        try {
+            ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, params);
+            postgresConnection.closeConnection(connection);
+            return resultSet;
+        } catch (SQLException exception) {
+            postgresConnection.closeConnection(connection);
+            throw exception;
+        }
     }
 
-    public ResultSet call(String sql, Connection connection, int[] types, Object... params) throws SQLException {
+    public ResultSet call(String sql, Connection connection, Object... params) throws SQLException {
 
 
         CallableStatement callableStatement = connection.prepareCall(sql);
