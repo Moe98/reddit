@@ -23,8 +23,6 @@ public class SearchThread extends Command {
     public String execute(JSONObject request) {
         try {
             String searchKeyword = request.getJSONObject("body").getString("searchKeyword");
-            if (searchKeyword == null)
-                return Responder.makeErrorResponse("searchKeyword must not be null", 400).toString();
             if (searchKeyword.isBlank())
                 return Responder.makeErrorResponse("searchKeyword must not be blank", 400).toString();
 
@@ -50,7 +48,7 @@ public class SearchThread extends Command {
             });
             return Responder.makeDataResponse(data).toString();
         } catch (JSONException e) {
-            return Responder.makeErrorResponse("Request doesn't have a body.", 400).toString();
+            return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (ArangoDBException e) {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
