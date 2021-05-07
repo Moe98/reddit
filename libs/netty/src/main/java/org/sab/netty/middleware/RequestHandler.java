@@ -13,22 +13,26 @@ import org.sab.netty.Server;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     String methodType;
     String uri;
     JSONObject body;
-    Map<String, List<String>> uriParams;
+    JSONObject uriParams;
     HttpRequest req;
-    HttpHeaders headers;
+    JSONObject headers;
     String queueName;
     boolean badRequest;
     String[] uriFields;
 
-    static Map<String, List<String>> getURIParams(String uri) {
+    JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
-        return decoder.parameters();
+        uriParams = new JSONObject();
+        Set<Map.Entry<String, List<String>>> uriParamsSet = decoder.parameters().entrySet();
+        uriParamsSet.forEach(entry -> uriParams.put(entry.getKey(), entry.getValue().get(0)));
+        return uriParams;
     }
 
     JSONObject packRequest() {
@@ -38,8 +42,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         request.put("uriParams", uriParams);
         request.put("methodType", methodType);
         request.put("headers", headers);
-        request.put("functionName", headers.get("Function-Name"));
-
+        request.put("functionName", headers.getString("Function-Name"));
         return request;
     }
 
@@ -55,9 +58,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             req = (HttpRequest) msg;
             uri = req.uri();
             methodType = req.method().toString();
-            uriParams = getURIParams(uri);
-            headers = req.headers();
-
+            uriParams = getURIParams();
+            headers = getHeaders();
             ctx.channel().attr(Server.REQ_KEY).set(req);
         }
         if (msg instanceof HttpContent) {
@@ -67,7 +69,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (!methodType.equals("GET") && jsonBuf.isReadable()) {
                 try {
                     body = new JSONObject(jsonStr);
-                } catch (JSONException e){
+                } catch (JSONException e) {
                     badRequest = true;
                 }
             }
@@ -78,13 +80,12 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             System.out.println(msg);
         }
         if (msg instanceof LastHttpContent) {
-            if(badRequest){
+            if (badRequest) {
                 errorResponse(ctx, 400, "Incorrect Body");
             }
             uriFields = uri.substring(1).split("/");
-
-            if(uriFields.length >= 2) {
-                queueName = uriFields[1];
+            if (uriFields.length >= 2) {
+                queueName = removeUriParamsFromQueueName(uriFields[1]);
                 if (Server.apps.contains(queueName.toLowerCase())) {
                     ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
                     JSONObject request = packRequest();
@@ -96,6 +97,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 errorResponse(ctx, 404, "Not Found");
         }
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -113,9 +115,21 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 '}';
     }
 
-    private void errorResponse(ChannelHandlerContext ctx, int code, String msg){
+    private void errorResponse(ChannelHandlerContext ctx, int code, String msg) {
         JSONObject response = new JSONObject().put("statusCode", code).put("msg", msg);
         ByteBuf content = Unpooled.copiedBuffer(response.toString(), CharsetUtil.UTF_8);
         ctx.pipeline().context("QueueHandler").fireChannelRead(content.copy());
     }
+
+    private static String removeUriParamsFromQueueName(String queueName) {
+        int questionMark = queueName.indexOf("?");
+        return queueName.substring(0, questionMark == -1 ? queueName.length() : questionMark);
+    }
+
+    private JSONObject getHeaders() {
+        headers = new JSONObject();
+        req.headers().entries().forEach(entry -> headers.put(entry.getKey(), entry.getValue()));
+        return headers;
+    }
+
 }
