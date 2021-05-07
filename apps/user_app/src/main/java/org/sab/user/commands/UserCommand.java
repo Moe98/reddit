@@ -6,7 +6,6 @@ import org.sab.functions.Auth;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
-import org.sab.service.Responder;
 import org.sab.service.validation.CommandWithVerification;
 
 import java.sql.ResultSet;
@@ -59,6 +58,8 @@ public abstract class UserCommand extends CommandWithVerification {
                     user.setBirthdate(resultSet.getString(BIRTHDATE));
                 case EMAIL:
                     user.setEmail(resultSet.getString(EMAIL));
+                case PHOTO_URL:
+                    user.setPhotoUrl(resultSet.getString("photo_url"));
             }
 
 

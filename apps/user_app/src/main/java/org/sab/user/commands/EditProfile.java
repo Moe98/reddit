@@ -9,7 +9,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
