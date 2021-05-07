@@ -6,7 +6,7 @@ public class ChatStorageApp extends Service {
 
     @Override
     public String getAppUriName() {
-        return "CHAT_STORAGE_APP";
+        return "CHAT";
     }
 
     @Override
