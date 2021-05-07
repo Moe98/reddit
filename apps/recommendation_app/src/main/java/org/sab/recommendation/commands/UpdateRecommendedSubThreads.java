@@ -2,15 +2,21 @@ package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.core.error.TimeoutException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
+import org.sab.recommendation.RecommendationApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,21 +29,19 @@ public class UpdateRecommendedSubThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
+        JSONArray data = new JSONArray();
+        String username;
         try {
+            username = request.getJSONObject("body").getString("username");
+            if (username.isBlank())
+                return Responder.makeErrorResponse("username must not be blank", 400).toString();
+
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
-            }
-            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("SubThreadsView").exists()) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "SubThreadsView", "SubThreads", new String[]{"Title", "Content"});
-            }
-
             String query = """
                     LET followedSample = (
-                        FOR thread IN 1..1 OUTBOUND @username UserFollowThread
+                        FOR thread IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
                             SORT RAND()
                             RETURN thread
                     )
@@ -45,17 +49,26 @@ public class UpdateRecommendedSubThreads extends Command {
                         FOR thread in followedSample
                             LIMIT 5
                             LET sortedRecommendation = (
-                                FOR subThread IN 1..1 OUTBOUND CONCAT('Threads/', thread._key) ThreadContainSubThread
-                                    SORT subThread.Time DESC
+                                FOR subThread IN 1..1 OUTBOUND CONCAT('%s/', thread.%s) %s
+                                    SORT subThread.%s DESC
                                     LIMIT 100
-                                    SORT SUM([subThread.Likes, -subThread.Dislikes]) DESC
+                                    SORT SUM([subThread.%s, -subThread.%s]) DESC
                                     LIMIT 5
                                     RETURN subThread
                             )
                             RETURN sortedRecommendation
                     )
                     LET recommendedThreads = (
-                    """ +
+                    """
+                    .formatted(RecommendationApp.usersCollectionName,
+                            RecommendationApp.userFollowThreadCollectionName,
+                            RecommendationApp.threadsCollectionName,
+                            RecommendationApp.threadName,
+                            RecommendationApp.threadContainSubThreadCollectionName,
+                            RecommendationApp.subThreadDate,
+                            RecommendationApp.subThreadLikes,
+                            RecommendationApp.subThreadDislikes)
+                    +
                     UpdateRecommendedThreads.getQuery() +
                     """
                             )
@@ -64,69 +77,68 @@ public class UpdateRecommendedSubThreads extends Command {
                                     SORT RAND()
                                     LIMIT 5
                                     LET sortedRecommendedThreadsRecommendation = (
-                                        FOR subThread IN 1..1 OUTBOUND CONCAT('Threads/', thread._key) ThreadContainSubThread
-                                            SORT subThread.Time DESC
+                                        FOR subThread IN 1..1 OUTBOUND CONCAT('%s/', thread.%s) %s
+                                            SORT subThread.%s DESC
                                             LIMIT 100
-                                            SORT SUM([subThread.Likes, -subThread.Dislikes]) DESC
+                                            SORT SUM([subThread.%s, -subThread.%s]) DESC
                                             LIMIT 5
                                             RETURN subThread
                                     )
                                     RETURN sortedRecommendedThreadsRecommendation
                             )
                             FOR subThread IN SLICE(APPEND(FLATTEN(recommendationsFromFollowed), FLATTEN(recommendationsFromRecommendedThreads)), 0, 50)
-                                    RETURN subThread""";
-            Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
+                                    RETURN subThread"""
+                            .formatted(RecommendationApp.threadsCollectionName,
+                                    RecommendationApp.threadName,
+                                    RecommendationApp.threadContainSubThreadCollectionName,
+                                    RecommendationApp.subThreadDate,
+                                    RecommendationApp.subThreadLikes,
+                                    RecommendationApp.subThreadDislikes);
+            Map<String, Object> bindVars = Collections.singletonMap("username", username);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, query, bindVars);
 
-            JSONArray data = new JSONArray();
-            if (cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    JSONObject subThread = new JSONObject();
-                    subThread.put("_key", document.getKey());
-                    subThread.put("ParentThread", document.getProperties().get("ParentThread"));
-                    subThread.put("Title", document.getProperties().get("Title"));
-                    subThread.put("Creator", document.getProperties().get("Creator"));
-                    subThread.put("Likes", document.getProperties().get("Likes"));
-                    subThread.put("Dislikes", document.getProperties().get("Dislikes"));
-                    subThread.put("Content", document.getProperties().get("Content"));
-                    subThread.put("HasImage", document.getProperties().get("HasImage"));
-                    subThread.put("Time", document.getProperties().get("Time"));
-                    data.put(subThread);
-                });
-                response.put("data", data);
-            } else {
-                response.put("msg", "No Result");
-                response.put("data", new JSONArray());
-            }
+            cursor.forEachRemaining(document -> {
+                JSONObject subThread = new JSONObject();
+                subThread.put(RecommendationApp.subThreadId, document.getKey());
+                subThread.put(RecommendationApp.subThreadParentThread, document.getProperties().get(RecommendationApp.subThreadParentThread));
+                subThread.put(RecommendationApp.subThreadTitle, document.getProperties().get(RecommendationApp.subThreadTitle));
+                subThread.put(RecommendationApp.subThreadCreator, document.getProperties().get(RecommendationApp.subThreadCreator));
+                subThread.put(RecommendationApp.subThreadLikes, document.getProperties().get(RecommendationApp.subThreadLikes));
+                subThread.put(RecommendationApp.subThreadDislikes, document.getProperties().get(RecommendationApp.subThreadDislikes));
+                subThread.put(RecommendationApp.subThreadContent, document.getProperties().get(RecommendationApp.subThreadContent));
+                subThread.put(RecommendationApp.subThreadHasImage, document.getProperties().get(RecommendationApp.subThreadHasImage));
+                subThread.put(RecommendationApp.subThreadDate, document.getProperties().get(RecommendationApp.subThreadDate));
+                data.put(subThread);
+            });
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
+        } catch (JSONException e) {
+            return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            if (arango != null)
+                arango.disconnect(arangoDB);
         }
 
-        if (response.getJSONArray("data").length() != 0) {
+        if (data.length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if (!couchbase.bucketExists(cluster, "RecommendedSubThreads")) {
-                    couchbase.createBucket(cluster, "RecommendedSubThreads", 100);
-                }
-
-                JsonObject object = JsonObject.create().put("listOfSubThreads", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
-                couchbase.upsertDocument(cluster, "RecommendedSubThreads", request.getJSONObject("body").getString("username"), object);
-                response.put("msg", "Recommended SubThreads Updated Successfully!");
-                response.put("statusCode", 200);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.subThreadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(cluster, RecommendationApp.recommendedSubThreadsBucketName, username, couchbaseData);
+            } catch (TimeoutException e) {
+                return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
+            } catch (CouchbaseException e) {
+                return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
             } catch (Exception e) {
-                response.put("msg", e.getMessage());
-                response.put("data", new JSONArray());
-                response.put("statusCode", 500);
+                return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
             } finally {
-                couchbase.disconnect(cluster);
+                if (couchbase != null)
+                    couchbase.disconnect(cluster);
             }
         }
-        return response.toString();
+        return Responder.makeDataResponse(data).toString();
     }
 }

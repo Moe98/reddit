@@ -2,15 +2,21 @@ package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.core.error.TimeoutException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
+import org.sab.recommendation.RecommendationApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,103 +29,106 @@ public class UpdateRecommendedThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
+        JSONArray data = new JSONArray();
+        String username;
         try {
+            username = request.getJSONObject("body").getString("username");
+            if (username.isBlank())
+                return Responder.makeErrorResponse("username must not be blank", 400).toString();
+
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            if (!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()) {
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[]{"_key", "Description"});
-            }
+            Map<String, Object> bindVars = Collections.singletonMap("username", username);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, getQuery(), bindVars);
 
-            Map<String, Object> bindVars = Collections.singletonMap("username", "Users/" + request.getJSONObject("body").getString("username"));
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), getQuery(), bindVars);
-
-            JSONArray data = new JSONArray();
-            if (cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    JSONObject thread = new JSONObject();
-                    thread.put("_key", document.getKey());
-                    thread.put("Description", document.getProperties().get("Description"));
-                    thread.put("Creator", document.getProperties().get("Creator"));
-                    thread.put("NumOfFollowers", document.getProperties().get("NumOfFollowers"));
-                    thread.put("DateCreated", document.getProperties().get("DateCreated"));
-                    data.put(thread);
-                });
-                response.put("data", data);
-            } else {
-                response.put("msg", "No Result");
-                response.put("data", new JSONArray());
-            }
+            cursor.forEachRemaining(document -> {
+                JSONObject thread = new JSONObject();
+                thread.put(RecommendationApp.threadName, document.getKey());
+                thread.put(RecommendationApp.threadDescription, document.getProperties().get(RecommendationApp.threadDescription));
+                thread.put(RecommendationApp.threadCreator, document.getProperties().get(RecommendationApp.threadCreator));
+                thread.put(RecommendationApp.threadFollowers, document.getProperties().get(RecommendationApp.threadFollowers));
+                thread.put(RecommendationApp.threadDate, document.getProperties().get(RecommendationApp.threadDate));
+                data.put(thread);
+            });
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
+        } catch (JSONException e) {
+            return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            if (arango != null)
+                arango.disconnect(arangoDB);
         }
 
-        if (response.getJSONArray("data").length() != 0) {
+        if (data.length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if (!couchbase.bucketExists(cluster, "RecommendedThreads")) {
-                    couchbase.createBucket(cluster, "RecommendedThreads", 100);
-                }
-
-                JsonObject object = JsonObject.create().put("listOfThreads", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
-                couchbase.upsertDocument(cluster, "RecommendedThreads", request.getJSONObject("body").getString("username"), object);
-                response.put("msg", "Recommended Threads Updated Successfully!");
-                response.put("statusCode", 200);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(cluster, RecommendationApp.recommendedThreadsBucketName, username, couchbaseData);
+            } catch (TimeoutException e) {
+                return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
+            } catch (CouchbaseException e) {
+                return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
             } catch (Exception e) {
-                response.put("msg", e.getMessage());
-                response.put("data", new JSONArray());
-                response.put("statusCode", 500);
+                return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
             } finally {
-                couchbase.disconnect(cluster);
+                if (couchbase != null)
+                    couchbase.disconnect(cluster);
             }
         }
-        return response.toString();
+        return Responder.makeDataResponse(data).toString();
     }
 
     public static String getQuery() {
         return """
                 LET followed = (
-                    FOR thread, edge IN 1..1 OUTBOUND @username UserFollowThread
-                        SORT edge.date DESC
+                    FOR thread, edge IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
+                        SORT edge.%s DESC
                         RETURN thread
                 )
                 LET recommendations = (
-                    FOR thread in followed
+                    FOR thread IN followed
                         LIMIT 5
-                        LET subRecommendation = (FOR result IN ThreadsView
-                            SEARCH ANALYZER(result.Description IN TOKENS(thread.Description, 'text_en'), 'text_en')
-                            SORT BM25(result) DESC
-                            LIMIT 5
-                            RETURN result
+                        LET subRecommendation = (
+                            FOR result IN %s
+                                SEARCH ANALYZER(result.%s IN TOKENS(thread.%s, 'text_en'), 'text_en')
+                                SORT BM25(result) DESC
+                                LIMIT 5
+                                RETURN result
                         )
                         RETURN subRecommendation
                 )
                 LET uniqueRecommendations = (
-                    FOR thread in FLATTEN(recommendations)
-                        FILTER thread not in followed
+                    FOR thread IN FLATTEN(recommendations)
+                        FILTER thread NOT IN followed
                         RETURN DISTINCT thread
                 )
                 LET mostPopular = (
-                    FOR thread IN Threads
-                        SORT thread.NumOfFollowers DESC
+                    FOR thread IN %s
+                        SORT thread.%s DESC
                         LIMIT 100
                         RETURN thread
                 )
                 LET fill = (
-                    FOR thread in mostPopular
-                        FILTER thread not in followed AND thread not in uniqueRecommendations
+                    FOR thread IN mostPopular
+                        FILTER thread NOT IN followed AND thread NOT IN uniqueRecommendations
                         SORT RAND()
                         LIMIT 25
                         RETURN thread
                 )
                 FOR thread IN SLICE(APPEND(uniqueRecommendations, fill), 0, 25)
-                    RETURN thread""";
+                    RETURN thread"""
+                .formatted(RecommendationApp.usersCollectionName,
+                        RecommendationApp.userFollowThreadCollectionName,
+                        RecommendationApp.userFollowThreadDate,
+                        RecommendationApp.getViewName(RecommendationApp.threadsCollectionName),
+                        RecommendationApp.threadDescription,
+                        RecommendationApp.threadDescription,
+                        RecommendationApp.threadsCollectionName,
+                        RecommendationApp.threadFollowers);
     }
 }

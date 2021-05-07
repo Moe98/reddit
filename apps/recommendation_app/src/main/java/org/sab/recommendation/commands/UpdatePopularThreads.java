@@ -2,7 +2,10 @@ package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.ArangoDB;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.core.error.TimeoutException;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.json.JacksonTransformers;
@@ -10,7 +13,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
+import org.sab.recommendation.RecommendationApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
 public class UpdatePopularThreads extends Command {
     private Arango arango;
@@ -20,63 +25,55 @@ public class UpdatePopularThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
+        JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
             String query = """
-                    FOR thread IN Threads
-                        SORT thread.NumOfFollowers DESC
+                    FOR thread IN %s
+                        SORT thread.%s DESC
                         LIMIT 100
-                        RETURN thread""";
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, null);
+                        RETURN thread"""
+                    .formatted(RecommendationApp.threadsCollectionName, RecommendationApp.threadFollowers);
+            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, query, null);
 
-            JSONArray data = new JSONArray();
-            if (cursor.hasNext()) {
-                cursor.forEachRemaining(document -> {
-                    JSONObject thread = new JSONObject();
-                    thread.put("_key", document.getKey());
-                    thread.put("Description", document.getProperties().get("Description"));
-                    thread.put("Creator", document.getProperties().get("Creator"));
-                    thread.put("NumOfFollowers", document.getProperties().get("NumOfFollowers"));
-                    thread.put("DateCreated", document.getProperties().get("DateCreated"));
-                    data.put(thread);
-                });
-                response.put("data", data);
-            } else {
-                response.put("msg", "No Result");
-                response.put("data", new JSONArray());
-            }
+            cursor.forEachRemaining(document -> {
+                JSONObject thread = new JSONObject();
+                thread.put(RecommendationApp.threadName, document.getKey());
+                thread.put(RecommendationApp.threadDescription, document.getProperties().get(RecommendationApp.threadDescription));
+                thread.put(RecommendationApp.threadCreator, document.getProperties().get(RecommendationApp.threadCreator));
+                thread.put(RecommendationApp.threadFollowers, document.getProperties().get(RecommendationApp.threadFollowers));
+                thread.put(RecommendationApp.threadDate, document.getProperties().get(RecommendationApp.threadDate));
+                data.put(thread);
+            });
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            if (arango != null)
+                arango.disconnect(arangoDB);
         }
 
-        if (response.getJSONArray("data").length() != 0) {
+        if (data.length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
                 cluster = couchbase.connect();
 
-                if (!couchbase.bucketExists(cluster, "Listings")) {
-                    couchbase.createBucket(cluster, "Listings", 100);
-                }
-
-                JsonObject object = JsonObject.create().put("listOfThreads", JacksonTransformers.stringToJsonArray(response.getJSONArray("data").toString()));
-                couchbase.upsertDocument(cluster, "Listings", "popThreads", object);
-                response.put("msg", "Popular Threads Updated Successfully!");
-                response.put("statusCode", 200);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(cluster, RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularThreadsKey, couchbaseData);
+            } catch (TimeoutException e) {
+                return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
+            } catch (CouchbaseException e) {
+                return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
             } catch (Exception e) {
-                response.put("msg", e.getMessage());
-                response.put("data", new JSONArray());
-                response.put("statusCode", 500);
+                return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
             } finally {
-                couchbase.disconnect(cluster);
+                if (couchbase != null)
+                    couchbase.disconnect(cluster);
             }
         }
-        return response.toString();
+        return Responder.makeDataResponse(data).toString();
     }
 }

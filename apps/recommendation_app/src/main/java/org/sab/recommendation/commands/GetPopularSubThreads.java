@@ -1,13 +1,17 @@
 package org.sab.recommendation.commands;
 
+import com.couchbase.client.core.error.CouchbaseException;
+import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.core.error.TimeoutException;
 import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.json.JsonObject;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.couchbase.client.java.json.JsonArray;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.couchbase.Couchbase;
+import org.sab.recommendation.RecommendationApp;
 import org.sab.service.Command;
+import org.sab.service.Responder;
 
 public class GetPopularSubThreads extends Command {
     private Couchbase couchbase;
@@ -15,26 +19,25 @@ public class GetPopularSubThreads extends Command {
 
     @Override
     public String execute(JSONObject request) {
-        JSONObject response = new JSONObject();
         try {
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
-            if (!couchbase.bucketExists(cluster, "Listings") || !couchbase.documentExists(cluster, "Listings", "popSubThreads")) {
-                return new UpdatePopularSubThreads().execute(null);
-            }
-
-            JsonObject result = couchbase.getDocument(cluster, "Listings", "popSubThreads");
-            JsonNode data = new ObjectMapper().readTree(result.toString()).get("listOfSubThreads");
-            response.put("data", new JSONArray(data.toString()));
-            response.put("statusCode", 200);
+            JsonArray result = couchbase.getDocument(cluster, RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularSubThreadsKey).getArray(RecommendationApp.subThreadsDataKey);
+            return Responder.makeDataResponse(new JSONArray(result.toString())).toString();
+        } catch (DocumentNotFoundException e) {
+            return new UpdatePopularSubThreads().execute(null);
+        } catch (TimeoutException e) {
+            return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
+        } catch (CouchbaseException e) {
+            return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
+        } catch (JSONException e) {
+            return Responder.makeErrorResponse("Failed to create data JSONArray from Couchbase results.", 500).toString();
         } catch (Exception e) {
-            response.put("msg", e.getMessage());
-            response.put("data", new JSONArray());
-            response.put("statusCode", 500);
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
-            couchbase.disconnect(cluster);
+            if (couchbase != null)
+                couchbase.disconnect(cluster);
         }
-        return response.toString();
     }
 }
