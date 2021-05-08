@@ -14,7 +14,7 @@ public class PostgresConnection {
 
     private String url;
     private Properties props;
-    private final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
+    private static final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
 
     private PostgresConnection() {
     }
@@ -92,15 +92,18 @@ public class PostgresConnection {
         return resultSet;
     }
 
-    private static void createUsersTable() throws IOException {
+    private static void createUsersTable() throws IOException, EnvironmentVariableNotLoaded {
         runScript("../../libs/postgres/src/main/resources/sql/CreateTable.sql");
     }
 
-    private static void createUsersProcedures() throws IOException {
+    private static void createUsersProcedures() throws IOException, EnvironmentVariableNotLoaded {
         runScript("../../libs/postgres/src/main/resources/sql/procedures.sql");
     }
 
-    private static void runScript(String scriptPath) throws IOException {
+    private static void runScript(String scriptPath) throws IOException, EnvironmentVariableNotLoaded {
+        for (String param : propertiesParams)
+            if (System.getenv(param) == null)
+                throw new EnvironmentVariableNotLoaded(param);
         String[] command = new String[]{
                 "psql",
                 "-f",
@@ -121,7 +124,7 @@ public class PostgresConnection {
 
     }
 
-    public static void dbInit() throws IOException {
+    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
         createUsersTable();
         createUsersProcedures();
 
