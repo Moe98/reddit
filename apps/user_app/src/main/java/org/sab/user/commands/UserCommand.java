@@ -50,16 +50,22 @@ public abstract class UserCommand extends CommandWithVerification {
             switch (attribute) {
                 case PASSWORD:
                     user.setPassword(resultSet.getString(PASSWORD));
+                    break;
                 case USERNAME:
                     user.setUsername(resultSet.getString(USERNAME));
+                    break;
                 case USER_ID:
                     user.setUserId(resultSet.getString("user_id"));
+                    break;
                 case BIRTHDATE:
                     user.setBirthdate(resultSet.getString(BIRTHDATE));
+                    break;
                 case EMAIL:
                     user.setEmail(resultSet.getString(EMAIL));
+                    break;
                 case PHOTO_URL:
                     user.setPhotoUrl(resultSet.getString("photo_url"));
+                    break;
             }
 
 
