@@ -52,7 +52,7 @@ public class CreateDirectChat extends CommandWithVerification {
             responseBody.put("chatId", chatId.toString());
 
             response.put("statusCode", 200);
-            response.put("msg", "Group Chat Created");
+            response.put("msg", "Direct chat created successfully");
             response.put("data", responseBody);
 
         } catch (InvalidInputException e) {
