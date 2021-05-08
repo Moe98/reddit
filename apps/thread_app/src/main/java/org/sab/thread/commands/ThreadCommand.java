@@ -39,19 +39,17 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = "UserBookmarkThread";
     protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = "UserBannedFromThread";
 
-
-    protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName, String key) {
+    protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;
         final String to = THREAD_COLLECTION_NAME + "/" + threadName;
 
-        return addEdgeFromToWithKey(from, to, key);
+        return addEdgeFromToWithKey(from, to);
     }
 
-    protected final BaseEdgeDocument addEdgeFromToWithKey(String from, String to, String key) {
+    protected final BaseEdgeDocument addEdgeFromToWithKey(String from, String to) {
         BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
         edgeDocument.setFrom(from);
         edgeDocument.setTo(to);
-        edgeDocument.setKey(key);
 
         return edgeDocument;
     }

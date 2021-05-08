@@ -22,7 +22,7 @@ public class FollowThread extends ThreadCommand {
         body.put(THREAD_NAME, "asmakElRayes7amido");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "67890");
+        uriParams.put(ACTION_MAKER_ID, "33366");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -55,20 +55,30 @@ public class FollowThread extends ThreadCommand {
                 arango.createCollection(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
             }
 
-            final String edgeKey = userId + threadName;
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+                responseMessage = "This thread does not exist.";
+                return Responder.makeErrorResponse(responseMessage, 400).toString();
+            }
+
+//            final String edgeKey = userId + threadName;
+            final String followEdgeId = arango.getSingleEdgeId(arangoDB,
+                    DB_Name,
+                    USER_FOLLOW_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + userId,
+                    THREAD_COLLECTION_NAME + "/" + threadName);
 
             final BaseDocument threadDocument = arango.readDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName);
             int followerCount = (int) threadDocument.getAttribute(NUM_OF_FOLLOWERS_DB);
 
-            if (arango.documentExists(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, edgeKey)) {
+            if (!followEdgeId.equals("")) {
                 responseMessage = "You have unfollowed this Thread.";
-                arango.deleteDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, edgeKey);
+                arango.deleteDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, followEdgeId);
 
                 --followerCount;
             } else {
                 responseMessage = "You are now following this Thread!";
 
-                final BaseEdgeDocument userFollowsThreadEdge = addEdgeFromUserToThread(userId, threadName, edgeKey);
+                final BaseEdgeDocument userFollowsThreadEdge = addEdgeFromUserToThread(userId, threadName);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, userFollowsThreadEdge);
 
                 ++followerCount;

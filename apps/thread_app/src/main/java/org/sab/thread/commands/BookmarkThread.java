@@ -18,10 +18,10 @@ public class BookmarkThread extends ThreadCommand {
     public static void main(String[] args) {
         BookmarkThread bookmarkThread = new BookmarkThread();
         JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
+        body.put(THREAD_NAME, "GelatiAzza");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "67890");
+        uriParams.put(ACTION_MAKER_ID, "117690");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -54,14 +54,24 @@ public class BookmarkThread extends ThreadCommand {
                 arango.createCollection(arangoDB, DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, true);
             }
 
-            final String edgeKey = userId + threadName;
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+                responseMessage = "This thread does not exist.";
+                return Responder.makeErrorResponse(responseMessage, 400).toString();
+            }
 
-            if (arango.documentExists(arangoDB, DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, edgeKey)) {
+//            final String edgeKey = userId + threadName;
+            final String bookmarkEdgeId = arango.getSingleEdgeId(arangoDB,
+                                        DB_Name,
+                                        USER_BOOKMARK_THREAD_COLLECTION_NAME,
+                                        USER_COLLECTION_NAME + "/" + userId,
+                                        THREAD_COLLECTION_NAME + "/" + threadName);
+
+            if (!bookmarkEdgeId.equals("")) {
                 responseMessage = "You have removed this Thread from your bookmarks.";
-                arango.deleteDocument(arangoDB, DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, edgeKey);
+                arango.deleteDocument(arangoDB, DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, bookmarkEdgeId);
             } else {
                 responseMessage = "You have added this Thread to your bookmarks!";
-                final BaseEdgeDocument userBookmarkThreadEdge = addEdgeFromUserToThread(userId, threadName, edgeKey);
+                final BaseEdgeDocument userBookmarkThreadEdge = addEdgeFromUserToThread(userId, threadName);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, userBookmarkThreadEdge);
             }
         } catch (Exception e) {

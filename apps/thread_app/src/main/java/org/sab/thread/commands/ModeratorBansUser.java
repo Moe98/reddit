@@ -19,10 +19,10 @@ public class ModeratorBansUser extends ThreadCommand {
         ModeratorBansUser moderatorBansUser = new ModeratorBansUser();
         JSONObject body = new JSONObject();
         body.put(THREAD_NAME, "asmakElRayes7amido");
-        body.put(BANNED_USER_ID, "541");
+        body.put(BANNED_USER_ID, "117690");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "33366");
+        uriParams.put(ACTION_MAKER_ID, "32930");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -55,22 +55,41 @@ public class ModeratorBansUser extends ThreadCommand {
             if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             }
             if (!arango.collectionExists(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
             }
 
-            final String threadModeratorEdgeKey = userId + threadName;
-            final String bannedUserEdgeKey = bannedUserId + threadName;
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+                messageResponse = "This thread does not exist.";
+                return Responder.makeErrorResponse(messageResponse, 400).toString();
+            }
 
-            if (!arango.documentExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, threadModeratorEdgeKey)) {
+            // TODO what if this user is a mod??
+            if(!checkUserExists(arango, arangoDB, bannedUserId)){
+                messageResponse = "The user you are trying to ban does not exist.";
+                return Responder.makeErrorResponse(messageResponse, 400).toString();
+            }
+
+            final String threadModeratorEdgeKey =  arango.getSingleEdgeId(arangoDB,
+                    DB_Name,
+                    USER_MOD_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + userId,
+                    THREAD_COLLECTION_NAME + "/" + threadName);
+            final String bannedUserEdgeKey = arango.getSingleEdgeId(arangoDB,
+                    DB_Name,
+                    USER_BANNED_FROM_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + bannedUserId,
+                    THREAD_COLLECTION_NAME + "/" + threadName);
+
+            if (threadModeratorEdgeKey.equals("")) {
                 // User isn't a moderator of this thread.
                 messageResponse = "You are not a moderator of this thread.";
                 return Responder.makeErrorResponse(messageResponse, 401).toString();
             }
-            if (arango.documentExists(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, bannedUserEdgeKey)) {
+            if (!bannedUserEdgeKey.equals("")) {
                 // User is already banned from this thread.
                 messageResponse = "User is already banned from this thread.";
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
@@ -78,7 +97,7 @@ public class ModeratorBansUser extends ThreadCommand {
 
             // The request was made from a moderator of this thread, and the
             // user has not been banned yet from the thread.
-            final BaseEdgeDocument userBannedFromThreadEdge = addEdgeFromUserToThread(bannedUserId, threadName, bannedUserEdgeKey);
+            final BaseEdgeDocument userBannedFromThreadEdge = addEdgeFromUserToThread(bannedUserId, threadName);
             arango.createEdgeDocument(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, userBannedFromThreadEdge);
             messageResponse = "User has been successfully banned.";
         } catch (Exception e) {

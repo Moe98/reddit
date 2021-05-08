@@ -44,33 +44,47 @@ public class AssignThreadModerator extends ThreadCommand {
                 arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
             }
             if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, true);
+                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             }
 
-            // TODO check if assigner, mod and thread exist
-            // TODO check if assigner is the current mod
-            //  Can there be more than one mod?
+            // check if thread exists
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+                msg = "Thread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
 
-
-            String edgeKey = modId + threadId;
-
-            if (arango.documentExists(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, edgeKey)) {
-                msg = "User already moderates this thread";
+            // check if assigner is a moderator on this thread
+            String assignerModEdgeId = arango.getSingleEdgeId(arangoDB,
+                                                                DB_Name,
+                                                                USER_MOD_THREAD_COLLECTION_NAME,
+                                                                USER_COLLECTION_NAME + "/" + assignerId,
+                                                                THREAD_COLLECTION_NAME + "/" + threadId);
+            if(assignerModEdgeId.equals("")) {
+                // assigner is not a mod
+                msg = "You don't have permission to assign a moderator for this thread";
                 return Responder.makeErrorResponse(msg, 404).toString();
-                // TODO error
+            }
 
+            String moderatorModEdgeId = arango.getSingleEdgeId(arangoDB,
+                    DB_Name,
+                    USER_MOD_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + modId,
+                    THREAD_COLLECTION_NAME + "/" + threadId);
+
+            if (!moderatorModEdgeId.equals("")) {
+                msg = "User already moderates this thread";
+                return Responder.makeErrorResponse(msg, 400).toString();
 
             } else {
                 // bookmark
                 msg = "Assigned Moderator";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setKey(edgeKey);
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + modId);
                 edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + threadId);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_THREAD_MOD_COLLECTION_NAME, edgeDocument);
+                arango.createEdgeDocument(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
             }
 
