@@ -136,19 +136,19 @@ public class Arango {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
     }
 
-    public static String getSingleEdgeId(Arango arango, ArangoDB arangoDB, String DB_Name, String collectionName, String userId, String contentId){
+    public String getSingleEdgeId(ArangoDB arangoDB, String DB_Name, String collectionName, String fromNodeId, String toNodeId){
         String query = """
-                FOR content, edge IN 1..1 OUTBOUND @username @collectionName
-                    FILTER content._id == @contentId
+                FOR node, edge IN 1..1 OUTBOUND @fromNodeId @collectionName
+                    FILTER node._id == @toNodeId
                     RETURN DISTINCT {edgeId:edge._key}
                 """;
 
         Map<String, Object> bindVars =  new HashMap<>();
-        bindVars.put("username", userId);
-        bindVars.put("contentId", contentId);
+        bindVars.put("fromNodeId", fromNodeId);
+        bindVars.put("toNodeId", toNodeId);
         bindVars.put("collectionName", collectionName);
         // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-        ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, DB_Name, query, bindVars);
+        ArangoCursor<BaseDocument> cursor = query(arangoDB, DB_Name, query, bindVars);
         String edgeId = "";
         if (cursor.hasNext()) {
             edgeId = (String)cursor.next().getAttribute("edgeId");

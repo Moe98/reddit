@@ -46,9 +46,7 @@ public class DislikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
             }
 
-            // TODO check user exists
-            // TODO why not let it autogenerate a key?
-            String dislikeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+            String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
 
             // if user already dislikes the comment, then remove his dislike and update dislike count
             if(!dislikeEdgeId.equals("")){
@@ -80,7 +78,7 @@ public class DislikeComment extends CommentCommand{
                 // TODO why update likes?
                 int newLikes = (int) originalComment.getAttribute(LIKES_DB);
                 //checking if the user likes this content to remove his like
-                String likeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+                String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
                 if (!likeEdgeId.equals("")) {
                     arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
                     newLikes -= 1;

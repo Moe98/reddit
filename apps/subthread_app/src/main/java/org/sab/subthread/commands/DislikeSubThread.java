@@ -45,7 +45,7 @@ public class DislikeSubThread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             }
 
-            String dislikeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
+            String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
             System.out.println(dislikeEdgeId);
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if(!dislikeEdgeId.equals("")){
@@ -73,7 +73,7 @@ public class DislikeSubThread extends SubThreadCommand{
                 BaseDocument originalSubthread = arango.readDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 int newDislikes = (int) originalSubthread.getAttribute(DISLIKES_DB)+1;
                 int newLikes = (int) originalSubthread.getAttribute(LIKES_DB);
-                String likeEdgeId = arango.getSingleEdgeId(arango,arangoDB,DB_Name,USER_LIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
+                String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
                 //checking if the user likes this subthread to remove his like
                 if (!likeEdgeId.equals("")) {
                     arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
