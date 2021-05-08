@@ -15,15 +15,15 @@ import java.util.UUID;
 
 public class CreateDirectChat extends CommandWithVerification {
 
-    private DirectChatTable directChat;
+    private DirectChatTable directChatTable;
 
     public void getDirectChatTableInstance() {
-        if (directChat == null) {
+        if (directChatTable == null) {
             CassandraConnector cassandra = new CassandraConnector();
             cassandra.connect();
             cassandra.initializeKeySpace();
-            directChat = new DirectChatTable(cassandra);
-            directChat.createTable();
+            directChatTable = new DirectChatTable(cassandra);
+            directChatTable.createTable();
         }
     }
 
@@ -46,7 +46,7 @@ public class CreateDirectChat extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            UUID chatId = directChat.createDirectChat(firstMember, secondMember);
+            UUID chatId = directChatTable.createDirectChat(firstMember, secondMember);
 
             JSONObject responseBody = new JSONObject();
             responseBody.put("chatId", chatId.toString());

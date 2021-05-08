@@ -16,15 +16,15 @@ import java.util.UUID;
 
 public class CreateGroupChat extends CommandWithVerification {
 
-    private GroupChatTable groupChat;
+    private GroupChatTable groupChatTable;
 
     public void getGroupChatTableInstance() {
-        if (groupChat == null) {
+        if (groupChatTable == null) {
             CassandraConnector cassandra = new CassandraConnector();
             cassandra.connect();
             cassandra.initializeKeySpace();
-            groupChat = new GroupChatTable(cassandra);
-            groupChat.createTable();
+            groupChatTable = new GroupChatTable(cassandra);
+            groupChatTable.createTable();
         }
     }
 
@@ -49,7 +49,7 @@ public class CreateGroupChat extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            UUID chatId = groupChat.createGroupChat(creator, name, description);
+            UUID chatId = groupChatTable.createGroupChat(creator, name, description);
 
             JSONObject responseBody = new JSONObject();
             responseBody.put("chatId", chatId.toString());
