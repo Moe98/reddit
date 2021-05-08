@@ -15,9 +15,9 @@ public class Jwt {
     /**
      * The Secret used for signing the token.
      */
-    private static final String SECRET = "scaleabull";
+    private static final String SECRET =  System.getenv("JWT_SECRET");
 
-    private static final String ISSUER = "scaleabull";
+    private static final String ISSUER =  System.getenv("JWT_ISSUER");
 
     private static final Algorithm ALGORITHM = Algorithm.HMAC512(SECRET);
 
