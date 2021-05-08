@@ -1,13 +1,15 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.junit.*;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.functions.Auth;
 import org.sab.functions.Utilities;
 import org.sab.user.UserApp;
 
-import java.util.*;
+import java.util.Date;
 
 import static org.junit.Assert.*;
 
@@ -26,7 +28,7 @@ public class SignUpTest {
     }
 
     @BeforeClass
-    public static void connectToSql() {
+    public static void connectToDbs() {
         try {
             UserApp.dbInit();
         } catch (Exception e) {
@@ -52,29 +54,24 @@ public class SignUpTest {
     public void a_SignUpCreatesAnEntryInDB() {
 
         JSONObject body = new JSONObject();
+
         String email = username + "@gmail.com";
         String birthdate = "1997-12-14";
-
         body.put("username", username);
         body.put("password", password);
         body.put("email", email);
         body.put("birthdate", birthdate);
-        body.put("userId", UUID.randomUUID().toString());
 
         JSONObject request = makeRequest(body, "POST", new JSONObject());
         SignUp signUpCommand = new SignUp();
         JSONObject response = new JSONObject(signUpCommand.execute(request));
         System.out.println(response);
+
         assertEquals(200, response.getInt("statusCode"));
-        JSONObject data = null;
-        try {
-            data = response.getJSONObject("data");
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        JSONObject data = response.getJSONObject("data");
         assertEquals(data.getString("username"), username);
         assertEquals(data.getString("birthdate"), birthdate);
-
+        assertEquals(data.getString("email"), email);
 
     }
 
@@ -84,26 +81,22 @@ public class SignUpTest {
         JSONObject response = getUserRequest();
         System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
-        JSONObject data = null;
-        try {
-            data = response.getJSONObject("data");
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        JSONObject data = response.getJSONObject("data");
         assertEquals(data.getString("username"), username);
         assertTrue(Auth.verifyHash(password, data.getString("password")));
-
 
     }
 
     @Test
     public void c_updatePassword() {
 
+        String newPassword = "123456";
         JSONObject body = new JSONObject();
 
         body.put("username", username);
         body.put("newPassword", "123456");
         body.put("oldPassword", password);
+
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
         UpdatePassword updatePasswordCommand = new UpdatePassword();
 
@@ -111,6 +104,9 @@ public class SignUpTest {
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
+
+        JSONObject user = getUserRequest().getJSONObject("data");
+        assertTrue(Auth.verifyHash(newPassword, user.getString("password")));
     }
 
     @Test
@@ -159,20 +155,14 @@ public class SignUpTest {
         DeleteProfilePhoto deleteProfilePhotoCommand = new DeleteProfilePhoto();
 
         JSONObject response = new JSONObject(deleteProfilePhotoCommand.execute(request));
-        JSONObject userData = getUserRequest();
-        JSONObject data = null;
-        try {
-            data = userData.getJSONObject("data");
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        JSONObject user = getUserRequest().getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Profile Picture deleted successfully");
-        assertFalse(data.has("photo_url"));
+        assertFalse(user.has("photo_url"));
     }
 
     @Test
-    public void g_delete() {
+    public void g_deleteAccount() {
 
         JSONObject body = new JSONObject();
 
@@ -186,6 +176,9 @@ public class SignUpTest {
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Deleted Successfully!");
+
+        JSONObject getUserResponse = getUserRequest();
+        assertEquals(getUserResponse.getString("msg"), "User not found!");
     }
 
 
