@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.sab.service</groupId>
+    <groupId>org.sab</groupId>
     <artifactId>service</artifactId>
     <version>1.0-SNAPSHOT</version>
 
