@@ -42,6 +42,12 @@ public class Requester {
         return new JSONObject(new GetUser().execute(request));
     }
 
+    public static JSONObject viewAnotherProfile(String username) {
+        JSONObject uriParams = new JSONObject().put("username", username);
+        JSONObject request = makeRequest(null, "GET", uriParams);
+        return new JSONObject(new ViewAnotherProfile().execute(request));
+    }
+
     public static JSONObject updatePassword(String oldPassword, String newPassword) {
         JSONObject body = new JSONObject();
         body.put("oldPassword", oldPassword);

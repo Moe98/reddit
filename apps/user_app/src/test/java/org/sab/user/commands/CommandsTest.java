@@ -191,7 +191,17 @@ public class CommandsTest {
     }
 
     @Test
-    public void T12_deleteProfilePicture() {
+    public void T12_viewAnotherProfile() {
+
+        JSONObject response = Requester.viewAnotherProfile(username);
+        JSONObject user = Requester.getUser(username).getJSONObject("data");
+        assertEquals(200, response.getInt("statusCode"));
+        assertEquals(user.getString("username"), username);
+        assertTrue(user.has("photoUrl"));
+    }
+
+    @Test
+    public void T13_deleteProfilePicture() {
         if (!Utilities.isDevelopmentMode())
             return;
 
@@ -199,12 +209,12 @@ public class CommandsTest {
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Profile Picture deleted successfully");
-        assertFalse(user.has("photo_url"));
+        assertFalse(user.has("photoUrl"));
     }
 
 
     @Test
-    public void T13_deleteAccount() {
+    public void T14_deleteAccount() {
 
 
         JSONObject response = Requester.deleteAccount(password);
