@@ -27,6 +27,55 @@ public class UpdateRecommendedThreads extends Command {
     private Couchbase couchbase;
     private Cluster cluster;
 
+    public static String getQuery() {
+        return """
+                LET followed = (
+                    FOR thread, edge IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
+                        SORT edge.%s DESC
+                        RETURN thread
+                )
+                LET recommendations = (
+                    FOR thread IN followed
+                        LIMIT 5
+                        LET subRecommendation = (
+                            FOR result IN %s
+                                SEARCH ANALYZER(result.%s IN TOKENS(thread.%s, 'text_en'), 'text_en')
+                                SORT BM25(result) DESC
+                                LIMIT 5
+                                RETURN result
+                        )
+                        RETURN subRecommendation
+                )
+                LET uniqueRecommendations = (
+                    FOR thread IN FLATTEN(recommendations)
+                        FILTER thread NOT IN followed
+                        RETURN DISTINCT thread
+                )
+                LET mostPopular = (
+                    FOR thread IN %s
+                        SORT thread.%s DESC
+                        LIMIT 100
+                        RETURN thread
+                )
+                LET fill = (
+                    FOR thread IN mostPopular
+                        FILTER thread NOT IN followed AND thread NOT IN uniqueRecommendations
+                        SORT RAND()
+                        LIMIT 25
+                        RETURN thread
+                )
+                FOR thread IN SLICE(APPEND(uniqueRecommendations, fill), 0, 25)
+                    RETURN thread"""
+                .formatted(RecommendationApp.usersCollectionName,
+                        RecommendationApp.userFollowThreadCollectionName,
+                        RecommendationApp.userFollowThreadDate,
+                        RecommendationApp.getViewName(RecommendationApp.threadsCollectionName),
+                        RecommendationApp.threadDescription,
+                        RecommendationApp.threadDescription,
+                        RecommendationApp.threadsCollectionName,
+                        RecommendationApp.threadFollowers);
+    }
+
     @Override
     public String execute(JSONObject request) {
         JSONArray data = new JSONArray();
@@ -81,54 +130,5 @@ public class UpdateRecommendedThreads extends Command {
             }
         }
         return Responder.makeDataResponse(data).toString();
-    }
-
-    public static String getQuery() {
-        return """
-                LET followed = (
-                    FOR thread, edge IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
-                        SORT edge.%s DESC
-                        RETURN thread
-                )
-                LET recommendations = (
-                    FOR thread IN followed
-                        LIMIT 5
-                        LET subRecommendation = (
-                            FOR result IN %s
-                                SEARCH ANALYZER(result.%s IN TOKENS(thread.%s, 'text_en'), 'text_en')
-                                SORT BM25(result) DESC
-                                LIMIT 5
-                                RETURN result
-                        )
-                        RETURN subRecommendation
-                )
-                LET uniqueRecommendations = (
-                    FOR thread IN FLATTEN(recommendations)
-                        FILTER thread NOT IN followed
-                        RETURN DISTINCT thread
-                )
-                LET mostPopular = (
-                    FOR thread IN %s
-                        SORT thread.%s DESC
-                        LIMIT 100
-                        RETURN thread
-                )
-                LET fill = (
-                    FOR thread IN mostPopular
-                        FILTER thread NOT IN followed AND thread NOT IN uniqueRecommendations
-                        SORT RAND()
-                        LIMIT 25
-                        RETURN thread
-                )
-                FOR thread IN SLICE(APPEND(uniqueRecommendations, fill), 0, 25)
-                    RETURN thread"""
-                .formatted(RecommendationApp.usersCollectionName,
-                        RecommendationApp.userFollowThreadCollectionName,
-                        RecommendationApp.userFollowThreadDate,
-                        RecommendationApp.getViewName(RecommendationApp.threadsCollectionName),
-                        RecommendationApp.threadDescription,
-                        RecommendationApp.threadDescription,
-                        RecommendationApp.threadsCollectionName,
-                        RecommendationApp.threadFollowers);
     }
 }

@@ -6,24 +6,18 @@ import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.Cluster;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-import org.sab.service.Service;
 import org.sab.models.SubThread;
 import org.sab.models.Thread;
+import org.sab.service.Service;
 
 public class RecommendationApp extends Service {
-    private Arango arango;
-    private ArangoDB arangoDB;
-    private Couchbase couchbase;
-    private Cluster cluster;
     final public static String dbName = System.getenv("ARANGO_DB");
-
     final public static String threadsCollectionName = Thread.getCollectionName();
     final public static String threadName = Thread.getNameAttributeName();
     final public static String threadDescription = Thread.getDescriptionAttributeName();
     final public static String threadCreator = Thread.getCreatorAttributeName();
     final public static String threadFollowers = Thread.getNumOfFollowersAttributeName();
     final public static String threadDate = Thread.getDateCreatedAttributeName();
-
     final public static String subThreadsCollectionName = SubThread.getCollectionName();
     final public static String subThreadId = SubThread.getIdAttributeName();
     final public static String subThreadParentThread = SubThread.getParentThreadAttributeName();
@@ -34,14 +28,11 @@ public class RecommendationApp extends Service {
     final public static String subThreadContent = SubThread.getContentAttributeName();
     final public static String subThreadHasImage = SubThread.getHasImageAttributeName();
     final public static String subThreadDate = SubThread.getDateAttributeName();
-
     final public static String usersCollectionName = "Users";
-
     final public static String threadContainSubThreadCollectionName = "ThreadContainSubThread";
     final public static String userFollowUserCollectionName = "UserFollowUser";
     final public static String userFollowThreadCollectionName = "UserFollowThread";
     final public static String userFollowThreadDate = "Date";
-
     final public static int defaultRamQuota = 100;
     final public static String listingsBucketName = "Listings";
     final public static String listingsPopularThreadsKey = "popThreads";
@@ -52,6 +43,10 @@ public class RecommendationApp extends Service {
     final public static String subThreadsDataKey = "listOfSubThreads";
     final public static String threadsDataKey = "listOfThreads";
     final public static String usernamesDataKey = "listOfUsernames";
+    private Arango arango;
+    private ArangoDB arangoDB;
+    private Couchbase couchbase;
+    private Cluster cluster;
 
     @Override
     public String getAppUriName() {
@@ -83,10 +78,13 @@ public class RecommendationApp extends Service {
             couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
-
             arango.createDatabaseIfNotExists(arangoDB, dbName);
             arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, usersCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, threadContainSubThreadCollectionName, true);
+            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowUserCollectionName, true);
+            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowThreadCollectionName, true);
             arango.createViewIfNotExists(arangoDB, dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
             arango.createViewIfNotExists(arangoDB, dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
         } catch (ArangoDBException | CouchbaseException e) {

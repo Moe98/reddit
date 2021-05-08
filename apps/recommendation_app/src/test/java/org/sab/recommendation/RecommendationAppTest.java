@@ -11,12 +11,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
+import org.sab.models.SubThread;
+import org.sab.models.Thread;
 import org.sab.recommendation.commands.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +26,36 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 
 public class RecommendationAppTest {
+    final public static String dbName = System.getenv("ARANGO_DB");
+    final public static String threadsCollectionName = Thread.getCollectionName();
+    final public static String threadDescription = Thread.getDescriptionAttributeName();
+    final public static String threadCreator = Thread.getCreatorAttributeName();
+    final public static String threadFollowers = Thread.getNumOfFollowersAttributeName();
+    final public static String threadDate = Thread.getDateCreatedAttributeName();
+    final public static String subThreadsCollectionName = SubThread.getCollectionName();
+    final public static String subThreadParentThread = SubThread.getParentThreadAttributeName();
+    final public static String subThreadTitle = SubThread.getTitleAttributeName();
+    final public static String subThreadCreator = SubThread.getCreatorAttributeName();
+    final public static String subThreadLikes = SubThread.getLikesAttributeName();
+    final public static String subThreadDislikes = SubThread.getDislikesAttributeName();
+    final public static String subThreadContent = SubThread.getContentAttributeName();
+    final public static String subThreadHasImage = SubThread.getHasImageAttributeName();
+    final public static String subThreadDate = SubThread.getDateAttributeName();
+    final public static String usersCollectionName = "Users";
+    final public static String threadContainSubThreadCollectionName = "ThreadContainSubThread";
+    final public static String userFollowUserCollectionName = "UserFollowUser";
+    final public static String userFollowThreadCollectionName = "UserFollowThread";
+    final public static int defaultRamQuota = 100;
+    final public static String listingsBucketName = "Listings";
+    final public static String listingsPopularThreadsKey = "popThreads";
+    final public static String listingsPopularSubThreadsKey = "popSubThreads";
+    final public static String recommendedSubThreadsBucketName = "RecommendedSubThreads";
+    final public static String recommendedThreadsBucketName = "RecommendedThreads";
+    final public static String recommendedUsersBucketName = "RecommendedUsers";
     private static Arango arango;
     private static ArangoDB arangoDB;
+    private static Couchbase couchbase;
+    private static Cluster cluster;
     private static HashMap<String, ArrayList<String>> toBeDeleted;
     private static String[] subThreads;
     private static String[] threads;
@@ -37,123 +66,117 @@ public class RecommendationAppTest {
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
+            couchbase = Couchbase.getInstance();
+            cluster = couchbase.connect();
 
             toBeDeleted = new HashMap<>();
-            toBeDeleted.put("Users", new ArrayList<>());
-            toBeDeleted.put("Threads", new ArrayList<>());
-            toBeDeleted.put("SubThreads", new ArrayList<>());
-            toBeDeleted.put("UserFollowUser", new ArrayList<>());
-            toBeDeleted.put("UserFollowThread", new ArrayList<>());
-            toBeDeleted.put("ThreadContainSubThread", new ArrayList<>());
+            toBeDeleted.put(usersCollectionName, new ArrayList<>());
+            toBeDeleted.put(threadsCollectionName, new ArrayList<>());
+            toBeDeleted.put(subThreadsCollectionName, new ArrayList<>());
+            toBeDeleted.put(userFollowUserCollectionName, new ArrayList<>());
+            toBeDeleted.put(userFollowThreadCollectionName, new ArrayList<>());
+            toBeDeleted.put(threadContainSubThreadCollectionName, new ArrayList<>());
 
             // Dummy Data
             users = new String[10];
             threads = new String[]{"ComputersTEST98789", "PCPartsTEST98789", "MoviesTEST98789", "SeriesTEST98789"};
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
-            if (!arango.databaseExists(arangoDB, System.getenv("ARANGO_DB"))) {
-                arango.createDatabase(arangoDB, System.getenv("ARANGO_DB"));
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "Threads")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "Threads", false);
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "SubThreads")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "SubThreads", false);
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "Users")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "Users", false);
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", true);
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "UserFollowThread")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "UserFollowThread", true);
-            }
-            if (!arango.collectionExists(arangoDB, System.getenv("ARANGO_DB"), "ThreadContainSubThread")) {
-                arango.createCollection(arangoDB, System.getenv("ARANGO_DB"), "ThreadContainSubThread", true);
-            }
+
+            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
+            arango.createDatabaseIfNotExists(arangoDB, dbName);
+            arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, usersCollectionName, false);
+            arango.createCollectionIfNotExists(arangoDB, dbName, threadContainSubThreadCollectionName, true);
+            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowUserCollectionName, true);
+            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowThreadCollectionName, true);
+
             for (int i = 0; i < users.length; i++) {
-                if (arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i))
-                    arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", "user" + i);
+                if (arango.documentExists(arangoDB, dbName, usersCollectionName, "user" + i))
+                    arango.deleteDocument(arangoDB, dbName, usersCollectionName, "user" + i);
                 BaseDocument user = new BaseDocument();
                 user.setKey("user" + i);
-                arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "Users", user);
-                toBeDeleted.get("Users").add("user" + i);
+                arango.createDocument(arangoDB, dbName, usersCollectionName, user);
+                toBeDeleted.get(usersCollectionName).add("user" + i);
                 users[i] = "user" + i;
             }
             for (int i = 0; i < threads.length; i++) {
-                if (arango.documentExists(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]))
-                    arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), "Threads", threads[i]);
+                if (arango.documentExists(arangoDB, dbName, threadsCollectionName, threads[i]))
+                    arango.deleteDocument(arangoDB, dbName, threadsCollectionName, threads[i]);
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(threads[i]);
-                thread.addAttribute("Description", threadsDesc[i]);
-                thread.addAttribute("Creator", "hamada");
-                thread.addAttribute("NumOfFollowers", 1000000000 + i);
-                thread.addAttribute("DateCreated", Timestamp.valueOf(LocalDateTime.now()));
-                arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "Threads", thread);
-                toBeDeleted.get("Threads").add(threads[i]);
+                thread.addAttribute(threadDescription, threadsDesc[i]);
+                thread.addAttribute(threadCreator, "hamada");
+                thread.addAttribute(threadFollowers, 1000000000 + i);
+                thread.addAttribute(threadDate, Timestamp.valueOf(LocalDateTime.now()));
+                arango.createDocument(arangoDB, dbName, threadsCollectionName, thread);
+                toBeDeleted.get(threadsCollectionName).add(threads[i]);
             }
             for (int i = 0; i < 5; i++) {
                 BaseDocument subThread = new BaseDocument();
-                subThread.addAttribute("ParentThread", threads[0]);
-                subThread.addAttribute("Title", "title" + i);
-                subThread.addAttribute("Creator", "hamada");
-                subThread.addAttribute("Likes", 1000000000 + i);
-                subThread.addAttribute("Dislikes", 0);
-                subThread.addAttribute("Content", "content");
-                subThread.addAttribute("HasImage", false);
-                subThread.addAttribute("Time", Timestamp.valueOf(LocalDateTime.now()));
-                BaseDocument created1 = arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "SubThreads", subThread);
-                toBeDeleted.get("SubThreads").add(created1.getKey());
+                subThread.addAttribute(subThreadParentThread, threads[0]);
+                subThread.addAttribute(subThreadTitle, "title" + i);
+                subThread.addAttribute(subThreadCreator, "hamada");
+                subThread.addAttribute(subThreadLikes, 1000000000 + i);
+                subThread.addAttribute(subThreadDislikes, 0);
+                subThread.addAttribute(subThreadContent, "content");
+                subThread.addAttribute(subThreadHasImage, false);
+                subThread.addAttribute(subThreadDate, Timestamp.valueOf(LocalDateTime.now()));
+                BaseDocument created1 = arango.createDocument(arangoDB, dbName, subThreadsCollectionName, subThread);
+                toBeDeleted.get(subThreadsCollectionName).add(created1.getKey());
                 subThreads[i] = created1.getKey();
 
                 subThread = new BaseDocument();
-                subThread.addAttribute("ParentThread", threads[1]);
-                subThread.addAttribute("Title", "title" + i);
-                subThread.addAttribute("Creator", "hamada");
-                subThread.addAttribute("Likes", 1000000000 + i + 1);
-                subThread.addAttribute("Dislikes", 0);
-                subThread.addAttribute("Content", "content");
-                subThread.addAttribute("HasImage", false);
-                subThread.addAttribute("Time", Timestamp.valueOf(LocalDateTime.now()));
-                BaseDocument created2 = arango.createDocument(arangoDB, System.getenv("ARANGO_DB"), "SubThreads", subThread);
-                toBeDeleted.get("SubThreads").add(created2.getKey());
+                subThread.addAttribute(subThreadParentThread, threads[1]);
+                subThread.addAttribute(subThreadTitle, "title" + i);
+                subThread.addAttribute(subThreadCreator, "hamada");
+                subThread.addAttribute(subThreadLikes, 1000000000 + i + 1);
+                subThread.addAttribute(subThreadDislikes, 0);
+                subThread.addAttribute(subThreadContent, "content");
+                subThread.addAttribute(subThreadHasImage, false);
+                subThread.addAttribute(subThreadDate, Timestamp.valueOf(LocalDateTime.now()));
+                BaseDocument created2 = arango.createDocument(arangoDB, dbName, subThreadsCollectionName, subThread);
+                toBeDeleted.get(subThreadsCollectionName).add(created2.getKey());
                 subThreads[i + 5] = created2.getKey();
             }
             BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setFrom("Users/" + users[0]);
-            edgeDocument.setTo("Threads/" + threads[0]);
-            BaseEdgeDocument created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowThread", edgeDocument);
-            toBeDeleted.get("UserFollowThread").add(created.getKey());
+            edgeDocument.setFrom(usersCollectionName + "/" + users[0]);
+            edgeDocument.setTo(threadsCollectionName + "/" + threads[0]);
+            BaseEdgeDocument created = arango.createEdgeDocument(arangoDB, dbName, userFollowThreadCollectionName, edgeDocument);
+            toBeDeleted.get(userFollowThreadCollectionName).add(created.getKey());
             for (int i = 0; i < subThreads.length; i++) {
                 edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setTo("SubThreads/" + subThreads[i]);
+                edgeDocument.setTo(subThreadsCollectionName + "/" + subThreads[i]);
                 if (i < 5)
-                    edgeDocument.setFrom("Threads/" + threads[0]);
+                    edgeDocument.setFrom(threadsCollectionName + "/" + threads[0]);
                 else
-                    edgeDocument.setFrom("Threads/" + threads[1]);
-                created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "ThreadContainSubThread", edgeDocument);
-                toBeDeleted.get("ThreadContainSubThread").add(created.getKey());
+                    edgeDocument.setFrom(threadsCollectionName + "/" + threads[1]);
+                created = arango.createEdgeDocument(arangoDB, dbName, threadContainSubThreadCollectionName, edgeDocument);
+                toBeDeleted.get(threadContainSubThreadCollectionName).add(created.getKey());
             }
             for (int i = 0; i < 5; i++) {
                 edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setFrom("Users/" + users[0]);
-                edgeDocument.setTo("Users/" + users[i + 1]);
-                created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-                toBeDeleted.get("UserFollowUser").add(created.getKey());
+                edgeDocument.setFrom(usersCollectionName + "/" + users[0]);
+                edgeDocument.setTo(usersCollectionName + "/" + users[i + 1]);
+                created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+                toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
             }
             for (int i = 1; i < 5; i++) {
                 edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setFrom("Users/" + users[i]);
-                edgeDocument.setTo("Users/" + users[i + 5]);
-                created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-                toBeDeleted.get("UserFollowUser").add(created.getKey());
+                edgeDocument.setFrom(usersCollectionName + "/" + users[i]);
+                edgeDocument.setTo(usersCollectionName + "/" + users[i + 5]);
+                created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+                toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
             }
             edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setFrom("Users/" + users[1]);
-            edgeDocument.setTo("Users/" + users[users.length - 1]);
-            created = arango.createEdgeDocument(arangoDB, System.getenv("ARANGO_DB"), "UserFollowUser", edgeDocument);
-            toBeDeleted.get("UserFollowUser").add(created.getKey());
+            edgeDocument.setFrom(usersCollectionName + "/" + users[1]);
+            edgeDocument.setTo(usersCollectionName + "/" + users[users.length - 1]);
+            created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+            toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -161,19 +184,17 @@ public class RecommendationAppTest {
 
     @AfterClass
     public static void tearDown() {
-        Couchbase couchbase = Couchbase.getInstance();
-        Cluster cluster = couchbase.connect();
         try {
             toBeDeleted.forEach((key, value) -> {
                 for (String _key : value) {
-                    arango.deleteDocument(arangoDB, System.getenv("ARANGO_DB"), key, _key);
+                    arango.deleteDocument(arangoDB, dbName, key, _key);
                 }
             });
-            couchbase.deleteDocument(cluster, "RecommendedThreads", users[0]);
-            couchbase.deleteDocument(cluster, "Listings", "popThreads");
-            couchbase.deleteDocument(cluster, "Listings", "popSubThreads");
-            couchbase.deleteDocument(cluster, "RecommendedSubThreads", users[0]);
-            couchbase.deleteDocument(cluster, "RecommendedUsers", users[0]);
+            couchbase.deleteDocument(cluster, recommendedThreadsBucketName, users[0]);
+            couchbase.deleteDocument(cluster, listingsBucketName, listingsPopularThreadsKey);
+            couchbase.deleteDocument(cluster, listingsBucketName, listingsPopularSubThreadsKey);
+            couchbase.deleteDocument(cluster, recommendedSubThreadsBucketName, users[0]);
+            couchbase.deleteDocument(cluster, recommendedUsersBucketName, users[0]);
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
