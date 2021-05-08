@@ -3,12 +3,12 @@ package org.sab.user.commands;
 import org.json.JSONObject;
 import org.sab.functions.Auth;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -47,7 +47,7 @@ public class UpdatePassword extends UserCommand {
         try {
             newPassword = Auth.hash(newPassword);
             PostgresConnection.call("update_user_password", username, newPassword);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 

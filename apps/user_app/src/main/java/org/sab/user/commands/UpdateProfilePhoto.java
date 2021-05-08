@@ -2,7 +2,6 @@ package org.sab.user.commands;
 
 import org.sab.functions.CloudUtilities;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -41,7 +40,7 @@ public class UpdateProfilePhoto extends UserCommand {
         // getting the user
         try {
             getUser(username);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
@@ -57,7 +56,7 @@ public class UpdateProfilePhoto extends UserCommand {
         //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("update_profile_picture", username, photoUrl);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 

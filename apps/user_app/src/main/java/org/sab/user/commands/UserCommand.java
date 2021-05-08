@@ -5,8 +5,8 @@ import org.json.JSONObject;
 import org.sab.functions.Auth;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +30,7 @@ public abstract class UserCommand extends CommandWithVerification {
 
             String hashedPassword = user.getPassword();
             checkPassword = Auth.verifyHash(password, hashedPassword);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return new JSONObject().put("msg", e.getMessage()).put("statusCode", 502);
         }
         if (!checkPassword) {
@@ -39,7 +39,7 @@ public abstract class UserCommand extends CommandWithVerification {
         return new JSONObject().put("msg", "User Authentication successful!").put("statusCode", 200);
     }
 
-    protected User getUser(String username, String... userAttributes) throws SQLException, PropertiesNotLoadedException {
+    protected User getUser(String username, String... userAttributes) throws SQLException, EnvironmentVariableNotLoaded {
         ResultSet resultSet = PostgresConnection.call("get_user", username);
         if (resultSet == null || !resultSet.next()) {
             throw new SQLException("User not found!");

@@ -1,7 +1,7 @@
 package org.sab.postgres;
 
 import org.junit.Test;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -20,7 +20,7 @@ public class PostgresConnectionTest {
             assertTrue(rs.next());
             assertEquals(1, rs.getInt(1));
             assertFalse(rs.next());
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (SQLException | EnvironmentVariableNotLoaded e) {
             fail(e.getMessage());
         }
     }
@@ -31,13 +31,13 @@ public class PostgresConnectionTest {
     }
 
     @Test
-    public void postgresIsSingleton()  {
+    public void postgresIsSingleton() {
         PostgresConnection conn1 = null;
         PostgresConnection conn2 = null;
         try {
             conn1 = PostgresConnection.getInstance();
             conn2 = PostgresConnection.getInstance();
-        } catch (PropertiesNotLoadedException e) {
+        } catch (EnvironmentVariableNotLoaded e) {
             fail(e.getMessage());
         }
         assertTrue(conn1 == conn2);
@@ -48,13 +48,17 @@ public class PostgresConnectionTest {
         PostgresConnection postgresConnection = null;
         try {
             postgresConnection = PostgresConnection.getInstance();
-        } catch (PropertiesNotLoadedException e) {
+        } catch (EnvironmentVariableNotLoaded e) {
             fail(e.getMessage());
         }
-        Connection conn = postgresConnection.connect();
-        postgresConnection.closeConnection(conn);
-    }
+        try {
+            Connection connection = postgresConnection.connect();
+            connection.close();
+        } catch (SQLException e) {
+            fail(e.getMessage());
+        }
 
+    }
 
 
 }
