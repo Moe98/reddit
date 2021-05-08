@@ -31,7 +31,7 @@ public class PostgresConnectionTest {
     }
 
     @Test
-    public void postgresIsSingleton()  {
+    public void postgresIsSingleton() {
         PostgresConnection conn1 = null;
         PostgresConnection conn2 = null;
         try {
@@ -51,10 +51,14 @@ public class PostgresConnectionTest {
         } catch (PropertiesNotLoadedException e) {
             fail(e.getMessage());
         }
-        Connection conn = postgresConnection.connect();
-        postgresConnection.closeConnection(conn);
-    }
+        try {
+            Connection connection = postgresConnection.connect();
+            connection.close();
+        } catch (SQLException e) {
+            fail(e.getMessage());
+        }
 
+    }
 
 
 }

@@ -1,12 +1,12 @@
 package org.sab.postgres;
 
 
-import org.json.simple.parser.ParseException;
 import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
-
 import java.util.Properties;
 
 
@@ -15,7 +15,6 @@ public class PostgresConnection {
 
     private String url;
     private Properties props;
-    private Connection conn;
     private final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
 
     private PostgresConnection() {
@@ -24,17 +23,14 @@ public class PostgresConnection {
     public static PostgresConnection getInstance() throws PropertiesNotLoadedException {
         if (instance == null) {
             final PostgresConnection attemptedConnection = new PostgresConnection();
-            try {
-                attemptedConnection.loadProperties();
-                instance = attemptedConnection;
-            } catch (IOException | ParseException e) {
-                throw new PropertiesNotLoadedException(e);
-            }
+            attemptedConnection.loadProperties();
+            instance = attemptedConnection;
+
         }
         return instance;
     }
 
-    private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
+    private void loadProperties() throws PropertiesNotLoadedException {
         props = new Properties();
 
         for (String param : propertiesParams)
@@ -50,23 +46,10 @@ public class PostgresConnection {
                         System.getenv("POSTGRES_DB"));
     }
 
-    public Connection connect() {
-        try {
-            conn = DriverManager.getConnection(url, props);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-        return conn;
+    public Connection connect() throws SQLException {
+        return DriverManager.getConnection(url, props);
     }
 
-    public void closeConnection(Connection c) {
-        try {
-            c.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
 
     public static String procedureInitializer(String procedureName, int numParams) {
         StringBuilder ans = new StringBuilder("{").append("call");
@@ -85,10 +68,10 @@ public class PostgresConnection {
         Connection connection = postgresConnection.connect();
         try {
             ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, params);
-            postgresConnection.closeConnection(connection);
+            connection.close();
             return resultSet;
         } catch (SQLException exception) {
-            postgresConnection.closeConnection(connection);
+            connection.close();
             throw exception;
         }
     }
