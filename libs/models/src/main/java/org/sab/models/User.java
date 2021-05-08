@@ -65,7 +65,7 @@ public class User {
                 "userId='" + userId + '\'' +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", photo_url='" + photoUrl + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
                 ", birthdate='" + birthdate + '\'' +
                 ", email='" + email + '\'' +
                 '}';
@@ -76,7 +76,7 @@ public class User {
         user.put("username",username);
         user.put("birthdate",birthdate);
         user.put("email",email);
-        user.put("photo_url",photoUrl);
+        user.put("photoUrl",photoUrl);
         user.put("password",password);
         return user;
     }
