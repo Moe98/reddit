@@ -76,15 +76,15 @@ public class BlockUser extends UserToUserCommand {
     }
 
     public static void main(String[] args) {
-        LikeComment lc = new LikeComment();
+        BlockUser lc = new BlockUser();
 //        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
 
 
         JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "21289");
+        body.put(USER_ID, "Moe");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "asdafsda");
+        uriParams.put(ACTION_MAKER_ID, "Manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
