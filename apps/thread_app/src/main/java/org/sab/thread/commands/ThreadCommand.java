@@ -26,7 +26,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String DB_Name = "ARANGO_DB";
     protected static final String THREAD_COLLECTION_NAME = "Thread";
     protected static final String USER_COLLECTION_NAME = "User";
-    protected static final String USER_THREAD_MOD_COLLECTION_NAME = "UserThreadMod";
+    protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";
     protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = "UserFollowThread";
     protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = "UserBookmarkThread";
     protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = "UserBannedFromThread";
