@@ -6,7 +6,13 @@ import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThread;
 import org.sab.models.Thread;
+import org.sab.recommendation.commands.UpdatePopularSubThreads;
+import org.sab.recommendation.commands.UpdatePopularThreads;
 import org.sab.service.Service;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RecommendationApp extends Service {
     final public static String dbName = System.getenv("ARANGO_DB");
@@ -87,6 +93,13 @@ public class RecommendationApp extends Service {
     }
 
     public static void main(String[] args) {
+        Runnable periodicTasks = () -> {
+            new UpdatePopularThreads().execute(null);
+            new UpdatePopularSubThreads().execute(null);
+        };
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(periodicTasks, 0, 15, TimeUnit.MINUTES);
         dbInit();
         new RecommendationApp().start();
     }
