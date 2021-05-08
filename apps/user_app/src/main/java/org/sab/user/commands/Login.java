@@ -38,9 +38,9 @@ public class Login extends UserCommand {
             return userAuth.toString();
         // Add token parameters
         HashMap<String, String> claims = new HashMap<String, String>();
-        claims.put("username", USERNAME);
+        claims.put(USERNAME, username);
         // Generate Authentication headers
-        String token = Jwt.generateToken(claims, 1);
+        String token = Jwt.generateToken(claims, 60);
 
         return makeJwtResponse("Login Successful!", token);
     }

@@ -12,6 +12,7 @@ import java.util.List;
 public class GetUser extends UserCommand {
     @Override
     protected String execute() {
+        System.out.println(authenticationParams.toString());
         Boolean authenticated = authenticationParams.getBoolean(Authenticated);
         if(!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);

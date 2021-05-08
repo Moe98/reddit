@@ -17,10 +17,9 @@ public class UpdatePassword extends UserCommand {
 
 
     protected Schema getSchema() {
-        Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute oldPassword = new Attribute(OLD_PASSWORD, DataType.PASSWORD, true);
         Attribute newPassword = new Attribute(NEW_PASSWORD, DataType.PASSWORD, true);
-        return new Schema(List.of(username, oldPassword, newPassword));
+        return new Schema(List.of(oldPassword, newPassword));
     }
 
     @Override
@@ -30,9 +29,12 @@ public class UpdatePassword extends UserCommand {
 
     @Override
     protected String execute() {
+        Boolean authenticated = authenticationParams.getBoolean(Authenticated);
+        if(!authenticated)
+            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
         // retrieving the body objects
-        String username = body.getString(USERNAME);
+        String username = authenticationParams.getString(USERNAME);
         String oldPassword = body.getString(OLD_PASSWORD);
         String newPassword = body.getString(NEW_PASSWORD);
 

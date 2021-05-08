@@ -17,9 +17,8 @@ import java.util.List;
 public class UpdateProfilePhoto extends UserCommand {
     @Override
     protected Schema getSchema() {
-        Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute photoUrl = new Attribute(PHOTO_URL, DataType.STRING, true);
-        return new Schema(List.of(username, photoUrl));
+        return new Schema(List.of(photoUrl));
     }
 
     @Override
@@ -34,7 +33,7 @@ public class UpdateProfilePhoto extends UserCommand {
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
         // retrieving the body objects
-        String username = body.getString(USERNAME);
+        String username = authenticationParams.getString(USERNAME);
         String photoUrl = body.getString(PHOTO_URL);
 
         // getting the user

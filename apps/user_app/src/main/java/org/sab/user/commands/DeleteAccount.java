@@ -24,10 +24,8 @@ public class DeleteAccount extends UserCommand {
 
 
     protected Schema getSchema() {
-
-        Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute password = new Attribute(PASSWORD, DataType.PASSWORD, true);
-        return new Schema(List.of(username, password));
+        return new Schema(List.of(password));
     }
 
     @Override
@@ -42,8 +40,7 @@ public class DeleteAccount extends UserCommand {
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
         // retrieving the body objects
-
-        String username = body.getString(USERNAME);
+        String username = authenticationParams.getString(USERNAME);
         String password = body.getString(PASSWORD);
 
         // Authentication
