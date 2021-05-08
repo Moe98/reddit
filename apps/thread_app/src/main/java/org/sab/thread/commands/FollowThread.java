@@ -74,7 +74,7 @@ public class FollowThread extends ThreadCommand {
                 ++followerCount;
             }
 
-            threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, ++followerCount);
+            threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
 
             arango.updateDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
         } catch (Exception e) {
