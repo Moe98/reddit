@@ -32,24 +32,24 @@ public class SearchSubThread extends Command {
                     FOR result IN %s
                          SEARCH ANALYZER(result.%s IN TOKENS(@keywords, "text_en") OR result.%s IN TOKENS(@keywords, "text_en"), "text_en")
                          RETURN result"""
-                    .formatted(SearchApp.getViewName(SearchApp.subThreadsCollectionName),
-                            SearchApp.subThreadTitle,
-                            SearchApp.subThreadContent);
+                    .formatted(SearchApp.getViewName(SearchApp.SUB_THREADS_COLLECTION_NAME),
+                            SearchApp.SUB_THREAD_TITLE,
+                            SearchApp.SUB_THREAD_CONTENT);
             Map<String, Object> bindVars = Collections.singletonMap("keywords", searchKeywords);
-            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.DB_NAME, query, bindVars);
 
             JSONArray data = new JSONArray();
             cursor.forEachRemaining(document -> {
                 JSONObject subThread = new JSONObject();
-                subThread.put(SearchApp.subThreadId, document.getKey());
-                subThread.put(SearchApp.subThreadParentThread, document.getProperties().get(SearchApp.subThreadParentThread));
-                subThread.put(SearchApp.subThreadTitle, document.getProperties().get(SearchApp.subThreadTitle));
-                subThread.put(SearchApp.subThreadCreator, document.getProperties().get(SearchApp.subThreadCreator));
-                subThread.put(SearchApp.subThreadLikes, document.getProperties().get(SearchApp.subThreadLikes));
-                subThread.put(SearchApp.subThreadDislikes, document.getProperties().get(SearchApp.subThreadDislikes));
-                subThread.put(SearchApp.subThreadContent, document.getProperties().get(SearchApp.subThreadContent));
-                subThread.put(SearchApp.subThreadHasImage, document.getProperties().get(SearchApp.subThreadHasImage));
-                subThread.put(SearchApp.subThreadTime, document.getProperties().get(SearchApp.subThreadTime));
+                subThread.put(SearchApp.SUB_THREAD_ID, document.getKey());
+                subThread.put(SearchApp.SUB_THREAD_PARENT_THREAD, document.getProperties().get(SearchApp.SUB_THREAD_PARENT_THREAD));
+                subThread.put(SearchApp.SUB_THREAD_TITLE, document.getProperties().get(SearchApp.SUB_THREAD_TITLE));
+                subThread.put(SearchApp.SUB_THREAD_CREATOR, document.getProperties().get(SearchApp.SUB_THREAD_CREATOR));
+                subThread.put(SearchApp.SUB_THREAD_LIKES, document.getProperties().get(SearchApp.SUB_THREAD_LIKES));
+                subThread.put(SearchApp.SUB_THREAD_DISLIKES, document.getProperties().get(SearchApp.SUB_THREAD_DISLIKES));
+                subThread.put(SearchApp.SUB_THREAD_CONTENT, document.getProperties().get(SearchApp.SUB_THREAD_CONTENT));
+                subThread.put(SearchApp.SUB_THREAD_HAS_IMAGE, document.getProperties().get(SearchApp.SUB_THREAD_HAS_IMAGE));
+                subThread.put(SearchApp.SUB_THREAD_DATE, document.getProperties().get(SearchApp.SUB_THREAD_DATE));
                 data.put(subThread);
             });
             return Responder.makeDataResponse(data).toString();

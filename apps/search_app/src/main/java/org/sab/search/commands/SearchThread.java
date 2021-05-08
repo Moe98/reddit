@@ -32,20 +32,20 @@ public class SearchThread extends Command {
                     FOR result IN %s
                          SEARCH ANALYZER(STARTS_WITH(result.%s, LOWER(LTRIM(@keyword))) OR PHRASE(result.%s, @keyword), "text_en")
                          RETURN result"""
-                    .formatted(SearchApp.getViewName(SearchApp.threadsCollectionName),
-                            SearchApp.threadName,
-                            SearchApp.threadName);
+                    .formatted(SearchApp.getViewName(SearchApp.THREADS_COLLECTION_NAME),
+                            SearchApp.THREAD_NAME,
+                            SearchApp.THREAD_NAME);
             Map<String, Object> bindVars = Collections.singletonMap("keyword", searchKeyword);
-            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.DB_NAME, query, bindVars);
 
             JSONArray data = new JSONArray();
             cursor.forEachRemaining(document -> {
                 JSONObject thread = new JSONObject();
-                thread.put(SearchApp.threadName, document.getKey());
-                thread.put(SearchApp.threadDescription, document.getProperties().get(SearchApp.threadDescription));
-                thread.put(SearchApp.threadCreator, document.getProperties().get(SearchApp.threadCreator));
-                thread.put(SearchApp.threadFollowers, document.getProperties().get(SearchApp.threadFollowers));
-                thread.put(SearchApp.threadDate, document.getProperties().get(SearchApp.threadDate));
+                thread.put(SearchApp.THREAD_NAME, document.getKey());
+                thread.put(SearchApp.THREAD_DESCRIPTION, document.getProperties().get(SearchApp.THREAD_DESCRIPTION));
+                thread.put(SearchApp.THREAD_CREATOR, document.getProperties().get(SearchApp.THREAD_CREATOR));
+                thread.put(SearchApp.THREAD_FOLLOWERS, document.getProperties().get(SearchApp.THREAD_FOLLOWERS));
+                thread.put(SearchApp.THREAD_DATE, document.getProperties().get(SearchApp.THREAD_DATE));
                 data.put(thread);
             });
             return Responder.makeDataResponse(data).toString();

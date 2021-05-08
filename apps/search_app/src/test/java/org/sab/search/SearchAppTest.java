@@ -21,11 +21,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class SearchAppTest {
-    final private static String dbName = System.getenv("ARANGO_DB");
-    final private static String threadsCollectionName = SearchApp.threadsCollectionName;
-    final private static String subThreadsCollectionName = SearchApp.subThreadsCollectionName;
-    private static Arango arango;
-    private static HashMap<String, ArrayList<String>> toBeDeleted;
+    static String dbName = System.getenv("ARANGO_DB");
+    static String threadsCollectionName = SearchApp.THREADS_COLLECTION_NAME;
+    static String subThreadsCollectionName = SearchApp.SUB_THREADS_COLLECTION_NAME;
+    static Arango arango;
+    static HashMap<String, ArrayList<String>> toBeDeleted;
 
     @BeforeClass
     public static void setUp() {
