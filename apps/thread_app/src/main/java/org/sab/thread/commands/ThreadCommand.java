@@ -1,10 +1,14 @@
 package org.sab.thread.commands;
 
+import com.arangodb.ArangoDB;
+import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.sab.arango.Arango;
 import org.sab.models.ThreadAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class ThreadCommand extends CommandWithVerification {
+    // thread attributes
     protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
     protected static final String DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
     protected static final String CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
@@ -21,6 +25,10 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
+
+    // user attributes
+    // TODO get from enum
+    protected static final String IS_DELETED_DB = "IsDeleted";
 
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
@@ -46,5 +54,18 @@ public abstract class ThreadCommand extends CommandWithVerification {
         edgeDocument.setKey(key);
 
         return edgeDocument;
+    }
+
+    protected final boolean checkUserExists(Arango arango, ArangoDB arangoDB, String userId) {
+        boolean userExists;
+        if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
+            userExists = false;
+        } else {
+            // TODO change to query
+            BaseDocument res = arango.readDocument(arangoDB, DB_Name, USER_COLLECTION_NAME, userId);
+            boolean isDeleted = (Boolean)res.getAttribute(IS_DELETED_DB);
+            userExists = !isDeleted;
+        }
+        return userExists;
     }
 }
