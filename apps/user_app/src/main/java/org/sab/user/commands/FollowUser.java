@@ -57,21 +57,22 @@ public class FollowUser extends UserToUserCommand {
             }
 
             if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
-                responseMessage = "User does not exist.";
+                responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             final String actionMakerBlockedUser = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
+            // TODO: If user can unfollow a user they blocked, then delete this condition.
             if (actionMakerBlockedUser.length() != 0) {
-                responseMessage = "You cannot interact with this user as you have blocked them.";
+                responseMessage = ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             final String userBlockedActionMaker = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
 
             if (userBlockedActionMaker.length() != 0) {
-                responseMessage = "You cannot interact with this user as they have blocked you.";
+                responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
@@ -80,7 +81,7 @@ public class FollowUser extends UserToUserCommand {
             final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
 
             if (isDeleted) {
-                responseMessage = "User has deleted their account.";
+                responseMessage = USER_DELETED_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
@@ -88,12 +89,12 @@ public class FollowUser extends UserToUserCommand {
             int followerCount = Integer.parseInt(String.valueOf(userDocument.getAttribute(NUM_OF_FOLLOWERS_DB)));
 
             if (edgeKey.length() != 0) {
-                responseMessage = "You have unfollowed this User.";
+                responseMessage = SUCCESSFULLY_UNFOLLOWED_USER;
                 arango.deleteDocument(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
                 --followerCount;
 
             } else {
-                responseMessage = "You are now following this User!";
+                responseMessage = SUCCESSFULLY_FOLLOWED_USER;
 
                 final BaseEdgeDocument userFollowsUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, userFollowsUserEdge);

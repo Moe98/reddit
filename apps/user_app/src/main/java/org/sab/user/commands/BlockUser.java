@@ -62,13 +62,13 @@ public class BlockUser extends UserToUserCommand {
             }
 
             if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
-                responseMessage = "User does not exist.";
+                responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             String actionMakerBlockedEdge = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
             if (actionMakerBlockedEdge.length() != 0) {
-                responseMessage = "You cannot interact with this user as they have blocked you.";
+                responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
@@ -77,17 +77,17 @@ public class BlockUser extends UserToUserCommand {
             final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
 
             if (isDeleted) {
-                responseMessage = "User has deleted their account.";
+                responseMessage = USER_DELETED_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             String blockEdgeId = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             if (blockEdgeId.length() != 0) {
-                responseMessage = "You have unblocked this User.";
+                responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
                 arango.deleteDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
             } else {
-                responseMessage = "You have blocked this user.";
+                responseMessage = USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
 
                 final BaseEdgeDocument userBlockUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
