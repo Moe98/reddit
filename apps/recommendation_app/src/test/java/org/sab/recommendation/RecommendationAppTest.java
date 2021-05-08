@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 public class RecommendationAppTest {
     final public static String dbName = System.getenv("ARANGO_DB");
     final public static String threadsCollectionName = Thread.getCollectionName();
+    final public static String threadName = Thread.getNameAttributeName();
     final public static String threadDescription = Thread.getDescriptionAttributeName();
     final public static String threadCreator = Thread.getCreatorAttributeName();
     final public static String threadFollowers = Thread.getNumOfFollowersAttributeName();
@@ -94,6 +95,8 @@ public class RecommendationAppTest {
             arango.createCollectionIfNotExists(arangoDB, dbName, threadContainSubThreadCollectionName, true);
             arango.createCollectionIfNotExists(arangoDB, dbName, userFollowUserCollectionName, true);
             arango.createCollectionIfNotExists(arangoDB, dbName, userFollowThreadCollectionName, true);
+            arango.createViewIfNotExists(arangoDB, dbName, RecommendationApp.getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
+            arango.createViewIfNotExists(arangoDB, dbName, RecommendationApp.getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
 
             for (int i = 0; i < users.length; i++) {
                 if (arango.documentExists(arangoDB, dbName, usersCollectionName, "user" + i))
@@ -223,7 +226,6 @@ public class RecommendationAppTest {
     public void GetRecommendedSubThreads() {
         new UpdateRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
         JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
-        assertEquals("ff", responseJson.getString("msg"));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
     }
@@ -232,7 +234,6 @@ public class RecommendationAppTest {
     public void GetRecommendedThreads() {
         new UpdateRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
         JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
-        assertEquals("ff", responseJson.getString("msg"));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
