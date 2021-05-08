@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
-import org.sab.chat.storage.tables.DirectChatTable;
+
 
 import java.util.List;
 import java.util.UUID;

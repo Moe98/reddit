@@ -47,10 +47,16 @@ public class ClientManager {
             case "CreateDirectChat":
                 createDirectChat((String) messageJson.get("first_member"), (String) messageJson.get("second_member"));
                 break;
-            default: //CreateDirectMessage
+            case "CreateDirectMessage":
                 createDirectMessage((String) messageJson.get("chatId"), (String) messageJson.get("sender_id"), (String) messageJson.get("content"));
                 break;
+            default:
+                handleNonsupportedType(ctx);
         }
+    }
+
+    public static void handleNonsupportedType(ChannelHandlerContext ctx){
+        System.out.println("non supported type");
     }
 
     public static void authenticate(String userName, ChannelHandlerContext ctx) {
