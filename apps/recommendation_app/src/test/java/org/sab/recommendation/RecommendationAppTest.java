@@ -83,10 +83,10 @@ public class RecommendationAppTest {
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
 
-//            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
-//            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
-//            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
             arango.createDatabaseIfNotExists(arangoDB, dbName);
             arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
