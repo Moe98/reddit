@@ -7,13 +7,13 @@ import org.sab.arango.Arango;
 import org.sab.functions.Auth;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.user.UserApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -52,7 +52,7 @@ public class SignUp extends UserCommand {
         // Calling the create_user SQL procedure
         try {
             PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
@@ -67,7 +67,7 @@ public class SignUp extends UserCommand {
         try {
             User user = getUser(username, USER_ID, USERNAME, EMAIL, BIRTHDATE);
             return Responder.makeDataResponse(user.toJSON());
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 

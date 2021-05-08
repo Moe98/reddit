@@ -1,14 +1,13 @@
 package org.sab.postgres;
 
 
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Properties;
-
 
 public class PostgresConnection {
     private static PostgresConnection instance = null;
@@ -20,7 +19,8 @@ public class PostgresConnection {
     private PostgresConnection() {
     }
 
-    public static PostgresConnection getInstance() throws PropertiesNotLoadedException {
+
+    public static PostgresConnection getInstance() throws EnvironmentVariableNotLoaded {
         if (instance == null) {
             final PostgresConnection attemptedConnection = new PostgresConnection();
             attemptedConnection.loadProperties();
@@ -30,12 +30,12 @@ public class PostgresConnection {
         return instance;
     }
 
-    private void loadProperties() throws PropertiesNotLoadedException {
+    private void loadProperties() throws EnvironmentVariableNotLoaded {
         props = new Properties();
 
         for (String param : propertiesParams)
             if (System.getenv(param) == null)
-                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
+                throw new EnvironmentVariableNotLoaded(param);
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
@@ -62,7 +62,7 @@ public class PostgresConnection {
 
     }
 
-    public static ResultSet call(String procedureName, Object... params) throws SQLException, PropertiesNotLoadedException {
+    public static ResultSet call(String procedureName, Object... params) throws SQLException, EnvironmentVariableNotLoaded {
 
         PostgresConnection postgresConnection = getInstance();
         Connection connection = postgresConnection.connect();

@@ -7,7 +7,6 @@ import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.user.UserApp;
@@ -51,9 +50,10 @@ public class DeleteAccount extends UserCommand {
         //calling the delete SQL procedure
         try {
             PostgresConnection.call("delete_user", username);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
+
         try {
             deleteFromArango(username);
         } catch (ArangoDBException e) {

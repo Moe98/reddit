@@ -3,7 +3,6 @@ package org.sab.user.commands;
 import org.sab.functions.CloudUtilities;
 import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -38,7 +37,7 @@ public class DeleteProfilePhoto extends UserCommand {
             if (user.getPhotoUrl() == null)
                 return Responder.makeMsgResponse("You don't have a profile picture, you can't delete your avatar!");
 
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
@@ -52,7 +51,7 @@ public class DeleteProfilePhoto extends UserCommand {
         //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("delete_profile_picture", username);
-        } catch (PropertiesNotLoadedException | SQLException e) {
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 

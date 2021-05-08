@@ -1,10 +1,10 @@
 package org.sab.user.commands;
 
 import org.sab.models.User;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,7 +18,7 @@ public class GetUser extends UserCommand {
         try {
             User user = getUser(username, USERNAME, PASSWORD, EMAIL, BIRTHDATE, PHOTO_URL, USER_ID);
             return Responder.makeDataResponse(user.toJSON());
-        } catch (SQLException | PropertiesNotLoadedException e) {
+        } catch (SQLException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 500);
         }
     }
