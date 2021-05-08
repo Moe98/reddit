@@ -61,7 +61,7 @@ public class DislikeComment extends CommentCommand{
                 BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 // TODO make this thread safe
                 //  I feel like this var is unnecessary to begin with
-                int newDisikes =  (int)originalComment.getAttribute(DISLIKES_DB)-1;
+                int newDisikes =  Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)))-1;
                 originalComment.updateAttribute(DISLIKES_DB,newDisikes);
                 // putting the comment with the updated amount of dislikes
                 arango.updateDocument(arangoDB,DB_Name,COMMENT_COLLECTION_NAME,originalComment,commentId);
@@ -80,9 +80,9 @@ public class DislikeComment extends CommentCommand{
 
                 // retrieving the original comment with the old amount of likes
                 BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                int newDislikes = (int) originalComment.getAttribute(DISLIKES_DB)+1;
+                int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)))+1;
                 // TODO why update likes?
-                int newLikes = (int) originalComment.getAttribute(LIKES_DB);
+                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB)));
                 //checking if the user likes this content to remove his like
                 String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
                 if (!likeEdgeId.equals("")) {

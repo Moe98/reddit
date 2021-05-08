@@ -71,7 +71,7 @@ public class CreateThread extends ThreadCommand {
             thread.setDescription((String) res.getAttribute(DESCRIPTION_DB));
             thread.setCreatorId((String) res.getAttribute(CREATOR_ID_DB));
             thread.setDateCreated((String) res.getAttribute(DATE_CREATED_DB));
-            thread.setNumOfFollowers(Integer.parseInt(res.getAttribute(NUM_OF_FOLLOWERS_DB).toString()));
+            thread.setNumOfFollowers(Integer.parseInt(String.valueOf(res.getAttribute(NUM_OF_FOLLOWERS_DB))));
 
             // assign creator to be mod
             BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
