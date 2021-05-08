@@ -38,7 +38,7 @@ public class CreateDirectChat extends CommandWithVerification {
 
     @Override
     public String execute() {
-       
+
         UUID firstMember = UUID.fromString((String) body.get("firstMember"));
         UUID secondMember = UUID.fromString((String) body.get("secondMember"));
 
@@ -46,15 +46,21 @@ public class CreateDirectChat extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            directChat.createDirectChat(firstMember, secondMember);
+            UUID chatId = directChat.createDirectChat(firstMember, secondMember);
+
+            JSONObject responseBody = new JSONObject();
+            responseBody.put("chatId", chatId.toString());
+
             response.put("statusCode", 200);
-            response.put("msg", "Direct Chat Created");
+            response.put("msg", "Group Chat Created");
+            response.put("data", responseBody);
+
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);
             response.put("msg", e.getMessage());
-        } finally {
-            return response.toString();
         }
+        return response.toString();
+
 
     }
 
