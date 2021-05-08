@@ -65,7 +65,8 @@ public class RecommendationAppTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
@@ -200,7 +201,6 @@ public class RecommendationAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
-            arango.disconnect();
             couchbase.disconnect(cluster);
         }
     }

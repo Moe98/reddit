@@ -27,7 +27,8 @@ public class UpdatePopularThreads extends Command {
         JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
 
             String query = """
                     FOR thread IN %s
@@ -50,9 +51,6 @@ public class UpdatePopularThreads extends Command {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            if (arango != null)
-                arango.disconnect();
         }
 
         if (data.length() != 0) {

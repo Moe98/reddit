@@ -18,7 +18,8 @@ public class SearchThreadCommand {
     public void execute() {
         try {
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
 
             if(!arango.viewExists(System.getenv("ARANGO_DB"), "ThreadsView")){
                 arango.createView(System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"Description"});
@@ -46,8 +47,6 @@ public class SearchThreadCommand {
                 System.out.println("No results found");
         } catch (ArangoDBException e) {
             System.err.println("Failed to execute query. " + e.getMessage());
-        } finally {
-            arango.disconnect();
         }
     }
 

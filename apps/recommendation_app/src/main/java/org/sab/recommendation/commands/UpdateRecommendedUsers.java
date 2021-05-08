@@ -36,7 +36,8 @@ public class UpdateRecommendedUsers extends Command {
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
 //          First, we acquire the followed users. Based on the acquired results, we acquire the
 //          users which followed users follow, Then, these users are filtered and sorted according to
 //          a score that is based on the number of the followers of these users that the main user follow.
@@ -66,9 +67,6 @@ public class UpdateRecommendedUsers extends Command {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            if (arango != null)
-                arango.disconnect();
         }
 
         if (data.length() != 0) {

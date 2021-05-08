@@ -69,7 +69,8 @@ public class RecommendationApp extends Service {
     private void dbInit() {
         try {
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
@@ -89,8 +90,6 @@ public class RecommendationApp extends Service {
         } catch (ArangoDBException | CouchbaseException e) {
             e.printStackTrace();
         } finally {
-            if (arango != null)
-                arango.disconnect();
             if (couchbase != null)
                 couchbase.disconnect(cluster);
         }

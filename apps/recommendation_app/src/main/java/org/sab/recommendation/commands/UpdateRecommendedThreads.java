@@ -88,7 +88,8 @@ public class UpdateRecommendedThreads extends Command {
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
             arango = Arango.getInstance();
-            arango.connect();
+            if (!arango.isConnected())
+                arango.connect();
 
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
             ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, getQuery(), bindVars);
@@ -108,9 +109,6 @@ public class UpdateRecommendedThreads extends Command {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            if (arango != null)
-                arango.disconnect();
         }
 
         if (data.length() != 0) {
