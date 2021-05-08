@@ -24,7 +24,6 @@ import static org.junit.Assert.*;
 public class RecommendationAppTest {
     final public static String dbName = RecommendationApp.dbName;
     final public static String threadsCollectionName = RecommendationApp.threadsCollectionName;
-    final public static String threadName = RecommendationApp.threadName;
     final public static String threadDescription = RecommendationApp.threadDescription;
     final public static String threadCreator = RecommendationApp.threadCreator;
     final public static String threadFollowers = RecommendationApp.threadFollowers;
@@ -42,7 +41,6 @@ public class RecommendationAppTest {
     final public static String threadContainSubThreadCollectionName = RecommendationApp.threadContainSubThreadCollectionName;
     final public static String userFollowUserCollectionName = RecommendationApp.userFollowUserCollectionName;
     final public static String userFollowThreadCollectionName = RecommendationApp.userFollowThreadCollectionName;
-    final public static int defaultRamQuota = RecommendationApp.defaultRamQuota;
     final public static String listingsBucketName = RecommendationApp.listingsBucketName;
     final public static String listingsPopularThreadsKey = RecommendationApp.listingsPopularThreadsKey;
     final public static String listingsPopularSubThreadsKey = RecommendationApp.listingsPopularSubThreadsKey;
