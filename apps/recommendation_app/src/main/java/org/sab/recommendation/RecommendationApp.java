@@ -61,7 +61,7 @@ public class RecommendationApp extends Service {
         return collectionName + "View";
     }
 
-    private void dbInit() {
+    public static void dbInit() {
         try {
             Arango arango = Arango.getInstance();
             arango.connectIfNotConnected();
@@ -87,8 +87,7 @@ public class RecommendationApp extends Service {
     }
 
     public static void main(String[] args) {
-        RecommendationApp app = new RecommendationApp();
-        app.dbInit();
-        app.start();
+        dbInit();
+        new RecommendationApp().start();
     }
 }

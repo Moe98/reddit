@@ -78,19 +78,7 @@ public class RecommendationAppTest {
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
 
-            couchbase.createBucketIfNotExists(listingsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(recommendedSubThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(recommendedThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(recommendedUsersBucketName, defaultRamQuota);
-            arango.createDatabaseIfNotExists(dbName);
-            arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
-            arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
-            arango.createCollectionIfNotExists(dbName, usersCollectionName, false);
-            arango.createCollectionIfNotExists(dbName, threadContainSubThreadCollectionName, true);
-            arango.createCollectionIfNotExists(dbName, userFollowUserCollectionName, true);
-            arango.createCollectionIfNotExists(dbName, userFollowThreadCollectionName, true);
-            arango.createViewIfNotExists(dbName, RecommendationApp.getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
-            arango.createViewIfNotExists(dbName, RecommendationApp.getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
+            RecommendationApp.dbInit();
 
             for (int i = 0; i < users.length; i++) {
                 if (arango.documentExists(dbName, usersCollectionName, "user" + i))
