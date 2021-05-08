@@ -1,7 +1,6 @@
 package org.sab.couchbase;
 
 import com.couchbase.client.core.error.CouchbaseException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryResult;
 import org.junit.*;

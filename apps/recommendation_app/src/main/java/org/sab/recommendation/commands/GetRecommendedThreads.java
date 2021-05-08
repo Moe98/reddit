@@ -3,7 +3,6 @@ package org.sab.recommendation.commands;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,8 +13,6 @@ import org.sab.service.Command;
 import org.sab.service.Responder;
 
 public class GetRecommendedThreads extends Command {
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String execute(JSONObject request) {
@@ -24,9 +21,8 @@ public class GetRecommendedThreads extends Command {
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
-            couchbase = Couchbase.getInstance();
-            if (!couchbase.isConnected())
-                couchbase.connect();
+            Couchbase couchbase = Couchbase.getInstance();
+            couchbase.connectIfNotConnected();
 
             JsonArray result = couchbase.getDocument(RecommendationApp.recommendedThreadsBucketName, username).getArray(RecommendationApp.threadsDataKey);
             try {

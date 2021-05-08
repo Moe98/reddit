@@ -1,12 +1,10 @@
 package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
@@ -18,17 +16,13 @@ import org.sab.service.Command;
 import org.sab.service.Responder;
 
 public class UpdatePopularThreads extends Command {
-    private Arango arango;
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String execute(JSONObject request) {
         JSONArray data = new JSONArray();
         try {
-            arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             String query = """
                     FOR thread IN %s
@@ -55,9 +49,8 @@ public class UpdatePopularThreads extends Command {
 
         if (data.length() != 0) {
             try {
-                couchbase = Couchbase.getInstance();
-                if (!couchbase.isConnected())
-                    couchbase.connect();
+                Couchbase couchbase = Couchbase.getInstance();
+                couchbase.connectIfNotConnected();
 
                 JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
                 couchbase.upsertDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularThreadsKey, couchbaseData);

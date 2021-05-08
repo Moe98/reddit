@@ -1,18 +1,14 @@
 package org.sab.recommendation;
 
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import com.couchbase.client.java.Cluster;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-import org.sab.models.SubThread;
-import org.sab.models.Thread;
 import org.sab.recommendation.commands.*;
 
 import java.io.IOException;
@@ -26,36 +22,35 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 
 public class RecommendationAppTest {
-    final public static String dbName = System.getenv("ARANGO_DB");
-    final public static String threadsCollectionName = Thread.getCollectionName();
-    final public static String threadName = Thread.getNameAttributeName();
-    final public static String threadDescription = Thread.getDescriptionAttributeName();
-    final public static String threadCreator = Thread.getCreatorAttributeName();
-    final public static String threadFollowers = Thread.getNumOfFollowersAttributeName();
-    final public static String threadDate = Thread.getDateCreatedAttributeName();
-    final public static String subThreadsCollectionName = SubThread.getCollectionName();
-    final public static String subThreadParentThread = SubThread.getParentThreadAttributeName();
-    final public static String subThreadTitle = SubThread.getTitleAttributeName();
-    final public static String subThreadCreator = SubThread.getCreatorAttributeName();
-    final public static String subThreadLikes = SubThread.getLikesAttributeName();
-    final public static String subThreadDislikes = SubThread.getDislikesAttributeName();
-    final public static String subThreadContent = SubThread.getContentAttributeName();
-    final public static String subThreadHasImage = SubThread.getHasImageAttributeName();
-    final public static String subThreadDate = SubThread.getDateAttributeName();
-    final public static String usersCollectionName = "Users";
-    final public static String threadContainSubThreadCollectionName = "ThreadContainSubThread";
-    final public static String userFollowUserCollectionName = "UserFollowUser";
-    final public static String userFollowThreadCollectionName = "UserFollowThread";
-    final public static int defaultRamQuota = 100;
-    final public static String listingsBucketName = "Listings";
-    final public static String listingsPopularThreadsKey = "popThreads";
-    final public static String listingsPopularSubThreadsKey = "popSubThreads";
-    final public static String recommendedSubThreadsBucketName = "RecommendedSubThreads";
-    final public static String recommendedThreadsBucketName = "RecommendedThreads";
-    final public static String recommendedUsersBucketName = "RecommendedUsers";
+    final public static String dbName = RecommendationApp.dbName;
+    final public static String threadsCollectionName = RecommendationApp.threadsCollectionName;
+    final public static String threadName = RecommendationApp.threadName;
+    final public static String threadDescription = RecommendationApp.threadDescription;
+    final public static String threadCreator = RecommendationApp.threadCreator;
+    final public static String threadFollowers = RecommendationApp.threadFollowers;
+    final public static String threadDate = RecommendationApp.threadDate;
+    final public static String subThreadsCollectionName = RecommendationApp.subThreadsCollectionName;
+    final public static String subThreadParentThread = RecommendationApp.subThreadParentThread;
+    final public static String subThreadTitle = RecommendationApp.subThreadTitle;
+    final public static String subThreadCreator = RecommendationApp.subThreadCreator;
+    final public static String subThreadLikes = RecommendationApp.subThreadLikes;
+    final public static String subThreadDislikes = RecommendationApp.subThreadDislikes;
+    final public static String subThreadContent = RecommendationApp.subThreadContent;
+    final public static String subThreadHasImage = RecommendationApp.subThreadHasImage;
+    final public static String subThreadDate = RecommendationApp.subThreadDate;
+    final public static String usersCollectionName = RecommendationApp.usersCollectionName;
+    final public static String threadContainSubThreadCollectionName = RecommendationApp.threadContainSubThreadCollectionName;
+    final public static String userFollowUserCollectionName = RecommendationApp.userFollowUserCollectionName;
+    final public static String userFollowThreadCollectionName = RecommendationApp.userFollowThreadCollectionName;
+    final public static int defaultRamQuota = RecommendationApp.defaultRamQuota;
+    final public static String listingsBucketName = RecommendationApp.listingsBucketName;
+    final public static String listingsPopularThreadsKey = RecommendationApp.listingsPopularThreadsKey;
+    final public static String listingsPopularSubThreadsKey = RecommendationApp.listingsPopularSubThreadsKey;
+    final public static String recommendedSubThreadsBucketName = RecommendationApp.recommendedSubThreadsBucketName;
+    final public static String recommendedThreadsBucketName = RecommendationApp.recommendedThreadsBucketName;
+    final public static String recommendedUsersBucketName = RecommendationApp.recommendedUsersBucketName;
     private static Arango arango;
     private static Couchbase couchbase;
-    private static Cluster cluster;
     private static HashMap<String, ArrayList<String>> toBeDeleted;
     private static String[] subThreads;
     private static String[] threads;
@@ -65,11 +60,9 @@ public class RecommendationAppTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
+            arango.connectIfNotConnected();
             couchbase = Couchbase.getInstance();
-            if (!couchbase.isConnected())
-                couchbase.connect();
+            couchbase.connectIfNotConnected();
 
             toBeDeleted = new HashMap<>();
             toBeDeleted.put(usersCollectionName, new ArrayList<>());
@@ -201,6 +194,9 @@ public class RecommendationAppTest {
             couchbase.deleteDocument(recommendedUsersBucketName, users[0]);
         } catch (Exception e) {
             fail(e.getMessage());
+        } finally {
+            arango.disconnect();
+            couchbase.disconnect();
         }
     }
 

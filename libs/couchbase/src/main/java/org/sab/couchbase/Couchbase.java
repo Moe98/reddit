@@ -1,10 +1,7 @@
 package org.sab.couchbase;
 
-import com.couchbase.client.core.diagnostics.ClusterState;
 import com.couchbase.client.core.diagnostics.PingState;
-import com.couchbase.client.core.service.ServiceType;
 import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.diagnostics.PingOptions;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
@@ -13,7 +10,6 @@ import com.couchbase.client.java.query.QueryResult;
 import com.couchbase.client.java.query.QueryScanConsistency;
 
 import java.time.Duration;
-import java.util.EnumSet;
 
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
@@ -42,6 +38,11 @@ public class Couchbase {
             return false;
         cluster.waitUntilReady(Duration.ofSeconds(3));
         return cluster.ping().endpoints().values().stream().anyMatch(a -> a.stream().anyMatch(b -> b.state() == PingState.OK));
+    }
+
+    public void connectIfNotConnected() {
+        if (!isConnected())
+            connect();
     }
 
     public void disconnect() {

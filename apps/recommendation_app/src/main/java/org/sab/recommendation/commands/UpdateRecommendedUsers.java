@@ -1,12 +1,10 @@
 package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
@@ -22,9 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class UpdateRecommendedUsers extends Command {
-    private Arango arango;
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String execute(JSONObject request) {
@@ -35,9 +30,9 @@ public class UpdateRecommendedUsers extends Command {
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
-            arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
 //          First, we acquire the followed users. Based on the acquired results, we acquire the
 //          users which followed users follow, Then, these users are filtered and sorted according to
 //          a score that is based on the number of the followers of these users that the main user follow.
@@ -71,9 +66,8 @@ public class UpdateRecommendedUsers extends Command {
 
         if (data.length() != 0) {
             try {
-                couchbase = Couchbase.getInstance();
-                if (!couchbase.isConnected())
-                    couchbase.connect();
+                Couchbase couchbase = Couchbase.getInstance();
+                couchbase.connectIfNotConnected();
 
                 JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.usernamesDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
                 couchbase.upsertDocument(RecommendationApp.recommendedUsersBucketName, username, couchbaseData);

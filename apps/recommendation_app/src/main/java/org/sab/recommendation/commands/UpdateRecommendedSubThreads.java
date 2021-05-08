@@ -1,12 +1,10 @@
 package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
@@ -22,9 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class UpdateRecommendedSubThreads extends Command {
-    private Arango arango;
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String execute(JSONObject request) {
@@ -35,11 +30,13 @@ public class UpdateRecommendedSubThreads extends Command {
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
-            arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
-//          First, we acquire a random sample of the followed sub-threads,
-//          then, we acquire a sample of the sub-threads that are recommended for the user to follow
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
+            // Recommended SubThreads are fetched by 2 ways combined together:
+            // 1st, trending SubThreads (5) from a random sample of followed Threads (5).
+            // 2nd, trending SubThreads (5) from a random sample of recommended Threads (5).
+            // Returning a total of up to (50) recommended SubThreads per fetch.
             String query = """
                     LET followedSample = (
                         FOR thread IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
@@ -121,9 +118,8 @@ public class UpdateRecommendedSubThreads extends Command {
 
         if (data.length() != 0) {
             try {
-                couchbase = Couchbase.getInstance();
-                if (!couchbase.isConnected())
-                    couchbase.connect();
+                Couchbase couchbase = Couchbase.getInstance();
+                couchbase.connectIfNotConnected();
 
                 JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.subThreadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
                 couchbase.upsertDocument(RecommendationApp.recommendedSubThreadsBucketName, username, couchbaseData);

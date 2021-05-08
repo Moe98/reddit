@@ -1,7 +1,6 @@
 package org.sab.arango;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.fasterxml.jackson.databind.node.ObjectNode;

@@ -1,9 +1,7 @@
 package org.sab.recommendation;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.couchbase.client.core.error.CouchbaseException;
-import com.couchbase.client.java.Cluster;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThread;
@@ -43,9 +41,6 @@ public class RecommendationApp extends Service {
     final public static String subThreadsDataKey = "listOfSubThreads";
     final public static String threadsDataKey = "listOfThreads";
     final public static String usernamesDataKey = "listOfUsernames";
-    private Arango arango;
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String getAppUriName() {
@@ -68,12 +63,10 @@ public class RecommendationApp extends Service {
 
     private void dbInit() {
         try {
-            arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
-            couchbase = Couchbase.getInstance();
-            if (!couchbase.isConnected())
-                couchbase.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+            Couchbase couchbase = Couchbase.getInstance();
+            couchbase.connectIfNotConnected();
 
             couchbase.createBucketIfNotExists(listingsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(recommendedSubThreadsBucketName, defaultRamQuota);

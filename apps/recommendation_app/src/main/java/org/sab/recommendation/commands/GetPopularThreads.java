@@ -3,7 +3,6 @@ package org.sab.recommendation.commands;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,15 +13,12 @@ import org.sab.service.Command;
 import org.sab.service.Responder;
 
 public class GetPopularThreads extends Command {
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     @Override
     public String execute(JSONObject request) {
         try {
-            couchbase = Couchbase.getInstance();
-            if (!couchbase.isConnected())
-                couchbase.connect();
+            Couchbase couchbase = Couchbase.getInstance();
+            couchbase.connectIfNotConnected();
 
             JsonArray result = couchbase.getDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularThreadsKey).getArray(RecommendationApp.threadsDataKey);
             return Responder.makeDataResponse(new JSONArray(result.toString())).toString();

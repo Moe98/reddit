@@ -1,12 +1,10 @@
 package org.sab.recommendation.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.error.TimeoutException;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JacksonTransformers;
 import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONArray;
@@ -22,14 +20,13 @@ import java.util.Collections;
 import java.util.Map;
 
 public class UpdateRecommendedThreads extends Command {
-    private Arango arango;
-    private Couchbase couchbase;
-    private Cluster cluster;
 
     public static String getQuery() {
-//      First, we acquire the followed users. Next, we acquire recommended threads based on
-//      the acquired users. Then, these recommendations are filtered according to uniqueness
-//      and popularity. Finally, the acquired results are formatted according to the database.
+        // Recommended Threads are fetched by 2 ways, where the 2nd way acts as a filler in-case the 1st way returns
+        // in sufficient number of recommendations:
+        // 1st, similar (using BM25 Ranking Function) Threads (5) to the latest Threads (5) that the User has followed.
+        // 2nd, random popular Threads (25-1stWay(N)).
+        // Returning up to 25 total recommended Threads.
         return """
                 LET followed = (
                     FOR thread, edge IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
@@ -87,9 +84,8 @@ public class UpdateRecommendedThreads extends Command {
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
-            arango = Arango.getInstance();
-            if (!arango.isConnected())
-                arango.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
             ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, getQuery(), bindVars);
@@ -113,9 +109,8 @@ public class UpdateRecommendedThreads extends Command {
 
         if (data.length() != 0) {
             try {
-                couchbase = Couchbase.getInstance();
-                if (!couchbase.isConnected())
-                    couchbase.connect();
+                Couchbase couchbase = Couchbase.getInstance();
+                couchbase.connectIfNotConnected();
 
                 JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
                 couchbase.upsertDocument(RecommendationApp.recommendedThreadsBucketName, username, couchbaseData);

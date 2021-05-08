@@ -1,7 +1,11 @@
 package org.sab.arango;
 
-import com.arangodb.*;
-import com.arangodb.entity.*;
+import com.arangodb.ArangoCursor;
+import com.arangodb.ArangoDB;
+import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.BaseEdgeDocument;
+import com.arangodb.entity.CollectionType;
+import com.arangodb.entity.ViewEntity;
 import com.arangodb.entity.arangosearch.CollectionLink;
 import com.arangodb.entity.arangosearch.FieldLink;
 import com.arangodb.mapping.ArangoJack;
@@ -15,7 +19,6 @@ import java.util.Map;
 public class Arango {
     final private static Arango instance = new Arango();
     private static ArangoDB.Builder builder;
-
     private ArangoDB arangoDB;
 
     private Arango() {
@@ -41,6 +44,11 @@ public class Arango {
 
     public boolean isConnected() {
         return arangoDB != null && arangoDB.db().exists();
+    }
+
+    public void connectIfNotConnected() {
+        if (!isConnected())
+            connect();
     }
 
     public void disconnect() {
