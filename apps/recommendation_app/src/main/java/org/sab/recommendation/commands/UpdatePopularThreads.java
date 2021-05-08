@@ -19,7 +19,6 @@ import org.sab.service.Responder;
 
 public class UpdatePopularThreads extends Command {
     private Arango arango;
-    private ArangoDB arangoDB;
     private Couchbase couchbase;
     private Cluster cluster;
 
@@ -28,7 +27,7 @@ public class UpdatePopularThreads extends Command {
         JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
 
             String query = """
                     FOR thread IN %s
@@ -36,7 +35,7 @@ public class UpdatePopularThreads extends Command {
                         LIMIT 100
                         RETURN thread"""
                     .formatted(RecommendationApp.threadsCollectionName, RecommendationApp.threadFollowers);
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, query, null);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, null);
 
             cursor.forEachRemaining(document -> {
                 JSONObject thread = new JSONObject();
@@ -53,7 +52,7 @@ public class UpdatePopularThreads extends Command {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
             if (arango != null)
-                arango.disconnect(arangoDB);
+                arango.disconnect();
         }
 
         if (data.length() != 0) {

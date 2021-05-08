@@ -14,15 +14,14 @@ import java.util.Map;
 public class SearchThreadCommand {
     protected HashMap<String, String> parameters;
     private Arango arango;
-    private ArangoDB arangoDB;
 
     public void execute() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
 
-            if(!arangoDB.db(System.getenv("ARANGO_DB")).view("ThreadsView").exists()){
-                arango.createView(arangoDB, System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"Description"});
+            if(!arango.viewExists(System.getenv("ARANGO_DB"), "ThreadsView")){
+                arango.createView(System.getenv("ARANGO_DB"), "ThreadsView", "Threads", new String[] {"Description"});
             }
 
             String query = "" +
@@ -30,7 +29,7 @@ public class SearchThreadCommand {
                     "    SEARCH PHRASE(result.Description, @words, \"text_en\")\n" +
                     "    RETURN result";
             Map<String, Object> bindVars = Collections.singletonMap("words", parameters.get("searchText"));
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(System.getenv("ARANGO_DB"), query, bindVars);
 
             Thread thread = new Thread();
             if(cursor.hasNext()) {
@@ -48,7 +47,7 @@ public class SearchThreadCommand {
         } catch (ArangoDBException e) {
             System.err.println("Failed to execute query. " + e.getMessage());
         } finally {
-            arango.disconnect(arangoDB);
+            arango.disconnect();
         }
     }
 

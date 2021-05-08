@@ -23,7 +23,6 @@ import java.util.Map;
 
 public class UpdateRecommendedSubThreads extends Command {
     private Arango arango;
-    private ArangoDB arangoDB;
     private Couchbase couchbase;
     private Cluster cluster;
 
@@ -37,7 +36,7 @@ public class UpdateRecommendedSubThreads extends Command {
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
 //          First, we acquire a random sample of the followed sub-threads,
 //          then, we acquire a sample of the sub-threads that are recommended for the user to follow
             String query = """
@@ -96,7 +95,7 @@ public class UpdateRecommendedSubThreads extends Command {
                                     RecommendationApp.subThreadLikes,
                                     RecommendationApp.subThreadDislikes);
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, bindVars);
 
             cursor.forEachRemaining(document -> {
                 JSONObject subThread = new JSONObject();
@@ -119,7 +118,7 @@ public class UpdateRecommendedSubThreads extends Command {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
             if (arango != null)
-                arango.disconnect(arangoDB);
+                arango.disconnect();
         }
 
         if (data.length() != 0) {

@@ -53,7 +53,6 @@ public class RecommendationAppTest {
     final public static String recommendedThreadsBucketName = "RecommendedThreads";
     final public static String recommendedUsersBucketName = "RecommendedUsers";
     private static Arango arango;
-    private static ArangoDB arangoDB;
     private static Couchbase couchbase;
     private static Cluster cluster;
     private static HashMap<String, ArrayList<String>> toBeDeleted;
@@ -65,7 +64,7 @@ public class RecommendationAppTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
@@ -87,33 +86,33 @@ public class RecommendationAppTest {
             couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
-            arango.createDatabaseIfNotExists(arangoDB, dbName);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, usersCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadContainSubThreadCollectionName, true);
-            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowUserCollectionName, true);
-            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowThreadCollectionName, true);
+            arango.createDatabaseIfNotExists(dbName);
+            arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, usersCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, threadContainSubThreadCollectionName, true);
+            arango.createCollectionIfNotExists(dbName, userFollowUserCollectionName, true);
+            arango.createCollectionIfNotExists(dbName, userFollowThreadCollectionName, true);
 
             for (int i = 0; i < users.length; i++) {
-                if (arango.documentExists(arangoDB, dbName, usersCollectionName, "user" + i))
-                    arango.deleteDocument(arangoDB, dbName, usersCollectionName, "user" + i);
+                if (arango.documentExists(dbName, usersCollectionName, "user" + i))
+                    arango.deleteDocument(dbName, usersCollectionName, "user" + i);
                 BaseDocument user = new BaseDocument();
                 user.setKey("user" + i);
-                arango.createDocument(arangoDB, dbName, usersCollectionName, user);
+                arango.createDocument(dbName, usersCollectionName, user);
                 toBeDeleted.get(usersCollectionName).add("user" + i);
                 users[i] = "user" + i;
             }
             for (int i = 0; i < threads.length; i++) {
-                if (arango.documentExists(arangoDB, dbName, threadsCollectionName, threads[i]))
-                    arango.deleteDocument(arangoDB, dbName, threadsCollectionName, threads[i]);
+                if (arango.documentExists(dbName, threadsCollectionName, threads[i]))
+                    arango.deleteDocument(dbName, threadsCollectionName, threads[i]);
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(threads[i]);
                 thread.addAttribute(threadDescription, threadsDesc[i]);
                 thread.addAttribute(threadCreator, "hamada");
                 thread.addAttribute(threadFollowers, 1000000000 + i);
                 thread.addAttribute(threadDate, Timestamp.valueOf(LocalDateTime.now()));
-                arango.createDocument(arangoDB, dbName, threadsCollectionName, thread);
+                arango.createDocument(dbName, threadsCollectionName, thread);
                 toBeDeleted.get(threadsCollectionName).add(threads[i]);
             }
             for (int i = 0; i < 5; i++) {
@@ -126,7 +125,7 @@ public class RecommendationAppTest {
                 subThread.addAttribute(subThreadContent, "content");
                 subThread.addAttribute(subThreadHasImage, false);
                 subThread.addAttribute(subThreadDate, Timestamp.valueOf(LocalDateTime.now()));
-                BaseDocument created1 = arango.createDocument(arangoDB, dbName, subThreadsCollectionName, subThread);
+                BaseDocument created1 = arango.createDocument(dbName, subThreadsCollectionName, subThread);
                 toBeDeleted.get(subThreadsCollectionName).add(created1.getKey());
                 subThreads[i] = created1.getKey();
 
@@ -139,14 +138,14 @@ public class RecommendationAppTest {
                 subThread.addAttribute(subThreadContent, "content");
                 subThread.addAttribute(subThreadHasImage, false);
                 subThread.addAttribute(subThreadDate, Timestamp.valueOf(LocalDateTime.now()));
-                BaseDocument created2 = arango.createDocument(arangoDB, dbName, subThreadsCollectionName, subThread);
+                BaseDocument created2 = arango.createDocument(dbName, subThreadsCollectionName, subThread);
                 toBeDeleted.get(subThreadsCollectionName).add(created2.getKey());
                 subThreads[i + 5] = created2.getKey();
             }
             BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
             edgeDocument.setFrom(usersCollectionName + "/" + users[0]);
             edgeDocument.setTo(threadsCollectionName + "/" + threads[0]);
-            BaseEdgeDocument created = arango.createEdgeDocument(arangoDB, dbName, userFollowThreadCollectionName, edgeDocument);
+            BaseEdgeDocument created = arango.createEdgeDocument(dbName, userFollowThreadCollectionName, edgeDocument);
             toBeDeleted.get(userFollowThreadCollectionName).add(created.getKey());
             for (int i = 0; i < subThreads.length; i++) {
                 edgeDocument = new BaseEdgeDocument();
@@ -155,27 +154,27 @@ public class RecommendationAppTest {
                     edgeDocument.setFrom(threadsCollectionName + "/" + threads[0]);
                 else
                     edgeDocument.setFrom(threadsCollectionName + "/" + threads[1]);
-                created = arango.createEdgeDocument(arangoDB, dbName, threadContainSubThreadCollectionName, edgeDocument);
+                created = arango.createEdgeDocument(dbName, threadContainSubThreadCollectionName, edgeDocument);
                 toBeDeleted.get(threadContainSubThreadCollectionName).add(created.getKey());
             }
             for (int i = 0; i < 5; i++) {
                 edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setFrom(usersCollectionName + "/" + users[0]);
                 edgeDocument.setTo(usersCollectionName + "/" + users[i + 1]);
-                created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+                created = arango.createEdgeDocument(dbName, userFollowUserCollectionName, edgeDocument);
                 toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
             }
             for (int i = 1; i < 5; i++) {
                 edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setFrom(usersCollectionName + "/" + users[i]);
                 edgeDocument.setTo(usersCollectionName + "/" + users[i + 5]);
-                created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+                created = arango.createEdgeDocument(dbName, userFollowUserCollectionName, edgeDocument);
                 toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
             }
             edgeDocument = new BaseEdgeDocument();
             edgeDocument.setFrom(usersCollectionName + "/" + users[1]);
             edgeDocument.setTo(usersCollectionName + "/" + users[users.length - 1]);
-            created = arango.createEdgeDocument(arangoDB, dbName, userFollowUserCollectionName, edgeDocument);
+            created = arango.createEdgeDocument(dbName, userFollowUserCollectionName, edgeDocument);
             toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
         } catch (Exception e) {
             fail(e.getMessage());
@@ -187,7 +186,7 @@ public class RecommendationAppTest {
         try {
             toBeDeleted.forEach((key, value) -> {
                 for (String _key : value) {
-                    arango.deleteDocument(arangoDB, dbName, key, _key);
+                    arango.deleteDocument(dbName, key, _key);
                 }
             });
             couchbase.deleteDocument(cluster, recommendedThreadsBucketName, users[0]);
@@ -198,7 +197,7 @@ public class RecommendationAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
-            arango.disconnect(arangoDB);
+            arango.disconnect();
             couchbase.disconnect(cluster);
         }
     }

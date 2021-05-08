@@ -23,7 +23,6 @@ import java.util.Map;
 
 public class UpdateRecommendedThreads extends Command {
     private Arango arango;
-    private ArangoDB arangoDB;
     private Couchbase couchbase;
     private Cluster cluster;
 
@@ -89,10 +88,10 @@ public class UpdateRecommendedThreads extends Command {
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
 
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, RecommendationApp.dbName, getQuery(), bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, getQuery(), bindVars);
 
             cursor.forEachRemaining(document -> {
                 JSONObject thread = new JSONObject();
@@ -111,7 +110,7 @@ public class UpdateRecommendedThreads extends Command {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         } finally {
             if (arango != null)
-                arango.disconnect(arangoDB);
+                arango.disconnect();
         }
 
         if (data.length() != 0) {

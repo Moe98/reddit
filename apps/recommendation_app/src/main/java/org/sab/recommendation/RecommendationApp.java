@@ -44,7 +44,6 @@ public class RecommendationApp extends Service {
     final public static String threadsDataKey = "listOfThreads";
     final public static String usernamesDataKey = "listOfUsernames";
     private Arango arango;
-    private ArangoDB arangoDB;
     private Couchbase couchbase;
     private Cluster cluster;
 
@@ -70,7 +69,7 @@ public class RecommendationApp extends Service {
     private void dbInit() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connect();
             couchbase = Couchbase.getInstance();
             cluster = couchbase.connect();
 
@@ -78,20 +77,20 @@ public class RecommendationApp extends Service {
             couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
-            arango.createDatabaseIfNotExists(arangoDB, dbName);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, usersCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadContainSubThreadCollectionName, true);
-            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowUserCollectionName, true);
-            arango.createCollectionIfNotExists(arangoDB, dbName, userFollowThreadCollectionName, true);
-            arango.createViewIfNotExists(arangoDB, dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
-            arango.createViewIfNotExists(arangoDB, dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
+            arango.createDatabaseIfNotExists(dbName);
+            arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, usersCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, threadContainSubThreadCollectionName, true);
+            arango.createCollectionIfNotExists(dbName, userFollowUserCollectionName, true);
+            arango.createCollectionIfNotExists(dbName, userFollowThreadCollectionName, true);
+            arango.createViewIfNotExists(dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
+            arango.createViewIfNotExists(dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
         } catch (ArangoDBException | CouchbaseException e) {
             e.printStackTrace();
         } finally {
             if (arango != null)
-                arango.disconnect(arangoDB);
+                arango.disconnect();
             if (couchbase != null)
                 couchbase.disconnect(cluster);
         }
