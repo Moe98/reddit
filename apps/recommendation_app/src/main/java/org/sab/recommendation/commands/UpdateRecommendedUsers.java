@@ -47,13 +47,13 @@ public class UpdateRecommendedUsers extends Command {
                          SORT mutual_number DESC
                          LIMIT 25
                          RETURN {username:friend}"""
-                    .formatted(RecommendationApp.usersCollectionName,
-                            RecommendationApp.userFollowUserCollectionName,
-                            RecommendationApp.usersCollectionName,
-                            RecommendationApp.userFollowUserCollectionName,
-                            RecommendationApp.usersCollectionName);
+                    .formatted(RecommendationApp.USERS_COLLECTION_NAME,
+                            RecommendationApp.USER_FOLLOW_USER_COLLECTION_NAME,
+                            RecommendationApp.USERS_COLLECTION_NAME,
+                            RecommendationApp.USER_FOLLOW_USER_COLLECTION_NAME,
+                            RecommendationApp.USERS_COLLECTION_NAME);
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, query, bindVars);
 
             cursor.forEachRemaining(document -> data.put(document.getProperties().get("username")));
         } catch (ArangoDBException e) {
@@ -69,8 +69,8 @@ public class UpdateRecommendedUsers extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.usernamesDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.recommendedUsersBucketName, username, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.USERNAMES_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(RecommendationApp.RECOMMENDED_USERS_BUCKET_NAME, username, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {

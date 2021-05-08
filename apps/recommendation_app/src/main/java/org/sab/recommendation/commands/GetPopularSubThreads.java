@@ -20,7 +20,7 @@ public class GetPopularSubThreads extends Command {
             Couchbase couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 
-            JsonArray result = couchbase.getDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularSubThreadsKey).getArray(RecommendationApp.subThreadsDataKey);
+            JsonArray result = couchbase.getDocument(RecommendationApp.LISTINGS_BUCKET_NAME, RecommendationApp.LISTINGS_POPULAR_SUB_THREADS_KEY).getArray(RecommendationApp.SUB_THREADS_DATA_KEY);
             return Responder.makeDataResponse(new JSONArray(result.toString())).toString();
         } catch (DocumentNotFoundException e) {
             return new UpdatePopularSubThreads().execute(null);

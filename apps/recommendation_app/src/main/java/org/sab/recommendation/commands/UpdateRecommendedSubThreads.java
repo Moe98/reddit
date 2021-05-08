@@ -58,14 +58,14 @@ public class UpdateRecommendedSubThreads extends Command {
                     )
                     LET recommendedThreads = (
                     """
-                    .formatted(RecommendationApp.usersCollectionName,
-                            RecommendationApp.userFollowThreadCollectionName,
-                            RecommendationApp.threadsCollectionName,
-                            RecommendationApp.threadName,
-                            RecommendationApp.threadContainSubThreadCollectionName,
-                            RecommendationApp.subThreadDate,
-                            RecommendationApp.subThreadLikes,
-                            RecommendationApp.subThreadDislikes)
+                    .formatted(RecommendationApp.USERS_COLLECTION_NAME,
+                            RecommendationApp.USER_FOLLOW_THREAD_COLLECTION_NAME,
+                            RecommendationApp.THREADS_COLLECTION_NAME,
+                            RecommendationApp.THREAD_NAME,
+                            RecommendationApp.THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME,
+                            RecommendationApp.SUB_THREAD_DATE,
+                            RecommendationApp.SUB_THREAD_LIKES,
+                            RecommendationApp.SUB_THREAD_DISLIKES)
                     +
                     UpdateRecommendedThreads.getQuery() +
                     """
@@ -86,26 +86,26 @@ public class UpdateRecommendedSubThreads extends Command {
                             )
                             FOR subThread IN SLICE(APPEND(FLATTEN(recommendationsFromFollowed), FLATTEN(recommendationsFromRecommendedThreads)), 0, 50)
                                     RETURN subThread"""
-                            .formatted(RecommendationApp.threadsCollectionName,
-                                    RecommendationApp.threadName,
-                                    RecommendationApp.threadContainSubThreadCollectionName,
-                                    RecommendationApp.subThreadDate,
-                                    RecommendationApp.subThreadLikes,
-                                    RecommendationApp.subThreadDislikes);
+                            .formatted(RecommendationApp.THREADS_COLLECTION_NAME,
+                                    RecommendationApp.THREAD_NAME,
+                                    RecommendationApp.THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME,
+                                    RecommendationApp.SUB_THREAD_DATE,
+                                    RecommendationApp.SUB_THREAD_LIKES,
+                                    RecommendationApp.SUB_THREAD_DISLIKES);
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, query, bindVars);
 
             cursor.forEachRemaining(document -> {
                 JSONObject subThread = new JSONObject();
-                subThread.put(RecommendationApp.subThreadId, document.getKey());
-                subThread.put(RecommendationApp.subThreadParentThread, document.getProperties().get(RecommendationApp.subThreadParentThread));
-                subThread.put(RecommendationApp.subThreadTitle, document.getProperties().get(RecommendationApp.subThreadTitle));
-                subThread.put(RecommendationApp.subThreadCreator, document.getProperties().get(RecommendationApp.subThreadCreator));
-                subThread.put(RecommendationApp.subThreadLikes, document.getProperties().get(RecommendationApp.subThreadLikes));
-                subThread.put(RecommendationApp.subThreadDislikes, document.getProperties().get(RecommendationApp.subThreadDislikes));
-                subThread.put(RecommendationApp.subThreadContent, document.getProperties().get(RecommendationApp.subThreadContent));
-                subThread.put(RecommendationApp.subThreadHasImage, document.getProperties().get(RecommendationApp.subThreadHasImage));
-                subThread.put(RecommendationApp.subThreadDate, document.getProperties().get(RecommendationApp.subThreadDate));
+                subThread.put(RecommendationApp.SUB_THREAD_ID, document.getKey());
+                subThread.put(RecommendationApp.SUB_THREAD_PARENT_THREAD, document.getProperties().get(RecommendationApp.SUB_THREAD_PARENT_THREAD));
+                subThread.put(RecommendationApp.SUB_THREAD_TITLE, document.getProperties().get(RecommendationApp.SUB_THREAD_TITLE));
+                subThread.put(RecommendationApp.SUB_THREAD_CREATOR, document.getProperties().get(RecommendationApp.SUB_THREAD_CREATOR));
+                subThread.put(RecommendationApp.SUB_THREAD_LIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_LIKES));
+                subThread.put(RecommendationApp.SUB_THREAD_DISLIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_DISLIKES));
+                subThread.put(RecommendationApp.SUB_THREAD_CONTENT, document.getProperties().get(RecommendationApp.SUB_THREAD_CONTENT));
+                subThread.put(RecommendationApp.SUB_THREAD_HAS_IMAGE, document.getProperties().get(RecommendationApp.SUB_THREAD_HAS_IMAGE));
+                subThread.put(RecommendationApp.SUB_THREAD_DATE, document.getProperties().get(RecommendationApp.SUB_THREAD_DATE));
                 data.put(subThread);
             });
         } catch (ArangoDBException e) {
@@ -121,8 +121,8 @@ public class UpdateRecommendedSubThreads extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.subThreadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.recommendedSubThreadsBucketName, username, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.SUB_THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(RecommendationApp.RECOMMENDED_SUB_THREADS_BUCKET_NAME, username, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {

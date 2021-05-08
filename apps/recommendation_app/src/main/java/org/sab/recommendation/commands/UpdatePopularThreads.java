@@ -29,16 +29,16 @@ public class UpdatePopularThreads extends Command {
                         SORT thread.%s DESC
                         LIMIT 100
                         RETURN thread"""
-                    .formatted(RecommendationApp.threadsCollectionName, RecommendationApp.threadFollowers);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, null);
+                    .formatted(RecommendationApp.THREADS_COLLECTION_NAME, RecommendationApp.THREAD_FOLLOWERS);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, query, null);
 
             cursor.forEachRemaining(document -> {
                 JSONObject thread = new JSONObject();
-                thread.put(RecommendationApp.threadName, document.getKey());
-                thread.put(RecommendationApp.threadDescription, document.getProperties().get(RecommendationApp.threadDescription));
-                thread.put(RecommendationApp.threadCreator, document.getProperties().get(RecommendationApp.threadCreator));
-                thread.put(RecommendationApp.threadFollowers, document.getProperties().get(RecommendationApp.threadFollowers));
-                thread.put(RecommendationApp.threadDate, document.getProperties().get(RecommendationApp.threadDate));
+                thread.put(RecommendationApp.THREAD_NAME, document.getKey());
+                thread.put(RecommendationApp.THREAD_DESCRIPTION, document.getProperties().get(RecommendationApp.THREAD_DESCRIPTION));
+                thread.put(RecommendationApp.THREAD_CREATOR, document.getProperties().get(RecommendationApp.THREAD_CREATOR));
+                thread.put(RecommendationApp.THREAD_FOLLOWERS, document.getProperties().get(RecommendationApp.THREAD_FOLLOWERS));
+                thread.put(RecommendationApp.THREAD_DATE, document.getProperties().get(RecommendationApp.THREAD_DATE));
                 data.put(thread);
             });
         } catch (ArangoDBException e) {
@@ -52,8 +52,8 @@ public class UpdatePopularThreads extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularThreadsKey, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(RecommendationApp.LISTINGS_BUCKET_NAME, RecommendationApp.LISTINGS_POPULAR_THREADS_KEY, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {

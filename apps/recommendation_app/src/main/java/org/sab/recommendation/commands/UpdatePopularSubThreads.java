@@ -31,23 +31,23 @@ public class UpdatePopularSubThreads extends Command {
                         SORT SUM([subThread.%s, subThread.%s]) DESC
                         LIMIT 100
                         RETURN subThread"""
-                    .formatted(RecommendationApp.subThreadsCollectionName,
-                            RecommendationApp.subThreadDate,
-                            RecommendationApp.subThreadLikes,
-                            RecommendationApp.subThreadDislikes);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, query, null);
+                    .formatted(RecommendationApp.SUB_THREADS_COLLECTION_NAME,
+                            RecommendationApp.SUB_THREAD_DATE,
+                            RecommendationApp.SUB_THREAD_LIKES,
+                            RecommendationApp.SUB_THREAD_DISLIKES);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, query, null);
 
             cursor.forEachRemaining(document -> {
                 JSONObject subThread = new JSONObject();
-                subThread.put(RecommendationApp.subThreadId, document.getKey());
-                subThread.put(RecommendationApp.subThreadParentThread, document.getProperties().get(RecommendationApp.subThreadParentThread));
-                subThread.put(RecommendationApp.subThreadTitle, document.getProperties().get(RecommendationApp.subThreadTitle));
-                subThread.put(RecommendationApp.subThreadCreator, document.getProperties().get(RecommendationApp.subThreadCreator));
-                subThread.put(RecommendationApp.subThreadLikes, document.getProperties().get(RecommendationApp.subThreadLikes));
-                subThread.put(RecommendationApp.subThreadDislikes, document.getProperties().get(RecommendationApp.subThreadDislikes));
-                subThread.put(RecommendationApp.subThreadContent, document.getProperties().get(RecommendationApp.subThreadContent));
-                subThread.put(RecommendationApp.subThreadHasImage, document.getProperties().get(RecommendationApp.subThreadHasImage));
-                subThread.put(RecommendationApp.subThreadDate, document.getProperties().get(RecommendationApp.subThreadDate));
+                subThread.put(RecommendationApp.SUB_THREAD_ID, document.getKey());
+                subThread.put(RecommendationApp.SUB_THREAD_PARENT_THREAD, document.getProperties().get(RecommendationApp.SUB_THREAD_PARENT_THREAD));
+                subThread.put(RecommendationApp.SUB_THREAD_TITLE, document.getProperties().get(RecommendationApp.SUB_THREAD_TITLE));
+                subThread.put(RecommendationApp.SUB_THREAD_CREATOR, document.getProperties().get(RecommendationApp.SUB_THREAD_CREATOR));
+                subThread.put(RecommendationApp.SUB_THREAD_LIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_LIKES));
+                subThread.put(RecommendationApp.SUB_THREAD_DISLIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_DISLIKES));
+                subThread.put(RecommendationApp.SUB_THREAD_CONTENT, document.getProperties().get(RecommendationApp.SUB_THREAD_CONTENT));
+                subThread.put(RecommendationApp.SUB_THREAD_HAS_IMAGE, document.getProperties().get(RecommendationApp.SUB_THREAD_HAS_IMAGE));
+                subThread.put(RecommendationApp.SUB_THREAD_DATE, document.getProperties().get(RecommendationApp.SUB_THREAD_DATE));
                 data.put(subThread);
             });
         } catch (ArangoDBException e) {
@@ -61,8 +61,8 @@ public class UpdatePopularSubThreads extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.subThreadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularSubThreadsKey, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.SUB_THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(RecommendationApp.LISTINGS_BUCKET_NAME, RecommendationApp.LISTINGS_POPULAR_SUB_THREADS_KEY, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {

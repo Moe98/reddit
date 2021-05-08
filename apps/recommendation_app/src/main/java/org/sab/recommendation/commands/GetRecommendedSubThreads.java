@@ -24,7 +24,7 @@ public class GetRecommendedSubThreads extends Command {
             Couchbase couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 
-            JsonArray result = couchbase.getDocument(RecommendationApp.recommendedSubThreadsBucketName, username).getArray(RecommendationApp.subThreadsDataKey);
+            JsonArray result = couchbase.getDocument(RecommendationApp.RECOMMENDED_SUB_THREADS_BUCKET_NAME, username).getArray(RecommendationApp.SUB_THREADS_DATA_KEY);
             try {
                 return Responder.makeDataResponse(new JSONArray(result.toString())).toString();
             } catch (JSONException e) {

@@ -24,7 +24,7 @@ public class GetRecommendedUsers extends Command {
             Couchbase couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 
-            JsonArray result = couchbase.getDocument(RecommendationApp.recommendedUsersBucketName, username).getArray(RecommendationApp.usernamesDataKey);
+            JsonArray result = couchbase.getDocument(RecommendationApp.RECOMMENDED_USERS_BUCKET_NAME, username).getArray(RecommendationApp.USERNAMES_DATA_KEY);
             try {
                 return Responder.makeDataResponse(new JSONArray(result.toString())).toString();
             } catch (JSONException e) {

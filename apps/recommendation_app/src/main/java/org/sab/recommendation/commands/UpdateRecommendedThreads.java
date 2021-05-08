@@ -65,14 +65,14 @@ public class UpdateRecommendedThreads extends Command {
                 )
                 FOR thread IN SLICE(APPEND(uniqueRecommendations, fill), 0, 25)
                     RETURN thread"""
-                .formatted(RecommendationApp.usersCollectionName,
-                        RecommendationApp.userFollowThreadCollectionName,
-                        RecommendationApp.userFollowThreadDate,
-                        RecommendationApp.getViewName(RecommendationApp.threadsCollectionName),
-                        RecommendationApp.threadDescription,
-                        RecommendationApp.threadDescription,
-                        RecommendationApp.threadsCollectionName,
-                        RecommendationApp.threadFollowers);
+                .formatted(RecommendationApp.USERS_COLLECTION_NAME,
+                        RecommendationApp.USER_FOLLOW_THREAD_COLLECTION_NAME,
+                        RecommendationApp.USER_FOLLOW_THREAD_DATE,
+                        RecommendationApp.getViewName(RecommendationApp.THREADS_COLLECTION_NAME),
+                        RecommendationApp.THREAD_DESCRIPTION,
+                        RecommendationApp.THREAD_DESCRIPTION,
+                        RecommendationApp.THREADS_COLLECTION_NAME,
+                        RecommendationApp.THREAD_FOLLOWERS);
     }
 
     @Override
@@ -88,15 +88,15 @@ public class UpdateRecommendedThreads extends Command {
             arango.connectIfNotConnected();
 
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.dbName, getQuery(), bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, getQuery(), bindVars);
 
             cursor.forEachRemaining(document -> {
                 JSONObject thread = new JSONObject();
-                thread.put(RecommendationApp.threadName, document.getKey());
-                thread.put(RecommendationApp.threadDescription, document.getProperties().get(RecommendationApp.threadDescription));
-                thread.put(RecommendationApp.threadCreator, document.getProperties().get(RecommendationApp.threadCreator));
-                thread.put(RecommendationApp.threadFollowers, document.getProperties().get(RecommendationApp.threadFollowers));
-                thread.put(RecommendationApp.threadDate, document.getProperties().get(RecommendationApp.threadDate));
+                thread.put(RecommendationApp.THREAD_NAME, document.getKey());
+                thread.put(RecommendationApp.THREAD_DESCRIPTION, document.getProperties().get(RecommendationApp.THREAD_DESCRIPTION));
+                thread.put(RecommendationApp.THREAD_CREATOR, document.getProperties().get(RecommendationApp.THREAD_CREATOR));
+                thread.put(RecommendationApp.THREAD_FOLLOWERS, document.getProperties().get(RecommendationApp.THREAD_FOLLOWERS));
+                thread.put(RecommendationApp.THREAD_DATE, document.getProperties().get(RecommendationApp.THREAD_DATE));
                 data.put(thread);
             });
         } catch (ArangoDBException e) {
@@ -112,8 +112,8 @@ public class UpdateRecommendedThreads extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.recommendedThreadsBucketName, username, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(RecommendationApp.RECOMMENDED_THREADS_BUCKET_NAME, username, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {
