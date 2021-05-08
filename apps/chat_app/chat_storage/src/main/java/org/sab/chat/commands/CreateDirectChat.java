@@ -5,11 +5,15 @@ import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.tables.DirectChatTable;
 
-import org.sab.service.Command;
+import org.sab.service.validation.CommandWithVerification;
+import org.sab.validation.Attribute;
+import org.sab.validation.DataType;
+import org.sab.validation.Schema;
 
+import java.util.List;
 import java.util.UUID;
 
-public class CreateDirectChat extends Command{
+public class CreateDirectChat extends CommandWithVerification {
 
     private DirectChatTable directChat;
 
@@ -24,10 +28,19 @@ public class CreateDirectChat extends Command{
     }
 
     @Override
-    public String execute(JSONObject request) {
-        JSONObject requestBody = (JSONObject)request.get("body");
-        UUID firstMember = UUID.fromString((String) requestBody.get("first_member"));
-        UUID secondMember = UUID.fromString((String) requestBody.get("second_member"));
+    protected Schema getSchema() {
+        Attribute firstMember = new Attribute("firstMember", DataType.STRING, true);
+        Attribute secondMember = new Attribute("secondMember", DataType.STRING, true);
+
+        return new Schema(List.of(firstMember, secondMember));
+    }
+
+
+    @Override
+    public String execute() {
+       
+        UUID firstMember = UUID.fromString((String) body.get("firstMember"));
+        UUID secondMember = UUID.fromString((String) body.get("secondMember"));
 
         getDirectChatTableInstance();
 
