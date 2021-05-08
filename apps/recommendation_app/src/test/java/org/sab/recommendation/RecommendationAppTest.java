@@ -201,6 +201,7 @@ public class RecommendationAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
+            arango.disconnect();
             couchbase.disconnect(cluster);
         }
     }
