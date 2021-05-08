@@ -1,5 +1,6 @@
 package org.sab.user.commands;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -7,9 +8,11 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.functions.Auth;
 import org.sab.functions.Utilities;
+import org.sab.service.authentication.Jwt;
 import org.sab.user.UserApp;
 
 import java.util.Date;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -18,12 +21,14 @@ public class SignUpTest {
 
     static String username = "scale-a-bull" + new Date().getTime();
     static String password = "12345678";
-
+    static String token;
+    static JSONObject authenticationParams = new JSONObject();
     JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", methodType);
         request.put("uriParams", uriParams);
+        request.put("authenticationParams",authenticationParams);
         return request;
     }
 
@@ -48,6 +53,20 @@ public class SignUpTest {
         GetUser getUserCommand = new GetUser();
         JSONObject response = new JSONObject(getUserCommand.execute(request));
         return response;
+    }
+    public void decodeToken(String token){
+        Jwt jwt = new Jwt();
+        Boolean authenticated = false;
+        try {
+            Map<String, Object> claims = jwt.verifyAndDecode(token);
+            authenticated = true;
+            authenticationParams.put("username",(String) claims.get("username"));
+            authenticationParams.put("jwt",token);
+        } catch (JWTVerificationException jwtVerificationException) {
+            System.out.println(jwtVerificationException.getMessage());
+            authenticated = false;
+        }
+        authenticationParams.put("isAuthenticated",authenticated);
     }
 
     @Test
@@ -74,9 +93,27 @@ public class SignUpTest {
         assertEquals(data.getString("email"), email);
 
     }
-
     @Test
-    public void b_GetUser() {
+    public void b_Login() {
+
+        JSONObject body = new JSONObject();
+
+        body.put("username", username);
+        body.put("password", password);
+        JSONObject request = makeRequest(body, "POST", new JSONObject());
+
+        Login loginCommand = new Login();
+        JSONObject response = new JSONObject(loginCommand.execute(request));
+
+        assertEquals(200, response.getInt("statusCode"));
+        assertEquals(response.getString("msg"), "Login Successful!");
+        token = response.getString("token");
+        decodeToken(token);
+        System.out.println(authenticationParams.toString());
+    }
+    @Test
+    public void c_GetUser() {
+        System.out.println(authenticationParams.toString());
 
         JSONObject response = getUserRequest();
         System.out.println(response);
@@ -88,7 +125,7 @@ public class SignUpTest {
     }
 
     @Test
-    public void c_updatePassword() {
+    public void d_updatePassword() {
 
         String newPassword = "123456";
         JSONObject body = new JSONObject();
@@ -110,7 +147,7 @@ public class SignUpTest {
     }
 
     @Test
-    public void d_updatePasswordBack() {
+    public void e_updatePasswordBack() {
 
         JSONObject body = new JSONObject();
 
@@ -127,7 +164,7 @@ public class SignUpTest {
     }
 
     @Test
-    public void e_updateProfilePicture() {
+    public void f_updateProfilePicture() {
         if (!Utilities.isDevelopmentMode())
             return;
         String photoUrl = "https://picsum.photos/200";
@@ -146,7 +183,7 @@ public class SignUpTest {
     }
 
     @Test
-    public void f_deleteProfilePicture() {
+    public void g_deleteProfilePicture() {
         if (!Utilities.isDevelopmentMode())
             return;
         JSONObject body = new JSONObject();
@@ -162,7 +199,7 @@ public class SignUpTest {
     }
 
     @Test
-    public void g_deleteAccount() {
+    public void h_deleteAccount() {
 
         JSONObject body = new JSONObject();
 

@@ -10,11 +10,12 @@ import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 public class DeleteProfilePhoto extends UserCommand {
     @Override
     protected Schema getSchema() {
-        return null;
+        return new Schema(List.of());
     }
 
     @Override
