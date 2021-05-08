@@ -9,7 +9,7 @@ import java.util.Map;
 public class Requester {
     static JSONObject authenticationParams = new JSONObject();
 
-    static public JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
+    private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", methodType);
@@ -18,7 +18,7 @@ public class Requester {
         return request;
     }
 
-    static public JSONObject signUp(String username, String email, String password, String birthdate) {
+    public static JSONObject signUp(String username, String email, String password, String birthdate) {
         JSONObject body = new JSONObject();
         body.put("username", username);
         body.put("email", email);
@@ -28,7 +28,7 @@ public class Requester {
         return new JSONObject(new SignUp().execute(request));
     }
 
-    static public JSONObject login(String username, String password) {
+    public static JSONObject login(String username, String password) {
         JSONObject body = new JSONObject();
         body.put("username", username);
         body.put("password", password);
@@ -36,13 +36,13 @@ public class Requester {
         return new JSONObject(new Login().execute(request));
     }
 
-    static public JSONObject getUser(String username) {
+    public static JSONObject getUser(String username) {
         JSONObject uriParams = new JSONObject().put("username", username);
         JSONObject request = makeRequest(null, "GET", uriParams);
         return new JSONObject(new GetUser().execute(request));
     }
 
-    static public JSONObject updatePassword(String oldPassword, String newPassword) {
+    public static JSONObject updatePassword(String oldPassword, String newPassword) {
         JSONObject body = new JSONObject();
         body.put("oldPassword", oldPassword);
         body.put("newPassword", newPassword);
@@ -58,12 +58,12 @@ public class Requester {
         return new JSONObject(new UpdateProfilePhoto().execute(request));
     }
 
-    static public JSONObject deleteProfilePicture() {
+    public static JSONObject deleteProfilePicture() {
         JSONObject request = makeRequest(new JSONObject(), "DELETE", new JSONObject());
         return new JSONObject(new DeleteProfilePhoto().execute(request));
     }
 
-    static public JSONObject deleteAccount(String password) {
+    public static JSONObject deleteAccount(String password) {
         JSONObject body = new JSONObject();
         body.put("password", password);
 
@@ -73,7 +73,7 @@ public class Requester {
 
     public static void decodeToken(String token) {
         Jwt jwt = new Jwt();
-        Boolean authenticated = false;
+        boolean authenticated;
         try {
             Map<String, Object> claims = jwt.verifyAndDecode(token);
             authenticated = true;
