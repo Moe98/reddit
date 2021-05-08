@@ -72,12 +72,13 @@ public class RecommendationApp extends Service {
             if (!arango.isConnected())
                 arango.connect();
             couchbase = Couchbase.getInstance();
-            cluster = couchbase.connect();
+            if (!couchbase.isConnected())
+                couchbase.connect();
 
-            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(listingsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedSubThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedUsersBucketName, defaultRamQuota);
             arango.createDatabaseIfNotExists(dbName);
             arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
@@ -89,9 +90,6 @@ public class RecommendationApp extends Service {
             arango.createViewIfNotExists(dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
         } catch (ArangoDBException | CouchbaseException e) {
             e.printStackTrace();
-        } finally {
-            if (couchbase != null)
-                couchbase.disconnect(cluster);
         }
     }
 

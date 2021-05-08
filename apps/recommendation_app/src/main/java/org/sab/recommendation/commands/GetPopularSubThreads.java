@@ -21,9 +21,10 @@ public class GetPopularSubThreads extends Command {
     public String execute(JSONObject request) {
         try {
             couchbase = Couchbase.getInstance();
-            cluster = couchbase.connect();
+            if (!couchbase.isConnected())
+                couchbase.connect();
 
-            JsonArray result = couchbase.getDocument(cluster, RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularSubThreadsKey).getArray(RecommendationApp.subThreadsDataKey);
+            JsonArray result = couchbase.getDocument(RecommendationApp.listingsBucketName, RecommendationApp.listingsPopularSubThreadsKey).getArray(RecommendationApp.subThreadsDataKey);
             return Responder.makeDataResponse(new JSONArray(result.toString())).toString();
         } catch (DocumentNotFoundException e) {
             return new UpdatePopularSubThreads().execute(null);
@@ -35,9 +36,6 @@ public class GetPopularSubThreads extends Command {
             return Responder.makeErrorResponse("Failed to create data JSONArray from Couchbase results.", 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            if (couchbase != null)
-                couchbase.disconnect(cluster);
         }
     }
 }

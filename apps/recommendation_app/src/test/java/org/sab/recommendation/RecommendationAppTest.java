@@ -68,7 +68,8 @@ public class RecommendationAppTest {
             if (!arango.isConnected())
                 arango.connect();
             couchbase = Couchbase.getInstance();
-            cluster = couchbase.connect();
+            if (!couchbase.isConnected())
+                couchbase.connect();
 
             toBeDeleted = new HashMap<>();
             toBeDeleted.put(usersCollectionName, new ArrayList<>());
@@ -84,10 +85,10 @@ public class RecommendationAppTest {
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
 
-            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(listingsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedSubThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedThreadsBucketName, defaultRamQuota);
+            couchbase.createBucketIfNotExists(recommendedUsersBucketName, defaultRamQuota);
             arango.createDatabaseIfNotExists(dbName);
             arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
@@ -193,16 +194,13 @@ public class RecommendationAppTest {
                     arango.deleteDocument(dbName, key, _key);
                 }
             });
-            couchbase.deleteDocument(cluster, recommendedThreadsBucketName, users[0]);
-            couchbase.deleteDocument(cluster, listingsBucketName, listingsPopularThreadsKey);
-            couchbase.deleteDocument(cluster, listingsBucketName, listingsPopularSubThreadsKey);
-            couchbase.deleteDocument(cluster, recommendedSubThreadsBucketName, users[0]);
-            couchbase.deleteDocument(cluster, recommendedUsersBucketName, users[0]);
+            couchbase.deleteDocument(recommendedThreadsBucketName, users[0]);
+            couchbase.deleteDocument(listingsBucketName, listingsPopularThreadsKey);
+            couchbase.deleteDocument(listingsBucketName, listingsPopularSubThreadsKey);
+            couchbase.deleteDocument(recommendedSubThreadsBucketName, users[0]);
+            couchbase.deleteDocument(recommendedUsersBucketName, users[0]);
         } catch (Exception e) {
             fail(e.getMessage());
-        } finally {
-            arango.disconnect();
-            couchbase.disconnect(cluster);
         }
     }
 

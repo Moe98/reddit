@@ -1,6 +1,10 @@
 package org.sab.couchbase;
 
+import com.couchbase.client.core.diagnostics.ClusterState;
+import com.couchbase.client.core.diagnostics.PingState;
+import com.couchbase.client.core.service.ServiceType;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.diagnostics.PingOptions;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
@@ -8,74 +12,88 @@ import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.query.QueryResult;
 import com.couchbase.client.java.query.QueryScanConsistency;
 
+import java.time.Duration;
+import java.util.EnumSet;
+
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
 @SuppressWarnings("unused")
 public class Couchbase {
-    private static Couchbase instance = null;
+    final private static Couchbase instance = new Couchbase();
+
+    private Cluster cluster;
 
     private Couchbase() {
+        connect();
     }
 
     public static Couchbase getInstance() {
-        if (instance == null)
-            instance = new Couchbase();
         return instance;
     }
 
-    public Cluster connect() {
-        return Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
+    public void connect() {
+        if (cluster != null)
+            disconnect();
+        cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
     }
 
-    public void disconnect(Cluster cluster) {
+    public boolean isConnected() {
+        if (cluster == null)
+            return false;
+        cluster.waitUntilReady(Duration.ofSeconds(3));
+        return cluster.ping().endpoints().values().stream().anyMatch(a -> a.stream().anyMatch(b -> b.state() == PingState.OK));
+    }
+
+    public void disconnect() {
         cluster.disconnect();
+        cluster = null;
     }
 
-    public void createBucket(Cluster cluster, String bucketName, int ramQuotaMB) {
+    public void createBucket(String bucketName, int ramQuotaMB) {
         cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB));
         cluster.query("CREATE PRIMARY INDEX on `default` : `" + bucketName + "`;");
     }
 
-    public void dropBucket(Cluster cluster, String bucketName) {
+    public void dropBucket(String bucketName) {
         cluster.query("DROP PRIMARY INDEX on `default` : `" + bucketName + "`;");
         cluster.buckets().dropBucket(bucketName);
     }
 
-    public boolean bucketExists(Cluster cluster, String bucketName) {
+    public boolean bucketExists(String bucketName) {
         return cluster.buckets().getAllBuckets().containsKey(bucketName);
     }
 
-    public void createBucketIfNotExists(Cluster cluster, String bucketName, int ramQuotaMB) {
-        if (!bucketExists(cluster, bucketName))
-            createBucket(cluster, bucketName, ramQuotaMB);
+    public void createBucketIfNotExists(String bucketName, int ramQuotaMB) {
+        if (!bucketExists(bucketName))
+            createBucket(bucketName, ramQuotaMB);
     }
 
-    public MutationResult upsertDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object) {
+    public MutationResult upsertDocument(String bucketName, String documentKey, JsonObject object) {
         return cluster.bucket(bucketName).defaultCollection().upsert(documentKey, object);
     }
 
-    public JsonObject getDocument(Cluster cluster, String bucketName, String documentKey) {
+    public JsonObject getDocument(String bucketName, String documentKey) {
         GetResult getResult = cluster.bucket(bucketName).defaultCollection().get(documentKey);
         return getResult.contentAsObject();
     }
 
-    public boolean documentExists(Cluster cluster, String bucketName, String documentKey) {
+    public boolean documentExists(String bucketName, String documentKey) {
         return cluster.bucket(bucketName).defaultCollection().exists(documentKey).exists();
     }
 
-    public MutationResult replaceDocument(Cluster cluster, String bucketName, String documentKey, JsonObject object) {
+    public MutationResult replaceDocument(String bucketName, String documentKey, JsonObject object) {
         return cluster.bucket(bucketName).defaultCollection().replace(documentKey, object);
     }
 
-    public MutationResult deleteDocument(Cluster cluster, String bucketName, String documentKey) {
+    public MutationResult deleteDocument(String bucketName, String documentKey) {
         return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
     }
 
-    public QueryResult query(Cluster cluster, String queryText) {
-        return query(cluster, queryText, false);
+    public QueryResult query(String queryText) {
+        return query(queryText, false);
     }
 
-    public QueryResult query(Cluster cluster, String queryText, boolean consistent) {
+    public QueryResult query(String queryText, boolean consistent) {
         return cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
     }
 }

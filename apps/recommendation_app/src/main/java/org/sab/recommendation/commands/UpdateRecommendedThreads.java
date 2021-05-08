@@ -114,19 +114,17 @@ public class UpdateRecommendedThreads extends Command {
         if (data.length() != 0) {
             try {
                 couchbase = Couchbase.getInstance();
-                cluster = couchbase.connect();
+                if (!couchbase.isConnected())
+                    couchbase.connect();
 
                 JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.threadsDataKey, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(cluster, RecommendationApp.recommendedThreadsBucketName, username, couchbaseData);
+                couchbase.upsertDocument(RecommendationApp.recommendedThreadsBucketName, username, couchbaseData);
             } catch (TimeoutException e) {
                 return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
             } catch (CouchbaseException e) {
                 return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
             } catch (Exception e) {
                 return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-            } finally {
-                if (couchbase != null)
-                    couchbase.disconnect(cluster);
             }
         }
         return Responder.makeDataResponse(data).toString();
