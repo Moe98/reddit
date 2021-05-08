@@ -83,8 +83,8 @@ public class CreateSubThread extends SubThreadCommand {
             String date = (String) res.getAttribute(DATE_CREATED_DB);
             hasImage = (Boolean) res.getAttribute(HASIMAGE_DB);
 
-            int likes = (int) res.getAttribute(LIKES_DB);
-            int dislikes = (int) res.getAttribute(DISLIKES_DB);
+            int likes = Integer.parseInt(String.valueOf(res.getAttribute(LIKES_DB)));
+            int dislikes = Integer.parseInt(String.valueOf(res.getAttribute(DISLIKES_DB)));
 
             // TODO validate correct insertion
 

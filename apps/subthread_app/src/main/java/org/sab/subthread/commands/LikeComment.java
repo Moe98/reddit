@@ -56,7 +56,7 @@ public class LikeComment extends CommentCommand{
                 arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
 
                 BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                int newLikes =  (int)originalComment.getAttribute(LIKES_DB)-1;
+                int newLikes =  Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB)))-1;
                 originalComment.updateAttribute(LIKES_DB,newLikes);
                 // putting the comment with the updated amount of likes
                 arango.updateDocument(arangoDB,DB_Name,COMMENT_COLLECTION_NAME,originalComment,commentId);
@@ -74,8 +74,8 @@ public class LikeComment extends CommentCommand{
 
                 // retrieving the original comment with the old amount of likes
                 BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                int newLikes = (int) originalComment.getAttribute(LIKES_DB) + 1;
-                int newDislikes = (int) originalComment.getAttribute(DISLIKES_DB);
+                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) + 1;
+                int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)));
                 //checking if the user dislikes this content to remove his dislike
                 String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
                 if (!dislikeEdgeId.equals("")) {

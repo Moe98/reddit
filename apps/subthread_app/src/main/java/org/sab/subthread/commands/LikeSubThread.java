@@ -50,7 +50,7 @@ public class LikeSubThread extends SubThreadCommand{
                 arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
 
                 BaseDocument originalSubthread = arango.readDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newLikes =  (int)originalSubthread.getAttribute(LIKES_DB)-1;
+                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB)))-1;
                 originalSubthread.updateAttribute(LIKES_DB,newLikes);
                 // putting the comment with the updated amount of likes
                 arango.updateDocument(arangoDB, DB_Name,SUBTHREAD_COLLECTION_NAME,originalSubthread,subthreadId);
@@ -68,8 +68,8 @@ public class LikeSubThread extends SubThreadCommand{
 
                 // retrieving the original comment with the old amount of likes and dislikes
                 BaseDocument originalSubthread = arango.readDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newLikes = (int) originalSubthread.getAttribute(LIKES_DB) + 1;
-                int newDislikes = (int) originalSubthread.getAttribute(DISLIKES_DB);
+                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) + 1;
+                int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB)));
 
                 String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
                 //checking if the user dislikes this subthread to remove his dislike

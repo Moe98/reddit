@@ -80,8 +80,8 @@ public class CreateComment extends CommentCommand {
             userId = (String) res.getAttribute(ACTION_MAKER_ID);
             content = (String) res.getAttribute(CONTENT_DB);
             parentContentType = (String) res.getAttribute(PARENT_CONTENT_TYPE_DB);
-            final int likes = (int) res.getAttribute(LIKES_DB);
-            final int dislikes = (int) res.getAttribute(DISLIKES_DB);
+            final int likes = Integer.parseInt(String.valueOf(res.getAttribute(LIKES_DB)));
+            final int dislikes = Integer.parseInt(String.valueOf(res.getAttribute(DISLIKES_DB)));
             final String dateCreated = (String) res.getAttribute(DATE_CREATED_DB);
 
             comment = new Comment();
