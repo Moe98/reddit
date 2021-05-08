@@ -19,14 +19,13 @@ public class CreateSubThread extends SubThreadCommand {
     @Override
     protected Schema getSchema() {
         Attribute parentThreadId = new Attribute(PARENT_THREAD_ID, DataType.STRING, true);
-        Attribute creatorId = new Attribute(CREATOR_ID, DataType.STRING, true);
 
         Attribute title = new Attribute(TITLE, DataType.STRING, true);
         Attribute content = new Attribute(CONTENT, DataType.STRING, true);
 
         Attribute hasImage = new Attribute(HASIMAGE, DataType.BOOLEAN, true);
 
-        return new Schema(List.of(parentThreadId, creatorId, title, content, hasImage));
+        return new Schema(List.of(parentThreadId, title, content, hasImage));
     }
 
     private Arango arango;
@@ -35,8 +34,7 @@ public class CreateSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
         String parentThreadId = body.getString(PARENT_THREAD_ID);
-        // TODO from URI
-        String creatorId = body.getString(CREATOR_ID);
+        String creatorId = uriParams.getString(CREATOR_ID);
 
         String title = body.getString(TITLE);
         String content = body.getString(CONTENT);
@@ -115,6 +113,7 @@ public class CreateSubThread extends SubThreadCommand {
 
 
         JSONObject uriParams = new JSONObject();
+        uriParams.put("creatorId", "32930");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
