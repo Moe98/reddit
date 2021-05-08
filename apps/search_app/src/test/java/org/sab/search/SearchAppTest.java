@@ -16,16 +16,18 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class SearchAppTest {
-    static String dbName = System.getenv("ARANGO_DB");
+    static String dbName = SearchApp.DB_NAME;
     static String threadsCollectionName = SearchApp.THREADS_COLLECTION_NAME;
     static String subThreadsCollectionName = SearchApp.SUB_THREADS_COLLECTION_NAME;
     static Arango arango;
     static HashMap<String, ArrayList<String>> toBeDeleted;
+    static String[] threads;
+    static String[] subThreadsKeys;
 
     @BeforeClass
     public static void setUp() {
@@ -40,8 +42,9 @@ public class SearchAppTest {
             toBeDeleted.put(threadsCollectionName, new ArrayList<>());
             toBeDeleted.put(subThreadsCollectionName, new ArrayList<>());
 
-            String[] threads = new String[]{"ThreadForTestSearchApp", "ThreadTestTestSearchApp"};
+            threads = new String[]{"ThreadForTestSearchApp", "ThreadTestTestSearchApp"};
             String[] subThreadsTitles = new String[]{"i love scalable", "i went to eat ice cream"};
+            subThreadsKeys = new String[2];
             for (String s : threads) {
                 BaseDocument thread = new BaseDocument();
                 thread.setKey(s);
@@ -64,7 +67,9 @@ public class SearchAppTest {
                 subThread.addAttribute(SubThread.getDateAttributeName(), Timestamp.valueOf(LocalDateTime.now()));
                 BaseDocument created = arango.createDocument(dbName, subThreadsCollectionName, subThread);
                 toBeDeleted.get(subThreadsCollectionName).add(created.getKey());
+                subThreadsKeys[i] = created.getKey();
             }
+            TimeUnit.SECONDS.sleep(1);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -88,8 +93,9 @@ public class SearchAppTest {
     @Test
     public void SearchThread() {
         try {
-            JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearchApp"))));
+            JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearch"))));
             assertEquals(200, responseJson.getInt("statusCode"));
+            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(threads[0]));
         } catch (JSONException e) {
             fail(e.getMessage());
         }
@@ -100,6 +106,7 @@ public class SearchAppTest {
         try {
             JSONObject responseJson = new JSONObject(new SearchSubThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeywords", "ice cream"))));
             assertEquals(200, responseJson.getInt("statusCode"));
+            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreadsKeys[1]));
         } catch (JSONException e) {
             fail(e.getMessage());
         }
