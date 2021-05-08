@@ -13,7 +13,7 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class Arango {
-    private static Arango instance = null;
+    final private static Arango instance = new Arango();
     private static ArangoDB.Builder builder;
 
     private ArangoDB arangoDB;
@@ -25,12 +25,11 @@ public class Arango {
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
+
+        connect();
     }
 
     public static Arango getInstance() {
-        if (instance == null) {
-            instance = new Arango();
-        }
         return instance;
     }
 

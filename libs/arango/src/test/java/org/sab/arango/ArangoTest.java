@@ -23,7 +23,7 @@ public class ArangoTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connect();
+            assertTrue(arango.isConnected());
 
             dbName = "TestDB";
             collectionName = "TestCollection";
