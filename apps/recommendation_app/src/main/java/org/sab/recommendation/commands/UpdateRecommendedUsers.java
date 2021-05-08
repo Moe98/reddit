@@ -38,7 +38,9 @@ public class UpdateRecommendedUsers extends Command {
 
             arango = Arango.getInstance();
             arangoDB = arango.connect();
-
+//          First, we acquire the followed users. Based on the acquired results, we acquire the
+//          users which followed users follow, Then, these users are filtered and sorted according to
+//          a score that is based on the number of the followers of these users that the main user follow.
             String query = """
                     LET followed = (
                         FOR user IN 1..1 OUTBOUND CONCAT('%s/', @username) %s

@@ -28,6 +28,9 @@ public class UpdateRecommendedThreads extends Command {
     private Cluster cluster;
 
     public static String getQuery() {
+//      First, we acquire the followed users. Next, we acquire recommended threads based on
+//      the acquired users. Then, these recommendations are filtered according to uniqueness
+//      and popularity. Finally, the acquired results are formatted according to the database.
         return """
                 LET followed = (
                     FOR thread, edge IN 1..1 OUTBOUND CONCAT('%s/', @username) %s

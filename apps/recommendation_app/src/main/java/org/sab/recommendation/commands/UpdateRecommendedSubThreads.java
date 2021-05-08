@@ -38,7 +38,8 @@ public class UpdateRecommendedSubThreads extends Command {
 
             arango = Arango.getInstance();
             arangoDB = arango.connect();
-
+//          First, we acquire a random sample of the followed sub-threads,
+//          then, we acquire a sample of the sub-threads that are recommended for the user to follow
             String query = """
                     LET followedSample = (
                         FOR thread IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
