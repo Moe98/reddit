@@ -49,6 +49,7 @@ public class ArangoTest {
         try {
             assertTrue(arango.dropDatabase(dbName));
             arango.disconnect();
+            assertFalse(arango.isConnected());
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }

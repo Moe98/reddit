@@ -34,6 +34,8 @@ public class Arango {
     }
 
     public void connect() {
+        if (arangoDB != null)
+            disconnect();
         arangoDB = builder.build();
     }
 
