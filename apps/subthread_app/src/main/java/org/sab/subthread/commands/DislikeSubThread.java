@@ -45,6 +45,12 @@ public class DislikeSubThread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             }
 
+            // TODO check if subthread exists
+            if(!arango.documentExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+                msg = "Subthread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
             String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
             System.out.println(dislikeEdgeId);
             // if user already dislikes the subthread, then remove his dislike and update dislike count
@@ -99,7 +105,7 @@ public class DislikeSubThread extends SubThreadCommand{
         DislikeSubThread tc = new DislikeSubThread();
 
         JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "43939");
+        body.put(SUBTHREAD_ID, "126033");
 
         JSONObject uriParams = new JSONObject();
         uriParams.put(ACTION_MAKER_ID, "asdafsda");

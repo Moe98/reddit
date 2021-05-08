@@ -35,6 +35,8 @@ public class ReportSubThread extends SubThreadCommand{
         long millis = System.currentTimeMillis();
         java.sql.Date dateCreated = new java.sql.Date(millis);
 
+        JSONObject response = new JSONObject();
+        String msg = "";
 
         try {
             arango = Arango.getInstance();
@@ -45,6 +47,20 @@ public class ReportSubThread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
             }
 
+            // check if thread exists
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+                msg = "Thread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
+            // check if subthread exists
+            if(!arango.documentExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+                msg = "Subthread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
+            // TODO check if subthread belongs to thread!
+
             BaseDocument myObject = new BaseDocument();
             myObject.addAttribute(REPORTER_ID_DB, userId);
             myObject.addAttribute(TYPE_OF_REPORT_DB, typeOfReport);
@@ -54,12 +70,38 @@ public class ReportSubThread extends SubThreadCommand{
             myObject.addAttribute(SUBTHREAD_ID, subthreadId);
 
             BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
+            msg = "Created Subthread Report";
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             arango.disconnect(arangoDB);
+            response.put("msg", msg);
         }
-        return Responder.makeDataResponse(new JSONObject()).toString();
+        return Responder.makeDataResponse(response).toString();
+    }
+
+    public static void main(String[] args) {
+        ReportSubThread tc = new ReportSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put(TYPE_OF_REPORT, "SubthreadReport");
+        body.put(REPORTED_SUBTHREAD_ID, "126209");
+        body.put(THREAD_ID, "GelatiAzza");
+        body.put(REPORT_MSG, "This highly offends me!!");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(REPORTER_ID, "asdafsda");
+
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
     }
 }

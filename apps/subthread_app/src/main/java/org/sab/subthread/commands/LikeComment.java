@@ -51,6 +51,12 @@ public class LikeComment extends CommentCommand{
 
             String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
 
+            // TODO check if comment exists
+            if(!arango.documentExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+                msg = "Comment does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
             // if user already likes the comment, then remove his like and update like count
             if(!likeEdgeId.equals("")){
                 arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
@@ -103,7 +109,7 @@ public class LikeComment extends CommentCommand{
 
 
         JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "21289");
+        body.put(COMMENT_ID, "127313");
 
         JSONObject uriParams = new JSONObject();
         uriParams.put(ACTION_MAKER_ID, "asdafsda");

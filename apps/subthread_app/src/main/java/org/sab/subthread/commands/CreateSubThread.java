@@ -43,17 +43,19 @@ public class CreateSubThread extends SubThreadCommand {
 
         SubThread subThread;
 
-
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            // TODO check thread exists
-            // TODO check creator exists
-
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+            }
+            // TODO check thread exists
+            String msg;
+            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, parentThreadId)) {
+                msg = "Thread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             BaseDocument myObject = new BaseDocument();

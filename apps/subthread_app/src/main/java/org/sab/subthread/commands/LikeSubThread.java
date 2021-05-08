@@ -43,6 +43,12 @@ public class LikeSubThread extends SubThreadCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             }
 
+            // TODO check if subthread exists
+            if(!arango.documentExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+                msg = "Subthread does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
             String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
 
             // if user already likes the subthread, then remove his like and update like count
@@ -96,7 +102,7 @@ public class LikeSubThread extends SubThreadCommand{
         LikeSubThread tc = new LikeSubThread();
 
         JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "43939");
+        body.put(SUBTHREAD_ID, "126033");
 
         JSONObject uriParams = new JSONObject();
         uriParams.put(ACTION_MAKER_ID, "asdafsda");

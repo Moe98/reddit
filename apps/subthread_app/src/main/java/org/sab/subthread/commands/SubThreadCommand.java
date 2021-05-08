@@ -55,10 +55,11 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     protected static final String ACTION_MAKER_ID = "userId";
 
-
+    
     // Database attributes
     protected static final String DB_Name = "ARANGO_DB";
 
+    protected static final String THREAD_COLLECTION_NAME = "Thread";
     protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
     protected static final String USER_COLLECTION_NAME = "User";
 

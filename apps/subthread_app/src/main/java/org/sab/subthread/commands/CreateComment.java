@@ -20,12 +20,12 @@ public class CreateComment extends CommentCommand {
     public static void main(String[] args) {
         CreateComment addComment = new CreateComment();
         JSONObject body = new JSONObject();
-        body.put(PARENT_SUBTHREAD_ID, "33029");
+        body.put(PARENT_SUBTHREAD_ID, "126171");
         body.put(CONTENT, "I think their fish is bad!");
         body.put(PARENT_CONTENT_TYPE, "SubThread");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "67890");
+        uriParams.put(ACTION_MAKER_ID, "32930");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -58,6 +58,10 @@ public class CreateComment extends CommentCommand {
             if (!arango.collectionExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, false);
             }
+
+            // TODO check other things exist
+            //  If the parent is a subthread check subthread exists
+            //  If the parent is a comment check a comment exist
 
             final BaseDocument myObject = new BaseDocument();
 
@@ -135,10 +139,10 @@ public class CreateComment extends CommentCommand {
         final String commentId = comment.getId();
         final String parentId = comment.getParentId();
 
-        String from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;
+        String from = "";
         final String to = COMMENT_COLLECTION_NAME + "/" + commentId;
 
-        // TODO The collection names should come from a config file.
+         // TODO The collection names should come from a config file.
         switch (parentContentType) {
             case "Comment" -> from = COMMENT_COLLECTION_NAME + "/" + parentId;
             case "SubThread" -> from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;

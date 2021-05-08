@@ -46,6 +46,12 @@ public class DislikeComment extends CommentCommand{
                 arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
             }
 
+            // TODO check if comment exists
+            if(!arango.documentExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+                msg = "Comment does not exist";
+                return Responder.makeErrorResponse(msg, 400).toString();
+            }
+
             String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
 
             // if user already dislikes the comment, then remove his dislike and update dislike count
@@ -105,7 +111,7 @@ public class DislikeComment extends CommentCommand{
 
 
         JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "21289");
+        body.put(COMMENT_ID, "127313");
 
         JSONObject uriParams = new JSONObject();
         uriParams.put(ACTION_MAKER_ID, "asdafsda");
