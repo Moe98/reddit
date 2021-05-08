@@ -83,10 +83,10 @@ public class RecommendationAppTest {
             String[] threadsDesc = new String[]{"all about computer", "all about computer parts", "all about movies", "all about tv series"};
             subThreads = new String[10];
 
-            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
+//            couchbase.createBucketIfNotExists(cluster, listingsBucketName, defaultRamQuota);
             couchbase.createBucketIfNotExists(cluster, recommendedSubThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
-            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
+//            couchbase.createBucketIfNotExists(cluster, recommendedThreadsBucketName, defaultRamQuota);
+//            couchbase.createBucketIfNotExists(cluster, recommendedUsersBucketName, defaultRamQuota);
             arango.createDatabaseIfNotExists(arangoDB, dbName);
             arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
             arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
@@ -223,6 +223,7 @@ public class RecommendationAppTest {
     public void GetRecommendedSubThreads() {
         new UpdateRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
         JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        assertEquals("ff", responseJson.getString("msg"));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
     }
@@ -231,6 +232,7 @@ public class RecommendationAppTest {
     public void GetRecommendedThreads() {
         new UpdateRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
         JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        assertEquals("ff", responseJson.getString("msg"));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
