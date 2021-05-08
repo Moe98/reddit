@@ -36,7 +36,7 @@ public class Arango {
         return instance;
     }
 
-    public void connect() {
+    private void connect() {
         if (arangoDB != null)
             disconnect();
         arangoDB = builder.build();
@@ -52,8 +52,10 @@ public class Arango {
     }
 
     public void disconnect() {
-        arangoDB.shutdown();
-        arangoDB = null;
+        if (arangoDB != null) {
+            arangoDB.shutdown();
+            arangoDB = null;
+        }
     }
 
     public boolean createDatabase(String dbName) {
