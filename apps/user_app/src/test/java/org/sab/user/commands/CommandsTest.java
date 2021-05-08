@@ -197,7 +197,7 @@ public class CommandsTest {
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(user.getString("username"), username);
-        assertTrue(user.has("photoUrl"));
+        assertTrue(!Utilities.isDevelopmentMode() || user.has("photoUrl"));
     }
 
     @Test
