@@ -6,8 +6,8 @@ public enum UserAttributes {
     ACTION_MAKER_ID("userId", "UserId"),
     USER_ID("userId", "UserId"),
     IS_DELETED("isDeleted", "IsDeleted"),
-    DATE_CREATED("dateCreated", "DateCreated");
-
+    DATE_CREATED("dateCreated", "DateCreated"),
+    NUM_OF_FOLLOWERS("numOfFollowers", "NumOfFollowers");
 
     private final String http;
     private final String db;

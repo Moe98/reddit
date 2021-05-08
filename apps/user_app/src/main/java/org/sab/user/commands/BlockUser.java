@@ -17,9 +17,7 @@ public class BlockUser extends UserToUserCommand {
     private ArangoDB arangoDB;
 
     public static void main(String[] args) {
-        BlockUser lc = new BlockUser();
-//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
-
+        BlockUser bu = new BlockUser();
 
         JSONObject body = new JSONObject();
         body.put(USER_ID, "Moe");
@@ -35,7 +33,7 @@ public class BlockUser extends UserToUserCommand {
         System.out.println(request);
         System.out.println("----------");
 
-        System.out.println(lc.execute(request));
+        System.out.println(bu.execute(request));
     }
 
     @Override
@@ -50,12 +48,12 @@ public class BlockUser extends UserToUserCommand {
         String userId = body.getString(USER_ID);
 
         JSONObject response = new JSONObject();
-        String msg = "";
+        String responseMessage = "";
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+//            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
             }
@@ -64,8 +62,14 @@ public class BlockUser extends UserToUserCommand {
             }
 
             if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
-                msg = "User does not exist.";
-                return Responder.makeErrorResponse(msg, 404).toString();
+                responseMessage = "User does not exist.";
+                return Responder.makeErrorResponse(responseMessage, 404).toString();
+            }
+
+            String actionMakerBlockedEdge = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            if(actionMakerBlockedEdge.length()!=0){
+                responseMessage = "You cannot interact with this user as they have blocked you.";
+                return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             // Get the user to check if they exist or have been deleted.
@@ -73,26 +77,27 @@ public class BlockUser extends UserToUserCommand {
             final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
 
             if (isDeleted) {
-                msg = "User has deleted their account.";
-                return Responder.makeErrorResponse(msg, 404).toString();
+                responseMessage = "User has deleted their account.";
+                return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             String blockEdgeId = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             if (blockEdgeId.length() != 0) {
-                msg = "You have unblocked this User.";
+                responseMessage = "You have unblocked this User.";
                 arango.deleteDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
             } else {
-                msg = "You have blocked this user.";
+                responseMessage = "You have blocked this user.";
 
                 final BaseEdgeDocument userBlockUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             arango.disconnect(arangoDB);
-            response.put("msg", msg);
+            response.put("msg", responseMessage);
         }
         return Responder.makeDataResponse(response).toString();
     }

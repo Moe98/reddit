@@ -19,8 +19,8 @@ public class Arango {
 
     private Arango() {
         builder = new ArangoDB.Builder()
-                .user(System.getenv("ARANGO_USER"))
-                .password(System.getenv("ARANGO_PASSWORD"))
+                .user(("root"))
+                .password(("root"))
                 .serializer(new ArangoJack());
     }
 
