@@ -29,6 +29,10 @@ public class DeleteProfilePhoto extends UserCommand {
 
     @Override
     protected String execute() {
+        Boolean authenticated = authenticationParams.getBoolean(Authenticated);
+        if(!authenticated)
+            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
+
         // retrieving the body objects
         String username = body.getString(USERNAME);
 

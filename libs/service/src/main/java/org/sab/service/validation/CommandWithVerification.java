@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public abstract class CommandWithVerification extends Command {
 
-    protected JSONObject body, uriParams;
+    protected JSONObject body, uriParams, authenticationParams;
     protected Schema schema;
 
 
@@ -25,6 +25,7 @@ public abstract class CommandWithVerification extends Command {
         if (!methodType.equals(request.getString("methodType")))
             return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
         body = methodType.equals("GET") ? new JSONObject() : request.getJSONObject("body");
+        authenticationParams = request.getJSONObject("authenticationParams");
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
