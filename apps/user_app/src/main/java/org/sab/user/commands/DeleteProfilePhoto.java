@@ -53,7 +53,7 @@ public class DeleteProfilePhoto extends UserCommand {
         try {
             PostgresConnection.call("delete_profile_picture", username);
         } catch (PropertiesNotLoadedException | SQLException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
         return Responder.makeMsgResponse("Profile Picture deleted successfully");
