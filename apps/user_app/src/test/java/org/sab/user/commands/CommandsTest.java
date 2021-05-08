@@ -29,7 +29,7 @@ public class CommandsTest {
     @BeforeClass
     public static void connectToDbs() {
         try {
-            UserApp.dbInit();
+            UserApp.dbInit(true);
         } catch (Exception e) {
             fail(e.getMessage());
         }

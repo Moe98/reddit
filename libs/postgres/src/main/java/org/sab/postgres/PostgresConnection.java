@@ -92,12 +92,18 @@ public class PostgresConnection {
         return resultSet;
     }
 
-    private static void createUsersTable() throws IOException, EnvironmentVariableNotLoaded {
-        runScript("../../libs/postgres/src/main/resources/sql/CreateTable.sql");
+    private static void createUsersTable(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
+        String path = "libs/postgres/src/main/resources/sql/CreateTable.sql";
+        if (isTesting)
+            path = "../../" + path;
+        runScript(path);
     }
 
-    private static void createUsersProcedures() throws IOException, EnvironmentVariableNotLoaded {
-        runScript("../../libs/postgres/src/main/resources/sql/procedures.sql");
+    private static void createUsersProcedures(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
+        String path = "libs/postgres/src/main/resources/sql/procedures.sql";
+        if (isTesting)
+            path = "../../" + path;
+        runScript(path);
     }
 
     private static void runScript(String scriptPath) throws IOException, EnvironmentVariableNotLoaded {
@@ -124,9 +130,9 @@ public class PostgresConnection {
 
     }
 
-    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        createUsersTable();
-        createUsersProcedures();
+    public static void dbInit(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
+        createUsersTable(isTesting);
+        createUsersProcedures(isTesting);
 
     }
 

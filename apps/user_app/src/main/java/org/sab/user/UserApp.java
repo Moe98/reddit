@@ -14,7 +14,7 @@ public class UserApp extends Service {
 
     public static void main(String[] args) throws IOException, EnvironmentVariableNotLoaded {
 
-//        dbInit();
+        dbInit(false);
         new UserApp().start();
     }
 
@@ -33,8 +33,8 @@ public class UserApp extends Service {
         return DEFAULT_PROPERTIES_FILENAME;
     }
 
-    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        PostgresConnection.dbInit();
+    public static void dbInit(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
+        PostgresConnection.dbInit(isTesting);
         arangoDbInit();
     }
 
