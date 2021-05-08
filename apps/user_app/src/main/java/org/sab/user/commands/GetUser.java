@@ -12,11 +12,10 @@ import java.util.List;
 public class GetUser extends UserCommand {
     @Override
     protected String execute() {
-        System.out.println(authenticationParams.toString());
-        Boolean authenticated = authenticationParams.getBoolean(Authenticated);
-        if(!authenticated)
+
+        boolean authenticated = authenticationParams.getBoolean(Authenticated);
+        if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
-            
         if (!uriParams.has(USERNAME))
             return Responder.makeErrorResponse("You must add username in URIParams!", 400);
         String username = uriParams.getString(USERNAME);

@@ -9,7 +9,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -28,7 +27,7 @@ public class UpdateProfilePhoto extends UserCommand {
 
     @Override
     protected String execute() {
-        Boolean authenticated = authenticationParams.getBoolean(Authenticated);
+        boolean authenticated = authenticationParams.getBoolean(Authenticated);
         if(!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
