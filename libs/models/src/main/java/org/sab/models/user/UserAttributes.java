@@ -2,10 +2,12 @@ package org.sab.models.user;
 
 public enum UserAttributes {
 
-    // variables in a thread object
-    USER_ID("id", "Id"),
+    // variables in a user object
+    ACTION_MAKER_ID("userId", "UserId"),
+    USER_ID("userId", "UserId"),
     IS_DELETED("isDeleted", "IsDeleted"),
     DATE_CREATED("dateCreated", "DateCreated");
+
 
     private final String http;
     private final String db;
