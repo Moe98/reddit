@@ -46,7 +46,7 @@ public abstract class CommandWithVerification extends Command {
     }
 
     protected boolean isFoundInBody(String attribute) {
-        return body.keySet().contains(attribute);
+        return body.has(attribute);
     }
 
     private void verifyBody() throws RequestVerificationException {

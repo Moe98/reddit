@@ -12,7 +12,7 @@ import java.util.List;
 public class GetUser extends UserCommand {
     @Override
     protected String execute() {
-        if (!uriParams.keySet().contains(USERNAME))
+        if (!uriParams.has(USERNAME))
             return Responder.makeErrorResponse("You must add username in URIParams!", 400);
         String username = uriParams.getString(USERNAME);
         try {
