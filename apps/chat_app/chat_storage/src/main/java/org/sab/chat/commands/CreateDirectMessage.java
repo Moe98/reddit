@@ -53,7 +53,7 @@ public class CreateDirectMessage extends CommandWithVerification {
             responseBody.put("messageId", messageId.toString());
 
             response.put("statusCode", 200);
-            response.put("msg", "Direct Message Created");
+            response.put("msg", "Direct message created successfully");
             response.put("data", responseBody);
 
         } catch (InvalidInputException e) {
