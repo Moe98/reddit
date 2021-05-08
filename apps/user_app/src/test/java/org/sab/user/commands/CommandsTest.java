@@ -149,7 +149,7 @@ public class CommandsTest {
 
         String newPassword = "123456";
 
-        JSONObject response = Requester.updatePassword(username, password, newPassword);
+        JSONObject response = Requester.updatePassword(password, newPassword);
         assertEquals(200, response.getInt("statusCode"));
 
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
@@ -162,7 +162,7 @@ public class CommandsTest {
     public void T09_updatePasswordBack() {
 
 
-        JSONObject response = Requester.updatePassword(username, "123456", password);
+        JSONObject response = Requester.updatePassword("123456", password);
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Account Updated Successfully!");
     }
@@ -171,7 +171,7 @@ public class CommandsTest {
     public void T10_newPasswordCannotMatchPreviousPassword() {
 
 
-        JSONObject response = Requester.updatePassword(username, password, password);
+        JSONObject response = Requester.updatePassword(password, password);
         int statusCode = response.getInt("statusCode");
         assertTrue(statusCode >= 400);
         System.out.println(response);
@@ -183,7 +183,7 @@ public class CommandsTest {
         if (!Utilities.isDevelopmentMode())
             return;
         String photoUrl = "https://picsum.photos/200";
-        JSONObject response = Requester.updateProfilePicture(username, photoUrl);
+        JSONObject response = Requester.updateProfilePicture(photoUrl);
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Profile Picture uploaded successfully");
 
@@ -195,8 +195,7 @@ public class CommandsTest {
         if (!Utilities.isDevelopmentMode())
             return;
 
-
-        JSONObject response = Requester.deleteProfilePicture(username);
+        JSONObject response = Requester.deleteProfilePicture();
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(response.getString("msg"), "Profile Picture deleted successfully");

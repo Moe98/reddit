@@ -42,29 +42,24 @@ public class Requester {
         return new JSONObject(new GetUser().execute(request));
     }
 
-    static public JSONObject updatePassword(String username, String oldPassword, String newPassword) {
+    static public JSONObject updatePassword(String oldPassword, String newPassword) {
         JSONObject body = new JSONObject();
-        body.put("username", username);
         body.put("oldPassword", oldPassword);
         body.put("newPassword", newPassword);
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
         return new JSONObject(new UpdatePassword().execute(request));
     }
 
-    static public JSONObject updateProfilePicture(String username, String photoUrl) {
+    static public JSONObject updateProfilePicture(String photoUrl) {
         JSONObject body = new JSONObject();
-        body.put("username", username);
         body.put("photoUrl", photoUrl);
 
         JSONObject request = makeRequest(body, "PUT", new JSONObject());
         return new JSONObject(new UpdateProfilePhoto().execute(request));
     }
 
-    static public JSONObject deleteProfilePicture(String username) {
-        JSONObject body = new JSONObject();
-        body.put("username", username);
-
-        JSONObject request = makeRequest(body, "DELETE", new JSONObject());
+    static public JSONObject deleteProfilePicture() {
+        JSONObject request = makeRequest(new JSONObject(), "DELETE", new JSONObject());
         return new JSONObject(new DeleteProfilePhoto().execute(request));
     }
 
@@ -90,9 +85,6 @@ public class Requester {
         }
         authenticationParams.put("isAuthenticated", authenticated);
     }
-
-
-    
 
 
 }
