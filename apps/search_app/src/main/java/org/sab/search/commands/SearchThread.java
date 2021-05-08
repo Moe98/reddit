@@ -1,7 +1,6 @@
 package org.sab.search.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
@@ -16,8 +15,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class SearchThread extends Command {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     public String execute(JSONObject request) {
@@ -26,9 +23,11 @@ public class SearchThread extends Command {
             if (searchKeyword.isBlank())
                 return Responder.makeErrorResponse("searchKeyword must not be blank", 400).toString();
 
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
+            // Search Threads using an English text analyzer to search for the keyword appearing in a prefix of Threads'
+            // names.
             String query = """
                     FOR result IN %s
                          SEARCH ANALYZER(STARTS_WITH(result.%s, LOWER(LTRIM(@keyword))) OR PHRASE(result.%s, @keyword), "text_en")
@@ -37,7 +36,7 @@ public class SearchThread extends Command {
                             SearchApp.threadName,
                             SearchApp.threadName);
             Map<String, Object> bindVars = Collections.singletonMap("keyword", searchKeyword);
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.dbName, query, bindVars);
 
             JSONArray data = new JSONArray();
             cursor.forEachRemaining(document -> {
@@ -56,9 +55,6 @@ public class SearchThread extends Command {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong.", 500).toString();
-        } finally {
-            if (arango != null)
-                arango.disconnect(arangoDB);
         }
     }
 }

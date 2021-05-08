@@ -1,6 +1,5 @@
 package org.sab.search;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,23 +22,18 @@ import static org.junit.Assert.fail;
 
 public class SearchAppTest {
     final private static String dbName = System.getenv("ARANGO_DB");
-    final private static String threadsCollectionName = Thread.getCollectionName();
-    final private static String subThreadsCollectionName = SubThread.getCollectionName();
+    final private static String threadsCollectionName = SearchApp.threadsCollectionName;
+    final private static String subThreadsCollectionName = SearchApp.subThreadsCollectionName;
     private static Arango arango;
-    private static ArangoDB arangoDB;
     private static HashMap<String, ArrayList<String>> toBeDeleted;
 
     @BeforeClass
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            arango.connectIfNotConnected();
 
-            arango.createDatabaseIfNotExists(arangoDB, dbName);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
-            arango.createViewIfNotExists(arangoDB, dbName, SearchApp.getViewName(threadsCollectionName), threadsCollectionName, new String[]{Thread.getNameAttributeName(), Thread.getDescriptionAttributeName()});
-            arango.createViewIfNotExists(arangoDB, dbName, SearchApp.getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{SubThread.getTitleAttributeName(), SubThread.getContentAttributeName()});
+            SearchApp.dbInit();
 
             // Dummy Data
             toBeDeleted = new HashMap<>();
@@ -55,7 +49,7 @@ public class SearchAppTest {
                 thread.addAttribute(Thread.getCreatorAttributeName(), "hamada");
                 thread.addAttribute(Thread.getNumOfFollowersAttributeName(), 0);
                 thread.addAttribute(Thread.getDateCreatedAttributeName(), Timestamp.valueOf(LocalDateTime.now()));
-                arango.createDocument(arangoDB, dbName, threadsCollectionName, thread);
+                arango.createDocument(dbName, threadsCollectionName, thread);
                 toBeDeleted.get(threadsCollectionName).add(s);
             }
             for (int i = 0; i < 2; i++) {
@@ -68,7 +62,7 @@ public class SearchAppTest {
                 subThread.addAttribute(SubThread.getContentAttributeName(), "content");
                 subThread.addAttribute(SubThread.getHasImageAttributeName(), false);
                 subThread.addAttribute(SubThread.getDateAttributeName(), Timestamp.valueOf(LocalDateTime.now()));
-                BaseDocument created = arango.createDocument(arangoDB, dbName, subThreadsCollectionName, subThread);
+                BaseDocument created = arango.createDocument(dbName, subThreadsCollectionName, subThread);
                 toBeDeleted.get(subThreadsCollectionName).add(created.getKey());
             }
         } catch (Exception e) {
@@ -81,13 +75,13 @@ public class SearchAppTest {
         try {
             toBeDeleted.forEach((key, value) -> {
                 for (String _key : value) {
-                    arango.deleteDocument(arangoDB, dbName, key, _key);
+                    arango.deleteDocument(dbName, key, _key);
                 }
             });
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
-            arango.disconnect(arangoDB);
+            arango.disconnect();
         }
     }
 

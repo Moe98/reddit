@@ -1,7 +1,6 @@
 package org.sab.search.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
@@ -16,8 +15,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public class SearchSubThread extends Command {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     public String execute(JSONObject request) {
@@ -26,9 +23,11 @@ public class SearchSubThread extends Command {
             if (searchKeywords.isBlank())
                 return Responder.makeErrorResponse("searchKeywords must not be blank", 400).toString();
 
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
+            // Search SubThread by using an English text analyzer to search for keywords appearing in SubThreads' Titles
+            // & Contents.
             String query = """
                     FOR result IN %s
                          SEARCH ANALYZER(result.%s IN TOKENS(@keywords, "text_en") OR result.%s IN TOKENS(@keywords, "text_en"), "text_en")
@@ -37,7 +36,7 @@ public class SearchSubThread extends Command {
                             SearchApp.subThreadTitle,
                             SearchApp.subThreadContent);
             Map<String, Object> bindVars = Collections.singletonMap("keywords", searchKeywords);
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, SearchApp.dbName, query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(SearchApp.dbName, query, bindVars);
 
             JSONArray data = new JSONArray();
             cursor.forEachRemaining(document -> {
@@ -60,9 +59,6 @@ public class SearchSubThread extends Command {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong.", 500).toString();
-        } finally {
-            if (arango != null)
-                arango.disconnect(arangoDB);
         }
     }
 }

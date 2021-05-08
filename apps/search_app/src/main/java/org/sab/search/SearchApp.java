@@ -1,6 +1,5 @@
 package org.sab.search;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
 import org.sab.models.SubThread;
@@ -25,8 +24,6 @@ public class SearchApp extends Service {
     final public static String subThreadContent = SubThread.getContentAttributeName();
     final public static String subThreadHasImage = SubThread.getHasImageAttributeName();
     final public static String subThreadTime = SubThread.getDateAttributeName();
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     public String getAppUriName() {
@@ -47,26 +44,22 @@ public class SearchApp extends Service {
         return collectionName + "View";
     }
 
-    private void dbInit() {
+    public static void dbInit() {
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
-            arango.createDatabaseIfNotExists(arangoDB, dbName);
-            arango.createCollectionIfNotExists(arangoDB, dbName, threadsCollectionName, false);
-            arango.createCollectionIfNotExists(arangoDB, dbName, subThreadsCollectionName, false);
-            arango.createViewIfNotExists(arangoDB, dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
-            arango.createViewIfNotExists(arangoDB, dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
+            Arango arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+            arango.createDatabaseIfNotExists(dbName);
+            arango.createCollectionIfNotExists(dbName, threadsCollectionName, false);
+            arango.createCollectionIfNotExists(dbName, subThreadsCollectionName, false);
+            arango.createViewIfNotExists(dbName, getViewName(threadsCollectionName), threadsCollectionName, new String[]{threadName, threadDescription});
+            arango.createViewIfNotExists(dbName, getViewName(subThreadsCollectionName), subThreadsCollectionName, new String[]{subThreadTitle, subThreadContent});
         } catch (ArangoDBException e) {
             e.printStackTrace();
-        } finally {
-            if (arango != null)
-                arango.disconnect(arangoDB);
         }
     }
 
     public static void main(String[] args) {
-        SearchApp app = new SearchApp();
-        app.dbInit();
-        app.start();
+        dbInit();
+        new SearchApp().start();
     }
 }
