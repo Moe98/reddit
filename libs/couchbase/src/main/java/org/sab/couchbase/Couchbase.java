@@ -27,16 +27,16 @@ public class Couchbase {
         return instance;
     }
 
-    public void connect() {
+    private void connect() {
         if (cluster != null)
             disconnect();
         cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
+        cluster.waitUntilReady(Duration.ofSeconds(3));
     }
 
     public boolean isConnected() {
         if (cluster == null)
             return false;
-        cluster.waitUntilReady(Duration.ofSeconds(3));
         return cluster.ping().endpoints().values().stream().anyMatch(a -> a.stream().anyMatch(b -> b.state() == PingState.OK));
     }
 
@@ -46,8 +46,10 @@ public class Couchbase {
     }
 
     public void disconnect() {
-        cluster.disconnect();
-        cluster = null;
+        if (cluster != null) {
+            cluster.disconnect();
+            cluster = null;
+        }
     }
 
     public void createBucket(String bucketName, int ramQuotaMB) {

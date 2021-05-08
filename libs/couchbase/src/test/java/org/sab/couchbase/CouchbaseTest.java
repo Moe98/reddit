@@ -20,7 +20,7 @@ public class CouchbaseTest {
     public static void setUp() {
         try {
             couchbase = Couchbase.getInstance();
-            couchbase.connect();
+            couchbase.connectIfNotConnected();
             assertTrue(couchbase.isConnected());
 
             bucketName = "TestBucket";
