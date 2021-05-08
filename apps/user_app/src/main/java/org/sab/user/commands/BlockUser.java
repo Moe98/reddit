@@ -67,7 +67,7 @@ public class BlockUser extends UserToUserCommand {
             }
 
             String actionMakerBlockedEdge = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
-            if(actionMakerBlockedEdge.length()!=0){
+            if (actionMakerBlockedEdge.length() != 0) {
                 responseMessage = "You cannot interact with this user as they have blocked you.";
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
