@@ -25,22 +25,24 @@ public class UserToUserActionsTest {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
 
+            arango.createDatabase(arangoDB, UserToUserCommand.TEST_DB_Name);
+
             moe = new BaseDocument();
-            moe.addAttribute(UserToUserCommand.USER_ID_DB, moeId);
+            moe.setKey(moeId);
             moe.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             moe.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
 
             addObjectToCollection(moe, UserToUserCommand.USER_COLLECTION_NAME);
 
             manta = new BaseDocument();
-            manta.addAttribute(UserToUserCommand.USER_ID_DB, mantaId);
+            manta.setKey(mantaId);
             manta.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             manta.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
 
             addObjectToCollection(manta, UserToUserCommand.USER_COLLECTION_NAME);
 
             lujine = new BaseDocument();
-            lujine.addAttribute(UserToUserCommand.USER_ID_DB, lujineId);
+            lujine.setKey(lujineId);
             lujine.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             lujine.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
 
@@ -64,10 +66,11 @@ public class UserToUserActionsTest {
     }
 
     @AfterClass
-    public void tearDown() {
+    public static void tearDown() {
         removeObjectFromCollection(moe, UserToUserCommand.USER_COLLECTION_NAME);
         removeObjectFromCollection(manta, UserToUserCommand.USER_COLLECTION_NAME);
         removeObjectFromCollection(lujine, UserToUserCommand.USER_COLLECTION_NAME);
+        arango.dropDatabase(arangoDB,UserToUserCommand.TEST_DB_Name);
     }
 
     @Test
@@ -87,11 +90,11 @@ public class UserToUserActionsTest {
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         FollowUser followUser = new FollowUser();
-        String response = followUser.execute(body);
+        String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(200, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.SUCCESSFULLY_FOLLOWED_USER, responseJson.getString("msg"));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.SUCCESSFULLY_FOLLOWED_USER, ((JSONObject)responseJson.get("data")).getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -122,8 +125,8 @@ public class UserToUserActionsTest {
         String response = blockUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(200, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, responseJson.getString("msg"));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject)responseJson.get("data")).getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -152,10 +155,10 @@ public class UserToUserActionsTest {
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         FollowUser followUser = new FollowUser();
-        String response = followUser.execute(body);
+        String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(404, responseJson.getString("statusCode"));
+        assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
@@ -187,11 +190,11 @@ public class UserToUserActionsTest {
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         FollowUser followUser = new FollowUser();
-        String response = followUser.execute(body);
+        String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(404, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
+        assertEquals(404, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE,responseJson.getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -222,8 +225,8 @@ public class UserToUserActionsTest {
         String response = blockUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(200, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, responseJson.getString("msg"));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject)responseJson.get("data")).getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -249,11 +252,11 @@ public class UserToUserActionsTest {
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         FollowUser followUser = new FollowUser();
-        String response = followUser.execute(body);
+        String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(200, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.SUCCESSFULLY_UNFOLLOWED_USER, responseJson.getString("msg"));
+        assertEquals(200, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.SUCCESSFULLY_UNFOLLOWED_USER, ((JSONObject)responseJson.get("data")).getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -292,8 +295,8 @@ public class UserToUserActionsTest {
         String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(404, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
+        assertEquals(404, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE,responseJson.getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
@@ -322,7 +325,7 @@ public class UserToUserActionsTest {
 
 
         FollowUser followUser = new FollowUser();
-        followUser.execute(body);
+        followUser.execute(request);
 
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
@@ -331,11 +334,11 @@ public class UserToUserActionsTest {
         userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
         arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, lujineId);
 
-        String response = followUser.execute(body);
+        String response = followUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(404, responseJson.getString("statusCode"));
-        assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
+        assertEquals(404, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE,responseJson.getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
@@ -367,10 +370,10 @@ public class UserToUserActionsTest {
         request.put("uriParams", uriParams);
 
         BlockUser blockUser = new BlockUser();
-        String response = blockUser.execute(body);
+        String response = blockUser.execute(request);
         JSONObject responseJson = new JSONObject(response);
 
-        assertEquals(404, responseJson.getString("statusCode"));
+        assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
         String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);

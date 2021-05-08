@@ -17,7 +17,7 @@ public abstract class UserToUserCommand extends CommandWithVerification {
 
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
-    protected static final String TEST_DB_Name = "TEST_DB";
+    protected static final String TEST_DB_Name = DB_Name;
     protected static final String USER_COLLECTION_NAME = "User";
     protected static final String USER_FOLLOWS_USER_COLLECTION_NAME = "UserFollowsUser";
     protected static final String USER_BLOCK_USER_COLLECTION_NAME = "UserBlockUser";

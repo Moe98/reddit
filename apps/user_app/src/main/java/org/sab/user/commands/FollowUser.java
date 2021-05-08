@@ -52,8 +52,13 @@ public class FollowUser extends UserToUserCommand {
             if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
             }
+
             if (!arango.collectionExists(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
+            }
+
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
             }
 
             if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
