@@ -1,6 +1,7 @@
 package org.sab.netty.middleware;
 
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,8 +11,8 @@ import io.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.netty.Server;
+import org.sab.service.authentication.Jwt;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     JSONObject headers;
     String queueName;
     boolean badRequest;
+    Jwt jwt;
+    JSONObject authenticationParams;
 
     JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -46,7 +49,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         request.put("methodType", methodType);
         request.put("headers", headers);
         request.put("functionName", headers.getString("Function-Name"));
-        return request;
+
+        return authenticate(request);
     }
 
     @Override
@@ -124,6 +128,32 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         headers = new JSONObject();
         req.headers().entries().forEach(entry -> headers.put(entry.getKey(), entry.getValue()));
         return headers;
+    }
+    private JSONObject authenticate(JSONObject request){
+        // JWT token
+        // set token if auth header is set
+        // format: Bearer xxxxxx-xxxxxx-xxxxxx
+        authenticationParams = new JSONObject();
+        jwt = new Jwt();
+        Boolean authenticated = false;
+        String authHeader = headers.has("Authorization")? headers.getString("Authorization") : null;
+        if (authHeader != null) {
+            String[] auth = authHeader.split(" ");
+            if (auth.length > 1) {
+                try {
+                    Map<String, Object> claims = jwt.verifyAndDecode(auth[1]);
+                    authenticated = true;
+                    authenticationParams.put("username",(String) claims.get("username"));
+                    authenticationParams.put("jwt",auth[1]);
+                } catch (JWTVerificationException jwtVerificationException) {
+                    System.out.println(jwtVerificationException.getMessage());
+                    authenticated = false;
+                }
+            }
+        }
+        authenticationParams.put("isAuthenticated",authenticated);
+        request.put("authenticationParams",authenticationParams);
+        return request;
     }
 
 }
