@@ -16,6 +16,28 @@ public class BlockUser extends UserToUserCommand {
     private Arango arango;
     private ArangoDB arangoDB;
 
+    public static void main(String[] args) {
+        BlockUser lc = new BlockUser();
+//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
+
+
+        JSONObject body = new JSONObject();
+        body.put(USER_ID, "Moe");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "Manta");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(lc.execute(request));
+    }
+
     @Override
     protected Schema getSchema() {
         final Attribute userId = new Attribute(USER_ID, DataType.STRING, true);
@@ -73,27 +95,5 @@ public class BlockUser extends UserToUserCommand {
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-        BlockUser lc = new BlockUser();
-//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
-
-
-        JSONObject body = new JSONObject();
-        body.put(USER_ID, "Moe");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "Manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(lc.execute(request));
     }
 }
