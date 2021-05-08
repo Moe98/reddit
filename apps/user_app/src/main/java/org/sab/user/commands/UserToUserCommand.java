@@ -1,5 +1,6 @@
 package org.sab.user.commands;
 
+import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
@@ -15,4 +16,21 @@ public abstract class UserToUserCommand extends CommandWithVerification {
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
     protected static final String USER_COLLECTION_NAME = "User";
+    protected static final String USER_FOLLOWS_USER_COLLECTION_NAME = "UserFollowsUser";
+    protected static final String USER_BLOCK_USER_COLLECTION_NAME = "UserBlockUser";
+
+    protected final BaseEdgeDocument addEdgeFromUserToUser(String actionMakerId, String userId) {
+        final String from = USER_COLLECTION_NAME + "/" + actionMakerId;
+        final String to = USER_COLLECTION_NAME + "/" + userId;
+
+        return addEdgeFromToWithKey(from, to);
+    }
+
+    protected final BaseEdgeDocument addEdgeFromToWithKey(String from, String to) {
+        BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
+        edgeDocument.setFrom(from);
+        edgeDocument.setTo(to);
+
+        return edgeDocument;
+    }
 }

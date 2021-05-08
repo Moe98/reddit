@@ -9,6 +9,7 @@ import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -130,5 +131,25 @@ public class Arango {
 
     public ArangoCursor<BaseDocument> query(ArangoDB arangoDB, String dbName, String query, Map<String, Object> bindVars) {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
+    }
+
+    public static String getSingleEdgeId(Arango arango, ArangoDB arangoDB, String DB_Name, String collectionName, String userId, String contentId){
+        String query = """
+                FOR content, edge IN 1..1 OUTBOUND @username @collectionName
+                    FILTER content._id == @contentId
+                    RETURN DISTINCT {edgeId:edge._key}
+                """;
+
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("username", userId);
+        bindVars.put("contentId", contentId);
+        bindVars.put("collectionName", collectionName);
+        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+        ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, DB_Name, query, bindVars);
+        String edgeId = "";
+        if (cursor.hasNext()) {
+            edgeId = (String)cursor.next().getAttribute("edgeId");
+        }
+        return edgeId;
     }
 }
