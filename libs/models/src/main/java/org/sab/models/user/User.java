@@ -1,7 +1,6 @@
 package org.sab.models.user;
 
 import org.json.JSONObject;
-import org.sab.models.ThreadAttributes;
 
 public class User {
     String id;
