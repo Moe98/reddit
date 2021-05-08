@@ -14,7 +14,7 @@ import java.util.Date;
 import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class SignUpTest {
+public class CommandsTest {
 
     static String username = "scale-a-bull" + new Date().getTime();
     static String password = "12345678";
