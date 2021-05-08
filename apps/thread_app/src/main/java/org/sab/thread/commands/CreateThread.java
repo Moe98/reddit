@@ -2,6 +2,7 @@ package org.sab.thread.commands;
 
 import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Thread;
@@ -30,7 +31,6 @@ public class CreateThread extends ThreadCommand {
     private Arango arango;
     private ArangoDB arangoDB;
 
-
     @Override
     public String execute() {
         String name = body.getString(THREAD_NAME);
@@ -41,8 +41,7 @@ public class CreateThread extends ThreadCommand {
 
         // TODO change from empty constructor
         Thread thread = new Thread();
-
-
+        
         try {
             arango = Arango.getInstance();
             arangoDB = arango.connect();
@@ -51,8 +50,12 @@ public class CreateThread extends ThreadCommand {
             if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
                 arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
             }
+            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
+            }
 
-            // TODO check creator exists and is not deleted
+            // TODO can we do this as a transaction?
+
             BaseDocument myObject = new BaseDocument();
             myObject.setKey(name);
 //            myObject.addAttribute(THREAD_NAME_DB, name);
@@ -70,6 +73,12 @@ public class CreateThread extends ThreadCommand {
             thread.setDateCreated((String) res.getAttribute(DATE_CREATED_DB));
             thread.setNumOfFollowers(Integer.parseInt(res.getAttribute(NUM_OF_FOLLOWERS_DB).toString()));
 
+            // assign creator to be mod
+            BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
+            edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + creatorId);
+            edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + name);
+            arango.createEdgeDocument(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
@@ -78,13 +87,37 @@ public class CreateThread extends ThreadCommand {
         return Responder.makeDataResponse(thread.toJSON()).toString();
     }
 
-
-
-
     public static void main(String[] args) {
         CreateThread tc = new CreateThread();
-        JSONObject request = new JSONObject("{\"body\":{\"dateCreated\":\"1998-2-9\",\"name\":\"asmakElRayes7amido\",\"creatorId\":\"sd54sdsda\",\"description\":\"agmad subreddit fl wogod\"},\"uriParams\":{},\"methodType\":\"POST\"}");
+        JSONObject request = new JSONObject();
+
+        JSONObject body = new JSONObject();
+        body.put("name", "asmakElRayes7amido");
+        body.put("creatorId", "32930");
+        body.put("description", "agmad subreddit fl wogod");
+
+        JSONObject uriParams = new JSONObject();
+
+        request.put("body", body);
+        request.put("uriParams", uriParams);
+        request.put("methodType", "POST");
+        System.out.println(request);
         System.out.println(tc.execute(request));
+
+        JSONObject request2 = new JSONObject();
+
+        JSONObject body2 = new JSONObject();
+        body2.put("name", "GelatiAzza");
+        body2.put("creatorId", "33366");
+        body2.put("description", "tany agmad subreddit fl wogod");
+
+        JSONObject uriParams2 = new JSONObject();
+
+        request2.put("body", body2);
+        request2.put("uriParams", uriParams2);
+        request2.put("methodType", "POST");
+        System.out.println(request2);
+        System.out.println(tc.execute(request2));
     }
 
 }
