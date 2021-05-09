@@ -2,6 +2,7 @@ package org.sab.chat.server.routers;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.simple.JSONObject;
 import org.sab.chat.server.models.ClientManager;
@@ -12,7 +13,14 @@ import java.util.UUID;
 public class CreateGroupMessageRouter extends Router {
     @Override
     public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        System.out.println("Forward to queue");
+        JSONObject body = new JSONObject();
+        body.put("chatId", request.get("chatId"));
+        body.put("senderId", request.get("sender_id"));
+        body.put("content", request.get("content"));
+
+        JSONObject packedRequest = packRequest("CREATE_GROUP_MESSAGE", body);
+
+        ctx.fireChannelRead(packedRequest);
     }
 
     @Override

@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.sab.chat.server.handlers.HttpRequestHandler;
+import org.sab.chat.server.handlers.QueueHandler;
 import org.sab.chat.server.handlers.TextWebSocketFrameHandler;
 
 public class ChatServerInitializer extends ChannelInitializer<Channel> {
@@ -25,4 +26,5 @@ public class ChatServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpRequestHandler("/ws"));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
         pipeline.addLast(new TextWebSocketFrameHandler(group));
+        pipeline.addLast(new QueueHandler("CHAT"));
     } }

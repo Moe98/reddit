@@ -19,6 +19,7 @@ public class ClientManager {
             handleNonsupportedType(ctx);
             return;
         }
+        router.forwardToQueue(ctx, messageJson);
         router.route(ctx, messageJson);
     }
 
