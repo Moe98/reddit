@@ -1,6 +1,5 @@
 package org.sab.user.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -13,8 +12,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class BlockUser extends UserToUserCommand {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     public static void main(String[] args) {
         BlockUser bu = new BlockUser();
@@ -50,30 +47,29 @@ public class BlockUser extends UserToUserCommand {
         JSONObject response = new JSONObject();
         String responseMessage = "";
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
 //            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
             }
 
-            if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
+            if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String actionMakerBlockedEdge = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            String actionMakerBlockedEdge = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
             if (actionMakerBlockedEdge.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
             // Get the user to check if they exist or have been deleted.
-            final BaseDocument userDocument = arango.readDocument(arangoDB, DB_Name, USER_COLLECTION_NAME, userId);
+            final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
             final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
 
             if (isDeleted) {
@@ -81,22 +77,21 @@ public class BlockUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String blockEdgeId = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            String blockEdgeId = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             if (blockEdgeId.length() != 0) {
                 responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
-                arango.deleteDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
+                arango.deleteDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
             } else {
                 responseMessage = USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
 
                 final BaseEdgeDocument userBlockUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
+                arango.createEdgeDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
             }
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
             response.put("msg", responseMessage);
         }
         return Responder.makeDataResponse(response).toString();

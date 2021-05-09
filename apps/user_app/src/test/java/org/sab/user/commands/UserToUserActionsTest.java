@@ -1,6 +1,5 @@
 package org.sab.user.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -13,16 +12,14 @@ import static org.junit.Assert.*;
 public class UserToUserActionsTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
     private static Arango arango;
-    private static ArangoDB arangoDB;
     private static BaseDocument moe, manta, lujine;
 
     @BeforeClass
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
 
-            arango.createDatabase(arangoDB, UserToUserCommand.TEST_DB_Name);
+            arango.createDatabase(UserToUserCommand.TEST_DB_Name);
 
             moe = new BaseDocument();
             moe.setKey(moeId);
@@ -51,15 +48,15 @@ public class UserToUserActionsTest {
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
         // TODO: Add testing DB.
-        if (!arango.collectionExists(arangoDB, UserToUserCommand.TEST_DB_Name, collectionName)) {
-            arango.createCollection(arangoDB, UserToUserCommand.TEST_DB_Name, collectionName, false);
+        if (!arango.collectionExists(UserToUserCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(UserToUserCommand.TEST_DB_Name, collectionName, false);
         }
 
-        arango.createDocument(arangoDB, UserToUserCommand.TEST_DB_Name, collectionName, document);
+        arango.createDocument(UserToUserCommand.TEST_DB_Name, collectionName, document);
     }
 
     private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
-        arango.deleteDocument(arangoDB, UserToUserCommand.TEST_DB_Name, collectionName, document.getKey());
+        arango.deleteDocument(UserToUserCommand.TEST_DB_Name, collectionName, document.getKey());
     }
 
     @AfterClass
@@ -67,13 +64,13 @@ public class UserToUserActionsTest {
         removeObjectFromCollection(moe, UserToUserCommand.USER_COLLECTION_NAME);
         removeObjectFromCollection(manta, UserToUserCommand.USER_COLLECTION_NAME);
         removeObjectFromCollection(lujine, UserToUserCommand.USER_COLLECTION_NAME);
-        arango.dropDatabase(arangoDB, UserToUserCommand.TEST_DB_Name);
+        arango.dropDatabase(UserToUserCommand.TEST_DB_Name);
     }
 
     public static void deleteUser(String userId) {
-        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
+        final BaseDocument userDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
         userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
-        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
+        arango.updateDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
     }
 
     public static String userFollowUser(String actionMakerId, String userId) {
@@ -109,9 +106,9 @@ public class UserToUserActionsTest {
     }
 
     public static void undeleteUser(String userId) {
-        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
+        final BaseDocument userDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
         userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, false);
-        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
+        arango.updateDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
     }
 
     public static String userUnfollowUser(String actionMaker, String userId) {
@@ -124,7 +121,7 @@ public class UserToUserActionsTest {
 
     @Test
     public void T01_UserFollowsUser() {
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         String response = userFollowUser(mantaId, moeId);
@@ -133,13 +130,13 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.SUCCESSFULLY_FOLLOWED_USER, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
-        assertFalse(edgeId.equals(""));
+        assertNotEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount + 1, newFollowerCount);
@@ -156,11 +153,11 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
-        assertFalse(edgeId.equals(""));
+        assertNotEquals("", edgeId);
 
         //removing the test effect
         userUnblockUser(mantaId, moeId);
@@ -170,7 +167,7 @@ public class UserToUserActionsTest {
     public void T03_UserCannotFollowBlockedUser() {
         userBlockUser(lujineId, moeId);
 
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         String response = userFollowUser(lujineId, moeId);
@@ -179,13 +176,13 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
-        assertTrue(edgeId.equals(""));
+        assertEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
@@ -198,7 +195,7 @@ public class UserToUserActionsTest {
     public void T04_UserCannotUnfollowBlockedUser() {
         userFollowUser(mantaId, moeId);
 
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         userBlockUser(mantaId, moeId);
@@ -209,13 +206,13 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
-        assertFalse(edgeId.equals(""));
+        assertNotEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
@@ -235,18 +232,18 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was removed successfully.
-        assertTrue(edgeId.equals(""));
+        assertEquals("", edgeId);
     }
 
     @Test
     public void T06_UserUnfollowsUser() {
         userFollowUser(mantaId, moeId);
 
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         String response = userUnfollowUser(mantaId, moeId);
@@ -255,13 +252,13 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.SUCCESSFULLY_UNFOLLOWED_USER, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was removed successfully.
-        assertTrue(edgeId.equals(""));
+        assertEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount - 1, newFollowerCount);
@@ -271,7 +268,7 @@ public class UserToUserActionsTest {
     public void TO7_UserCannotFollowDeletedUser() {
         deleteUser(moeId);
 
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         String response = userFollowUser(mantaId, moeId);
@@ -280,13 +277,13 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
-        assertTrue(edgeId.equals(""));
+        assertEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
@@ -299,7 +296,7 @@ public class UserToUserActionsTest {
     public void T08_UserCannotUnfollowDeletedUser() {
         userFollowUser(mantaId, lujineId);
 
-        final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
+        final BaseDocument oldUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         deleteUser(lujineId);
@@ -310,13 +307,13 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not removed.
-        assertFalse(edgeId.equals(""));
+        assertNotEquals("", edgeId);
 
-        final BaseDocument newUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
+        final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
@@ -336,11 +333,11 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
-        assertTrue(edgeId.equals(""));
+        assertEquals("", edgeId);
 
         //removing test effect
         undeleteUser(lujineId);
@@ -358,11 +355,11 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
-        assertFalse(edgeId.equals(""));
+        assertNotEquals("", edgeId);
 
         //removing test effects
         undeleteUser(lujineId);

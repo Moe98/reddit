@@ -1,6 +1,5 @@
 package org.sab.user.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -13,8 +12,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class FollowUser extends UserToUserCommand {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     public static void main(String[] args) {
         FollowUser followUser = new FollowUser();
@@ -42,31 +39,30 @@ public class FollowUser extends UserToUserCommand {
         String responseMessage = "";
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             final String userId = body.getString(USER_ID);
             final String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
 
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
             }
 
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
             }
 
-            if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
+            if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String actionMakerBlockedUser = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String actionMakerBlockedUser = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             // TODO: If user can unfollow a user they blocked, then delete this condition.
             if (actionMakerBlockedUser.length() != 0) {
@@ -74,7 +70,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String userBlockedActionMaker = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            final String userBlockedActionMaker = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
 
             if (userBlockedActionMaker.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
@@ -82,7 +78,7 @@ public class FollowUser extends UserToUserCommand {
             }
 
             // Get the user to check if they exist or have been deleted.
-            final BaseDocument userDocument = arango.readDocument(arangoDB, DB_Name, USER_COLLECTION_NAME, userId);
+            final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
             final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
 
             if (isDeleted) {
@@ -90,29 +86,28 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String edgeKey = Arango.getSingleEdgeId(arango, arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String edgeKey = Arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
             int followerCount = Integer.parseInt(String.valueOf(userDocument.getAttribute(NUM_OF_FOLLOWERS_DB)));
 
             if (edgeKey.length() != 0) {
                 responseMessage = SUCCESSFULLY_UNFOLLOWED_USER;
-                arango.deleteDocument(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
+                arango.deleteDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
                 --followerCount;
 
             } else {
                 responseMessage = SUCCESSFULLY_FOLLOWED_USER;
 
                 final BaseEdgeDocument userFollowsUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, userFollowsUserEdge);
+                arango.createEdgeDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, userFollowsUserEdge);
                 ++followerCount;
             }
 
             userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
-            arango.updateDocument(arangoDB, DB_Name, USER_COLLECTION_NAME, userDocument, userId);
+            arango.updateDocument(DB_Name, USER_COLLECTION_NAME, userDocument, userId);
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
             response.put("msg", responseMessage);
         }
 
