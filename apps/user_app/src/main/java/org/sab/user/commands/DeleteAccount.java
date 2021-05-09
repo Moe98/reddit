@@ -1,6 +1,5 @@
 package org.sab.user.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeleteAccount extends UserCommand {
 
@@ -36,7 +36,7 @@ public class DeleteAccount extends UserCommand {
     @Override
     protected String execute() {
         boolean authenticated = authenticationParams.getBoolean(Authenticated);
-        if(!authenticated)
+        if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
         // retrieving the body objects
@@ -74,12 +74,10 @@ public class DeleteAccount extends UserCommand {
 
 
     private void deleteFromArango(String username) {
-        HashMap<String, Object> documentProperties = new HashMap<>();
-        documentProperties.put("is_deleted", true);
-        BaseDocument user = new BaseDocument(documentProperties);
+        BaseDocument user = new BaseDocument(new HashMap<>(Map.of("is_deleted", true)));
         user.setKey(username);
         Arango arango = Arango.getInstance();
-        ArangoDB arangoDB = arango.connect();
-        arango.updateDocument(arangoDB, UserApp.ARANGO_DB_NAME, "Users", user, username);
+        arango.connectIfNotConnected();
+        arango.updateDocument(UserApp.ARANGO_DB_NAME, "Users", user, username);
     }
 }

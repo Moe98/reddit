@@ -1,6 +1,5 @@
 package org.sab.user.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -228,14 +227,16 @@ public class CommandsTest {
     }
 
     @AfterClass
-    public static void deleteFromArano() {
+    public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
-        ArangoDB arangoDB = arango.connect();
+        arango.connectIfNotConnected();
         String dbName = System.getenv("ARANGO_DB");
-        BaseDocument user = arango.readDocument(arangoDB, dbName, "Users", username);
+        BaseDocument user = arango.readDocument(dbName, "Users", username);
         Map props = user.getProperties();
         boolean is_deleted = (boolean) props.get("is_deleted");
         assertTrue(is_deleted);
-        arango.deleteDocument(arangoDB, dbName, "Users", username);
+        int numberOfFollowers = (int) props.get("number_of_followers");
+        assertEquals(0, numberOfFollowers);
+        arango.deleteDocument(dbName, "Users", username);
     }
 }

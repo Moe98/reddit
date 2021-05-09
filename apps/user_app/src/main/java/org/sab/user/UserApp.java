@@ -1,7 +1,6 @@
 package org.sab.user;
 
 
-import com.arangodb.ArangoDB;
 import org.sab.arango.Arango;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
@@ -42,12 +41,10 @@ public class UserApp extends Service {
         if (ARANGO_DB_NAME == null)
             throw new EnvironmentVariableNotLoaded("ARANGO_DB");
         Arango arango = Arango.getInstance();
-        ArangoDB arangoDB = arango.connect();
-        if (!arango.databaseExists(arangoDB, ARANGO_DB_NAME))
-            arango.createDatabase(arangoDB, ARANGO_DB_NAME);
+        arango.connectIfNotConnected();
+        arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
         String collectionName = "Users";
-        if (!arango.collectionExists(arangoDB, ARANGO_DB_NAME, collectionName))
-            arango.createCollection(arangoDB, ARANGO_DB_NAME, collectionName, false);
+        arango.createCollectionIfNotExists(ARANGO_DB_NAME, collectionName, false);
 
     }
 }
