@@ -102,7 +102,7 @@ public class GroupMessageTable {
         if (!members.contains(user))
             throw new InvalidInputException("Not a chat member");
 
-        String query1 = "SELECT content FROM " + "group_messages" +
+        String query1 = "SELECT * FROM " + "group_messages" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet messages = cassandra.runQuery(query1);
