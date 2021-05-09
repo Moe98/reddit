@@ -1,7 +1,6 @@
 package org.sab.arango;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,32 +12,33 @@ import static org.junit.Assert.*;
 
 public class ArangoTest {
     private static Arango arango;
-    private static ArangoDB arangoDB;
     private static String dbName;
     private static String collectionName;
     private static HashMap<String, Object> documentProperties;
+    private static String viewName;
 
 
     @BeforeClass
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            assertTrue(arango.isConnected());
 
             dbName = "TestDB";
             collectionName = "TestCollection";
+            viewName = "TestView";
             documentProperties = new HashMap<>();
             documentProperties.put("boolean_field", true);
             documentProperties.put("int_field", 1);
             documentProperties.put("string_field", "kokowawa");
 
-            assertTrue(arango.createDatabase(arangoDB, dbName));
-            assertTrue(arangoDB.getDatabases().contains(dbName));
+            assertTrue(arango.createDatabase(dbName));
+            assertTrue(arango.containsDatabase(dbName));
 
-            if (arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)))
-                arango.dropCollection(arangoDB, dbName, collectionName);
-            assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
-        } catch (ArangoDBException e){
+            if (arango.containsCollection(dbName, collectionName))
+                arango.dropCollection(dbName, collectionName);
+            assertFalse(arango.containsCollection(dbName, collectionName));
+        } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
     }
@@ -46,8 +46,9 @@ public class ArangoTest {
     @AfterClass
     public static void tearDown() {
         try {
-            assertTrue(arango.dropDatabase(arangoDB, dbName));
-            arango.disconnect(arangoDB);
+            assertTrue(arango.dropDatabase(dbName));
+            arango.disconnect();
+            assertFalse(arango.isConnected());
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -56,8 +57,8 @@ public class ArangoTest {
     @Before
     public void buildCollection() {
         try {
-            arango.createCollection(arangoDB, dbName, collectionName, false);
-            assertTrue(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
+            arango.createCollection(dbName, collectionName, false);
+            assertTrue(arango.containsCollection(dbName, collectionName));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -66,8 +67,8 @@ public class ArangoTest {
     @After
     public void dropCollection() {
         try {
-            arango.dropCollection(arangoDB, dbName, collectionName);
-            assertFalse(arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName)));
+            arango.dropCollection(dbName, collectionName);
+            assertFalse(arango.containsCollection(dbName, collectionName));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -76,10 +77,10 @@ public class ArangoTest {
     @Test
     public void databaseExists() {
         try {
-            arango.createDatabase(arangoDB, "testDB");
-            assertTrue(arango.databaseExists(arangoDB, "testDB"));
-            arango.dropDatabase(arangoDB, "testDB");
-            assertFalse(arango.databaseExists(arangoDB, "testDB"));
+            arango.createDatabase("testDB");
+            assertTrue(arango.databaseExists("testDB"));
+            arango.dropDatabase("testDB");
+            assertFalse(arango.databaseExists("testDB"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -88,10 +89,10 @@ public class ArangoTest {
     @Test
     public void collectionExists() {
         try {
-            arango.createCollection(arangoDB, dbName, "testCollectionExists", false);
-            assertTrue(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
-            arango.dropCollection(arangoDB, dbName, "testCollectionExists");
-            assertFalse(arango.collectionExists(arangoDB, dbName, "testCollectionExists"));
+            arango.createCollection(dbName, "testCollectionExists", false);
+            assertTrue(arango.collectionExists(dbName, "testCollectionExists"));
+            arango.dropCollection(dbName, "testCollectionExists");
+            assertFalse(arango.collectionExists(dbName, "testCollectionExists"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -112,9 +113,9 @@ public class ArangoTest {
         try {
             BaseDocument baseDocument = new BaseDocument(documentProperties);
             baseDocument.setKey("create");
-            assertEquals(arangoDB.db(dbName).collection(collectionName).count().getCount().intValue(), 0);
-            assertNotNull(arango.createDocument(arangoDB, dbName, collectionName, baseDocument));
-            assertEquals(arangoDB.db(dbName).collection(collectionName).count().getCount().intValue(), 1);
+            assertEquals(arango.documentCount(dbName, collectionName), 0);
+            assertNotNull(arango.createDocument(dbName, collectionName, baseDocument));
+            assertEquals(arango.documentCount(dbName, collectionName), 1);
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -125,8 +126,8 @@ public class ArangoTest {
         try {
             BaseDocument baseDocument = new BaseDocument(documentProperties);
             baseDocument.setKey("read");
-            arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
-            BaseDocument result = arango.readDocument(arangoDB, dbName, collectionName, "read");
+            arango.createDocument(dbName, collectionName, baseDocument);
+            BaseDocument result = arango.readDocument(dbName, collectionName, "read");
             assertNotNull(result);
             assertEquals(result.getKey(), "read");
             assertEquals(result.getProperties(), documentProperties);
@@ -140,8 +141,8 @@ public class ArangoTest {
         try {
             BaseDocument baseDocument = new BaseDocument(documentProperties);
             baseDocument.setKey("readJson");
-            arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
-            ObjectNode obj = arango.readDocumentAsJSON(arangoDB, dbName, collectionName, "readJson");
+            arango.createDocument(dbName, collectionName, baseDocument);
+            ObjectNode obj = arango.readDocumentAsJSON(dbName, collectionName, "readJson");
             assertNotNull(obj);
             for (String key : documentProperties.keySet()) {
                 Object value = documentProperties.get(key);
@@ -162,9 +163,9 @@ public class ArangoTest {
         try {
             BaseDocument baseDocument = new BaseDocument(documentProperties);
             baseDocument.setKey("update");
-            arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
+            arango.createDocument(dbName, collectionName, baseDocument);
             baseDocument.updateAttribute("string_field", "updated");
-            BaseDocument updated = arango.updateDocument(arangoDB, dbName, collectionName, baseDocument, "update");
+            BaseDocument updated = arango.updateDocument(dbName, collectionName, baseDocument, "update");
             assertEquals("updated", updated.getProperties().get("string_field"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
@@ -174,12 +175,12 @@ public class ArangoTest {
     @Test
     public void deleteDocument() {
         try {
-            int currentDocsNum = arangoDB.db(dbName).collection(collectionName).count().getCount().intValue();
+            int currentDocsNum = arango.documentCount(dbName, collectionName);
             BaseDocument baseDocument = new BaseDocument(documentProperties);
             baseDocument.setKey("delete");
-            arango.createDocument(arangoDB, dbName, collectionName, baseDocument);
-            assertTrue(arango.deleteDocument(arangoDB, dbName, collectionName, "delete"));
-            assertEquals(arangoDB.db(dbName).collection(collectionName).count().getCount().intValue(), currentDocsNum);
+            arango.createDocument(dbName, collectionName, baseDocument);
+            assertTrue(arango.deleteDocument(dbName, collectionName, "delete"));
+            assertEquals(arango.documentCount(dbName, collectionName), currentDocsNum);
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -188,8 +189,8 @@ public class ArangoTest {
     @Test
     public void createView() {
         try {
-            assertNotNull(arango.createView(arangoDB, dbName, "CreateViewTest", collectionName, new String[] {"string_field"}));
-            assertTrue(arangoDB.db(dbName).view("CreateViewTest").exists());
+            assertNotNull(arango.createView(dbName, "CreateViewTest", collectionName, new String[]{"string_field"}));
+            assertTrue(arango.viewExists(dbName, "CreateViewTest"));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -198,10 +199,21 @@ public class ArangoTest {
     @Test
     public void dropView() {
         try {
-            assertNotNull(arango.createView(arangoDB, dbName, "DropViewTest", collectionName, new String[] {"string_field"}));
-            assertTrue(arangoDB.db(dbName).view("DropViewTest").exists());
-            arango.dropView(arangoDB, dbName, "DropViewTest");
-            assertFalse(arangoDB.db(dbName).view("DropViewTest").exists());
+            assertNotNull(arango.createView(dbName, "DropViewTest", collectionName, new String[]{"string_field"}));
+            assertTrue(arango.viewExists(dbName, "DropViewTest"));
+            arango.dropView(dbName, "DropViewTest");
+            assertFalse(arango.viewExists(dbName, "DropViewTest"));
+        } catch (ArangoDBException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void viewExists() {
+        try {
+            assertFalse(arango.viewExists(dbName, viewName));
+            arango.createView(dbName, viewName, collectionName, new String[]{});
+            assertTrue(arango.viewExists(dbName, viewName));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }
@@ -210,7 +222,7 @@ public class ArangoTest {
     @Test
     public void query() {
         try {
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, dbName, "RETURN { number: 1 }", null);
+            ArangoCursor<BaseDocument> cursor = arango.query(dbName, "RETURN { number: 1 }", null);
             assertTrue(cursor.hasNext());
             cursor.next();
             assertFalse(cursor.hasNext());
