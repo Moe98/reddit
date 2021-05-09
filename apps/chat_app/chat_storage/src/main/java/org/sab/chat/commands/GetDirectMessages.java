@@ -6,6 +6,7 @@ import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectMessage;
 import org.sab.chat.storage.tables.DirectMessageTable;
+import org.sab.chat.storage.tables.TableUtils;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
@@ -52,7 +53,7 @@ public class GetDirectMessages extends CommandWithVerification {
             messages.stream().map(msg -> {
                 JSONObject msgJson = new JSONObject();
                 msgJson.put("chatId", msg.getChat_id().toString());
-                msgJson.put("messageId", msg.getMessage_id().toString());
+                msgJson.put("timestamp", TableUtils.getInstantFromUUID(msg.getMessage_id()));
                 msgJson.put("senderId", msg.getSender_id().toString());
                 msgJson.put("content", msg.getContent());
                 return msgJson;
