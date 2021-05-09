@@ -16,8 +16,7 @@ public abstract class UserToUserCommand extends CommandWithVerification {
     protected static final String USER_ID_DB = UserAttributes.USER_ID.getDb();
     protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
 
-    // TODO get from env vars
-    protected static final String DB_Name = "ARANGO_DB";
+    protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
     protected static final String TEST_DB_Name = DB_Name;
     protected static final String USER_COLLECTION_NAME = "User";
