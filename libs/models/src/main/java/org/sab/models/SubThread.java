@@ -16,73 +16,91 @@ public class SubThread {
         super();
     }
 
+
     public String getId() {
         return id;
     }
+
 
     public void setId(String id) {
         this.id = id;
     }
 
+
     public String getParentThread() {
         return parentThread;
     }
+
 
     public void setParentThread(String parentThread) {
         this.parentThread = parentThread;
     }
 
+
     public String getTitle() {
         return title;
     }
+
 
     public void setTitle(String title) {
         this.title = title;
     }
 
+
     public String getCreator() {
         return creator;
     }
+
 
     public void setCreator(String creator) {
         this.creator = creator;
     }
 
+
     public int getLikes() {
         return likes;
     }
+
 
     public void setLikes(int likes) {
         this.likes = likes;
     }
 
+
     public int getDislikes() {
         return dislikes;
     }
+
 
     public void setDislikes(int dislikes) {
         this.dislikes = dislikes;
     }
 
+
     public String getContent() {
         return content;
     }
+
 
     public void setContent(String content) {
         this.content = content;
     }
 
+
     public boolean isHasImage() {
         return hasImage;
     }
+
 
     public void setHasImage(boolean hasImage) {
         this.hasImage = hasImage;
     }
 
+
     public String getDate() {
         return date;
     }
+
 
     public void setDate(String date) {
         this.date = date;

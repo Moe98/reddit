@@ -6,6 +6,7 @@ import org.json.JSONObject;
 public class Responder {
     private Responder() {
     }
+
     // To Be Renamed To Handle All Responses Without Data (msg , statusCode)Only!
     public static JSONObject makeErrorResponse(String msg, int statusCode) {
         JSONObject error = new JSONObject().put("msg", msg).put("statusCode", statusCode);
