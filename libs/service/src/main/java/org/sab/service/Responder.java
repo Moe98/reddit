@@ -1,5 +1,6 @@
 package org.sab.service;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Responder {
@@ -21,5 +22,11 @@ public class Responder {
         JSONObject response = new JSONObject().put("msg", msg);
         response.put("statusCode", 200);
         return response.toString();
+    }
+
+    public static JSONObject makeDataResponse(JSONArray data) {
+        JSONObject response = new JSONObject().put("data", data);
+        response.put("statusCode", 200);
+        return response;
     }
 }
