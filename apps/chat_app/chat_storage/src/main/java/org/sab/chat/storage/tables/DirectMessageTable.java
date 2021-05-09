@@ -106,7 +106,7 @@ public class DirectMessageTable {
         if (!first_member.toString().equals(user.toString()) && !second_member.toString().equals(user.toString()))
             throw new InvalidInputException("Not a chat member");
 
-        String query1 = "SELECT content FROM " + "direct_messages" +
+        String query1 = "SELECT * FROM " + "direct_messages" +
                 " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
 
         ResultSet messages = cassandra.runQuery(query1);
