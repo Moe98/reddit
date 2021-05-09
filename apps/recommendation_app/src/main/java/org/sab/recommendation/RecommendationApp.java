@@ -2,6 +2,8 @@ package org.sab.recommendation;
 
 import com.arangodb.ArangoDBException;
 import com.couchbase.client.core.error.CouchbaseException;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThread;
@@ -91,6 +93,15 @@ public class RecommendationApp extends Service {
             arango.createViewIfNotExists(DB_NAME, getViewName(SUB_THREADS_COLLECTION_NAME), SUB_THREADS_COLLECTION_NAME, new String[]{SUB_THREAD_TITLE, SUB_THREAD_CONTENT});
         } catch (ArangoDBException | CouchbaseException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static boolean isAuthenticated(JSONObject request) {
+        try {
+            JSONObject authenticationParams = request.getJSONObject(RecommendationApp.AUTHENTICATION_PARAMS);
+            return authenticationParams.getBoolean(RecommendationApp.AUTHENTICATED);
+        } catch (JSONException e) {
+            return false;
         }
     }
 

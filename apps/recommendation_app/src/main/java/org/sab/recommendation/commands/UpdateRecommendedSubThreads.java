@@ -26,9 +26,7 @@ public class UpdateRecommendedSubThreads extends Command {
         JSONArray data = new JSONArray();
         String username;
         try {
-            JSONObject authenticationParams = request.getJSONObject(RecommendationApp.AUTHENTICATION_PARAMS);
-            boolean authenticated = authenticationParams.getBoolean(RecommendationApp.AUTHENTICATED);
-            if (!authenticated)
+            if (!RecommendationApp.isAuthenticated(request))
                 return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401).toString();
 
             username = request.getJSONObject("body").getString("username");
