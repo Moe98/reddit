@@ -47,6 +47,8 @@ public class RecommendationApp extends Service {
     final public static String SUB_THREADS_DATA_KEY = "listOfSubThreads";
     final public static String THREADS_DATA_KEY = "listOfThreads";
     final public static String USERNAMES_DATA_KEY = "listOfUsernames";
+    final public static String AUTHENTICATION_PARAMS = "authenticationParams";
+    final public static String AUTHENTICATED = "isAuthenticated";
 
     @Override
     public String getAppUriName() {

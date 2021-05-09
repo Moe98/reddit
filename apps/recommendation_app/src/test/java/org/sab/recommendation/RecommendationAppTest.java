@@ -53,6 +53,8 @@ public class RecommendationAppTest {
     static String[] subThreads;
     static String[] threads;
     static String[] users;
+    static JSONObject authentication;
+    static JSONObject request = new JSONObject();
 
     @BeforeClass
     public static void setUp() {
@@ -160,6 +162,10 @@ public class RecommendationAppTest {
             edgeDocument.setTo(usersCollectionName + "/" + users[users.length - 1]);
             created = arango.createEdgeDocument(dbName, userFollowUserCollectionName, edgeDocument);
             toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
+
+            authentication = new JSONObject().put(RecommendationApp.AUTHENTICATED, true);
+            request.put("body", new JSONObject().put("body", new JSONObject().put("username", users[0])));
+            request.put(RecommendationApp.AUTHENTICATION_PARAMS, authentication);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -204,24 +210,24 @@ public class RecommendationAppTest {
 
     @Test
     public void GetRecommendedSubThreads() {
-        new UpdateRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
-        JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        new UpdateRecommendedSubThreads().execute(request);
+        JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
     }
 
     @Test
     public void GetRecommendedThreads() {
-        new UpdateRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
-        JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        new UpdateRecommendedThreads().execute(request);
+        JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
 
     @Test
     public void GetRecommendedUsers() {
-        new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0])));
-        JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        new UpdateRecommendedUsers().execute(request);
+        JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
@@ -242,21 +248,21 @@ public class RecommendationAppTest {
 
     @Test
     public void UpdateRecommendedSubThreads() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedSubThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedSubThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
     }
 
     @Test
     public void UpdateRecommendedThreads() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedThreads().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
 
     @Test
     public void UpdateRecommendedUsers() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(new JSONObject().put("body", new JSONObject().put("username", users[0]))));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }

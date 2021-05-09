@@ -17,6 +17,11 @@ public class GetRecommendedSubThreads extends Command {
     @Override
     public String execute(JSONObject request) {
         try {
+            JSONObject authenticationParams = request.getJSONObject(RecommendationApp.AUTHENTICATION_PARAMS);
+            boolean authenticated = authenticationParams.getBoolean(RecommendationApp.AUTHENTICATED);
+            if (!authenticated)
+                return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401).toString();
+
             String username = request.getJSONObject("body").getString("username");
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
