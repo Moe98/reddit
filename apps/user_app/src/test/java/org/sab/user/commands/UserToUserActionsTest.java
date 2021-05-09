@@ -75,22 +75,10 @@ public class UserToUserActionsTest {
 
     @Test
     public void T01_UserFollowsUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        FollowUser followUser = new FollowUser();
-        String response = followUser.execute(request);
+        String response = userFollowUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -106,23 +94,14 @@ public class UserToUserActionsTest {
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount + 1, newFollowerCount);
+
+        // removing the effect of the test:
+        userUnfollowUser(mantaId,moeId);
     }
 
     @Test
     public void T02_UserBlocksUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        BlockUser blockUser = new BlockUser();
-        String response = blockUser.execute(request);
+        String response = userBlockUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -133,31 +112,21 @@ public class UserToUserActionsTest {
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
         assertFalse(edgeId.equals(""));
+
+        //removing the test effect
+        userUnblockUser(mantaId,moeId);
     }
 
     @Test
     public void T03_UserCannotFollowBlockedUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, lujineId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        BlockUser blockUser = new BlockUser();
-        blockUser.execute(request);
+        userBlockUser(lujineId,moeId);
 
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        FollowUser followUser = new FollowUser();
-        String response = followUser.execute(request);
+        String response = userFollowUser(lujineId,moeId);
         JSONObject responseJson = new JSONObject(response);
-
+        System.out.println(responseJson);
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
@@ -171,26 +140,19 @@ public class UserToUserActionsTest {
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
+
+        // removing test effect
+        userUnblockUser(lujineId,moeId);
     }
 
     @Test
     public void T04_UserCannotUnfollowBlockedUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
+        userFollowUser(mantaId,moeId);
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        FollowUser followUser = new FollowUser();
-        String response = followUser.execute(request);
+        userBlockUser(mantaId,moeId);
+        String response = userUnfollowUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(404, responseJson.getInt("statusCode"));
@@ -206,23 +168,16 @@ public class UserToUserActionsTest {
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
+
+        //removing test effects
+        userUnblockUser(mantaId,moeId);
+        userUnfollowUser(mantaId,moeId);
     }
 
     @Test
     public void T05_UserUnblocksUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        BlockUser blockUser = new BlockUser();
-        String response = blockUser.execute(request);
+        userBlockUser(mantaId,moeId);
+        String response = userUnblockUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -237,22 +192,11 @@ public class UserToUserActionsTest {
 
     @Test
     public void T06_UserUnfollowsUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
+        userFollowUser(mantaId,moeId);
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        FollowUser followUser = new FollowUser();
-        String response = followUser.execute(request);
+        String response =userUnfollowUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -272,27 +216,12 @@ public class UserToUserActionsTest {
 
     @Test
     public void TO7_UserCannotFollowDeletedUser() {
-
-        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
-        userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
-        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, moeId);
-
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, moeId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
+        deleteUser(moeId);
 
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        FollowUser followUser = new FollowUser();
-        String response = followUser.execute(request);
+        String response = userFollowUser(mantaId,moeId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(404, responseJson.getInt("statusCode"));
@@ -308,33 +237,21 @@ public class UserToUserActionsTest {
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
+
+        //removing test effects
+        undeleteUser(moeId);
     }
 
     @Test
     public void T08_UserCannotUnfollowDeletedUser() {
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, lujineId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-
-        FollowUser followUser = new FollowUser();
-        followUser.execute(request);
+        userFollowUser(mantaId,lujineId);
 
         final BaseDocument oldUserDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
         int oldFollowerCount = Integer.parseInt(String.valueOf(oldUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
-        userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
-        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, lujineId);
+        deleteUser(lujineId);
 
-        String response = followUser.execute(request);
+        String response = userUnfollowUser(mantaId,lujineId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(404, responseJson.getInt("statusCode"));
@@ -350,27 +267,17 @@ public class UserToUserActionsTest {
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(oldFollowerCount, newFollowerCount);
+
+        //removing test effects
+        undeleteUser(lujineId);
+        userUnfollowUser(mantaId,lujineId);
     }
 
     @Test
     public void TO9_UserCannotBlockDeletedUser() {
-        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, lujineId);
-        userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
-        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, lujineId);
+        deleteUser(lujineId);
 
-        JSONObject body = new JSONObject();
-        body.put(UserToUserCommand.USER_ID, lujineId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, mantaId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        BlockUser blockUser = new BlockUser();
-        String response = blockUser.execute(request);
+        String response = userBlockUser(mantaId,lujineId);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(404, responseJson.getInt("statusCode"));
@@ -381,10 +288,84 @@ public class UserToUserActionsTest {
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
         assertTrue(edgeId.equals(""));
+
+        //removing test effect
+        undeleteUser(lujineId);
     }
 
     @Test
     public void T10_UserCannotUnblockDeletedUser() {
-        assertTrue(1 == 1);
+        userBlockUser(mantaId,lujineId);
+
+        deleteUser(lujineId);
+
+        String response = userUnblockUser(mantaId,lujineId);
+        JSONObject responseJson = new JSONObject(response);
+
+        assertEquals(404, responseJson.getInt("statusCode"));
+        assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
+
+        String edgeId = Arango.getSingleEdgeId(arango, arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+
+        // If the length of |edgeId| is equal to zero, then that edge does not exist.
+        // This means it was not added.
+        assertFalse(edgeId.equals(""));
+
+        //removing test effects
+        undeleteUser(lujineId);
+        userUnblockUser(mantaId,lujineId);
     }
+
+    public static void deleteUser(String userId){
+        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
+        userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, true);
+        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
+    }
+
+    public static String userFollowUser(String actionMakerId, String userId){
+        JSONObject body = new JSONObject();
+        body.put(UserToUserCommand.USER_ID, userId);
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, actionMakerId);
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        FollowUser followUser = new FollowUser();
+        return followUser.execute(request);
+    }
+
+    public static String userBlockUser(String actionMaker, String userId){
+        JSONObject body = new JSONObject();
+        body.put(UserToUserCommand.USER_ID, userId);
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(UserToUserCommand.ACTION_MAKER_ID, actionMaker);
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        BlockUser blockUser = new BlockUser();
+        return blockUser.execute(request);
+    }
+
+    public static void undeleteUser(String userId){
+        final BaseDocument userDocument = arango.readDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userId);
+        userDocument.updateAttribute(UserToUserCommand.IS_DELETED_DB, false);
+        arango.updateDocument(arangoDB, UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, userDocument, userId);
+    }
+
+    public static String userUnfollowUser(String actionMaker, String userId){
+        return userFollowUser(actionMaker, userId);
+    }
+
+    public static String userUnblockUser(String actionMaker, String userId){
+        return userBlockUser(actionMaker, userId);
+    }
+
 }

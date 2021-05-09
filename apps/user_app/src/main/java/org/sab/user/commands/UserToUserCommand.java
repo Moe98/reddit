@@ -5,6 +5,7 @@ import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class UserToUserCommand extends CommandWithVerification {
+    //TODO: apply authentication.
     protected static final String ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
     protected static final String IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
     protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
@@ -17,6 +18,7 @@ public abstract class UserToUserCommand extends CommandWithVerification {
 
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
+    //TODO: use diff db for testing
     protected static final String TEST_DB_Name = DB_Name;
     protected static final String USER_COLLECTION_NAME = "User";
     protected static final String USER_FOLLOWS_USER_COLLECTION_NAME = "UserFollowsUser";
