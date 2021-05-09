@@ -164,7 +164,7 @@ public class RecommendationAppTest {
             toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
 
             authentication = new JSONObject().put(RecommendationApp.AUTHENTICATED, true);
-            request.put("body", new JSONObject().put("body", new JSONObject().put("username", users[0])));
+            request.put("body", new JSONObject().put("username", users[0]));
             request.put(RecommendationApp.AUTHENTICATION_PARAMS, authentication);
         } catch (Exception e) {
             fail(e.getMessage());
