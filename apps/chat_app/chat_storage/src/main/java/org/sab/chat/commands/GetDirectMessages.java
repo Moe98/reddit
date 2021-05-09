@@ -1,5 +1,6 @@
 package org.sab.chat.commands;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
@@ -13,7 +14,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 import java.util.UUID;
 
-// List<DirectMessage> getDirectMessages(UUID chatId, UUID userId)
 public class GetDirectMessages extends CommandWithVerification {
 
     private DirectMessageTable directMessageTable;
@@ -36,7 +36,6 @@ public class GetDirectMessages extends CommandWithVerification {
         return new Schema(List.of(chatId, userId));
     }
 
-
     @Override
     public String execute() {
 
@@ -49,11 +48,21 @@ public class GetDirectMessages extends CommandWithVerification {
         try {
             List<DirectMessage> messages = directMessageTable.getDirectMessages(chatId, userId);
 
+            JSONArray messagesJson = new JSONArray();
+            messages.stream().map(msg -> {
+                JSONObject msgJson = new JSONObject();
+                msgJson.put("chatId", msg.getChat_id().toString());
+                msgJson.put("messageId", msg.getMessage_id().toString());
+                msgJson.put("senderId", msg.getSender_id().toString());
+                msgJson.put("content", msg.getContent());
+                return msgJson;
+            }).forEach(messagesJson::put);
+
             JSONObject responseBody = new JSONObject();
-            responseBody.put("messageId", messageId.toString());
+            responseBody.put("messages", messagesJson);
 
             response.put("statusCode", 200);
-            response.put("msg", "Direct message created successfully");
+            response.put("msg", "Chat messages fetched successfully");
             response.put("data", responseBody);
 
         } catch (InvalidInputException e) {
