@@ -19,7 +19,6 @@ public class ChatServer {
             new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
     private final EventLoopGroup group = new NioEventLoopGroup();
     private Channel channel;
-    public static ClientManager clients;
     public static int couter=0;
 
     public ChannelFuture start(InetSocketAddress address) {
@@ -47,7 +46,6 @@ public class ChatServer {
     }
 
     public static void main(String[] args) {
-        clients = new ClientManager();
         int port = 5000;
         final ChatServer endpoint = new ChatServer();
         ChannelFuture future = endpoint.start(new InetSocketAddress(port));

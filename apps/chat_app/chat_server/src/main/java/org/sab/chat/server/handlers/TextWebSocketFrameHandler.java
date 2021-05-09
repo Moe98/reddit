@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.sab.chat.server.ChatServer;
 import org.sab.chat.server.models.ClientManager;
 import org.json.simple.JSONObject;
 
@@ -37,13 +36,13 @@ public class TextWebSocketFrameHandler extends
     }
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        UUID user = ChatServer.clients.channelToUser.remove(ctx.channel());
-        ArrayList<Channel> userChannels = ChatServer.clients.activeUsers.get(user);
+        UUID user = ClientManager.channelToUser.remove(ctx.channel());
+        ArrayList<Channel> userChannels = ClientManager.activeUsers.get(user);
         userChannels.remove(ctx.channel());
         if(userChannels.size()==0)
-            ChatServer.clients.activeUsers.remove(user);
+            ClientManager.activeUsers.remove(user);
         else{
-            ChatServer.clients.activeUsers.put(user,userChannels);
+            ClientManager.activeUsers.put(user,userChannels);
         }
         super.channelInactive(ctx);
     }
