@@ -29,6 +29,9 @@ public abstract class ThreadCommand extends CommandWithVerification {
     // TODO get from enum
     protected static final String IS_DELETED_DB = "IsDeleted";
 
+    protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+    protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
+
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
     protected static final String THREAD_COLLECTION_NAME = "Thread";
@@ -60,7 +63,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
         } else {
             // TODO change to query
             BaseDocument res = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
-            boolean isDeleted = (Boolean)res.getAttribute(IS_DELETED_DB);
+            boolean isDeleted = (Boolean) res.getAttribute(IS_DELETED_DB);
             userExists = !isDeleted;
         }
         return userExists;

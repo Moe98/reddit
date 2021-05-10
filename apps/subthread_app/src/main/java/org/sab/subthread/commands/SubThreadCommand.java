@@ -5,7 +5,7 @@ import org.sab.models.report.SubThreadReportAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class SubThreadCommand extends CommandWithVerification {
-    
+
     // Subthread attributes
     // http
     protected static final String SUBTHREAD_ID = SubThreadAttributes.SUBTHREAD_ID.getHTTP();
@@ -43,7 +43,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     protected static final String THREAD_ID = SubThreadReportAttributes.PARENT_THREAD_ID.getHTTP();
     protected static final String REPORT_MSG = SubThreadReportAttributes.REPORT_MSG.getHTTP();
-    
+
     // Report atributes
     // db
     protected static final String REPORTED_SUBTHREAD_ID_DB = SubThreadReportAttributes.SUBTHREAD_Id.getDb();
@@ -56,7 +56,8 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     protected static final String ACTION_MAKER_ID = "userId";
 
-    
+    protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+
     // Database attributes
     protected static final String DB_Name = "ARANGO_DB";
 
