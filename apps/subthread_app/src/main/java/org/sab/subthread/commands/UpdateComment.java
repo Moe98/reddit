@@ -18,9 +18,9 @@ public class UpdateComment extends CommentCommand {
         try {
             final Arango arango = Arango.getInstance();
 
+            final String content = body.getString(CONTENT);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
             final String commentId = uriParams.getString(COMMENT_ID);
-            final String content = body.getString(CONTENT);
 
             if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
@@ -32,9 +32,9 @@ public class UpdateComment extends CommentCommand {
 
             final BaseDocument commentDocument = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
 
-            final String authorId = (String) commentDocument.getAttribute(ACTION_MAKER_ID);
+            final String creatorId = (String) commentDocument.getAttribute(CREATOR_ID_DB);
 
-            if (!userId.equals(authorId)) {
+            if (!userId.equals(creatorId)) {
                 return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
             }
 
@@ -42,7 +42,7 @@ public class UpdateComment extends CommentCommand {
             arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, commentDocument, commentId);
 
             final String parentId = (String) commentDocument.getAttribute(PARENT_SUBTHREAD_ID_DB);
-            final String updatedConent = (String) commentDocument.getAttribute(CONTENT_DB);
+            final String updatedContent = (String) commentDocument.getAttribute(CONTENT_DB);
             final String parentContentType = (String) commentDocument.getAttribute(PARENT_CONTENT_TYPE_DB);
             final int likes = Integer.parseInt(String.valueOf(commentDocument.getAttribute(LIKES_DB)));
             final int dislikes = Integer.parseInt(String.valueOf(commentDocument.getAttribute(DISLIKES_DB)));
@@ -51,8 +51,8 @@ public class UpdateComment extends CommentCommand {
             comment = new Comment();
             comment.setId(commentId);
             comment.setParentId(parentId);
-            comment.setCreatorId(authorId);
-            comment.setContent(updatedConent);
+            comment.setCreatorId(creatorId);
+            comment.setContent(updatedContent);
             comment.setParentContentType(parentContentType);
             comment.setLikes(likes);
             comment.setDislikes(dislikes);

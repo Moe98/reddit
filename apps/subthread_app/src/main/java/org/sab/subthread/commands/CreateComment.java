@@ -43,7 +43,7 @@ public class CreateComment extends CommentCommand {
         String parentSubThreadId = body.getString(PARENT_SUBTHREAD_ID);
         String content = body.getString(CONTENT);
         String parentContentType = body.getString(PARENT_CONTENT_TYPE);
-        String userId = uriParams.getString(ACTION_MAKER_ID);
+        final String userId = uriParams.getString(ACTION_MAKER_ID);
 
         final Comment comment;
 
@@ -62,7 +62,7 @@ public class CreateComment extends CommentCommand {
             final BaseDocument myObject = new BaseDocument();
 
             myObject.addAttribute(PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
-            myObject.addAttribute(ACTION_MAKER_ID, userId);
+            myObject.addAttribute(CREATOR_ID_DB, userId);
             myObject.addAttribute(CONTENT_DB, content);
             myObject.addAttribute(PARENT_CONTENT_TYPE_DB, parentContentType);
             myObject.addAttribute(LIKES_DB, INITIAL_LIKES);
@@ -77,7 +77,7 @@ public class CreateComment extends CommentCommand {
 
             final String commentId = res.getKey();
             parentSubThreadId = (String) res.getAttribute(PARENT_SUBTHREAD_ID_DB);
-            userId = (String) res.getAttribute(ACTION_MAKER_ID);
+            final String creatorId = (String) res.getAttribute(CREATOR_ID_DB);
             content = (String) res.getAttribute(CONTENT_DB);
             parentContentType = (String) res.getAttribute(PARENT_CONTENT_TYPE_DB);
             final int likes = Integer.parseInt(String.valueOf(res.getAttribute(LIKES_DB)));
@@ -87,7 +87,7 @@ public class CreateComment extends CommentCommand {
             comment = new Comment();
             comment.setId(commentId);
             comment.setParentId(parentSubThreadId);
-            comment.setCreatorId(userId);
+            comment.setCreatorId(creatorId);
             comment.setContent(content);
             comment.setParentContentType(parentContentType);
             comment.setLikes(likes);
@@ -136,7 +136,7 @@ public class CreateComment extends CommentCommand {
         String from = "";
         final String to = COMMENT_COLLECTION_NAME + "/" + commentId;
 
-         // TODO The collection names should come from a config file.
+        // TODO The collection names should come from a config file.
         switch (parentContentType) {
             case "Comment" -> from = COMMENT_COLLECTION_NAME + "/" + parentId;
             case "SubThread" -> from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;

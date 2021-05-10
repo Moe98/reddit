@@ -29,7 +29,7 @@ public class GetSubThread extends SubThreadCommand {
             final BaseDocument subThreadDocument = arango.readDocument(DB_Name, subThreadId, subThreadId);
 
             final String parentThreadId = (String) subThreadDocument.getAttribute(PARENT_THREAD_ID_DB);
-            final String creatorId = (String) subThreadDocument.getAttribute(CONTENT_DB);
+            final String creatorId = (String) subThreadDocument.getAttribute(CREATOR_ID_DB);
             final String title = (String) subThreadDocument.getAttribute(TITLE_DB);
             final String content = (String) subThreadDocument.getAttribute(CONTENT_DB);
             final String date = (String) subThreadDocument.getAttribute(DATE_CREATED_DB);

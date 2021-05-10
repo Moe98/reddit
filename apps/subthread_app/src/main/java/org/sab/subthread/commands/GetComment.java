@@ -29,7 +29,7 @@ public class GetComment extends CommentCommand {
             final BaseDocument commentDocument = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
 
             final String parentId = (String) commentDocument.getAttribute(PARENT_SUBTHREAD_ID_DB);
-            final String userId = (String) commentDocument.getAttribute(ACTION_MAKER_ID);
+            final String creatorId = (String) commentDocument.getAttribute(CREATOR_ID_DB);
             final String content = (String) commentDocument.getAttribute(CONTENT_DB);
             final String parentContentType = (String) commentDocument.getAttribute(PARENT_CONTENT_TYPE_DB);
             final int likes = Integer.parseInt(String.valueOf(commentDocument.getAttribute(LIKES_DB)));
@@ -39,7 +39,7 @@ public class GetComment extends CommentCommand {
             comment = new Comment();
             comment.setId(commentId);
             comment.setParentId(parentId);
-            comment.setCreatorId(userId);
+            comment.setCreatorId(creatorId);
             comment.setContent(content);
             comment.setParentContentType(parentContentType);
             comment.setLikes(likes);
