@@ -48,9 +48,9 @@ public class DirectChatTable {
             throw new InvalidInputException("Invalid user UUID.");
         }
         String query1 = "SELECT * FROM " + TABLE_NAME +
-                " WHERE first_member = " + firstMember + "AND second_member = " + secondMember + " ALLOW FILTERING;";
+                " WHERE first_member = " + firstMember + " AND second_member = " + secondMember + " ALLOW FILTERING;";
         String query2 = "SELECT * FROM " + TABLE_NAME +
-                " WHERE first_member = " + secondMember + "AND second_member = " + firstMember + " ALLOW FILTERING;";
+                " WHERE first_member = " + secondMember + " AND second_member = " + firstMember + " ALLOW FILTERING;";
 
         ResultSet queryResult1 = cassandra.runQuery(query1);
         ResultSet queryResult2 = cassandra.runQuery(query2);
@@ -69,11 +69,17 @@ public class DirectChatTable {
             throw new InvalidInputException("Invalid user UUID.");
         }
 
-        String query = "SELECT * FROM " + TABLE_NAME +
-                " WHERE first_member = " + userId + "OR second_member = " + userId + " ALLOW FILTERING;";
+        String query1 = "SELECT * FROM " + TABLE_NAME +
+                " WHERE first_member = " + userId + " ALLOW FILTERING;";
+        String query2 = "SELECT * FROM " + TABLE_NAME +
+                " WHERE second_member = " + userId + " ALLOW FILTERING;";
 
-        ResultSet directChats = cassandra.runQuery(query);
-        return mapper.map(directChats).all();
+        List<DirectChat> directChats = mapper.map(cassandra.runQuery(query1)).all();
+        List<DirectChat> otherDirectChats = mapper.map(cassandra.runQuery(query2)).all();
+
+        directChats.addAll(otherDirectChats);
+        
+        return directChats;
     }
 
     public Mapper<DirectChat> getMapper() {
