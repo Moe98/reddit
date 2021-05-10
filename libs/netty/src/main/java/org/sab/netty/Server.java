@@ -1,4 +1,5 @@
 package org.sab.netty;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
@@ -15,15 +16,21 @@ import io.netty.util.AttributeKey;
 import javax.net.ssl.SSLException;
 
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public final class Server {
 
     static final boolean SSL = System.getProperty("ssl") != null;
-    static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
+    static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8443" : "8080"));
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
+    public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
+    public static final ArrayList<String> apps = new ArrayList<>(Arrays.asList("example_app", "thread", "subthread", "recommendation", "notification", "chat", "search", "user", "authentication", "useraction"));
 
-
+    public static EventLoopGroup bossGroup;
+    public static EventLoopGroup workerGroup;
+    
     public static void main(String[] args) throws CertificateException, SSLException, InterruptedException {
         // Configure SSL.
         final SslContext sslCtx;
@@ -35,8 +42,8 @@ public final class Server {
         }
 
         // Configure the server.
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
@@ -47,12 +54,17 @@ public final class Server {
 
             Channel ch = b.bind(PORT).sync().channel();
 
-            System.err.println("Open your web browser and navigate to " +
-                    (SSL? "https" : "http") + "://127.0.0.1:" + PORT + '/');
+            System.out.println("Open your web browser and navigate to " +
+                    (SSL ? "https" : "http") + "://127.0.0.1:" + PORT + '/');
+
             ch.closeFuture().sync();
         } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+            shutdownGracefully();
         }
+    }
+
+    public static void shutdownGracefully() {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 }

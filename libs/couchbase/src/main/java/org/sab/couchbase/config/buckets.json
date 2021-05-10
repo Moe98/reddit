@@ -1,0 +1,52 @@
+[
+  {
+    "name": "Listings",
+    "ramQuotaMB": 100,
+    "bucketType": "couchbase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "fullEviction",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  },
+  {
+    "name": "RecommendedSubThreads",
+    "ramQuotaMB": 100,
+    "bucketType": "couchbase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "fullEviction",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  },
+  {
+    "name": "RecommendedThreads",
+    "ramQuotaMB": 100,
+    "bucketType": "couchbase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "fullEviction",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  },
+  {
+    "name": "RecommendedUsers",
+    "ramQuotaMB": 100,
+    "bucketType": "couchbase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "fullEviction",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  },
+  {
+    "name": "TestBucket",
+    "ramQuotaMB": 100,
+    "bucketType": "couchbase",
+    "authType": "sasl",
+    "saslPassword": "",
+    "evictionPolicy": "fullEviction",
+    "replicaNumber": 0,
+    "flushEnabled": 1
+  }
+]
