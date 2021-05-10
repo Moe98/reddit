@@ -69,6 +69,19 @@ public class GroupChatTable {
         mapper.save(createdGroupChat);
         return createdGroupChat;
     }
+    public GroupChat getGroupChat(UUID chatId) throws InvalidInputException {
+        try {
+            UUID.fromString(chatId.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid chat UUID.");
+        }
+
+        String query = "SELECT * FROM " + TABLE_NAME +
+                " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
+
+        ResultSet groupChats = cassandra.runQuery(query);
+        return mapper.map(groupChats).all().get(0);
+    }
 
     public List<GroupChat> getGroupChats(UUID userId) throws InvalidInputException {
         try {

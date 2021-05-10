@@ -36,14 +36,14 @@ public class TextWebSocketFrameHandler extends
     }
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        UUID user = ClientManager.channelToUser.remove(ctx.channel());
-        ArrayList<Channel> userChannels = ClientManager.activeUsers.get(user);
-        userChannels.remove(ctx.channel());
-        if(userChannels.size()==0)
-            ClientManager.activeUsers.remove(user);
-        else{
-            ClientManager.activeUsers.put(user,userChannels);
-        }
+//        UUID user = ClientManager.channelToUser.remove(ctx.channel());
+//        ArrayList<Channel> userChannels = ClientManager.activeUsers.get(user);
+//        userChannels.remove(ctx.channel());
+//        if(userChannels.size()==0)
+//            ClientManager.activeUsers.remove(user);
+//        else{
+//            ClientManager.activeUsers.put(user,userChannels);
+//        }
         super.channelInactive(ctx);
     }
 
