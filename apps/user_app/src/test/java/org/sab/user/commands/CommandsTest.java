@@ -45,13 +45,12 @@ public class CommandsTest {
 
 
         JSONObject response = Requester.signUp(username, email, password, birthdate);
-        System.out.println(response);
 
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = response.getJSONObject("data");
-        assertEquals(data.getString("username"), username);
-        assertEquals(data.getString("birthdate"), birthdate);
-        assertEquals(data.getString("email"), email);
+        assertEquals(username, data.getString("username"));
+        assertEquals(birthdate, data.getString("birthdate"));
+        assertEquals(email, data.getString("email"));
 
     }
 
@@ -64,7 +63,6 @@ public class CommandsTest {
 
 
         JSONObject response = Requester.signUp(username, email, password, birthdate);
-        System.out.println(response);
         int statusCode = response.getInt("statusCode");
         assertTrue(statusCode >= 500);
 
@@ -103,7 +101,6 @@ public class CommandsTest {
         assertTrue(statusCode >= 400 && statusCode <= 500);
 
         String msg = response.getString("msg");
-        System.out.println(msg);
         assertTrue(msg.contains("birthdate must be of type SQL_DATE"));
 
     }
@@ -114,7 +111,7 @@ public class CommandsTest {
 
         JSONObject response = Requester.login(username, password);
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals(response.getString("msg"), "Login Successful!");
+        assertEquals("Login Successful!", response.getString("msg"));
         assertTrue(response.has("token"));
         token = response.getString("token");
         Requester.decodeToken(token);
@@ -124,10 +121,9 @@ public class CommandsTest {
     public void T06_GetUser() {
 
         JSONObject response = Requester.getUser(username);
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = response.getJSONObject("data");
-        assertEquals(data.getString("username"), username);
+        assertEquals(username, data.getString("username"));
         assertTrue(Auth.verifyHash(password, data.getString("password")));
 
     }
@@ -136,7 +132,6 @@ public class CommandsTest {
     public void T07_GetUserWithoutURIParams() {
 
         JSONObject response = Requester.getUser(null);
-        System.out.println(response);
         int statusCode = response.getInt("statusCode");
         String msg = response.getString("msg");
         assertTrue(statusCode >= 400 && statusCode < 500);
@@ -151,7 +146,7 @@ public class CommandsTest {
         JSONObject response = Requester.updatePassword(password, newPassword);
         assertEquals(200, response.getInt("statusCode"));
 
-        assertEquals(response.getString("msg"), "Account Updated Successfully!");
+        assertEquals("Account Updated Successfully!", response.getString("msg"));
 
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertTrue(Auth.verifyHash(newPassword, user.getString("password")));
@@ -163,7 +158,7 @@ public class CommandsTest {
 
         JSONObject response = Requester.updatePassword("123456", password);
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals(response.getString("msg"), "Account Updated Successfully!");
+        assertEquals("Account Updated Successfully!", response.getString("msg"));
     }
 
     @Test
@@ -173,7 +168,6 @@ public class CommandsTest {
         JSONObject response = Requester.updatePassword(password, password);
         int statusCode = response.getInt("statusCode");
         assertTrue(statusCode >= 400);
-        System.out.println(response);
         assertTrue(response.getString("msg").contains("cannot match"));
     }
 
@@ -184,7 +178,7 @@ public class CommandsTest {
         String photoUrl = "https://picsum.photos/200";
         JSONObject response = Requester.updateProfilePicture(photoUrl);
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals(response.getString("msg"), "Profile Picture uploaded successfully");
+        assertEquals("Profile Picture uploaded successfully", response.getString("msg"));
 
 
     }
@@ -195,7 +189,7 @@ public class CommandsTest {
         JSONObject response = Requester.viewAnotherProfile(username);
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals(user.getString("username"), username);
+        assertEquals(username, user.getString("username"));
         assertTrue(!Utilities.isDevelopmentMode() || user.has("photoUrl"));
     }
 
@@ -207,7 +201,7 @@ public class CommandsTest {
         JSONObject response = Requester.deleteProfilePicture();
         JSONObject user = Requester.getUser(username).getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals(response.getString("msg"), "Profile Picture deleted successfully");
+        assertEquals("Profile Picture deleted successfully", response.getString("msg"));
         assertFalse(user.has("photoUrl"));
     }
 
@@ -217,26 +211,24 @@ public class CommandsTest {
 
 
         JSONObject response = Requester.deleteAccount(password);
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
-        assertEquals(response.getString("msg"), "Account Deleted Successfully!");
+        assertEquals("Account Deleted Successfully!", response.getString("msg"));
 
         JSONObject getUserResponse = Requester.getUser(username);
-        assertEquals(getUserResponse.getString("msg"), "User not found!");
+        assertEquals("User not found!", getUserResponse.getString("msg"));
     }
 
     @AfterClass
     public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
         arango.connectIfNotConnected();
-        String dbName = System.getenv("ARANGO_DB");
-        BaseDocument user = arango.readDocument(dbName, "Users", username);
+        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, "Users", username);
         Map props = user.getProperties();
         boolean is_deleted = (boolean) props.get("is_deleted");
         assertTrue(is_deleted);
         int numberOfFollowers = (int) props.get("number_of_followers");
         assertEquals(0, numberOfFollowers);
-        arango.deleteDocument(dbName, "Users", username);
+        arango.deleteDocument(UserApp.ARANGO_DB_NAME, "Users", username);
     }
 }
