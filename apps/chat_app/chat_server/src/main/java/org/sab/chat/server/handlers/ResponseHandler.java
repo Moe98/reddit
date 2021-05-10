@@ -9,6 +9,7 @@ public class ResponseHandler extends SimpleChannelInboundHandler<JSONObject> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, JSONObject queueResponse) {
-        ClientManager.routeResponse(queueResponse, ctx);
+        queueResponse.remove("statusCode");
+        ClientManager.routeResponse((JSONObject) queueResponse.clone(), ctx);
     }
 }

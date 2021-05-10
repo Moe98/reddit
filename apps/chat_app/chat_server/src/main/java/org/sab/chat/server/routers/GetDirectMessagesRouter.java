@@ -2,6 +2,9 @@ package org.sab.chat.server.routers;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
+import org.sab.chat.server.ClientManager;
+
+import java.util.UUID;
 
 public class GetDirectMessagesRouter extends Router {
 
@@ -13,6 +16,12 @@ public class GetDirectMessagesRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("Route response");
+        JSONObject data = (JSONObject) response.get("data");
+        if(data == null) {
+            handleError(ctx, response);
+            return;
+        }
+
+        ctx.writeAndFlush(response.clone());
     }
 }

@@ -25,6 +25,6 @@ public class AddMemberRouter extends Router {
         UUID targetUserId = UUID.fromString((String) data.get("targetUserId"));
         ClientManager.handleMemberAdded(chatId, targetUserId);
 
-        System.out.println("Route response to client");
+        ClientManager.broadcastResponseToChatChannels(chatId, response);
     }
 }

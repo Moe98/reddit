@@ -13,6 +13,12 @@ public class GetGroupMessagesRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("Route response");
+        JSONObject data = (JSONObject) response.get("data");
+        if(data == null) {
+            handleError(ctx, response);
+            return;
+        }
+
+        ctx.writeAndFlush(response.clone());
     }
 }

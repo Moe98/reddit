@@ -32,6 +32,6 @@ public class CreateDirectChatRouter extends Router {
 
         ClientManager.handleUserCreateChat(chatId, memberIds);
 
-        System.out.println("Route response to client");
+        ClientManager.broadcastResponseToChatChannels(chatId, response);
     }
 }

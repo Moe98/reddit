@@ -3,6 +3,7 @@ package org.sab.chat.server;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.simple.JSONObject;
 import org.sab.chat.server.routers.Router;
 import org.sab.chat.server.routers.RouterBuilder;
@@ -50,21 +51,21 @@ public class ClientManager {
         ConcurrentLinkedQueue<UUID> userChats = getUserChats(userId);
 
         List<UUID> chatsToDelete = new ArrayList<>();
-        for(UUID chatId : userChats) {
+        for (UUID chatId : userChats) {
             ConcurrentLinkedQueue<Boolean> refCount = chatsRefCount.get(chatId);
             refCount.remove(true);
-            if(refCount.isEmpty())
+            if (refCount.isEmpty())
                 chatsToDelete.add(chatId);
         }
 
-        for(UUID chatId : chatsToDelete) {
+        for (UUID chatId : chatsToDelete) {
             chatMembers.remove(chatId);
             chatsRefCount.remove(chatId);
         }
 
         ConcurrentLinkedQueue<Channel> userChannels = getUserChannels(userId);
         userChannels.remove(channel);
-        if(userChannels.isEmpty()) {
+        if (userChannels.isEmpty()) {
             activeUsers.remove(userId);
             userChats.remove(userId);
         }
@@ -72,7 +73,7 @@ public class ClientManager {
 
     public static void syncUserChats(UUID userId, HashMap<UUID, List<UUID>> chats) {
         userChats.putIfAbsent(userId, new ConcurrentLinkedQueue<>(chats.keySet()));
-        for(Map.Entry<UUID, List<UUID>> chat : chats.entrySet()) {
+        for (Map.Entry<UUID, List<UUID>> chat : chats.entrySet()) {
             UUID chatId = chat.getKey();
             chatMembers.putIfAbsent(chatId, new ConcurrentLinkedQueue<>(chat.getValue()));
             chatsRefCount.putIfAbsent(chatId, new ConcurrentLinkedQueue<>());
@@ -91,9 +92,9 @@ public class ClientManager {
     }
 
     public static void handleUserLeftGroup(UUID chatId, UUID userId, boolean isAdmin) {
-        if(isAdmin) {
+        if (isAdmin) {
             ConcurrentLinkedQueue<UUID> chatMemberIds = getChatMembers(chatId);
-            for(UUID memberId : chatMemberIds)
+            for (UUID memberId : chatMemberIds)
                 userChats.get(memberId).remove(chatId);
             chatMembers.remove(chatId);
         } else {
@@ -103,8 +104,23 @@ public class ClientManager {
 
     public static void handleUserCreateChat(UUID chatId, List<UUID> memberIds) {
         chatMembers.putIfAbsent(chatId, new ConcurrentLinkedQueue<>(memberIds));
-        for(UUID memberId : memberIds)
+        for (UUID memberId : memberIds)
             userChats.get(memberId).add(chatId);
+    }
+
+    public static void broadcastResponseToChatChannels(UUID chatId, JSONObject response) {
+        TextWebSocketFrame message = new TextWebSocketFrame(response.toString());
+        ConcurrentLinkedQueue<UUID> memberIds = ClientManager.getChatMembers(chatId);
+        for (UUID memberId : memberIds) {
+            if (isUserOnline(memberId)) {
+                ConcurrentLinkedQueue<Channel> memberChannels = ClientManager.getUserChannels(memberId);
+                for (Channel channel : memberChannels) {
+                    channel.writeAndFlush(message);
+                }
+            } else {
+                // Notify
+            }
+        }
     }
 
     public static void forwardRequestToQueue(JSONObject messageJson, ChannelHandlerContext ctx) {
@@ -124,7 +140,10 @@ public class ClientManager {
     }
 
     public static void handleNonSupportedType(ChannelHandlerContext ctx) {
-        System.out.println("non supported type");
+        JSONObject response = new JSONObject();
+        response.put("type", "ERROR");
+        response.put("msg", "Non Supported Message Type");
+        ctx.channel().writeAndFlush(response);
     }
 
 }

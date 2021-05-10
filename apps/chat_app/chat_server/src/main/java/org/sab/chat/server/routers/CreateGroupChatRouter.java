@@ -31,6 +31,6 @@ public class CreateGroupChatRouter extends Router {
 
         ClientManager.handleUserCreateChat(chatId, memberIds);
 
-        System.out.println("Route response");
+        ClientManager.broadcastResponseToChatChannels(chatId, response);
     }
 }

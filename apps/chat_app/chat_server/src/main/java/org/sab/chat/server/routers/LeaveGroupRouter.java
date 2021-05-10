@@ -16,7 +16,6 @@ public class LeaveGroupRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-
         JSONObject data = (JSONObject) response.get("data");
         if(data == null) {
             handleError(ctx, response);
@@ -29,6 +28,6 @@ public class LeaveGroupRouter extends Router {
         boolean isAdmin = targetUserId.equals(adminId);
         ClientManager.handleUserLeftGroup(chatId, targetUserId, isAdmin);
 
-        System.out.println("Route response to client");
+        ClientManager.broadcastResponseToChatChannels(chatId, response);
     }
 }

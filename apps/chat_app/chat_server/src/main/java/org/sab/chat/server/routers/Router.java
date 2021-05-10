@@ -26,7 +26,6 @@ public abstract class Router {
     }
 
     public void handleError(ChannelHandlerContext ctx, JSONObject response) {
-        response.remove("statusCode");
         response.put("type", "ERROR");
         ctx.channel().writeAndFlush(response.clone());
     }

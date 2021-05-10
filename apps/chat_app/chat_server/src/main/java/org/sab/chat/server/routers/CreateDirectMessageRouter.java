@@ -1,14 +1,10 @@
 package org.sab.chat.server.routers;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.simple.JSONObject;
 import org.sab.chat.server.ClientManager;
 
-import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CreateDirectMessageRouter extends Router {
 
@@ -20,22 +16,14 @@ public class CreateDirectMessageRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("CreateDirectMessage");
-        String chatId = (String)(((JSONObject)response.get("data")).get("chatId"));
-        ConcurrentLinkedQueue<UUID> members = ClientManager.getChatMembers(UUID.fromString(chatId));
-        String content = (String)(((JSONObject)response.get("data")).get("content"));
-
-        TextWebSocketFrame message;
-        for (UUID memberId : members) {
-            if (ClientManager.isUserOnline(memberId)) {
-                ConcurrentLinkedQueue<Channel> memberChannels = ClientManager.getUserChannels(memberId);
-                for (Channel channel : memberChannels) {
-                    message = new TextWebSocketFrame(content);
-                    channel.writeAndFlush(message.retain());
-                }
-            } else {
-                //notification
-            }
+        JSONObject data = (JSONObject) response.get("data");
+        if(data == null) {
+            handleError(ctx, response);
+            return;
         }
+
+        UUID chatId = UUID.fromString((String) data.get("chatId"));
+
+        ClientManager.broadcastResponseToChatChannels(chatId, response);
     }
 }
