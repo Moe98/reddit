@@ -1,6 +1,6 @@
 package org.sab.chat.commands;
 
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupChat;
@@ -47,9 +47,13 @@ public class LeaveGroup extends CommandWithVerification {
         JSONObject response = new JSONObject();
         try {
             GroupChat groupChat = groupChatTable.leavesChat(chatId, userId);
+
+            JSONObject data = groupChat.toJson();
+            data.put("targetMemberId", userId.toString());
+
             response.put("statusCode", 200);
             response.put("msg", "User left group successfully");
-            response.put("data", groupChat.toJson());
+            response.put("data", data);
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);
             response.put("msg", e.getMessage());

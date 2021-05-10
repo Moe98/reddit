@@ -1,6 +1,6 @@
 package org.sab.chat.commands;
 
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupChat;
@@ -50,9 +50,13 @@ public class AddGroupMember extends CommandWithVerification {
         JSONObject response = new JSONObject();
         try {
             GroupChat groupChat = groupChatTable.addGroupMember(chatId, adminId, memberId);
+
+            JSONObject data = groupChat.toJson();
+            data.put("targetMemberId", memberId.toString());
+
             response.put("statusCode", 200);
             response.put("msg", "Admin added member successfully");
-            response.put("data", groupChat.toJson());
+            response.put("data", data);
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);
             response.put("msg", e.getMessage());
