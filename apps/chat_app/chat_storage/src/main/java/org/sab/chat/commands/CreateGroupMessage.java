@@ -4,7 +4,6 @@ import org.json.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupChat;
-import org.sab.chat.storage.models.GroupMessage;
 import org.sab.chat.storage.tables.GroupMessageTable;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.Attribute;
