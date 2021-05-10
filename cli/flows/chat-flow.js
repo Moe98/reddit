@@ -9,14 +9,17 @@ const { useState, useEffect } = React
 
 const chatsData = [
 	{
+		id: '166fff75-d0f6-4fa9-951a-4a58c696397a',
 		name: 'Alpha Squad',
 		membersList: ['Ouda', 'Joe', 'Bulleil', 'Ronic']
 	},
 	{
+		id: '166fff75-d0f6-4fa9-951a-4a58c696397b',
 		name: 'Hamada Security',
 		membersList: ['Joe', 'Bulleil', 'Ronic']
 	},
 	{
+		id: '166fff75-d0f6-4fa9-951a-4a58c696397c',
 		name: 'Cheating Case',
 		membersList: ['Ouda', 'Ronic']
 	}

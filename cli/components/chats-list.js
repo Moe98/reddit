@@ -6,7 +6,7 @@ const ChatsList = ({ chats, onChatSelect }) => {
 	const handleSelect = (item) => onChatSelect(item.value)
 
 	let items = chats.map((chat) => ({
-		key: chat.name,
+		key: chat.id,
 		label: `${chat.name} (${chat.membersList.join(', ')})`,
 		value: chat
 	}))
