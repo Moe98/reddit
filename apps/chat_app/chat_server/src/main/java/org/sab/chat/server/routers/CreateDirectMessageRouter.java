@@ -4,7 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.json.simple.JSONObject;
-import org.sab.chat.server.models.ClientManager;
+import org.sab.chat.server.ClientManager;
 
 import java.util.ArrayList;
 import java.util.UUID;

@@ -10,15 +10,18 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.sab.chat.server.handlers.HttpRequestHandler;
 import org.sab.chat.server.handlers.QueueHandler;
+import org.sab.chat.server.handlers.ResponseHandler;
 import org.sab.chat.server.handlers.TextWebSocketFrameHandler;
 
 public class ChatServerInitializer extends ChannelInitializer<Channel> {
     private final ChannelGroup group;
+
     public ChatServerInitializer(ChannelGroup group) {
         this.group = group;
     }
+
     @Override
-    protected void initChannel(Channel ch) throws Exception {
+    protected void initChannel(Channel ch) {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new ChunkedWriteHandler());
@@ -27,4 +30,6 @@ public class ChatServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
         pipeline.addLast(new TextWebSocketFrameHandler(group));
         pipeline.addLast(new QueueHandler("CHAT"));
-    } }
+        pipeline.addLast(new ResponseHandler());
+    }
+}

@@ -1,4 +1,4 @@
-package org.sab.chat.server.models;
+package org.sab.chat.server;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,18 +12,23 @@ public class ClientManager {
     public static final HashMap<UUID, ArrayList<Channel>> activeUsers = new HashMap<>();
     public static final HashMap<Channel, UUID> channelToUser = new HashMap<>();
 
-    public static void routeRequest(JSONObject messageJson, ChannelHandlerContext ctx) {
+    public static void forwardRequestToQueue(JSONObject messageJson, ChannelHandlerContext ctx) {
         String type = (String) messageJson.get("type");
         Router router = RouterBuilder.createRouter(type);
-        if(router == null) {
-            handleNonsupportedType(ctx);
+        if (router == null) {
+            handleNonSupportedType(ctx);
             return;
         }
         router.forwardToQueue(ctx, messageJson);
+    }
+
+    public static void routeResponse(JSONObject messageJson, ChannelHandlerContext ctx) {
+        String type = (String) messageJson.get("type");
+        Router router = RouterBuilder.createRouter(type);
         router.route(ctx, messageJson);
     }
 
-    public static void handleNonsupportedType(ChannelHandlerContext ctx){
+    public static void handleNonSupportedType(ChannelHandlerContext ctx) {
         System.out.println("non supported type");
     }
 

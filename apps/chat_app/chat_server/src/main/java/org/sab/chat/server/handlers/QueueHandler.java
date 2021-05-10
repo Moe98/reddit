@@ -28,8 +28,9 @@ public class QueueHandler extends SimpleChannelInboundHandler<JSONObject> {
             String response = rpcClient.call(request, reqQueueName, resQueueName);
             JSONParser parser = new JSONParser();
             JSONObject responseJson = (JSONObject) parser.parse(response);
-            //ctx.fireChannelRead(responseJson);
+            responseJson.put("type", requestJson.get("functionName"));
             System.out.println(responseJson.toJSONString());
+            ctx.fireChannelRead(responseJson);
         } catch (IOException | TimeoutException | InterruptedException | NullPointerException | ParseException e) {
             e.printStackTrace();
         }

@@ -8,7 +8,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.sab.chat.server.models.ClientManager;
+import org.sab.chat.server.ClientManager;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class TextWebSocketFrameHandler extends
         msg.retain();
         JSONParser parser = new JSONParser();
         JSONObject messageJson = (JSONObject) parser.parse(msg.text());
-        ClientManager.routeRequest(messageJson, ctx);
+        ClientManager.forwardRequestToQueue(messageJson, ctx);
     }
 
 }
