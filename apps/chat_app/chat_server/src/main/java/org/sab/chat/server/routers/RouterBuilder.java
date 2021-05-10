@@ -4,7 +4,7 @@ public class RouterBuilder {
 
     public static Router createRouter(String routerType) {
         return switch (routerType) {
-            case "AUTH" -> new AuthRouter();
+            case "INIT_CONNECTION" -> new InitConnectionRouter();
             case "ADD_GROUP_MEMBER" -> new AddMemberRouter();
             case "REMOVE_GROUP_MEMBER" -> new RemoveMemberRouter();
             case "LEAVE_GROUP" -> new LeaveGroupRouter();

@@ -8,10 +8,11 @@ import org.sab.chat.server.ClientManager;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CreateGroupMessageRouter extends Router {
     @Override
-    public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
+    public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();
         body.put("chatId", request.get("chatId"));
         body.put("senderId", request.get("senderId"));
@@ -24,7 +25,7 @@ public class CreateGroupMessageRouter extends Router {
     }
 
     @Override
-    public void route(ChannelHandlerContext ctx, JSONObject response) {
+    public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
         System.out.println("CreateGroupMessage");
         String content = (String)(((JSONObject)response.get("data")).get("content"));
         //hard coded values to be replaced by database values
@@ -33,13 +34,12 @@ public class CreateGroupMessageRouter extends Router {
         randomChatIds.add(UUID.fromString("02d0b9a2-ed84-4f1e-a86a-58aac9aec88d"));
         ArrayList<UUID> members = randomChatIds;
         TextWebSocketFrame message;
-        for (int i = 0; i < members.size(); i++) {
-            UUID memberID = members.get(i);
-            if (ClientManager.activeUsers.containsKey(memberID)) {
-                ArrayList<Channel> memberChannels = ClientManager.activeUsers.get(memberID);
-                for (int j = 0; j < memberChannels.size(); j++) {
+        for (UUID memberId : members) {
+            if (ClientManager.isUserOnline(memberId)) {
+                ConcurrentLinkedQueue<Channel> memberChannels = ClientManager.getUserChannels(memberId);
+                for (Channel channel : memberChannels) {
                     message = new TextWebSocketFrame(content);
-                    memberChannels.get(j).writeAndFlush(message.retain());
+                    channel.writeAndFlush(message.retain());
                 }
             }
         }

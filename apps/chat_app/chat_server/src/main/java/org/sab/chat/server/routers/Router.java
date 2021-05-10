@@ -16,7 +16,7 @@ public abstract class Router {
         return packedRequest;
     }
 
-    abstract public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request);
+    abstract public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request);
 
-    abstract public void route(ChannelHandlerContext ctx, JSONObject response);
+    abstract public void routeResponse(ChannelHandlerContext ctx, JSONObject response);
 }

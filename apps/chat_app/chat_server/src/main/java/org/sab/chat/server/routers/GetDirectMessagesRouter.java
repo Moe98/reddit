@@ -5,12 +5,12 @@ import org.json.simple.JSONObject;
 
 public class GetDirectMessagesRouter extends Router {
     @Override
-    public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
+    public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
         System.out.println("Forward to queue");
     }
 
     @Override
-    public void route(ChannelHandlerContext ctx, JSONObject response) {
+    public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
         System.out.println("Route response");
     }
 }

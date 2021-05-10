@@ -1,6 +1,5 @@
 package org.sab.chat.server.handlers;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
@@ -11,7 +10,6 @@ import org.json.simple.parser.ParseException;
 import org.sab.chat.server.ClientManager;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class TextWebSocketFrameHandler extends
@@ -36,14 +34,8 @@ public class TextWebSocketFrameHandler extends
     }
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        UUID user = ClientManager.channelToUser.remove(ctx.channel());
-        ArrayList<Channel> userChannels = ClientManager.activeUsers.get(user);
-        userChannels.remove(ctx.channel());
-        if(userChannels.size()==0)
-            ClientManager.activeUsers.remove(user);
-        else{
-            ClientManager.activeUsers.put(user,userChannels);
-        }
+        UUID userId = ClientManager.getChannelUser(ctx.channel().id());
+        ClientManager.handleUserOffline(userId, ctx.channel());
         super.channelInactive(ctx);
     }
 

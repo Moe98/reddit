@@ -5,12 +5,18 @@ import org.json.simple.JSONObject;
 
 public class GetChatsRouter extends Router {
     @Override
-    public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        System.out.println("Forward to queue");
+    public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
+        JSONObject body = new JSONObject();
+        body.put("userId", request.get("userId"));
+
+        String functionName = (String) request.get("type");
+        JSONObject packedRequest = packRequest(functionName, body);
+
+        ctx.fireChannelRead(packedRequest);
     }
 
     @Override
-    public void route(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("Route response");
+    public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
+        ctx.writeAndFlush(response.clone());
     }
 }
