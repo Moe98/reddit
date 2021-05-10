@@ -9,6 +9,7 @@ import org.sab.validation.Schema;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Login extends UserCommand {
 
@@ -37,14 +38,13 @@ public class Login extends UserCommand {
         if (userAuth.getInt("statusCode") != 200)
             return userAuth.toString();
         // Add token parameters
-        HashMap<String, String> claims = new HashMap<String, String>();
-        claims.put(USERNAME, username);
+        Map<String, String> claims = Map.of(USERNAME, username);
         // Generate Authentication headers
         String token = Jwt.generateToken(claims, 60);
 
         return makeJwtResponse("Login Successful!", token);
     }
-    public static String makeJwtResponse(String msg,String token) {
+    private static String makeJwtResponse(String msg,String token) {
         JSONObject response = new JSONObject().put("msg", msg).put("token",token);
         response.put("statusCode", 200);
         return response.toString();

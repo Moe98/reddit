@@ -7,6 +7,9 @@ import org.sab.service.authentication.Jwt;
 import java.util.Map;
 
 public class Requester {
+    Requester() {
+    }
+
     static JSONObject authenticationParams = new JSONObject();
 
     private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
