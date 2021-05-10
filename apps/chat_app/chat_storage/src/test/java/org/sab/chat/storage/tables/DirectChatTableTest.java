@@ -55,44 +55,44 @@ public class DirectChatTableTest {
 
     @Test
     public void whenCreatingDirectChat_thenCreatedCorrectly() {
-        UUID first_member = UUID.randomUUID();
-        UUID second_member = UUID.randomUUID();
+        UUID firstMember = UUID.randomUUID();
+        UUID secondMember = UUID.randomUUID();
 
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = directChats.createDirectChat( first_member, second_member);
+            chatId = directChats.createDirectChat(firstMember, secondMember).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create direct chat: " + e.getMessage());
         }
 
-        DirectChat createdDirectChat = directChats.getMapper().get(chat_id);
+        DirectChat createdDirectChat = directChats.getMapper().get(chatId);
 
-        assertEquals(chat_id, createdDirectChat.getChat_id());
-        assertEquals(first_member, createdDirectChat.getFirst_member());
-        assertEquals(second_member, createdDirectChat.getSecond_member());
-        directChats.getMapper().delete(chat_id);
+        assertEquals(chatId, createdDirectChat.getChat_id());
+        assertEquals(firstMember, createdDirectChat.getFirst_member());
+        assertEquals(secondMember, createdDirectChat.getSecond_member());
+        directChats.getMapper().delete(chatId);
 
     }
 
     @Test
     public void whenCreatingDirectChatAlreadyExisting_thenFailsToCreate() {
-        UUID first_member = UUID.randomUUID();
-        UUID second_member = UUID.randomUUID();
+        UUID firstMember = UUID.randomUUID();
+        UUID secondMember = UUID.randomUUID();
 
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = directChats.createDirectChat( first_member, second_member);
+            chatId = directChats.createDirectChat(firstMember, secondMember).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create direct chat: " + e.getMessage());
         }
 
         try {
-            directChats.createDirectChat( first_member, second_member);
+            directChats.createDirectChat(firstMember, secondMember);
             fail("Created group chat with invalid data");
         } catch (InvalidInputException ignored) {
 
         }
 
-        directChats.getMapper().delete(chat_id);
+        directChats.getMapper().delete(chatId);
     }
 }

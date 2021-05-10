@@ -2,6 +2,7 @@ package org.sab.chat.storage.models;
 
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import org.json.simple.JSONObject;
 
 import java.util.UUID;
 
@@ -44,6 +45,14 @@ public class DirectChat {
 
     public void setSecond_member(UUID second_member) {
         this.second_member = second_member;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("chatId", chat_id.toString());
+        json.put("firstMember", first_member.toString());
+        json.put("secondMember", second_member.toString());
+        return json;
     }
 
     @Override

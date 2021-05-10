@@ -2,6 +2,8 @@ package org.sab.chat.storage.models;
 
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import org.json.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.Date;
 import java.util.List;
@@ -75,6 +77,21 @@ public class GroupChat {
 
     public void setDate_created(Date date_created) {
         this.date_created = date_created;
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("chatId", chat_id.toString());
+        json.put("name", name);
+        json.put("description", description);
+        json.put("adminId", admin.toString());
+        json.put("dateCreated", date_created.toString());
+
+        JSONArray membersList = new JSONArray();
+        members.stream().map(memberId -> memberId.toString()).forEach(membersList::put);
+        json.put("memberIds", membersList);
+
+        return json;
     }
 
     @Override

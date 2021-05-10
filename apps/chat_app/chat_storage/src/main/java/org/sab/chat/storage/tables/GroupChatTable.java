@@ -25,7 +25,7 @@ public class GroupChatTable {
         this.cassandra = cassandra;
     }
 
-    public void createMapper(){
+    public void createMapper() {
         MappingManager manager = new MappingManager(cassandra.getSession());
         this.mapper = manager.mapper(GroupChat.class);
     }
@@ -43,7 +43,7 @@ public class GroupChatTable {
         createMapper();
     }
 
-    public UUID createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
+    public GroupChat createGroupChat(UUID creator, String name, String description) throws InvalidInputException {
         UUID chatId = UUID.randomUUID();
 
         if (name == null || name.length() == 0)
@@ -60,20 +60,21 @@ public class GroupChatTable {
         List<UUID> membersList = new ArrayList<>();
         membersList.add(creator);
         Date date = new Date();
-        mapper.save(new GroupChat(chatId, name, description, membersList, creator, new Timestamp(date.getTime())));
-        return chatId;
+        GroupChat createdGroupChat = new GroupChat(chatId, name, description, membersList, creator, new Timestamp(date.getTime()));
+        mapper.save(createdGroupChat);
+        return createdGroupChat;
     }
 
-    public UUID addGroupMember(UUID chat_id, UUID admin, UUID user) throws InvalidInputException {
+    public GroupChat addGroupMember(UUID chatId, UUID adminId, UUID memberId) throws InvalidInputException {
         try {
-            UUID.fromString(chat_id.toString());
-            UUID.fromString(admin.toString());
-            UUID.fromString(user.toString());
+            UUID.fromString(chatId.toString());
+            UUID.fromString(adminId.toString());
+            UUID.fromString(memberId.toString());
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid UUID.");
         }
         String query1 = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query1);
 
@@ -82,7 +83,7 @@ public class GroupChatTable {
         }
 
         String query2 = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chatId + " AND admin = " + adminId + " ALLOW FILTERING;";
         ResultSet query2Result = cassandra.runQuery(query2);
         List<Row> query2Rows = query2Result.all();
         if (TableUtils.isEmpty(query2Rows)) {
@@ -92,29 +93,31 @@ public class GroupChatTable {
         String name = query2Rows.get(0).get(5, String.class);
         String description = query2Rows.get(0).get(3, String.class);
         List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
-        Date date_created = query2Rows.get(0).getTimestamp(2);
+        Date dateCreated = query2Rows.get(0).getTimestamp(2);
 
-        if(members.contains(user)){
+        if (members.contains(memberId)) {
             throw new InvalidInputException("Member already there");
         }
-        members.add(user);
+        members.add(memberId);
 
-        mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+        GroupChat updatedGroupChat = new GroupChat(chatId, name, description, members, adminId, dateCreated);
 
-        return user;
+        mapper.save(updatedGroupChat);
+
+        return updatedGroupChat;
     }
 
-    public UUID removeGroupMember(UUID chat_id, UUID admin, UUID user) throws InvalidInputException {
+    public GroupChat removeGroupMember(UUID chatId, UUID adminId, UUID memberId) throws InvalidInputException {
         try {
-            UUID.fromString(chat_id.toString());
-            UUID.fromString(admin.toString());
-            UUID.fromString(user.toString());
+            UUID.fromString(chatId.toString());
+            UUID.fromString(adminId.toString());
+            UUID.fromString(memberId.toString());
 
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid UUID.");
         }
         String query = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query);
         List<Row> query1Rows = queryResult.all();
@@ -124,7 +127,7 @@ public class GroupChatTable {
         }
 
         String query1 = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " AND admin = " + admin + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chatId + " AND admin = " + adminId + " ALLOW FILTERING;";
         ResultSet query1Result = cassandra.runQuery(query1);
         List<Row> query2Rows = query1Result.all();
         if (TableUtils.isEmpty(query2Rows)) {
@@ -134,28 +137,29 @@ public class GroupChatTable {
         String name = query2Rows.get(0).get(5, String.class);
         String description = query2Rows.get(0).get(3, String.class);
         List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
-        Date date_created = query2Rows.get(0).getTimestamp(2);
+        Date dateCreated = query2Rows.get(0).getTimestamp(2);
 
-        if (!members.contains(user)) {
+        if (!members.contains(memberId)) {
             throw new InvalidInputException("Member not in group");
         }
-        members.remove(user);
-        mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+        members.remove(memberId);
+        GroupChat updatedGroupChat = new GroupChat(chatId, name, description, members, adminId, dateCreated);
+        mapper.save(updatedGroupChat);
 
-        return user;
+        return updatedGroupChat;
     }
 
-    public UUID leavesChat(UUID chat_id, UUID user) throws InvalidInputException {
+    public GroupChat leavesChat(UUID chatId, UUID userId) throws InvalidInputException {
         try {
-            UUID.fromString(chat_id.toString());
-            UUID.fromString(user.toString());
+            UUID.fromString(chatId.toString());
+            UUID.fromString(userId.toString());
 
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid UUID.");
         }
 
         String query = "SELECT * FROM " + "group_chats" +
-                " WHERE chat_id = " + chat_id + " ALLOW FILTERING;";
+                " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
 
         ResultSet queryResult = cassandra.runQuery(query);
         List<Row> all = queryResult.all();
@@ -170,17 +174,19 @@ public class GroupChatTable {
         Date date_created = all.get(0).getTimestamp(2);
         UUID admin = all.get(0).get(1, UUID.class);
 
-        if (!members.contains(user) && !admin.equals(user)) {
+        if (!members.contains(userId) && !admin.equals(userId)) {
             throw new InvalidInputException("Member not in group");
         }
-        if (members.contains(user) && admin.equals(user)) {
-            mapper.delete(chat_id);
-        } else if (members.contains(user)) {
-            members.remove(user);
-            mapper.save(new GroupChat(chat_id, name, description, members, admin, date_created));
+        GroupChat updatedGroupChat = mapper.get(chatId);
+        if (members.contains(userId) && admin.equals(userId)) {
+            mapper.delete(chatId);
+        } else if (members.contains(userId)) {
+            members.remove(userId);
+            updatedGroupChat = new GroupChat(chatId, name, description, members, admin, date_created);
+            mapper.save(updatedGroupChat);
         }
 
-        return user;
+        return updatedGroupChat;
     }
 
     public Mapper<GroupChat> getMapper() {

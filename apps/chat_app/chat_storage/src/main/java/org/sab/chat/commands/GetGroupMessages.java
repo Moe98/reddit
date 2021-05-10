@@ -6,7 +6,6 @@ import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupMessage;
 import org.sab.chat.storage.tables.GroupMessageTable;
-import org.sab.chat.storage.tables.TableUtils;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
@@ -50,14 +49,7 @@ public class GetGroupMessages extends CommandWithVerification {
             List<GroupMessage> messages = groupMessageTable.getGroupMessages(chatId, userId);
 
             JSONArray messagesJson = new JSONArray();
-            messages.stream().map(msg -> {
-                JSONObject msgJson = new JSONObject();
-                msgJson.put("chatId", msg.getChat_id().toString());
-                msgJson.put("timestamp", TableUtils.getInstantFromUUID(msg.getMessage_id()));
-                msgJson.put("senderId", msg.getSender_id().toString());
-                msgJson.put("content", msg.getContent());
-                return msgJson;
-            }).forEach(messagesJson::put);
+            messages.stream().map(GroupMessage::toJson).forEach(messagesJson::put);
 
             JSONObject responseBody = new JSONObject();
             responseBody.put("messages", messagesJson);

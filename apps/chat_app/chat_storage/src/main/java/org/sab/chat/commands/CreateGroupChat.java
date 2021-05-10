@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 
+import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.tables.GroupChatTable;
 
 import org.sab.service.validation.CommandWithVerification;
@@ -49,14 +50,10 @@ public class CreateGroupChat extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            UUID chatId = groupChatTable.createGroupChat(creator, name, description);
-
-            JSONObject responseBody = new JSONObject();
-            responseBody.put("chatId", chatId.toString());
-
+            GroupChat groupChat = groupChatTable.createGroupChat(creator, name, description);
             response.put("statusCode", 200);
             response.put("msg", "Group chat created successfully");
-            response.put("data", responseBody);
+            response.put("data", groupChat.toJson());
 
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);

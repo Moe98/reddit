@@ -22,7 +22,7 @@ public class DirectChatTable {
         this.cassandra = cassandra;
     }
 
-    public void createMapper(){
+    public void createMapper() {
         MappingManager manager = new MappingManager(cassandra.getSession());
         this.mapper = manager.mapper(DirectChat.class);
     }
@@ -38,26 +38,27 @@ public class DirectChatTable {
         createMapper();
     }
 
-    public UUID createDirectChat(UUID first_member, UUID second_member) throws InvalidInputException {
+    public DirectChat createDirectChat(UUID firstMember, UUID secondMember) throws InvalidInputException {
         UUID chatId = UUID.randomUUID();
         try {
-            UUID.fromString(first_member.toString());
-            UUID.fromString(second_member.toString());
+            UUID.fromString(firstMember.toString());
+            UUID.fromString(secondMember.toString());
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid user UUID.");
         }
         String query1 = "SELECT * FROM " + TABLE_NAME +
-                " WHERE first_member = " + first_member + "AND second_member = " + second_member + " ALLOW FILTERING;";
+                " WHERE first_member = " + firstMember + "AND second_member = " + secondMember + " ALLOW FILTERING;";
         String query2 = "SELECT * FROM " + TABLE_NAME +
-                " WHERE first_member = " + second_member + "AND second_member = " + first_member + " ALLOW FILTERING;";
+                " WHERE first_member = " + secondMember + "AND second_member = " + firstMember + " ALLOW FILTERING;";
 
         ResultSet queryResult1 = cassandra.runQuery(query1);
         ResultSet queryResult2 = cassandra.runQuery(query2);
 
         if (!TableUtils.isEmpty(queryResult1.all()) || !TableUtils.isEmpty(queryResult2.all()))
             throw new InvalidInputException("Chat already exist between Users");
-        mapper.save(new DirectChat(chatId, first_member, second_member));
-        return chatId;
+        DirectChat createdDirectChat = new DirectChat(chatId, firstMember, secondMember);
+        mapper.save(createdDirectChat);
+        return createdDirectChat;
     }
 
     public Mapper<DirectChat> getMapper() {

@@ -8,8 +8,6 @@ import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.GroupMessage;
-import org.sab.chat.storage.tables.GroupChatTable;
-import org.sab.chat.storage.tables.GroupMessageTable;
 
 import java.util.List;
 import java.util.UUID;
@@ -60,32 +58,32 @@ public class GroupMessageTableTest {
     public void whenCreatingGroupMessage_thenCreatedCorrectly() {
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
-        UUID admin = UUID.randomUUID();
+        UUID adminId = UUID.randomUUID();
         String name = "name";
         String description = "description";
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = groupChats.createGroupChat(admin, name,description);
+            chatId = groupChats.createGroupChat(adminId, name, description).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create group chat: " + e.getMessage());
         }
-        UUID message_id = null;
+        UUID messageId = null;
         String content = "content";
         try {
-            message_id = groupMessages.createGroupMessage(chat_id,admin, content);
+            messageId = groupMessages.createGroupMessage(chatId, adminId, content).getMessage_id();
         } catch (InvalidInputException e) {
-            fail("Failed to create group message: "+ e.getMessage());
+            fail("Failed to create group message: " + e.getMessage());
         }
 
-        GroupMessage createdMessage = groupMessages.getMapper().get(chat_id,message_id);
+        GroupMessage createdMessage = groupMessages.getMapper().get(chatId, messageId);
 
-        assertEquals(message_id,createdMessage.getMessage_id());
-        assertEquals(admin, createdMessage.getSender_id());
+        assertEquals(messageId, createdMessage.getMessage_id());
+        assertEquals(adminId, createdMessage.getSender_id());
         assertEquals(content, createdMessage.getContent());
 
 
-        groupChats.getMapper().delete(chat_id);
-        groupMessages.getMapper().delete(chat_id, message_id);
+        groupChats.getMapper().delete(chatId);
+        groupMessages.getMapper().delete(chatId, messageId);
     }
 
     @Test
@@ -93,55 +91,55 @@ public class GroupMessageTableTest {
 
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
-        UUID admin = UUID.randomUUID();
+        UUID adminId = UUID.randomUUID();
         String name = "name";
         String description = "description";
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = groupChats.createGroupChat(admin, name,description);
+            chatId = groupChats.createGroupChat(adminId, name, description).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create group chat: " + e.getMessage());
         }
         String content = "content";
         try {
-            groupMessages.createGroupMessage(chat_id, UUID.randomUUID(), content);
+            groupMessages.createGroupMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember was able to send a message.");
         } catch (InvalidInputException ignored) {
 
         }
-        groupChats.getMapper().delete(chat_id);
+        groupChats.getMapper().delete(chatId);
     }
 
     @Test
     public void whenGetDirectMessage_thenReturnedCorrectly() {
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
-        UUID admin = UUID.randomUUID();
+        UUID adminId = UUID.randomUUID();
         String name = "name";
         String description = "description";
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = groupChats.createGroupChat(admin, name,description);
+            chatId = groupChats.createGroupChat(adminId, name, description).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create group chat: " + e.getMessage());
         }
-        UUID message_id = null;
+        UUID messageId = null;
         String content = "content";
         try {
-            message_id = groupMessages.createGroupMessage(chat_id,admin, content);
+            messageId = groupMessages.createGroupMessage(chatId, adminId, content).getMessage_id();
         } catch (InvalidInputException e) {
-            fail("Failed to create group message: "+ e.getMessage());
+            fail("Failed to create group message: " + e.getMessage());
         }
 
-        GroupMessage createdMessage = groupMessages.getMapper().get(chat_id,message_id);
+        GroupMessage createdMessage = groupMessages.getMapper().get(chatId, messageId);
 
-        assertEquals(message_id,createdMessage.getMessage_id());
-        assertEquals(admin, createdMessage.getSender_id());
+        assertEquals(messageId, createdMessage.getMessage_id());
+        assertEquals(adminId, createdMessage.getSender_id());
         assertEquals(content, createdMessage.getContent());
 
 
-        groupChats.getMapper().delete(chat_id);
-        groupMessages.getMapper().delete(chat_id, message_id);
+        groupChats.getMapper().delete(chatId);
+        groupMessages.getMapper().delete(chatId, messageId);
     }
 
     @Test
@@ -149,28 +147,28 @@ public class GroupMessageTableTest {
 
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
-        UUID admin = UUID.randomUUID();
+        UUID adminId = UUID.randomUUID();
         String name = "name";
         String description = "description";
-        UUID chat_id = null;
+        UUID chatId = null;
         try {
-            chat_id = groupChats.createGroupChat(admin, name,description);
+            chatId = groupChats.createGroupChat(adminId, name, description).getChat_id();
         } catch (InvalidInputException e) {
             fail("Failed to create group chat: " + e.getMessage());
         }
         String content = "content";
         try {
-            groupMessages.createGroupMessage(chat_id, admin, content);
+            groupMessages.createGroupMessage(chatId, adminId, content);
         } catch (InvalidInputException e) {
             fail("A member failed to send a message.");
         }
         try {
-            groupMessages.getGroupMessages(chat_id, UUID.randomUUID());
+            groupMessages.getGroupMessages(chatId, UUID.randomUUID());
             fail("A nonmember was able to get a message.");
         } catch (InvalidInputException ignored) {
 
         }
 
-        groupChats.getMapper().delete(chat_id);
+        groupChats.getMapper().delete(chatId);
     }
 }

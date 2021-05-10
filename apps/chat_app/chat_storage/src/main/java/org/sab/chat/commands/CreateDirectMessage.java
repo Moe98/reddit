@@ -3,6 +3,7 @@ package org.sab.chat.commands;
 import org.json.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.DirectMessage;
 import org.sab.chat.storage.tables.DirectMessageTable;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.Attribute;
@@ -47,15 +48,10 @@ public class CreateDirectMessage extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            UUID messageId = directMessageTable.createDirectMessage(chatId, senderId, content);
-
-            JSONObject responseBody = new JSONObject();
-            responseBody.put("messageId", messageId.toString());
-
+            DirectMessage directMessage = directMessageTable.createDirectMessage(chatId, senderId, content);
             response.put("statusCode", 200);
             response.put("msg", "Direct message created successfully");
-            response.put("data", responseBody);
-
+            response.put("data", directMessage.toJson());
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);
             response.put("msg", e.getMessage());

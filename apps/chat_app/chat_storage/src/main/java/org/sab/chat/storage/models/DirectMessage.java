@@ -3,6 +3,8 @@ package org.sab.chat.storage.models;
 import com.datastax.driver.mapping.annotations.ClusteringColumn;
 import com.datastax.driver.mapping.annotations.PartitionKey;
 import com.datastax.driver.mapping.annotations.Table;
+import org.json.simple.JSONObject;
+import org.sab.chat.storage.tables.TableUtils;
 
 import java.util.UUID;
 
@@ -58,6 +60,14 @@ public class DirectMessage {
         this.content = content;
     }
 
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("chatId", chat_id.toString());
+        json.put("timestamp", TableUtils.getInstantFromUUID(message_id));
+        json.put("senderId", sender_id.toString());
+        json.put("content", content);
+        return json;
+    }
 
     @Override
     public String toString() {

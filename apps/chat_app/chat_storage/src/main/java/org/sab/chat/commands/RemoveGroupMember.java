@@ -3,6 +3,7 @@ package org.sab.chat.commands;
 import org.json.JSONObject;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.tables.GroupChatTable;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.Attribute;
@@ -48,11 +49,10 @@ public class RemoveGroupMember extends CommandWithVerification {
 
         JSONObject response = new JSONObject();
         try {
-            groupChatTable.removeGroupMember(chatId, adminId, memberId);
-
+            GroupChat groupChat = groupChatTable.removeGroupMember(chatId, adminId, memberId);
             response.put("statusCode", 200);
             response.put("msg", "Admin removed member successfully");
-
+            response.put("data", groupChat.toJson());
         } catch (InvalidInputException e) {
             response.put("statusCode", 400);
             response.put("msg", e.getMessage());
