@@ -78,10 +78,9 @@ public class Requester {
     }
 
     public static void decodeToken(String token) {
-        Jwt jwt = new Jwt();
         boolean authenticated;
         try {
-            Map<String, Object> claims = jwt.verifyAndDecode(token);
+            Map<String, Object> claims = Jwt.verifyAndDecode(token);
             authenticated = true;
             authenticationParams.put("username", claims.get("username"));
             authenticationParams.put("jwt", token);
