@@ -93,14 +93,14 @@ public class PostgresConnection {
     }
 
     private static void createUsersTable(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
-        String path = "libs/postgres/src/main/resources/sql/CreateTable.sql";
+        String path = "libs/postgres/src/main/resources/sql/CreateUsersTable.sql";
         if (isTesting)
             path = "../../" + path;
         runScript(path);
     }
 
     private static void createUsersProcedures(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
-        String path = "libs/postgres/src/main/resources/sql/procedures.sql";
+        String path = "libs/postgres/src/main/resources/sql/CreateUserProecuderes.sql";
         if (isTesting)
             path = "../../" + path;
         runScript(path);

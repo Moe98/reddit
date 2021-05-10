@@ -1,4 +1,4 @@
-drop FUNCTION create_user(user_id VARCHAR,
+DROP FUNCTION create_user (user_id VARCHAR,
                                        username   VARCHAR,
                                        email      VARCHAR,
                                        password   VARCHAR,
