@@ -13,7 +13,7 @@ import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,10 @@ public class Arango {
 
     private Arango() {
         builder = new ArangoDB.Builder()
-                .user(System.getenv("ARANGO_USER"))
-                .password(System.getenv("ARANGO_PASSWORD"))
+                .user("root")
+                .password("password")
+//                .user(System.getenv("ARANGO_USER"))
+//                .password(System.getenv("ARANGO_PASSWORD"))
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
