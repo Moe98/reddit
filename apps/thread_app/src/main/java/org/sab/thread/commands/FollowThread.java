@@ -1,7 +1,9 @@
 package org.sab.thread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
@@ -9,6 +11,8 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
@@ -16,10 +20,10 @@ public class FollowThread extends ThreadCommand {
     public static void main(String[] args) {
         FollowThread addComment = new FollowThread();
         JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
+        body.put(THREAD_NAME, "GelatiAzza");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "33366");
+        uriParams.put(ACTION_MAKER_ID, "lujine");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -29,7 +33,20 @@ public class FollowThread extends ThreadCommand {
         System.out.println(request);
         System.out.println("=========");
 
-        System.out.println(addComment.execute(request));
+//        System.out.println(addComment.execute(request));
+
+        Arango arango = Arango.getInstance();
+        ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME+"/lujine");
+        ArrayList<String> arr = new ArrayList<>();
+        arr.add(NUM_OF_FOLLOWERS_DB);
+        arr.add(DESCRIPTION_DB);
+        arr.add(CREATOR_ID_DB);
+        arr.add(DATE_CREATED_DB);
+        JSONArray jsonArr = arango.parseOutput(cursor, THREAD_NAME, arr);
+        for (Iterator<Object> it = jsonArr.iterator(); it.hasNext(); ) {
+            JSONObject j = (JSONObject) it.next();
+            System.out.println(j.toString());
+        }
     }
 
     @Override

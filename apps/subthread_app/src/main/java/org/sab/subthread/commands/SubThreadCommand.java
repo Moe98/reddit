@@ -22,6 +22,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     // Subthread attributes
     // db
+    protected static final String SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
     protected static final String PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
     protected static final String CREATOR_ID_DB = SubThreadAttributes.CREATOR_ID.getDb();
 

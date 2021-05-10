@@ -1,5 +1,6 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
@@ -8,7 +9,9 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-
+import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class CreateSubThread extends SubThreadCommand {
@@ -90,6 +93,8 @@ public class CreateSubThread extends SubThreadCommand {
             subThread.setLikes(likes);
             subThread.setDislikes(dislikes);
 
+
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
@@ -102,14 +107,12 @@ public class CreateSubThread extends SubThreadCommand {
 
         JSONObject body = new JSONObject();
         body.put("parentThreadId", "asmakElRayes7amido");
-        body.put("creatorId", "sd54sdsda");
-        body.put("title", "first");
-        body.put("content", "first subthread ever!!!");
+        body.put("title", "gelaty azza is better");
+        body.put("content", "fish is ya3");
         body.put("hasImage", "false");
 
-
         JSONObject uriParams = new JSONObject();
-        uriParams.put("creatorId", "32930");
+        uriParams.put("creatorId", "lujine");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -119,6 +122,23 @@ public class CreateSubThread extends SubThreadCommand {
         System.out.println(request);
         System.out.println("----------");
 
-        System.out.println(tc.execute(request));
+//        System.out.println(tc.execute(request));
+
+        Arango arango = Arango.getInstance();
+        ArangoCursor<BaseDocument>cursor = arango.filterCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, CREATOR_ID_DB, "manta");
+        ArrayList<String> arr = new ArrayList<>();
+        arr.add(PARENT_THREAD_ID_DB);
+        arr.add(CREATOR_ID_DB);
+        arr.add(TITLE_DB);
+        arr.add(CONTENT_DB);
+        arr.add(LIKES_DB);
+        arr.add(DISLIKES_DB);
+        JSONArray jsonArr = arango.parseOutput(cursor, SUBTHREAD_ID_DB, arr);
+        for (Iterator<Object> it = jsonArr.iterator(); it.hasNext(); ) {
+            JSONObject j = (JSONObject) it.next();
+            System.out.println(j.toString());
+        }
+
+
     }
 }

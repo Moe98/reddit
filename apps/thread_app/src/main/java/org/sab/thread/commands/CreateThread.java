@@ -84,12 +84,26 @@ public class CreateThread extends ThreadCommand {
     }
 
     public static void main(String[] args) {
+        Arango arango = Arango.getInstance();
+        arango.createCollection(DB_Name, "User", false);
+        BaseDocument myObject = new BaseDocument();
+        myObject.setKey("manta");
+        myObject.addAttribute("IsDeleted", false);
+        myObject.addAttribute("NumOfFollowers", 0);
+        arango.createDocument(DB_Name, "User", myObject);
+
+        BaseDocument myObject2 = new BaseDocument();
+        myObject2.setKey("lujine");
+        myObject2.addAttribute("IsDeleted", false);
+        myObject2.addAttribute("NumOfFollowers", 0);
+        arango.createDocument(DB_Name, "User", myObject2);
+
         CreateThread tc = new CreateThread();
         JSONObject request = new JSONObject();
 
         JSONObject body = new JSONObject();
         body.put("name", "asmakElRayes7amido");
-        body.put("creatorId", "32930");
+        body.put("creatorId", "manta");
         body.put("description", "agmad subreddit fl wogod");
 
         JSONObject uriParams = new JSONObject();
@@ -104,7 +118,7 @@ public class CreateThread extends ThreadCommand {
 
         JSONObject body2 = new JSONObject();
         body2.put("name", "GelatiAzza");
-        body2.put("creatorId", "33366");
+        body2.put("creatorId", "lujine");
         body2.put("description", "tany agmad subreddit fl wogod");
 
         JSONObject uriParams2 = new JSONObject();

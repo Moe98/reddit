@@ -12,7 +12,10 @@ import com.arangodb.mapping.ArangoJack;
 import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.json.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +34,7 @@ public class Arango {
                 .keepAliveInterval(600);
 
         connect();
+
     }
 
     public static Arango getInstance() {
@@ -189,6 +193,7 @@ public class Arango {
         }
         return edgeId;
     }
+
     
     public boolean containsDatabase(String dbName) {
         return arangoDB.getDatabases().contains(dbName);
@@ -200,5 +205,45 @@ public class Arango {
 
     public int documentCount(String dbName, String collectionName) {
         return arangoDB.db(dbName).collection(collectionName).count().getCount().intValue();
+    }
+
+
+    public ArangoCursor<BaseDocument> filterCollection(String DB_Name, String collectionName, String attributeName, String attributeValue){
+        JSONArray data = new JSONArray();
+        String query = """
+                    FOR obj IN %s
+                        FILTER obj.%s == @attributeValue
+                        RETURN obj    
+                    """.formatted(collectionName,attributeName);
+
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("attributeValue", attributeValue);
+        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+        return query(DB_Name, query, bindVars);
+    }
+    public ArangoCursor<BaseDocument> filterEdgeCollection(String DB_Name, String collectionName, String fromNodeId){
+        String query = """
+                    FOR node IN 1..1 OUTBOUND @fromNodeId @collectionName
+                    RETURN node
+                    """;
+
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("fromNodeId", fromNodeId);
+        bindVars.put("collectionName", collectionName);
+        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+        return query(DB_Name, query, bindVars);
+    }
+    public JSONArray parseOutput(ArangoCursor<BaseDocument> cursor, String keyName, ArrayList<String> attributeNames) {
+        JSONArray data = new JSONArray();
+        cursor.forEachRemaining(document -> {
+            JSONObject object = new JSONObject();
+            object.put(keyName, document.getKey());
+            for(String attribute : attributeNames) {
+                object.put(attribute, document.getProperties().get(attribute));
+            }
+            data.put(object);
+        });
+        return data;
+
     }
 }
