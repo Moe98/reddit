@@ -13,6 +13,7 @@ import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -167,6 +168,28 @@ public class Arango {
 
     public ArangoCursor<BaseDocument> query(String dbName, String query, Map<String, Object> bindVars) {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
+    }
+
+    public static String getSingleEdgeId(String dbName, String collectionName, String userId, String contentId){
+        String query = """
+                FOR content, edge IN 1..1 OUTBOUND @username @collectionName
+                    FILTER content._id == @contentId
+                    RETURN DISTINCT {edgeId:edge._key}
+                """;
+
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("username", userId);
+        bindVars.put("contentId", contentId);
+        bindVars.put("collectionName", collectionName);
+
+        ArangoCursor<BaseDocument> cursor = instance.query(dbName, query, bindVars);
+        String edgeId = "";
+        
+        if (cursor.hasNext()) {
+            edgeId = (String)cursor.next().getAttribute("edgeId");
+        }
+        
+        return edgeId;
     }
 
     public boolean containsDatabase(String dbName) {
