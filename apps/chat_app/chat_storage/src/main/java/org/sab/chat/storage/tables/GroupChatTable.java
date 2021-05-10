@@ -8,6 +8,7 @@ import com.datastax.driver.mapping.MappingManager;
 
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
 import java.sql.Timestamp;
@@ -31,7 +32,7 @@ public class GroupChatTable {
     }
 
     public void createTable() {
-        String query = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
+        String tableQuery = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (" +
                 "chat_id uuid, " +
                 "name text, " +
                 "description text, " +
@@ -39,7 +40,11 @@ public class GroupChatTable {
                 "admin uuid, " +
                 "date_created timestamp, " +
                 "PRIMARY KEY (chat_id));";
-        cassandra.runQuery(query);
+        cassandra.runQuery(tableQuery);
+
+        String indexQuery = "CREATE INDEX IF NOT EXISTS ON " + TABLE_NAME + " (members);";
+        cassandra.runQuery(indexQuery);
+
         createMapper();
     }
 
@@ -63,6 +68,20 @@ public class GroupChatTable {
         GroupChat createdGroupChat = new GroupChat(chatId, name, description, membersList, creator, new Timestamp(date.getTime()));
         mapper.save(createdGroupChat);
         return createdGroupChat;
+    }
+
+    public List<GroupChat> getGroupChats(UUID userId) throws InvalidInputException {
+        try {
+            UUID.fromString(userId.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid user UUID.");
+        }
+
+        String query = "SELECT * FROM " + TABLE_NAME +
+                " WHERE members CONTAINS " + userId + " ALLOW FILTERING;";
+
+        ResultSet groupChats = cassandra.runQuery(query);
+        return mapper.map(groupChats).all();
     }
 
     public GroupChat addGroupMember(UUID chatId, UUID adminId, UUID memberId) throws InvalidInputException {
