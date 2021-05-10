@@ -20,10 +20,12 @@ public class CreateGroupMessageRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("CreateGroupMessage");
-        String chatId = (String)(((JSONObject)response.get("data")).get("chatId"));
+        JSONObject data = (JSONObject) response.get("data");
+
+        String chatId = (String) data.get("chatId");
+        String content = (String) data.get("content");
+
         ConcurrentLinkedQueue<UUID> members = ClientManager.getChatMembers(UUID.fromString(chatId));
-        String content = (String)(((JSONObject)response.get("data")).get("content"));
 
         TextWebSocketFrame message;
         for (UUID memberId : members) {
@@ -33,7 +35,7 @@ public class CreateGroupMessageRouter extends Router {
                     message = new TextWebSocketFrame(content);
                     channel.writeAndFlush(message.retain());
                 }
-            }else {
+            } else {
                 //notification
             }
         }

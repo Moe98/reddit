@@ -4,15 +4,15 @@ const AppContext = require('../components/app-context')
 
 const useChatService = (onMessage, onError) => {
 	const ws = useRef(null)
-	const username = useContext(AppContext).username
+	const { userId } = useContext(AppContext)
 
 	useEffect(() => {
 		ws.current = new W3CWebSocket('ws://localhost:5000/ws')
 		ws.current.onopen = () => {
 			ws.current.send(
 				JSON.stringify({
-					type: 'AUTH',
-					username
+					type: 'INIT_CONNECTION',
+					userId
 				})
 			)
 		}

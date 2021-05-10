@@ -25,6 +25,12 @@ public abstract class Router {
         ctx.fireChannelRead(packedRequest);
     }
 
+    public void handleError(ChannelHandlerContext ctx, JSONObject response) {
+        response.remove("statusCode");
+        response.put("type", "ERROR");
+        ctx.channel().writeAndFlush(response.clone());
+    }
+
     abstract public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request);
 
     abstract public void routeResponse(ChannelHandlerContext ctx, JSONObject response);

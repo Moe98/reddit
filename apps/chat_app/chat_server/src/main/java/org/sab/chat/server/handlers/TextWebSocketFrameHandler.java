@@ -34,8 +34,8 @@ public class TextWebSocketFrameHandler extends
     }
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-//        UUID userId = ClientManager.getChannelUser(ctx.channel().id());
-//        ClientManager.handleUserOffline(userId, ctx.channel());
+        UUID userId = ClientManager.getChannelUser(ctx.channel().id());
+        ClientManager.handleUserOffline(userId, ctx.channel());
         super.channelInactive(ctx);
     }
 

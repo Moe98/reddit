@@ -53,7 +53,7 @@ public class RemoveGroupMember extends CommandWithVerification {
 
             JSONObject data = groupChat.toJson();
             data.put("targetMemberId", memberId.toString());
-            
+
             response.put("statusCode", 200);
             response.put("msg", "Admin removed member successfully");
             response.put("data", data);

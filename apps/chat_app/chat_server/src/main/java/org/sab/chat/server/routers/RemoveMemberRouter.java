@@ -2,6 +2,9 @@ package org.sab.chat.server.routers;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
+import org.sab.chat.server.ClientManager;
+
+import java.util.UUID;
 
 public class RemoveMemberRouter extends Router {
 
@@ -13,6 +16,15 @@ public class RemoveMemberRouter extends Router {
 
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
-        System.out.println("Route response");
+        JSONObject data = (JSONObject) response.get("data");
+        if(data == null) {
+            handleError(ctx, response);
+            return;
+        }
+        UUID chatId = UUID.fromString((String) data.get("chatId"));
+        UUID targetUserId = UUID.fromString((String) data.get("targetUserId"));
+        ClientManager.handleMemberRemoved(chatId, targetUserId);
+
+        System.out.println("Route response to client");
     }
 }

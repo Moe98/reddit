@@ -10,7 +10,7 @@ const App = ({ command = 'welcome', rainbow }) => {
     const user = {
         authToken: null,
         username: 'Ronic',
-        userId: '2'
+        userId: 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee'
     }
 	return (
 		<AppContext.Provider value={user}>
