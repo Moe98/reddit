@@ -3,7 +3,9 @@ package org.sab.couchbase;
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryResult;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,10 +32,7 @@ public class CouchbaseTest {
             documentProperties.put("int_field", 1);
             documentProperties.put("string_field", "helloCouch");
 
-            if (couchbase.bucketExists(bucketName))
-                couchbase.dropBucket(bucketName);
-
-            assertFalse(couchbase.bucketExists(bucketName));
+            couchbase.createBucketIfNotExists(bucketName, bucketSize);
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }
@@ -42,28 +41,9 @@ public class CouchbaseTest {
     @AfterClass
     public static void tearDown() {
         try {
+            couchbase.dropBucket(bucketName);
             couchbase.disconnect();
             assertFalse(couchbase.isConnected());
-        } catch (CouchbaseException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Before
-    public void buildBucket() {
-        try {
-            couchbase.createBucket(bucketName, bucketSize);
-            assertTrue(couchbase.bucketExists(bucketName));
-        } catch (CouchbaseException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @After
-    public void dropBucket() {
-        try {
-            couchbase.dropBucket(bucketName);
-            assertFalse(couchbase.bucketExists(bucketName));
         } catch (CouchbaseException e) {
             fail(e.getMessage());
         }

@@ -12,20 +12,40 @@ public class Thread {
         super();
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    public String getCreator() {
+        return creator;
+    }
+
     public void setCreator(String creator) {
         this.creator = creator;
     }
 
+    public long getNumOfFollowers() {
+        return numOfFollowers;
+    }
+
     public void setNumOfFollowers(long numOfFollowers) {
         this.numOfFollowers = numOfFollowers;
+    }
+
+    public String getDateCreated() {
+        return dateCreated;
     }
 
     public void setDateCreated(String dateCreated) {
