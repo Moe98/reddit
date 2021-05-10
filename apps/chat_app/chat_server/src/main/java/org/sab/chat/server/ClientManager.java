@@ -27,6 +27,10 @@ public class ClientManager {
         return userChats.get(userId);
     }
 
+    public static ConcurrentLinkedQueue<UUID> getChatMembers(UUID chatId) {
+        return chatMembers.get(chatId);
+    }
+
     public static UUID getChannelUser(ChannelId channelId) {
         return channelToUser.get(channelId);
     }
