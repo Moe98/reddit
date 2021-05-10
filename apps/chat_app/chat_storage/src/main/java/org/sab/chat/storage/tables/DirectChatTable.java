@@ -8,6 +8,7 @@ import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
 
+import java.util.List;
 import java.util.UUID;
 
 public class DirectChatTable {
@@ -59,6 +60,20 @@ public class DirectChatTable {
         DirectChat createdDirectChat = new DirectChat(chatId, firstMember, secondMember);
         mapper.save(createdDirectChat);
         return createdDirectChat;
+    }
+
+    public List<DirectChat> getDirectChats(UUID userId) throws InvalidInputException {
+        try {
+            UUID.fromString(userId.toString());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid user UUID.");
+        }
+
+        String query = "SELECT * FROM " + TABLE_NAME +
+                " WHERE first_member = " + userId + "OR second_member = " + userId + " ALLOW FILTERING;";
+
+        ResultSet directChats = cassandra.runQuery(query);
+        return mapper.map(directChats).all();
     }
 
     public Mapper<DirectChat> getMapper() {
