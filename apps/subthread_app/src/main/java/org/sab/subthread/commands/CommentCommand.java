@@ -28,6 +28,7 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String ACTION_MAKER_ID = "userId";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+    protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
     // TODO add attribs from enums
 
