@@ -16,6 +16,15 @@ public abstract class Router {
         return packedRequest;
     }
 
+    public void packAndForwardRequest(ChannelHandlerContext ctx, JSONObject request, String... attributes) {
+        JSONObject body = new JSONObject();
+        for(String attribute : attributes)
+            body.put(attribute, request.get(attribute));
+        String functionName = (String) request.get("type");
+        JSONObject packedRequest = packRequest(functionName, body);
+        ctx.fireChannelRead(packedRequest);
+    }
+
     abstract public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request);
 
     abstract public void routeResponse(ChannelHandlerContext ctx, JSONObject response);

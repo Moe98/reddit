@@ -19,13 +19,8 @@ public class InitConnectionRouter extends Router {
         ClientManager.handleUserOnline(userId, ctx.channel());
 
         // Get user chats
-        JSONObject body = new JSONObject();
-        body.put("userId", userId.toString());
-
-        String functionName = (String) request.get("type");
-        JSONObject packedRequest = packRequest(functionName, body);
-
-        ctx.fireChannelRead(packedRequest);
+        String[] attributes = {"userId"};
+        packAndForwardRequest(ctx, request, attributes);
     }
 
     @Override

@@ -14,15 +14,8 @@ public class CreateDirectMessageRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        JSONObject body = new JSONObject();
-        body.put("chatId", request.get("chatId"));
-        body.put("senderId", request.get("senderId"));
-        body.put("content", request.get("content"));
-
-        String functionName = (String) request.get("type");
-        JSONObject packedRequest = packRequest(functionName, body);
-
-        ctx.fireChannelRead(packedRequest);
+        String[] attributes = {"chatId", "senderId", "content"};
+        packAndForwardRequest(ctx, request, attributes);
     }
 
     @Override

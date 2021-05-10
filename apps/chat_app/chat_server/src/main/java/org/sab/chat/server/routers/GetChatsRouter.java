@@ -7,13 +7,8 @@ public class GetChatsRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        JSONObject body = new JSONObject();
-        body.put("userId", request.get("userId"));
-
-        String functionName = (String) request.get("type");
-        JSONObject packedRequest = packRequest(functionName, body);
-
-        ctx.fireChannelRead(packedRequest);
+        String[] attributes = {"userId"};
+        packAndForwardRequest(ctx, request, attributes);
     }
 
     @Override
