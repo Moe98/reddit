@@ -47,7 +47,6 @@ public class ClientManager {
 
     public static void handleUserOffline(UUID userId, Channel channel) {
         channelToUser.remove(channel.id());
-
         ConcurrentLinkedQueue<UUID> userChats = getUserChats(userId);
 
         List<UUID> chatsToDelete = new ArrayList<>();

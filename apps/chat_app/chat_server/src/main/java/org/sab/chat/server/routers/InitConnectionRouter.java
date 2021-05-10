@@ -1,7 +1,7 @@
 package org.sab.chat.server.routers;
 
 import io.netty.channel.ChannelHandlerContext;
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.sab.chat.server.ClientManager;
 
@@ -37,7 +37,7 @@ public class InitConnectionRouter extends Router {
         JSONArray directChatsJson = (JSONArray) data.get("directChats");
         JSONArray groupChatsJson = (JSONArray) data.get("groupChats");
 
-        for (int i = 0; i < directChatsJson.length(); i++) {
+        for (int i = 0; i < directChatsJson.size(); i++) {
             JSONObject chat = (JSONObject) directChatsJson.get(i);
             UUID chatId = UUID.fromString((String) chat.get("chatId"));
             List<UUID> chatMembers = new ArrayList<>();
@@ -46,14 +46,15 @@ public class InitConnectionRouter extends Router {
             chats.put(chatId, chatMembers);
         }
 
-        for (int i = 0; i < groupChatsJson.length(); i++) {
+        for (int i = 0; i < groupChatsJson.size(); i++) {
             JSONObject chat = (JSONObject) groupChatsJson.get(i);
             UUID chatId = UUID.fromString((String) chat.get("chatId"));
 
-            JSONArray membersIds = (JSONArray) chat.get("membersIds");
+            JSONArray membersIds = (JSONArray) chat.get("memberIds");
             List<UUID> chatMembers = new ArrayList<>();
-            for (int j = 0; j < membersIds.length(); i++)
+            for (int j = 0; j <  membersIds.size(); j++) {
                 chatMembers.add(UUID.fromString((String) membersIds.get(j)));
+            }
             chats.put(chatId, chatMembers);
         }
 
