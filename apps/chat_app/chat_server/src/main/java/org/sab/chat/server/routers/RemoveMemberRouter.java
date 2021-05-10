@@ -10,7 +10,7 @@ public class RemoveMemberRouter extends Router {
         JSONObject body = new JSONObject();
         body.put("chatId", request.get("chatId"));
         body.put("adminId", request.get("adminId"));
-        body.put("userId", request.get("userId"));
+        body.put("memberId", request.get("memberId"));
 
         String functionName = (String) request.get("type");
         JSONObject packedRequest = packRequest(functionName, body);

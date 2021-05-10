@@ -8,8 +8,8 @@ public class AddMemberRouter extends Router {
     public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();
         body.put("chatId", request.get("chatId"));
-        body.put("adminId", request.get("senderId"));
-        body.put("userId", request.get("content"));
+        body.put("adminId", request.get("adminId"));
+        body.put("memberId", request.get("memberId"));
 
         String functionName = (String) request.get("type");
         JSONObject packedRequest = packRequest(functionName, body);
