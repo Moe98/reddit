@@ -189,4 +189,16 @@ public class Arango {
         }
         return edgeId;
     }
+    
+    public boolean containsDatabase(String dbName) {
+        return arangoDB.getDatabases().contains(dbName);
+    }
+
+    public boolean containsCollection(String dbName, String collectionName) {
+        return arangoDB.db(dbName).getCollections().stream().anyMatch(a -> a.getName().equals(collectionName));
+    }
+
+    public int documentCount(String dbName, String collectionName) {
+        return arangoDB.db(dbName).collection(collectionName).count().getCount().intValue();
+    }
 }
