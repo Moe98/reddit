@@ -33,6 +33,8 @@ public class CreateGroupMessageRouter extends Router {
                     message = new TextWebSocketFrame(content);
                     channel.writeAndFlush(message.retain());
                 }
+            }else {
+                //notification
             }
         }
     }

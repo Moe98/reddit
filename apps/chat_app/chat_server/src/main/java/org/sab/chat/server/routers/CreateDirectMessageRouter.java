@@ -21,12 +21,10 @@ public class CreateDirectMessageRouter extends Router {
     @Override
     public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
         System.out.println("CreateDirectMessage");
-        String content = (String)response.get("content");
-        //hard coded values to be replaced by database values
-        ArrayList<UUID> randomChatIds = new ArrayList<>();
-        randomChatIds.add(UUID.fromString("efb3c541-9ddb-44d6-aa47-e6f2579ea177"));
-        randomChatIds.add(UUID.fromString("02d0b9a2-ed84-4f1e-a86a-58aac9aec88d"));
-        ArrayList<UUID> members = randomChatIds;
+        String chatId = (String)(((JSONObject)response.get("data")).get("chatId"));
+        ConcurrentLinkedQueue<UUID> members = ClientManager.getChatMembers(UUID.fromString(chatId));
+        String content = (String)(((JSONObject)response.get("data")).get("content"));
+
         TextWebSocketFrame message;
         for (UUID memberId : members) {
             if (ClientManager.isUserOnline(memberId)) {
