@@ -41,7 +41,8 @@ public class BlockUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String actionMakerBlockedEdge = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            String actionMakerBlockedEdge = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+
             if (actionMakerBlockedEdge.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
@@ -56,7 +57,7 @@ public class BlockUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String blockEdgeId = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            String blockEdgeId = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             if (blockEdgeId.length() != 0) {
                 responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
@@ -73,6 +74,7 @@ public class BlockUser extends UserToUserCommand {
         } finally {
             response.put("msg", responseMessage);
         }
+
         return Responder.makeDataResponse(response).toString();
     }
 }

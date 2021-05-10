@@ -41,7 +41,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String actionMakerBlockedUser = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String actionMakerBlockedUser = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             // TODO: If user can unfollow a user they blocked, then delete this condition.
             if (actionMakerBlockedUser.length() != 0) {
@@ -49,7 +49,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String userBlockedActionMaker = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            final String userBlockedActionMaker = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
 
             if (userBlockedActionMaker.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
@@ -65,7 +65,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String edgeKey = Arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String edgeKey = arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
             int followerCount = Integer.parseInt(String.valueOf(userDocument.getAttribute(NUM_OF_FOLLOWERS_DB)));
 
             if (edgeKey.length() != 0) {
