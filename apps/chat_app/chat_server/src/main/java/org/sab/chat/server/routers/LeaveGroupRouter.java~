@@ -8,6 +8,7 @@ public class LeaveGroupRouter extends Router {
     public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();
         body.put("chatId", request.get("chatId"));
+        body.put("adminId", request.get("adminId"));
         body.put("userId", request.get("userId"));
 
         String functionName = (String) request.get("type");
