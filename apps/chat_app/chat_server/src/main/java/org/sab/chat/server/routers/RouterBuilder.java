@@ -8,6 +8,7 @@ public class RouterBuilder {
             case "ADD_GROUP_MEMBER" -> new AddMemberRouter();
             case "REMOVE_GROUP_MEMBER" -> new RemoveMemberRouter();
             case "LEAVE_GROUP" -> new LeaveGroupRouter();
+            case "GET_CHATS" -> new GetChatsRouter();
             case "GET_DIRECT_MESSAGES" -> new GetDirectMessagesRouter();
             case "GET_GROUP_MESSAGES" -> new GetGroupMessagesRouter();
             case "CREATE_GROUP_MESSAGE" -> new CreateGroupMessageRouter();
