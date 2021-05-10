@@ -3,13 +3,13 @@ package org.sab.chat.server.routers;
 import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
 
-public class CreateDirectChatRouter extends Router {
-
+public class LeaveGroupRouter extends Router {
     @Override
-    public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
+    public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();
-        body.put("firstMember", request.get("firstMember"));
-        body.put("secondMember", request.get("secondMember"));
+        body.put("chatId", request.get("chatId"));
+        body.put("adminId", request.get("adminId"));
+        body.put("userId", request.get("userId"));
 
         String functionName = (String) request.get("type");
         JSONObject packedRequest = packRequest(functionName, body);
@@ -18,7 +18,7 @@ public class CreateDirectChatRouter extends Router {
     }
 
     @Override
-    public void routeResponse(ChannelHandlerContext ctx, JSONObject response) {
+    public void route(ChannelHandlerContext ctx, JSONObject response) {
         System.out.println("Route response");
     }
 }

@@ -4,6 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
 
 public class GetChatsRouter extends Router {
+
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();

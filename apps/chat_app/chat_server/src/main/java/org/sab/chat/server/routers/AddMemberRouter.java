@@ -4,9 +4,18 @@ import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
 
 public class AddMemberRouter extends Router {
+
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        System.out.println("Forward to queue");
+        JSONObject body = new JSONObject();
+        body.put("chatId", request.get("chatId"));
+        body.put("adminId", request.get("adminId"));
+        body.put("memberId", request.get("memberId"));
+
+        String functionName = (String) request.get("type");
+        JSONObject packedRequest = packRequest(functionName, body);
+
+        ctx.fireChannelRead(packedRequest);
     }
 
     @Override
