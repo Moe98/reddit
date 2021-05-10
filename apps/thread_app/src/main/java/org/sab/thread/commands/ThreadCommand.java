@@ -30,6 +30,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String IS_DELETED_DB = "IsDeleted";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+    protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
     // TODO get from env vars
     protected static final String DB_Name = "ARANGO_DB";
