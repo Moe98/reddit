@@ -33,7 +33,7 @@ public class Auth {
     public static boolean verifyHash(String password, String hash) {
         try {
             return BCrypt.checkpw(password, hash);
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
 
