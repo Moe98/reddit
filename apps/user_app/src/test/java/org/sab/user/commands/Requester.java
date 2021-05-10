@@ -83,10 +83,9 @@ public class Requester {
         try {
             Map<String, Object> claims = jwt.verifyAndDecode(token);
             authenticated = true;
-            authenticationParams.put("username", (String) claims.get("username"));
+            authenticationParams.put("username", claims.get("username"));
             authenticationParams.put("jwt", token);
         } catch (JWTVerificationException jwtVerificationException) {
-            System.out.println(jwtVerificationException.getMessage());
             authenticated = false;
         }
         authenticationParams.put("isAuthenticated", authenticated);
