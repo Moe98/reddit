@@ -6,6 +6,8 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
+import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
+import com.couchbase.client.java.manager.query.DropPrimaryQueryIndexOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.couchbase.client.java.query.QueryScanConsistency;
 
@@ -54,11 +56,11 @@ public class Couchbase {
 
     public void createBucket(String bucketName, int ramQuotaMB) {
         cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB));
-        cluster.query("CREATE PRIMARY INDEX on `default` : `" + bucketName + "`;");
+        cluster.queryIndexes().createPrimaryIndex(bucketName);
     }
 
     public void dropBucket(String bucketName) {
-        cluster.query("DROP PRIMARY INDEX on `default` : `" + bucketName + "`;");
+        cluster.queryIndexes().dropPrimaryIndex(bucketName, DropPrimaryQueryIndexOptions.dropPrimaryQueryIndexOptions().ignoreIfNotExists(true));
         cluster.buckets().dropBucket(bucketName);
     }
 
@@ -69,6 +71,8 @@ public class Couchbase {
     public void createBucketIfNotExists(String bucketName, int ramQuotaMB) {
         if (!bucketExists(bucketName))
             createBucket(bucketName, ramQuotaMB);
+        else
+            cluster.queryIndexes().createPrimaryIndex(bucketName, CreatePrimaryQueryIndexOptions.createPrimaryQueryIndexOptions().ignoreIfExists(true));
     }
 
     public MutationResult upsertDocument(String bucketName, String documentKey, JsonObject object) {

@@ -19,6 +19,7 @@ public class ConfigMap {
 
     private ConfigMap() {
         cmdMap = new ConcurrentHashMap<>();
+
     }
 
     public static ConfigMap getInstance() {
