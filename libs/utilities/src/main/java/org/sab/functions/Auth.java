@@ -7,6 +7,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Auth {
+    private Auth() {
+    }
+
     public static String encrypt(String plainTextPassword) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest salt = MessageDigest.getInstance("SHA-256");
         salt.update(plainTextPassword.getBytes("UTF-8"));
