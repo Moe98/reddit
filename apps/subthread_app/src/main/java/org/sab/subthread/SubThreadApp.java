@@ -50,39 +50,29 @@ public class SubThreadApp extends Service {
 
     public static void startArangoConnection() {
         try {
+            // TODO do we get the instance here?
             arango = Arango.getInstance();
-            arangoDB = arango.connect();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void stopArangoConnection() {
-        try {
-            arango.disconnect(arangoDB);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     public static void shutdownGracefully() {
-        stopArangoConnection();
         // TODO stop threads and halt app (super call?)
     }
 
     public static void createCollections(ArrayList<String> collectionNames, ArrayList<String> edgeCollectionNames) {
         try {
-
+        // TODO use a properties file
             for (String collectionName : collectionNames) {
-                if (!arango.collectionExists(arangoDB, DB_Name, collectionName)) {
-                    arango.createCollection(arangoDB, DB_Name, collectionName, false);
+                if (!arango.collectionExists(DB_Name, collectionName)) {
+                    arango.createCollection(DB_Name, collectionName, false);
                 }
             }
 
             for (String collectionName : edgeCollectionNames) {
-                if (!arango.collectionExists(arangoDB, DB_Name, collectionName)) {
-                    arango.createCollection(arangoDB, DB_Name, collectionName, true);
+                if (!arango.collectionExists(DB_Name, collectionName)) {
+                    arango.createCollection(DB_Name, collectionName, true);
                 }
             }
 

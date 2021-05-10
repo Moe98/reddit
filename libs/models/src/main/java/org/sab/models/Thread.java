@@ -10,8 +10,12 @@ public class Thread {
     private long numOfFollowers;
     private String dateCreated;
 
+    public Thread() {
+        super();
+    }
+
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -26,12 +30,21 @@ public class Thread {
         this.description = description;
     }
 
+    // TODO fix duplicate methods
     public String getCreatorId() {
         return this.creatorId;
     }
 
+    public String getCreator() {
+        return creatorId;
+    }
+
     public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public void setCreator(String creator) {
+        this.creatorId = creator;
     }
 
     public long getNumOfFollowers() {
@@ -48,6 +61,31 @@ public class Thread {
 
     public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    // TODO use enums
+    public static String getCollectionName() {
+        return "Threads";
+    }
+
+    public static String getNameAttributeName() {
+        return "_key";
+    }
+
+    public static String getDescriptionAttributeName() {
+        return "Description";
+    }
+
+    public static String getCreatorAttributeName() {
+        return "Creator";
+    }
+
+    public static String getNumOfFollowersAttributeName() {
+        return "NumOfFollowers";
+    }
+
+    public static String getDateCreatedAttributeName() {
+        return "DateCreated";
     }
 
     @Override

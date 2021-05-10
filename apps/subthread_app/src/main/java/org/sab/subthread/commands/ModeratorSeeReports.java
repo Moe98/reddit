@@ -1,7 +1,6 @@
 package org.sab.subthread.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,10 +16,6 @@ public class ModeratorSeeReports extends SubThreadCommand {
         return null;
     }
 
-
-    private Arango arango;
-    private ArangoDB arangoDB;
-
     @Override
     protected String execute() {
         String threadId = uriParams.getString(THREAD_ID);
@@ -28,8 +23,7 @@ public class ModeratorSeeReports extends SubThreadCommand {
         JSONObject response = new JSONObject();
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO can we bind the collection name in the query to SUBTHREAD_REPORTS_COLLECTION_NAME
             //  Same for the ThreadId attribute
@@ -41,7 +35,7 @@ public class ModeratorSeeReports extends SubThreadCommand {
 
             Map<String, Object> bindVars = Collections.singletonMap("threadId", threadId);
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            ArangoCursor<BaseDocument> cursor = arango.query(arangoDB, System.getenv("ARANGO_DB"), query, bindVars);
+            ArangoCursor<BaseDocument> cursor = arango.query(System.getenv("ARANGO_DB"), query, bindVars);
 
             JSONArray data = new JSONArray();
             if (cursor.hasNext()) {
@@ -64,8 +58,6 @@ public class ModeratorSeeReports extends SubThreadCommand {
             }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            arango.disconnect(arangoDB);
         }
         return Responder.makeDataResponse(response).toString();
     }

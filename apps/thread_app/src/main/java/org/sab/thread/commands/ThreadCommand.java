@@ -1,6 +1,5 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
@@ -54,13 +53,13 @@ public abstract class ThreadCommand extends CommandWithVerification {
         return edgeDocument;
     }
 
-    protected final boolean checkUserExists(Arango arango, ArangoDB arangoDB, String userId) {
+    protected final boolean checkUserExists(Arango arango, String userId) {
         boolean userExists;
-        if (!arango.documentExists(arangoDB, DB_Name, USER_COLLECTION_NAME, userId)) {
+        if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
             userExists = false;
         } else {
             // TODO change to query
-            BaseDocument res = arango.readDocument(arangoDB, DB_Name, USER_COLLECTION_NAME, userId);
+            BaseDocument res = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
             boolean isDeleted = (Boolean)res.getAttribute(IS_DELETED_DB);
             userExists = !isDeleted;
         }

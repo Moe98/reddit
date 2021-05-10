@@ -21,9 +21,6 @@ public class ReportSubThread extends SubThreadCommand{
         return new Schema(List.of(typeOfReport,subthreadId,threadId,reportMsg));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
-
     @Override
     public String execute() {
         String userId = uriParams.getString(REPORTER_ID);
@@ -39,22 +36,21 @@ public class ReportSubThread extends SubThreadCommand{
         String msg = "";
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
             }
 
             // check if thread exists
-            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // check if subthread exists
-            if(!arango.documentExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -69,13 +65,12 @@ public class ReportSubThread extends SubThreadCommand{
             myObject.addAttribute(REPORT_MSG, reportMsg);
             myObject.addAttribute(SUBTHREAD_ID, subthreadId);
 
-            BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
+            BaseDocument res = arango.createDocument(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
             msg = "Created Subthread Report";
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

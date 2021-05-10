@@ -1,6 +1,5 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
@@ -12,8 +11,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class ModeratorBansUser extends ThreadCommand {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     public static void main(String[] args) {
         ModeratorBansUser moderatorBansUser = new ModeratorBansUser();
@@ -45,41 +42,38 @@ public class ModeratorBansUser extends ThreadCommand {
         String messageResponse = "";
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB.
-            if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
             }
 
-            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 messageResponse = "This thread does not exist.";
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
             // TODO what if this user is a mod??
-            if(!checkUserExists(arango, arangoDB, bannedUserId)){
+            if(!checkUserExists(arango, bannedUserId)){
                 messageResponse = "The user you are trying to ban does not exist.";
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
-            final String threadModeratorEdgeKey =  arango.getSingleEdgeId(arangoDB,
-                    DB_Name,
+            final String threadModeratorEdgeKey =  arango.getSingleEdgeId(DB_Name,
                     USER_MOD_THREAD_COLLECTION_NAME,
                     USER_COLLECTION_NAME + "/" + userId,
                     THREAD_COLLECTION_NAME + "/" + threadName);
-            final String bannedUserEdgeKey = arango.getSingleEdgeId(arangoDB,
-                    DB_Name,
+            final String bannedUserEdgeKey = arango.getSingleEdgeId(DB_Name,
                     USER_BANNED_FROM_THREAD_COLLECTION_NAME,
                     USER_COLLECTION_NAME + "/" + bannedUserId,
                     THREAD_COLLECTION_NAME + "/" + threadName);
@@ -98,12 +92,11 @@ public class ModeratorBansUser extends ThreadCommand {
             // The request was made from a moderator of this thread, and the
             // user has not been banned yet from the thread.
             final BaseEdgeDocument userBannedFromThreadEdge = addEdgeFromUserToThread(bannedUserId, threadName);
-            arango.createEdgeDocument(arangoDB, DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, userBannedFromThreadEdge);
+            arango.createEdgeDocument(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, userBannedFromThreadEdge);
             messageResponse = "User has been successfully banned.";
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
             response.put("msg", messageResponse);
         }
 

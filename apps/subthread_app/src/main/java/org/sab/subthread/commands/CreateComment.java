@@ -1,6 +1,5 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -14,8 +13,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class CreateComment extends CommentCommand {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     public static void main(String[] args) {
         CreateComment addComment = new CreateComment();
@@ -51,12 +48,11 @@ public class CreateComment extends CommentCommand {
         final Comment comment;
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
             }
 
             // TODO check other things exist
@@ -74,7 +70,7 @@ public class CreateComment extends CommentCommand {
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
-            final BaseDocument res = arango.createDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, myObject);
+            final BaseDocument res = arango.createDocument(DB_Name, COMMENT_COLLECTION_NAME, myObject);
 
             System.out.println(res);
             System.out.println("=========");
@@ -105,22 +101,20 @@ public class CreateComment extends CommentCommand {
             final BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment);
 
             // Create the edge collections if they do not already exist.
-            if (!arango.collectionExists(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
             }
 
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
             }
 
             // Add the edge documents.
-            arango.createEdgeDocument(arangoDB, DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
-            arango.createEdgeDocument(arangoDB, DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
+            arango.createEdgeDocument(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
+            arango.createEdgeDocument(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            arango.disconnect(arangoDB);
         }
         return Responder.makeDataResponse(comment.toJSON()).toString();
     }

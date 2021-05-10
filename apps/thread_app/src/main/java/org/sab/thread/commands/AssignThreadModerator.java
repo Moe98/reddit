@@ -1,6 +1,5 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
@@ -21,8 +20,6 @@ public class AssignThreadModerator extends ThreadCommand {
         return new Schema(List.of(parentSubthreadId, newModeratorId));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     protected String execute() {
@@ -37,28 +34,26 @@ public class AssignThreadModerator extends ThreadCommand {
 
             String assignerId = uriParams.getString(ASSIGNER_ID);
 
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
-            if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
+            Arango arango = Arango.getInstance();      
+            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
-                arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
+                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             }
 
             // check if thread exists
-            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // check if assigner is a moderator on this thread
-            String assignerModEdgeId = arango.getSingleEdgeId(arangoDB,
-                                                                DB_Name,
+            String assignerModEdgeId = arango.getSingleEdgeId(DB_Name,
                                                                 USER_MOD_THREAD_COLLECTION_NAME,
                                                                 USER_COLLECTION_NAME + "/" + assignerId,
                                                                 THREAD_COLLECTION_NAME + "/" + threadId);
@@ -68,8 +63,7 @@ public class AssignThreadModerator extends ThreadCommand {
                 return Responder.makeErrorResponse(msg, 404).toString();
             }
 
-            String moderatorModEdgeId = arango.getSingleEdgeId(arangoDB,
-                    DB_Name,
+            String moderatorModEdgeId = arango.getSingleEdgeId(DB_Name,
                     USER_MOD_THREAD_COLLECTION_NAME,
                     USER_COLLECTION_NAME + "/" + modId,
                     THREAD_COLLECTION_NAME + "/" + threadId);
@@ -84,7 +78,7 @@ public class AssignThreadModerator extends ThreadCommand {
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + modId);
                 edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + threadId);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
+                arango.createEdgeDocument(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
             }
 
@@ -93,7 +87,6 @@ public class AssignThreadModerator extends ThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {
-            arango.disconnect(arangoDB);
             response.put("msg", msg);
         }
 

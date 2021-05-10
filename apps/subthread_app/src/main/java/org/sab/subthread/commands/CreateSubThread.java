@@ -1,6 +1,5 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
@@ -28,8 +27,6 @@ public class CreateSubThread extends SubThreadCommand {
         return new Schema(List.of(parentThreadId, title, content, hasImage));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     protected String execute() {
@@ -44,16 +41,15 @@ public class CreateSubThread extends SubThreadCommand {
         SubThread subThread;
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             }
             // TODO check thread exists
             String msg;
-            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, parentThreadId)) {
+            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, parentThreadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -71,7 +67,7 @@ public class CreateSubThread extends SubThreadCommand {
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
-            BaseDocument res = arango.createDocument(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, myObject);
+            BaseDocument res = arango.createDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, myObject);
 
             String subThreadId = res.getKey();
             parentThreadId = (String) res.getAttribute(PARENT_THREAD_ID_DB);
@@ -96,8 +92,6 @@ public class CreateSubThread extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            arango.disconnect(arangoDB);
         }
         return Responder.makeDataResponse(subThread.toJSON()).toString();
 

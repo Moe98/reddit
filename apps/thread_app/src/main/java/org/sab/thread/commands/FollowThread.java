@@ -1,6 +1,5 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -13,8 +12,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     public static void main(String[] args) {
         FollowThread addComment = new FollowThread();
@@ -41,56 +38,53 @@ public class FollowThread extends ThreadCommand {
         String responseMessage = "";
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             final String threadName = body.getString(THREAD_NAME);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
             }
 
-            if(!arango.documentExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 responseMessage = "This thread does not exist.";
                 return Responder.makeErrorResponse(responseMessage, 400).toString();
             }
 
-//            final String edgeKey = userId + threadName;
-            final String followEdgeId = arango.getSingleEdgeId(arangoDB,
-                    DB_Name,
+            final String followEdgeId = arango.getSingleEdgeId(DB_Name,
                     USER_FOLLOW_THREAD_COLLECTION_NAME,
                     USER_COLLECTION_NAME + "/" + userId,
                     THREAD_COLLECTION_NAME + "/" + threadName);
 
-            final BaseDocument threadDocument = arango.readDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadName);
+            final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
             int followerCount = (int) threadDocument.getAttribute(NUM_OF_FOLLOWERS_DB);
 
             if (!followEdgeId.equals("")) {
                 responseMessage = "You have unfollowed this Thread.";
-                arango.deleteDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, followEdgeId);
+                arango.deleteDocument(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, followEdgeId);
 
                 --followerCount;
             } else {
                 responseMessage = "You are now following this Thread!";
 
                 final BaseEdgeDocument userFollowsThreadEdge = addEdgeFromUserToThread(userId, threadName);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, userFollowsThreadEdge);
+                arango.createEdgeDocument(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, userFollowsThreadEdge);
 
                 ++followerCount;
             }
 
             threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
 
-            arango.updateDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
+            arango.updateDocument(DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            // arango.disconnect(arangoDB);
             response.put("msg", responseMessage);
         }
 

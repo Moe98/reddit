@@ -1,6 +1,5 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -28,8 +27,8 @@ public class CreateThread extends ThreadCommand {
         return new Schema(List.of(threadName, description, creatorId, numOfFollowers));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
+    // private Arango arango;
+    // private ArangoDB arangoDB;
 
     @Override
     public String execute() {
@@ -43,15 +42,14 @@ public class CreateThread extends ThreadCommand {
         Thread thread = new Thread();
         
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, THREAD_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             }
 
             // TODO can we do this as a transaction?
@@ -65,7 +63,7 @@ public class CreateThread extends ThreadCommand {
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
             myObject.addAttribute(NUM_OF_FOLLOWERS_DB, INITIAL_NUM_FOLLOWERS);
 
-            BaseDocument res = arango.createDocument(arangoDB, DB_Name, THREAD_COLLECTION_NAME, myObject);
+            BaseDocument res = arango.createDocument(DB_Name, THREAD_COLLECTION_NAME, myObject);
 
             thread.setName(res.getKey());
             thread.setDescription((String) res.getAttribute(DESCRIPTION_DB));
@@ -77,12 +75,10 @@ public class CreateThread extends ThreadCommand {
             BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
             edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + creatorId);
             edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + name);
-            arango.createEdgeDocument(arangoDB, DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
+            arango.createEdgeDocument(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            arango.disconnect(arangoDB);
         }
         return Responder.makeDataResponse(thread.toJSON()).toString();
     }

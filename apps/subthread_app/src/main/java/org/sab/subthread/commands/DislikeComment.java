@@ -1,6 +1,5 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
@@ -19,8 +18,6 @@ public class DislikeComment extends CommentCommand{
         return new Schema(List.of(commentId));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
 
     @Override
     public String execute() {
@@ -31,40 +28,39 @@ public class DislikeComment extends CommentCommand{
         String msg = "";
 
         try {
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME)) {
+            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
-                arango.createCollection(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, false);
+                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
             }
 
             // TODO check if comment exists
-            if(!arango.documentExists(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+            if(!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 msg = "Comment does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
-            String dislikeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+            String dislikeEdgeId = arango.getSingleEdgeId(DB_Name,USER_DISLIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
 
             // if user already dislikes the comment, then remove his dislike and update dislike count
             if(!dislikeEdgeId.equals("")){
-                arango.deleteDocument(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, dislikeEdgeId);
+                arango.deleteDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, dislikeEdgeId);
 
-                BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 // TODO make this thread safe
                 //  I feel like this var is unnecessary to begin with
                 int newDisikes =  Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)))-1;
                 originalComment.updateAttribute(DISLIKES_DB,newDisikes);
                 // putting the comment with the updated amount of dislikes
-                arango.updateDocument(arangoDB,DB_Name,COMMENT_COLLECTION_NAME,originalComment,commentId);
+                arango.updateDocument(DB_Name,COMMENT_COLLECTION_NAME,originalComment,commentId);
 
                 msg = "removed your dislike on the comment";
             }
@@ -76,30 +72,30 @@ public class DislikeComment extends CommentCommand{
                 edgeDocument.setTo(COMMENT_COLLECTION_NAME+ "/" + commentId);
 
                 // adding new edgeDocument representing that a user dislikes a comment
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeDocument);
+                arango.createEdgeDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
-                BaseDocument originalComment = arango.readDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)))+1;
                 // TODO why update likes?
                 int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB)));
                 //checking if the user likes this content to remove his like
-                String likeEdgeId = arango.getSingleEdgeId(arangoDB,DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
+                String likeEdgeId = arango.getSingleEdgeId(DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
                 if (!likeEdgeId.equals("")) {
-                    arango.deleteDocument(arangoDB, DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
+                    arango.deleteDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
                     newLikes -= 1;
                     msg += " & removed your like";
                 }
                 originalComment.updateAttribute(LIKES_DB, newLikes);
                 originalComment.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of likes and dislikes
-                arango.updateDocument(arangoDB, DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
+                arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
             }
         } catch (Exception e) {
-            System.out.println(e.getStackTrace());
+            // System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            arango.disconnect(arangoDB);
+            // arango.disconnect(arangoDB);
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

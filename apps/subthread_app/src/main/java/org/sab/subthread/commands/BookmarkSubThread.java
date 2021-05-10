@@ -1,6 +1,5 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
@@ -19,8 +18,6 @@ public class BookmarkSubThread extends SubThreadCommand {
         return new Schema(List.of(subthreadId));
     }
 
-    private Arango arango;
-    private ArangoDB arangoDB;
 
 
     @Override
@@ -34,27 +31,25 @@ public class BookmarkSubThread extends SubThreadCommand {
             String subthreadId = body.getString(SUBTHREAD_ID);
             String userId = uriParams.getString(REPORTER_ID);
 
-            arango = Arango.getInstance();
-            arangoDB = arango.connect();
+            Arango arango = Arango.getInstance();
 
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME)) {
+            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
-                arango.createCollection(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
             }
 
             // check subthread exist
-            if(!arango.documentExists(arangoDB, DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
-            String userBookmarkEdgeId = arango.getSingleEdgeId(arangoDB,
-                                                                DB_Name,
+            String userBookmarkEdgeId = arango.getSingleEdgeId(DB_Name,
                                                                 USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
                                                                 USER_COLLECTION_NAME + "/" + userId,
                                                                 SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
@@ -62,7 +57,7 @@ public class BookmarkSubThread extends SubThreadCommand {
             if(!userBookmarkEdgeId.equals("")){
                 msg = "Removed Subthread from Bookmarks";
                 // unbookmark
-                arango.deleteDocument(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, userBookmarkEdgeId);
+                arango.deleteDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, userBookmarkEdgeId);
 
             } else {
                 // bookmark
@@ -70,7 +65,7 @@ public class BookmarkSubThread extends SubThreadCommand {
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
                 edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
-                arango.createEdgeDocument(arangoDB, DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeDocument);
+                arango.createEdgeDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
             }
 
@@ -80,7 +75,7 @@ public class BookmarkSubThread extends SubThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {
-            arango.disconnect(arangoDB);
+            // arango.disconnect(arangoDB);
             response.put("msg", msg);
         }
 
