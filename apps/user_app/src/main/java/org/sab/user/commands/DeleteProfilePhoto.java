@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.sab.functions.CloudUtilities;
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;

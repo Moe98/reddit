@@ -10,7 +10,7 @@ import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
 import org.sab.functions.Auth;
 import org.sab.functions.Utilities;
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.user.UserApp;
 
 import java.util.Date;

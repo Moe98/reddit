@@ -2,7 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;

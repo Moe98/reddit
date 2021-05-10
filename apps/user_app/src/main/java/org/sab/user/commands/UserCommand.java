@@ -3,7 +3,7 @@ package org.sab.user.commands;
 
 import org.json.JSONObject;
 import org.sab.functions.Auth;
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;

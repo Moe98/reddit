@@ -1,6 +1,6 @@
 package org.sab.user.commands;
 
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;

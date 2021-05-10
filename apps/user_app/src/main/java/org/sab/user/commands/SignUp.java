@@ -4,7 +4,7 @@ import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.functions.Auth;
-import org.sab.models.User;
+import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
