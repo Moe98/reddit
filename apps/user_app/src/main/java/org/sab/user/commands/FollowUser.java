@@ -12,27 +12,6 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class FollowUser extends UserToUserCommand {
-
-    public static void main(String[] args) {
-        FollowUser followUser = new FollowUser();
-
-        JSONObject body = new JSONObject();
-        body.put(USER_ID, "Moe");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "Manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(followUser.execute(request));
-    }
-
     @Override
     protected String execute() {
         final JSONObject response = new JSONObject();
