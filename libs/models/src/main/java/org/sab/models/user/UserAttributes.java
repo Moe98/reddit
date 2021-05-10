@@ -1,27 +1,37 @@
 package org.sab.models.user;
 
+import org.sab.functions.Utilities;
+
 public enum UserAttributes {
 
-    // variables in a user object
-    ACTION_MAKER_ID("userId", "UserId"),
-    USER_ID("userId", "UserId"),
-    IS_DELETED("isDeleted", "IsDeleted"),
-    DATE_CREATED("dateCreated", "DateCreated"),
-    NUM_OF_FOLLOWERS("numOfFollowers", "NumOfFollowers");
+    ACTION_MAKER_ID("userId"),
+    USER_ID("userId"),
+    IS_DELETED("isDeleted"),
+    DATE_CREATED("dateCreated"),
+    NUM_OF_FOLLOWERS("numOfFollowers");
 
-    private final String http;
-    private final String db;
 
-    UserAttributes(String http, String db) {
-        this.http = http;
-        this.db = db;
+    private final String CAMELCASE;
+
+
+    UserAttributes(String camelCase) {
+        this.CAMELCASE = camelCase;
     }
 
     public String getHTTP() {
-        return http;
+        return CAMELCASE;
     }
 
-    public String getDb() {
-        return db;
+    public String getArangoDb() {
+        return Utilities.camelToPascalCase(CAMELCASE);
+    }
+
+    public String getPostgresDb() {
+        return Utilities.camelToSnakeCase(CAMELCASE);
+    }
+
+    @Override
+    public String toString() {
+        return CAMELCASE;
     }
 }
