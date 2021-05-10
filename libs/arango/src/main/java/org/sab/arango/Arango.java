@@ -181,12 +181,14 @@ public class Arango {
         bindVars.put("username", userId);
         bindVars.put("contentId", contentId);
         bindVars.put("collectionName", collectionName);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+
         ArangoCursor<BaseDocument> cursor = instance.query(dbName, query, bindVars);
         String edgeId = "";
+        
         if (cursor.hasNext()) {
             edgeId = (String)cursor.next().getAttribute("edgeId");
         }
+        
         return edgeId;
     }
 
