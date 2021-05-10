@@ -91,9 +91,9 @@ const ChatView = ({ chat, onChatExit }) => {
 	const onNewMessageSent = (messageText) => {
 		const isAbleToSend = sendToChat(
 			JSON.stringify({
-				type: 'CreateGroupMessage',
-				chatId: 'efb3c541-9ddb-44d6-aa47-e6f2579ea177',
-				sender_id: 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee',
+				type: 'CREATE_GROUP_MESSAGE',
+				chatId: '166fff75-d0f6-4fa9-951a-4a58c696397b',
+				senderId: 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee',
 				content: messageText
 			})
 		)

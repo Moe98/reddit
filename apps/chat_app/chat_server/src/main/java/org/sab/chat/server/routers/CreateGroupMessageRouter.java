@@ -15,7 +15,7 @@ public class CreateGroupMessageRouter extends Router {
     public void forwardToQueue(ChannelHandlerContext ctx, JSONObject request) {
         JSONObject body = new JSONObject();
         body.put("chatId", request.get("chatId"));
-        body.put("senderId", request.get("sender_id"));
+        body.put("senderId", request.get("senderId"));
         body.put("content", request.get("content"));
 
         JSONObject packedRequest = packRequest("CREATE_GROUP_MESSAGE", body);

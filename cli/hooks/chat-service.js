@@ -11,7 +11,7 @@ const useChatService = (onMessage, onError) => {
 		ws.current.onopen = () => {
 			ws.current.send(
 				JSON.stringify({
-					type: 'Auth',
+					type: 'AUTH',
 					username
 				})
 			)
