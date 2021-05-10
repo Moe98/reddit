@@ -36,7 +36,7 @@ public class DeleteAccount extends UserCommand {
 
     @Override
     protected String execute() {
-        boolean authenticated = authenticationParams.getBoolean(Authenticated);
+        boolean authenticated = authenticationParams.getBoolean(AUTHENTICATED);
         if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
