@@ -25,7 +25,7 @@ public abstract class CommandWithVerification extends Command {
         if (!methodType.equals(request.getString("methodType")))
             return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
         body = methodType.equals("GET") ? new JSONObject() : request.getJSONObject("body");
-        authenticationParams = request.getJSONObject("authenticationParams");
+        authenticationParams = request.has("authenticationParams") ? request.getJSONObject("authenticationParams") : new JSONObject();
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
