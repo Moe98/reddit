@@ -59,6 +59,10 @@ public class User {
         this.email = email;
     }
 
+    public static String getCollectionName() {
+        return "Users";
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -70,14 +74,15 @@ public class User {
                 ", email='" + email + '\'' +
                 '}';
     }
-    public JSONObject toJSON(){
-        JSONObject user=new JSONObject();
-        user.put("userId",userId);
-        user.put("username",username);
-        user.put("birthdate",birthdate);
-        user.put("email",email);
-        user.put("photoUrl",photoUrl);
-        user.put("password",password);
+
+    public JSONObject toJSON() {
+        JSONObject user = new JSONObject();
+        user.put("userId", userId);
+        user.put("username", username);
+        user.put("birthdate", birthdate);
+        user.put("email", email);
+        user.put("photoUrl", photoUrl);
+        user.put("password", password);
         return user;
     }
 

@@ -2,6 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
+import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
@@ -43,8 +44,7 @@ public class UserApp extends Service {
         Arango arango = Arango.getInstance();
         arango.connectIfNotConnected();
         arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
-        String collectionName = "Users";
-        arango.createCollectionIfNotExists(ARANGO_DB_NAME, collectionName, false);
+        arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
 
     }
 }

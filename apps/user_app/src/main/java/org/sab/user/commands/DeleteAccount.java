@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
+import org.sab.models.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -78,6 +79,6 @@ public class DeleteAccount extends UserCommand {
         user.setKey(username);
         Arango arango = Arango.getInstance();
         arango.connectIfNotConnected();
-        arango.updateDocument(UserApp.ARANGO_DB_NAME, "Users", user, username);
+        arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), user, username);
     }
 }

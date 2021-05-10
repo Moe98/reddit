@@ -10,6 +10,7 @@ import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
 import org.sab.functions.Auth;
 import org.sab.functions.Utilities;
+import org.sab.models.User;
 import org.sab.user.UserApp;
 
 import java.util.Date;
@@ -223,12 +224,12 @@ public class CommandsTest {
     public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
         arango.connectIfNotConnected();
-        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, "Users", username);
+        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
         Map props = user.getProperties();
         boolean is_deleted = (boolean) props.get("is_deleted");
         assertTrue(is_deleted);
         int numberOfFollowers = (int) props.get("number_of_followers");
         assertEquals(0, numberOfFollowers);
-        arango.deleteDocument(UserApp.ARANGO_DB_NAME, "Users", username);
+        arango.deleteDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
     }
 }
