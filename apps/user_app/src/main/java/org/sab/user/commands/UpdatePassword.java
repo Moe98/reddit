@@ -30,7 +30,7 @@ public class UpdatePassword extends UserCommand {
     @Override
     protected String execute() {
         boolean authenticated = authenticationParams.getBoolean(AUTHENTICATED);
-        if(!authenticated)
+        if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
         // retrieving the body objects
