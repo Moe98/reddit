@@ -1,6 +1,6 @@
 package org.sab.models.user;
 
-import org.sab.functions.Utilities;
+import org.sab.strings.StringManipulation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -78,11 +78,11 @@ public enum UserAttributes {
     }
 
     public String getArangoDb() {
-        return Utilities.camelToPascalCase(CAMELCASE);
+        return StringManipulation.camelToPascalCase(CAMELCASE);
     }
 
     public String getPostgresDb() {
-        return Utilities.camelToSnakeCase(CAMELCASE);
+        return StringManipulation.camelToSnakeCase(CAMELCASE);
     }
 
     @Override

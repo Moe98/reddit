@@ -7,7 +7,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +43,9 @@ public class Login extends UserCommand {
 
         return makeJwtResponse("Login Successful!", token);
     }
-    private static String makeJwtResponse(String msg,String token) {
-        JSONObject response = new JSONObject().put("msg", msg).put("token",token);
+
+    private static String makeJwtResponse(String msg, String token) {
+        JSONObject response = new JSONObject().put("msg", msg).put("token", token);
         response.put("statusCode", 200);
         return response.toString();
     }
