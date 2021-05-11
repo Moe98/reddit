@@ -29,7 +29,7 @@ const useChatService = () => {
 			case 'GET_DIRECT_MESSAGES':
 			case 'GET_GROUP_MESSAGES':
 				messages = { ...chatContext.messages }
-				messages[data.chatId] = [...data.messages]
+				messages[data.chatId] = [...data.messages.reverse()]
 				setChatContext({
 					...chatContext,
 					isLoadingMessages: false,
