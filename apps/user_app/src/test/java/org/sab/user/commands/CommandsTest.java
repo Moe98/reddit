@@ -8,7 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
-import org.sab.Auth.Auth;
+import org.sab.auth.Auth;
 import org.sab.functions.Utilities;
 import org.sab.models.user.User;
 import org.sab.user.UserApp;

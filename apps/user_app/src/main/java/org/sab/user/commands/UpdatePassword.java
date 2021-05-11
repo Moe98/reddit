@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.Auth.Auth;
+import org.sab.auth.Auth;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
