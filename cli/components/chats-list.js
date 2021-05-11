@@ -3,6 +3,7 @@ const { Text, Box } = require('ink')
 const { default: SelectInput } = require('ink-select-input')
 const { useContext } = require('react')
 const AppContext = require('../contexts/app-context')
+const { mapIdToSpecialId } = require('../utils/id-mapper')
 
 const ChatsList = ({ directChats, groupChats, onChatSelect }) => {
 	const handleSelect = (item) => onChatSelect(item.value)
@@ -10,20 +11,20 @@ const ChatsList = ({ directChats, groupChats, onChatSelect }) => {
 
 	let items = groupChats.map((chat) => ({
 		key: chat.chatId,
-		label: `${chat.name} (${chat.memberIds.join(', ')})`,
+		label: `${chat.name} (${chat.memberIds.map(mapIdToSpecialId).join(', ')})`,
 		value: chat
 	}))
 
 	items = items.concat(
 		directChats.map((chat) => ({
 			key: chat.chatId,
-			label: `@${
+			label: `@${mapIdToSpecialId(
 				userId === chat.firstMember ? chat.secondMember : chat.firstMember
-			}`,
+			)}`,
 			value: chat
 		}))
 	)
-	
+
 	return (
 		<Box flexDirection='column'>
 			<Text key={1} bold>

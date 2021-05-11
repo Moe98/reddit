@@ -17,13 +17,19 @@ const cli = meow(
 	  $ reddit-cli chat
 
 	Flags
+		--user, -u specify the user id. Special user ids are joe, ouda, abu and ronic.
 		--rainbow, -r  Add rainbow welcome title
 
 	Examples
-	  $ reddit-cli welcome -r
+	  $ reddit-cli chat -u ee55dcf8-ee7b-429a-939e-12c2f7b7ddee
+	  $ reddit-cli chat -u abu
 `,
 	{
 		flags: {
+			user: {
+				type: 'string',
+				alias: 'u'
+			},
 			rainbow: {
 				type: 'boolean',
 				alias: 'r'
@@ -35,6 +41,7 @@ const cli = meow(
 render(
 	React.createElement(App, {
 		command: cli.input[0],
+		user: cli.flags.user,
 		rainbow: cli.flags.rainbow
 	})
 )

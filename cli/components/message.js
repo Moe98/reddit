@@ -12,7 +12,7 @@ const Message = ({ content, senderId, timestamp }) => {
 		<Box alignItems='flex-start' width='100%'>
 			<Box>
 				<Text color={isYourMessage ? 'green' : 'blue'}>
-					{(isYourMessage ? 'You' : senderId) + ': '}
+					{(isYourMessage ? 'You' : mapIdToSpecialId(senderId)) + ': '}
 				</Text>
 			</Box>
 			<Box>

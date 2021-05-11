@@ -3,8 +3,6 @@ const { useEffect, useContext, useRef } = require('react')
 const AppContext = require('../contexts/app-context')
 const ChatContext = require('../contexts/chat-context')
 
-const fs = require('fs')
-
 const useChatService = () => {
 	const ws = useRef(null)
 	const { userId } = useContext(AppContext)
