@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 'use strict'
+process.env.NODE_ENV = 'production';
+
 const React = require('react')
 const importJsx = require('import-jsx')
 const { render } = require('ink')
 const meow = require('meow')
 
 const App = importJsx('./app')
+
 
 const cli = meow(
 	`
