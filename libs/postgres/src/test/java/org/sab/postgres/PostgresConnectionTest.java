@@ -40,7 +40,7 @@ public class PostgresConnectionTest {
         } catch (EnvironmentVariableNotLoaded e) {
             fail(e.getMessage());
         }
-        assertTrue(conn1 == conn2);
+        assertSame(conn1, conn2);
     }
 
     @Test
