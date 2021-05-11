@@ -19,7 +19,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CommandsTest {
+public class UserAppTest {
 
     static String username = "scale-a-bull" + new Date().getTime();
     static String password = "12345678";
