@@ -6,14 +6,18 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 
 import java.net.InetSocketAddress;
 
 public class ChatServer {
+
     private final ChannelGroup channelGroup =
             new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);
     private final EventLoopGroup group = new NioEventLoopGroup();
+    protected static final EventExecutorGroup queueExecutorGroup = new DefaultEventExecutorGroup(8);
     private Channel channel;
 
     public ChannelFuture start(InetSocketAddress address) {
@@ -37,6 +41,7 @@ public class ChatServer {
             channel.close();
         }
         channelGroup.close();
+        queueExecutorGroup.shutdownGracefully();
         group.shutdownGracefully();
     }
 

@@ -29,7 +29,7 @@ public class ChatServerInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast(new HttpRequestHandler("/ws"));
         pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
         pipeline.addLast(new TextWebSocketFrameHandler(group));
-        pipeline.addLast(new QueueHandler("CHAT"));
+        pipeline.addLast(ChatServer.queueExecutorGroup, new QueueHandler("CHAT"));
         pipeline.addLast(new ResponseHandler());
     }
 }
