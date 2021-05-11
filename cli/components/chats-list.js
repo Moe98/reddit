@@ -15,26 +15,42 @@ const CREATING_DIRECT_CHAT = 1
 const CREATING_GROUP_CHAT = 2
 
 const ChatsList = ({ onChatSelect }) => {
-	const handleSelect = (item) => onChatSelect(item.value)
 	const { userId } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [status, setStatus] = useState(CHAT_LIST)
 
-	let items = chatContext.groupChats.map((chat) => ({
+	const handleSelect = (item) => onChatSelect(item.value)
+
+	const isChatListEmpty = () =>
+		chatContext.groupChats.length + chatContext.directChats.length === 0
+
+	const mapDirectChatToItem = (chat) => ({
+		key: chat.chatId,
+		label: `@${mapIdToSpecialId(
+			userId === chat.firstMember ? chat.secondMember : chat.firstMember
+		)}`,
+		value: chat
+	})
+
+	const mapGroupChatToItem = (chat) => ({
 		key: chat.chatId,
 		label: `${chat.name} (${chat.memberIds.map(mapIdToSpecialId).join(', ')})`,
 		value: chat
-	}))
+	})
 
-	items = items.concat(
-		chatContext.directChats.map((chat) => ({
-			key: chat.chatId,
-			label: `@${mapIdToSpecialId(
-				userId === chat.firstMember ? chat.secondMember : chat.firstMember
-			)}`,
-			value: chat
-		}))
+	const items = chatContext.groupChats
+		.map(mapGroupChatToItem)
+		.concat(chatContext.directChats.map(mapDirectChatToItem))
+		.sort((a, b) => {
+			if (a.label === b.label) return 0
+			if (a.label < b.label) return -1
+			return 1
+		})
+
+	const [highlightedItem, setHighlightedItem] = useState(
+		!isChatListEmpty() ? items[0].value : null
 	)
+	const handleHighlight = (item) => setHighlightedItem(item.value)
 
 	const onBack = () => setStatus(CHAT_LIST)
 
@@ -43,6 +59,13 @@ const ChatsList = ({ onChatSelect }) => {
 			setStatus(CREATING_DIRECT_CHAT)
 		} else if (input === 'g') {
 			setStatus(CREATING_GROUP_CHAT)
+		} else if (input === 'l' && highlightedItem && highlightedItem.name) {
+			chatContext.sendToChat({
+				type: 'LEAVE_GROUP',
+				chatId: highlightedItem.chatId,
+				userId
+			})
+			setHighlightedItem(!isChatListEmpty() ? items[0].value : null)
 		}
 	})
 
@@ -53,8 +76,13 @@ const ChatsList = ({ onChatSelect }) => {
 					<Text key={1} bold>
 						Chat List
 					</Text>
-					{items.length > 0 ? (
-						<SelectInput key={2} items={items} onSelect={handleSelect} />
+					{!isChatListEmpty() ? (
+						<SelectInput
+							key={2}
+							items={items}
+							onSelect={handleSelect}
+							onHighlight={handleHighlight}
+						/>
 					) : (
 						<Text>You have no chats 🤷‍♂️</Text>
 					)}
@@ -68,7 +96,9 @@ const ChatsList = ({ onChatSelect }) => {
 						<Text underline>Controls</Text>
 						<Text>D - Create direct chat</Text>
 						<Text>G - Create Group chat</Text>
-						<Text>L - Leave selected chat</Text>
+						{highlightedItem && highlightedItem.name && (
+							<Text>L - Leave selected chat</Text>
+						)}
 					</Box>
 				</Box>
 			) : status === CREATING_DIRECT_CHAT ? (

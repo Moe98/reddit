@@ -113,17 +113,17 @@ public class ClientManager {
         channel.writeAndFlush(message);
     }
 
-    public static void broadcastResponseToChatChannels(UUID chatId, JSONObject response) {
+    public static void sendResponseToUser(UUID userId, JSONObject response) {
         String responseString = response.toString();
-        TextWebSocketFrame message;
+        for(Channel channel : getUserChannels(userId))
+            channel.writeAndFlush(new TextWebSocketFrame(responseString));
+    }
+
+    public static void broadcastResponseToChatChannels(UUID chatId, JSONObject response) {
         ConcurrentLinkedQueue<UUID> memberIds = ClientManager.getChatMembers(chatId);
         for (UUID memberId : memberIds) {
             if (isUserOnline(memberId)) {
-                ConcurrentLinkedQueue<Channel> memberChannels = ClientManager.getUserChannels(memberId);
-                for (Channel channel : memberChannels) {
-                    message = new TextWebSocketFrame(responseString);
-                    channel.writeAndFlush(message);
-                }
+                sendResponseToUser(memberId, response);
             } else {
                 // Notify
             }

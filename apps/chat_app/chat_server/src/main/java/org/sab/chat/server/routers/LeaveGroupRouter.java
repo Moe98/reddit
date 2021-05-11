@@ -22,12 +22,12 @@ public class LeaveGroupRouter extends Router {
             return;
         }
         UUID chatId = UUID.fromString((String) data.get("chatId"));
-        UUID targetUserId = UUID.fromString((String) data.get("targetUserId"));
+        UUID targetMemberId = UUID.fromString((String) data.get("targetMemberId"));
         UUID adminId = UUID.fromString((String) data.get("adminId"));
 
-        boolean isAdmin = targetUserId.equals(adminId);
-        ClientManager.handleUserLeftGroup(chatId, targetUserId, isAdmin);
-
         ClientManager.broadcastResponseToChatChannels(chatId, response);
+
+        boolean isAdmin = targetMemberId.equals(adminId);
+        ClientManager.handleUserLeftGroup(chatId, targetMemberId, isAdmin);
     }
 }

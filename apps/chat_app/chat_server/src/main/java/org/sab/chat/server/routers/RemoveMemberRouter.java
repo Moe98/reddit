@@ -22,9 +22,10 @@ public class RemoveMemberRouter extends Router {
             return;
         }
         UUID chatId = UUID.fromString((String) data.get("chatId"));
-        UUID targetUserId = UUID.fromString((String) data.get("targetUserId"));
-        ClientManager.handleMemberRemoved(chatId, targetUserId);
+        UUID targetMemberId = UUID.fromString((String) data.get("targetMemberId"));
 
         ClientManager.broadcastResponseToChatChannels(chatId, response);
+
+        ClientManager.handleMemberRemoved(chatId, targetMemberId);
     }
 }

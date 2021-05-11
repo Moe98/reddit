@@ -63,6 +63,7 @@ const useChatService = () => {
 					...chatContext,
 					directChats: [...chatContext.directChats, newDirectChat]
 				})
+				break
 			case 'CREATE_GROUP_CHAT':
 				const newGroupChat = {
 					chatId: data.chatId,
@@ -76,6 +77,7 @@ const useChatService = () => {
 					...chatContext,
 					groupChats: [...chatContext.groupChats, newGroupChat]
 				})
+				break
 			case 'LEAVE_GROUP':
 				const isUserRemoved =
 					isGroupAdmin(data.targetMemberId) || isTargetMember(userId)
@@ -92,6 +94,7 @@ const useChatService = () => {
 							? null
 							: chatContext.selectedChat
 				})
+				break
 			case 'REMOVE_GROUP_MEMBER':
 				const groupChatsAfterRemove = chatContext.groupChats.filter(
 					(chat) => chat.chatId !== data.chatId
@@ -106,6 +109,7 @@ const useChatService = () => {
 							? null
 							: chatContext.selectedChat
 				})
+				break
 			case 'ADD_GROUP_MEMBER':
 				const groupChatAddedTo = {
 					chatId: data.chatId,
@@ -121,6 +125,9 @@ const useChatService = () => {
 						? [...chatContext.groupChats, groupChatAddedTo]
 						: chatContext.groupChats
 				})
+				break
+			case 'ERROR':
+				console.log(frame.msg)
 		}
 	}
 
