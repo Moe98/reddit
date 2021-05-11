@@ -37,7 +37,7 @@ const ChatView = ({ chat, onChatExit }) => {
 	}, [])
 
 	useInput((input, _) => {
-		if (input.charCodeAt(0) === 339) {
+		if (input.charCodeAt(0) === 60) {
 			onChatExit()
 		}
 	})
@@ -64,7 +64,7 @@ const ChatView = ({ chat, onChatExit }) => {
 							onSubmit={onNewMessageSent}
 						/>
 					</Box>
-					<Text bold>{`\nPress “ALT + Q” to exit chat`}</Text>
+					<Text bold>{`\nPress “<” to exit chat`}</Text>
 				</Box>
 			) : (
 				<LoadingSpinner />
