@@ -90,22 +90,37 @@ const useChatService = () => {
 						? groupChatsAfterLeave
 						: chatContext.groupChats,
 					selectedChat:
-						isUserRemoved && chatContext.selectedChat && chatContext.selectedChat.chatId === data.chatId
+						isUserRemoved &&
+						chatContext.selectedChat &&
+						chatContext.selectedChat.chatId === data.chatId
 							? null
 							: chatContext.selectedChat
 				})
 				break
 			case 'REMOVE_GROUP_MEMBER':
-				const groupChatsAfterRemove = chatContext.groupChats.filter(
+				const groupChatsAfterChatRemoved = chatContext.groupChats.filter(
 					(chat) => chat.chatId !== data.chatId
+				)
+				const groupChatsAfterMemberRemoved = [...chatContext.groupChats].map(
+					(chat) => {
+						if (chat.chatId !== data.chatId) return chat
+						return {
+							...chat,
+							memberIds: chat.memberIds.filter(
+								(memberId) => !isTargetMember(memberId)
+							)
+						}
+					}
 				)
 				setChatContext({
 					...chatContext,
 					groupChats: isTargetMember(userId)
-						? groupChatsAfterRemove
-						: chatContext.groupChats,
+						? groupChatsAfterChatRemoved
+						: groupChatsAfterMemberRemoved,
 					selectedChat:
-						isTargetMember(userId) && chatContext.selectedChat && chatContext.selectedChat.chatId === data.chatId
+						isTargetMember(userId) &&
+						chatContext.selectedChat &&
+						chatContext.selectedChat.chatId === data.chatId
 							? null
 							: chatContext.selectedChat
 				})
@@ -119,11 +134,21 @@ const useChatService = () => {
 					dateCreated: data.dateCreated,
 					memberIds: data.memberIds
 				}
+
+				const groupChatsAfterMemberAdded = [...chatContext.groupChats].map(
+					(chat) => {
+						if (chat.chatId !== data.chatId) return chat
+						return {
+							...chat,
+							memberIds: [...chat.memberIds, data.targetMemberId]
+						}
+					}
+				)
 				setChatContext({
 					...chatContext,
 					groupChats: isTargetMember(userId)
 						? [...chatContext.groupChats, groupChatAddedTo]
-						: chatContext.groupChats
+						: groupChatsAfterMemberAdded
 				})
 				break
 			case 'ERROR':
