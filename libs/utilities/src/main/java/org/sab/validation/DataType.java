@@ -39,6 +39,11 @@ public enum DataType {
 
             return pattern.matcher(email).matches();
         }
+    }, ARRAY_OF_STRING("") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            return object instanceof String[];
+        }
     };
 
     private String additionalErrorMessage;
