@@ -41,7 +41,7 @@ public class Requester {
 
     public static JSONObject getUser() {
         JSONObject request = makeRequest(null, "GET", new JSONObject());
-        return new JSONObject(new GetUser().execute(request));
+        return new JSONObject(new ViewMyProfile().execute(request));
     }
 
     public static JSONObject viewAnotherProfile(String username) {

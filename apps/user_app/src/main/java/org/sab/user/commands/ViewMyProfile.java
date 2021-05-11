@@ -10,7 +10,7 @@ import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 import java.sql.SQLException;
 import java.util.List;
 
-public class GetUser extends UserCommand {
+public class ViewMyProfile extends UserCommand {
     @Override
     protected String execute() {
 
