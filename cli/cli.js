@@ -42,7 +42,9 @@ const cli = meow(
 render(
 	React.createElement(App, {
 		command: cli.input[0],
-		user: cli.flags.user,
-		rainbow: cli.flags.rainbow
+		flags: {
+			user: cli.flags.user,
+			rainbow: cli.flags.rainbow
+		}
 	})
 )

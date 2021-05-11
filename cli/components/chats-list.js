@@ -55,9 +55,9 @@ const ChatsList = ({ onChatSelect }) => {
 	const onBack = () => setStatus(CHAT_LIST)
 
 	useInput((input, _) => {
-		if (input === 'd') {
+		if (input === 'd' && status === CHAT_LIST) {
 			setStatus(CREATING_DIRECT_CHAT)
-		} else if (input === 'g') {
+		} else if (input === 'g' && status === CHAT_LIST) {
 			setStatus(CREATING_GROUP_CHAT)
 		} else if (input === 'l' && highlightedItem && highlightedItem.name) {
 			chatContext.sendToChat({
@@ -104,7 +104,7 @@ const ChatsList = ({ onChatSelect }) => {
 			) : status === CREATING_DIRECT_CHAT ? (
 				<CreateDirectChat onBack={onBack} />
 			) : (
-				<CreateGroupChat />
+				<CreateGroupChat onBack={onBack} />
 			)}
 		</React.Fragment>
 	)

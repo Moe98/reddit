@@ -1,22 +1,44 @@
 const React = require('react')
-const { Text } = require('ink')
+const { Text, Box } = require('ink')
+const { useContext } = require('react')
+const ChatContext = require('../contexts/chat-context')
+const importJsx = require('import-jsx')
+const AppContext = require('../contexts/app-context')
+const TextInput = importJsx('./text-input')
 
-const { useState, useEffect } = React
+const { useState } = React
 
-const CreateGroupChat = () => {
-	const [counter, setCounter] = useState(0)
+const CreateGroupChat = ({ onBack }) => {
+	const { userId } = useContext(AppContext)
+	const [chatContext, _] = useContext(ChatContext)
+	const [chatName, setChatName] = useState('')
 
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setCounter((previousCounter) => previousCounter + 1)
-		}, 100)
+	const onCreate = (chatName) => {
+		chatContext.sendToChat({
+			type: 'CREATE_GROUP_CHAT',
+			creator: userId,
+			name: chatName,
+			description: ''
+		})
+		onBack()
+	}
 
-		return () => {
-			clearInterval(timer)
-		}
-	}, [])
-
-	return <Text color='green'> x{counter}</Text>
+	return (
+		<React.Fragment>
+			<Text bold>Create a Group Chat</Text>
+			<Box>
+				<Box marginRight={1}>
+					<Text>{'>'}</Text>
+				</Box>
+				<TextInput
+					value={chatName}
+					placeholder={`Enter chat name`}
+					onChange={setChatName}
+					onSubmit={onCreate}
+				/>
+			</Box>
+		</React.Fragment>
+	)
 }
 
 module.exports = CreateGroupChat

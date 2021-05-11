@@ -19,12 +19,10 @@ const defaultChatContext = {
 	sendToChat: null
 }
 
-const App = ({
-	command = 'welcome',
-	rainbow,
-	user = 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee'
-}) => {
+const App = ({ command = 'welcome', flags }) => {
 	const [chatContext, setChatContext] = useState(defaultChatContext)
+
+	const { rainbow, user = 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee' } = flags
 
 	const defaultAppContext = {
 		authToken: null,
