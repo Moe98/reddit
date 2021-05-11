@@ -4,6 +4,7 @@ package org.sab.postgres;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
@@ -92,18 +93,13 @@ public class PostgresConnection {
         return resultSet;
     }
 
-    private static void createUsersTable(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
-        String path = "libs/postgres/src/main/resources/sql/CreateUsersTable.sql";
-        if (isTesting)
-            path = "../../" + path;
-        runScript(path);
+    private static void createUsersTable() throws IOException, EnvironmentVariableNotLoaded {
+
+        runScript(getScriptPath("CreateUsersTable"));
     }
 
-    private static void createUsersProcedures(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
-        String path = "libs/postgres/src/main/resources/sql/CreateUserProecuderes.sql";
-        if (isTesting)
-            path = "../../" + path;
-        runScript(path);
+    private static void createUsersProcedures() throws IOException, EnvironmentVariableNotLoaded {
+        runScript(getScriptPath("CreateUserProcedures"));
     }
 
     private static void runScript(String scriptPath) throws IOException, EnvironmentVariableNotLoaded {
@@ -130,10 +126,15 @@ public class PostgresConnection {
 
     }
 
-    public static void dbInit(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
-        createUsersTable(isTesting);
-        createUsersProcedures(isTesting);
+    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
+        createUsersTable();
+        createUsersProcedures();
     }
 
+    private static String getScriptPath(String sqlScriptName) throws IOException {
+        ClassLoader classLoader = PostgresConnection.class.getClassLoader();
+        File file = new File(classLoader.getResource("sql/" + sqlScriptName + ".sql").getFile());
+        return file.getCanonicalPath();
+    }
 
 }
