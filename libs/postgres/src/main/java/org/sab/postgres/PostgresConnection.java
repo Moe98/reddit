@@ -134,7 +134,7 @@ public class PostgresConnection {
     private static String getScriptPath(String sqlScriptName) throws IOException {
         ClassLoader classLoader = PostgresConnection.class.getClassLoader();
         File file = new File(classLoader.getResource("sql/" + sqlScriptName + ".sql").getFile());
-        return file.getCanonicalPath();
+        return file.getAbsolutePath();
     }
 
 }
