@@ -24,7 +24,7 @@ const CreateDirectChat = ({ onBack }) => {
 	}
 
 	useInput((input, _) => {
-		if (input.charCodeAt(0) === 339) {
+		if (input.charCodeAt(0) === 60) {
 			onBack()
 		}
 	})
@@ -43,7 +43,7 @@ const CreateDirectChat = ({ onBack }) => {
 					onSubmit={onCreate}
 				/>
 			</Box>
-			<Text bold>{`\nPress “ALT + Q” to go back`}</Text>
+			<Text bold>{`\nPress “<” to go back`}</Text>
 		</React.Fragment>
 	)
 }
