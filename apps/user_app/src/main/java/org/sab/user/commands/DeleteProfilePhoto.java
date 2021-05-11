@@ -33,9 +33,10 @@ public class DeleteProfilePhoto extends UserCommand {
 
         String username = authenticationParams.getString(USERNAME);
 
+        User user;
         // getting the user
         try {
-            User user = getUser(username, UserAttributes.PHOTO_URL);
+            user = getUser(username, UserAttributes.PHOTO_URL, UserAttributes.USER_ID);
             if (user.getPhotoUrl() == null)
                 return Responder.makeMsgResponse("You don't have a profile picture, you can't delete your avatar!");
 
@@ -45,7 +46,7 @@ public class DeleteProfilePhoto extends UserCommand {
 
         // Deleting from Cloudinary
         try {
-            CloudUtilities.destroyImage(username);
+            CloudUtilities.deleteImage(user.getUserId());
         } catch (IOException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }

@@ -11,39 +11,32 @@ import java.util.Map;
 public class CloudUtilities {
     private Cloudinary cloudinary;
 
-    static Map<String, String> config;
+    static final Map<String, String> CONFIG;
 
     static {
-        config = new HashMap();
-        config.put("cloud_name", System.getenv("COLOUDINARY_CLOUD_NAME"));
-        config.put("api_key", System.getenv("COLOUDINARY_API_KEY"));
-        config.put("api_secret", System.getenv("COLOUDINARY_API_SECRET"));
+        CONFIG = new HashMap<>();
+        CONFIG.put("cloud_name", System.getenv("COLOUDINARY_CLOUD_NAME"));
+        CONFIG.put("api_key", System.getenv("COLOUDINARY_API_KEY"));
+        CONFIG.put("api_secret", System.getenv("COLOUDINARY_API_SECRET"));
     }
 
     public CloudUtilities() throws EnvironmentVariableNotLoaded {
-        for (Map.Entry<String, String> entry : config.entrySet())
+        for (Map.Entry<String, String> entry : CONFIG.entrySet())
             if (entry.getValue() == null)
                 throw new EnvironmentVariableNotLoaded("COLOUDINARY_" + entry.getKey().toUpperCase());
-        cloudinary = new Cloudinary(config);
+        cloudinary = new Cloudinary(CONFIG);
     }
 
-    public static String uploadImage(String photoUrl, String username) throws IOException, EnvironmentVariableNotLoaded {
-        if (!Utilities.isDevelopmentMode())
-            return null;
-        String publicId = username.replaceAll("[-]", "");
+    public static String uploadImage(String photoUrl, String userId) throws IOException, EnvironmentVariableNotLoaded {
+        String publicId = userId.replaceAll("[-]", "");
         Cloudinary cloudinary = new CloudUtilities().cloudinary;
-        System.out.println("Uploading Image!");
-        Map uploadResult = cloudinary.uploader().upload(photoUrl, ObjectUtils.asMap("public_id", publicId));
-        String url = cloudinary.url().generate((String) uploadResult.get("public_id"));
-        return url;
+        Map<String, String> uploadResult = cloudinary.uploader().upload(photoUrl, ObjectUtils.asMap("public_id", publicId));
+        return cloudinary.url().generate(uploadResult.get("public_id"));
     }
 
-    public static void destroyImage(String username) throws IOException, EnvironmentVariableNotLoaded {
-        if (!Utilities.isDevelopmentMode())
-            return;
-        String publicId = username.replaceAll("[-]", "");
+    public static void deleteImage(String userId) throws IOException, EnvironmentVariableNotLoaded {
+        String publicId = userId.replaceAll("[-]", "");
         Cloudinary cloudinary = new CloudUtilities().cloudinary;
-        Map deleteParams = ObjectUtils.asMap("invalidate", true);
-        cloudinary.uploader().destroy(publicId, deleteParams);
+        cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("invalidate", true));
     }
 }

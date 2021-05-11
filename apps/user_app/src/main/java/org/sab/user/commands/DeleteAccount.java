@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.CloudUtilities;
 import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -56,15 +57,17 @@ public class DeleteAccount extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        try {
-            deleteFromArango(username);
-        } catch (ArangoDBException e) {
-            return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
-        }
+        JSONObject user = userAuth.getJSONObject("data");
+        if (user.has(UserAttributes.PHOTO_URL.toString()))
+            try {
+                deleteFromArango(username);
+            } catch (ArangoDBException e) {
+                return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
+            }
 
         // Deleting profile picture from Cloudinary
         try {
-            CloudUtilities.destroyImage(username);
+            CloudUtilities.deleteImage(user.getString(USER_ID));
         } catch (IOException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }

@@ -1,6 +1,8 @@
 package org.sab.user.commands;
 
 import org.sab.functions.CloudUtilities;
+import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -35,15 +37,16 @@ public class UpdateProfilePhoto extends UserCommand {
         String username = authenticationParams.getString(USERNAME);
         String photoUrl = body.getString(PHOTO_URL);
 
+        User user;
         // getting the user
         try {
-            getUser(username);
+            user = getUser(username, UserAttributes.USER_ID);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
         try {
-            photoUrl = CloudUtilities.uploadImage(photoUrl, username);
+            photoUrl = CloudUtilities.uploadImage(photoUrl, user.getUserId());
         } catch (IOException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         } catch (Exception e) {

@@ -26,8 +26,9 @@ public abstract class UserCommand extends CommandWithVerification {
     protected JSONObject authenticateUser(String username, String password) {
         boolean checkPassword;
 
+        User user;
         try {
-            User user = getUser(username, UserAttributes.PASSWORD);
+            user = getUser(username, UserAttributes.PASSWORD, UserAttributes.USER_ID, UserAttributes.PHOTO_URL);
             String hashedPassword = user.getPassword();
             checkPassword = Auth.verifyHash(password, hashedPassword);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
@@ -36,7 +37,7 @@ public abstract class UserCommand extends CommandWithVerification {
         if (!checkPassword) {
             return new JSONObject().put("msg", "Password is incorrect").put("statusCode", 401);
         }
-        return new JSONObject().put("msg", "User Authentication successful!").put("statusCode", 200);
+        return new JSONObject().put("msg", "User Authentication successful!").put("statusCode", 200).put("data", user.toJSON());
     }
 
     protected User getUser(String username, UserAttributes... userAttributes) throws SQLException, EnvironmentVariableNotLoaded {
