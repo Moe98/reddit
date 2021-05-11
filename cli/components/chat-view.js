@@ -9,57 +9,7 @@ const LoadingSpinner = importJsx('./loading-spinner')
 const MessagesList = importJsx('./messages-list')
 
 const ChatContext = require('../contexts/chat-context')
-
-const messagesData = [
-	{
-		id: 1,
-		author: 'Ronic',
-		text: 'Hello Everyone 👋\nWelcome to the group',
-		date: new Date('May 7, 2021 00:00:05')
-	},
-	{
-		id: 2,
-		author: 'Bulleil',
-		text: 'Hi',
-		date: new Date('May 7, 2021 00:01:05')
-	},
-	{
-		id: 3,
-		author: 'Ouda',
-		text: 'Hey guys',
-		date: new Date('May 7, 2021 00:01:10')
-	},
-	{
-		id: 4,
-		author: 'Joe',
-		text: 'Welcome',
-		date: new Date('May 7, 2021 00:01:20')
-	},
-	{
-		id: 5,
-		author: 'Ronic',
-		text: 'This project will end in one sitting',
-		date: new Date('May 7, 2021 00:03:00')
-	},
-	{
-		id: 6,
-		author: 'Ouda',
-		text: '🔥🔥🔥',
-		date: new Date('May 7, 2021 00:03:20')
-	},
-	{
-		id: 7,
-		author: 'Bulleil',
-		text: 'Inshaallah Yaba 🔥🔥',
-		date: new Date('May 7, 2021 00:03:50')
-	},
-	{
-		id: 8,
-		author: 'Joe',
-		text: 'Mandeal',
-		date: new Date('May 7, 2021 00:04:05')
-	}
-]
+const { mapIdToSpecialId } = require('../utils/id-mapper')
 
 const ChatView = ({ chat, onChatExit }) => {
 	const { userId } = useContext(AppContext)
@@ -103,18 +53,18 @@ const ChatView = ({ chat, onChatExit }) => {
 						</Box>
 						<TextInput
 							value={newMessage}
-							placeholder={`Chat with ${
+							placeholder={`Chat with ${mapIdToSpecialId(
 								chat.name
 									? chat.name
 									: userId == chat.firstMember
 									? chat.secondMember
 									: chat.firstMember
-							} here`}
+							)} here`}
 							onChange={setNewMessage}
 							onSubmit={onNewMessageSent}
 						/>
 					</Box>
-					<Text bold>{`\nPress “q” to exit chat`}</Text>
+					<Text bold>{`\nPress “Q” to exit chat`}</Text>
 				</Box>
 			) : (
 				<LoadingSpinner />

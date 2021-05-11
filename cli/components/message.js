@@ -4,6 +4,7 @@ const { useContext } = require('react')
 const AppContext = require('../contexts/app-context')
 
 const moment = require('moment')
+const { mapIdToSpecialId } = require('../utils/id-mapper')
 
 const Message = ({ content, senderId, timestamp }) => {
 	const { userId } = useContext(AppContext)

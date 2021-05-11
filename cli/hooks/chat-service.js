@@ -50,6 +50,16 @@ const useChatService = () => {
 					messages
 				})
 				break
+			case 'CREATE_DIRECT_CHAT':
+				const newDirectChat = {
+					chatId: data.chatId,
+					firstMember: data.firstMember,
+					secondMember: data.secondMember
+				}
+				setChatContext({
+					...chatContext,
+					directChats: [...chatContext.directChats, newDirectChat]
+				})
 		}
 	}
 
