@@ -90,7 +90,7 @@ const useChatService = () => {
 						? groupChatsAfterLeave
 						: chatContext.groupChats,
 					selectedChat:
-						isUserRemoved && chatContext.selectedChat === data.chatId
+						isUserRemoved && chatContext.selectedChat && chatContext.selectedChat.chatId === data.chatId
 							? null
 							: chatContext.selectedChat
 				})
@@ -105,7 +105,7 @@ const useChatService = () => {
 						? groupChatsAfterRemove
 						: chatContext.groupChats,
 					selectedChat:
-						isTargetMember(userId) && chatContext.selectedChat === data.chatId
+						isTargetMember(userId) && chatContext.selectedChat && chatContext.selectedChat.chatId === data.chatId
 							? null
 							: chatContext.selectedChat
 				})
