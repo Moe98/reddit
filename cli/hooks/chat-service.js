@@ -13,6 +13,9 @@ const useChatService = () => {
 		const frameType = frame.type
 		const data = frame.data
 
+		const isTargetMember = (id) => data.targetMemberId === id
+		const isGroupAdmin = (groupChat, id) => groupChat.adminId === id
+
 		let messages = {}
 		switch (frameType) {
 			case 'INIT_CONNECTION':
@@ -59,6 +62,64 @@ const useChatService = () => {
 				setChatContext({
 					...chatContext,
 					directChats: [...chatContext.directChats, newDirectChat]
+				})
+			case 'CREATE_GROUP_CHAT':
+				const newGroupChat = {
+					chatId: data.chatId,
+					name: data.name,
+					description: data.description,
+					adminId: data.adminId,
+					dateCreated: data.dateCreated,
+					memberIds: data.memberIds
+				}
+				setChatContext({
+					...chatContext,
+					groupChats: [...chatContext.groupChats, newGroupChat]
+				})
+			case 'LEAVE_GROUP':
+				const isUserRemoved =
+					isGroupAdmin(data.targetMemberId) || isTargetMember(userId)
+				const groupChatsAfterLeave = chatContext.groupChats.filter(
+					(chat) => chat.chatId !== data.chatId
+				)
+				setChatContext({
+					...chatContext,
+					groupChats: isUserRemoved
+						? groupChatsAfterLeave
+						: chatContext.groupChats,
+					selectedChat:
+						isUserRemoved && chatContext.selectedChat === data.chatId
+							? null
+							: chatContext.selectedChat
+				})
+			case 'REMOVE_GROUP_MEMBER':
+				const groupChatsAfterRemove = chatContext.groupChats.filter(
+					(chat) => chat.chatId !== data.chatId
+				)
+				setChatContext({
+					...chatContext,
+					groupChats: isTargetMember(userId)
+						? groupChatsAfterRemove
+						: chatContext.groupChats,
+					selectedChat:
+						isTargetMember(userId) && chatContext.selectedChat === data.chatId
+							? null
+							: chatContext.selectedChat
+				})
+			case 'ADD_GROUP_MEMBER':
+				const groupChatAddedTo = {
+					chatId: data.chatId,
+					name: data.name,
+					description: data.description,
+					adminId: data.adminId,
+					dateCreated: data.dateCreated,
+					memberIds: data.memberIds
+				}
+				setChatContext({
+					...chatContext,
+					groupChats: isTargetMember(userId)
+						? [...chatContext.groupChats, groupChatAddedTo]
+						: chatContext.groupChats
 				})
 		}
 	}
