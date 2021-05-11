@@ -49,8 +49,6 @@ public class UpdateProfilePhoto extends UserCommand {
             photoUrl = CloudinaryUtilities.uploadImage(photoUrl, user.getUserId());
         } catch (IOException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
-        } catch (Exception e) {
-            return Responder.makeErrorResponse("An error occurred while uploading your image!", 400);
         }
 
 
