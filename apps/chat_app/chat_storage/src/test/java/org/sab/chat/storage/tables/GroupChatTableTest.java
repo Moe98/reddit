@@ -7,8 +7,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
+import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -271,4 +273,41 @@ public class GroupChatTableTest {
         }
         groupChats.getMapper().delete(chatId);
     }
+
+    @Test
+    public void whenHavingXGroupChats_UserGetsXGroupChats() {
+        int chatNumber = 10;
+
+        UUID adminId = UUID.randomUUID();
+        ArrayList<UUID> listOfChatIds = new ArrayList<>();
+        for (int i = 0; i < chatNumber; i++) {
+
+            String groupName = "Alpha Squad";
+            String groupDesc = "Aqwa Squad fe Masr";
+            UUID chatId = null;
+            try {
+                chatId = groupChats.createGroupChat(adminId, groupName, groupDesc).getChat_id();
+                listOfChatIds.add(chatId);
+            } catch (InvalidInputException e) {
+                fail("Failed to create group chat: " + e.getMessage());
+            }
+
+        }
+
+        List<GroupChat> directChatsList = null;
+        try {
+            directChatsList = groupChats.getGroupChats(adminId);
+        } catch (InvalidInputException e) {
+            fail("Failed to retrieve user direct chats: " + e.getMessage());
+        }
+
+
+        assertEquals(chatNumber, directChatsList.size());
+
+        for (UUID chatId : listOfChatIds)
+            groupChats.getMapper().delete(chatId);
+
+    }
+
+
 }
