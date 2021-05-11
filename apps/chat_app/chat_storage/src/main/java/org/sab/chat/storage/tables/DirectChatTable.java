@@ -47,6 +47,11 @@ public class DirectChatTable {
         } catch (IllegalArgumentException e) {
             throw new InvalidInputException("Invalid user UUID.");
         }
+
+        if(firstMember.toString().equals(secondMember.toString()))
+            throw new InvalidInputException("Cannot have chat with yourself");
+
+
         String query1 = "SELECT * FROM " + TABLE_NAME +
                 " WHERE first_member = " + firstMember + " AND second_member = " + secondMember + " ALLOW FILTERING;";
         String query2 = "SELECT * FROM " + TABLE_NAME +
