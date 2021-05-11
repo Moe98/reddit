@@ -1,6 +1,6 @@
 package org.sab.user.commands;
 
-import org.sab.functions.CloudUtilities;
+import org.sab.cloudinary.CloudinaryUtilities;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
@@ -46,7 +46,7 @@ public class DeleteProfilePhoto extends UserCommand {
 
         // Deleting from Cloudinary
         try {
-            CloudUtilities.deleteImage(user.getUserId());
+            CloudinaryUtilities.deleteImage(user.getUserId());
         } catch (IOException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }

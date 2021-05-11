@@ -4,7 +4,7 @@ import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.functions.CloudUtilities;
+import org.sab.cloudinary.CloudinaryUtilities;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
@@ -57,7 +57,6 @@ public class DeleteAccount extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        JSONObject user = userAuth.getJSONObject("data");
 
         try {
             deleteFromArango(username);
@@ -65,10 +64,12 @@ public class DeleteAccount extends UserCommand {
             return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
         }
 
+        JSONObject user = userAuth.getJSONObject("data");
+
         // Deleting profile picture from Cloudinary
         if (user.has(UserAttributes.PHOTO_URL.toString()))
             try {
-                CloudUtilities.deleteImage(user.getString(USER_ID));
+                CloudinaryUtilities.deleteImage(user.getString(USER_ID));
             } catch (IOException | EnvironmentVariableNotLoaded e) {
                 return Responder.makeErrorResponse(e.getMessage(), 400);
             }
