@@ -33,7 +33,7 @@ public class UpdatePassword extends UserCommand {
         if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
-        // retrieving the body objects
+
         String username = authenticationParams.getString(USERNAME);
         String oldPassword = body.getString(OLD_PASSWORD);
         String newPassword = body.getString(NEW_PASSWORD);
