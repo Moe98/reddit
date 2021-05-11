@@ -67,7 +67,7 @@ public enum DataType {
 
     public abstract boolean isOfValidType(Object object);
 
-    private DataType(String additionalErrorMessage) {
+    DataType(String additionalErrorMessage) {
         this.additionalErrorMessage = additionalErrorMessage;
     }
 

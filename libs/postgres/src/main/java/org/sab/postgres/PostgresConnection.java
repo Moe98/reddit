@@ -131,7 +131,7 @@ public class PostgresConnection {
         createUsersProcedures();
     }
 
-    private static String getScriptPath(String sqlScriptName) throws IOException {
+    private static String getScriptPath(String sqlScriptName) {
         ClassLoader classLoader = PostgresConnection.class.getClassLoader();
         File file = new File(classLoader.getResource("sql/" + sqlScriptName + ".sql").getFile());
         return file.getAbsolutePath();

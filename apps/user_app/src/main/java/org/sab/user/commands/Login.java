@@ -41,11 +41,11 @@ public class Login extends UserCommand {
         // Generate Authentication headers
         String token = Jwt.generateToken(claims, 60);
 
-        return makeJwtResponse("Login Successful!", token);
+        return makeJwtResponse(token);
     }
 
-    private static String makeJwtResponse(String msg, String token) {
-        JSONObject response = new JSONObject().put("msg", msg).put("token", token);
+    private static String makeJwtResponse(String token) {
+        JSONObject response = new JSONObject().put("msg", "Login Successful!").put("token", token);
         response.put("statusCode", 200);
         return response.toString();
     }
