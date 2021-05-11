@@ -17,12 +17,12 @@ public class CreateComment extends CommentCommand {
     public static void main(String[] args) {
         CreateComment addComment = new CreateComment();
         JSONObject body = new JSONObject();
-        body.put(PARENT_SUBTHREAD_ID, "126171");
-        body.put(CONTENT, "I think their fish is bad!");
+        body.put(PARENT_SUBTHREAD_ID, "74248");
+        body.put(CONTENT, "no it is tasty!");
         body.put(PARENT_CONTENT_TYPE, "SubThread");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "32930");
+        uriParams.put(ACTION_MAKER_ID, "manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);

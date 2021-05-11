@@ -363,7 +363,7 @@ paths:
           description: Subthread is liked
         '405':
           description: Invalid input
-  "/thread/{parentThreadId}/subthread/{subthreadId}/dislike":
+  "/subthread/{userId}/dislike":
     put:
       tags:
         - Subthread
@@ -375,17 +375,27 @@ paths:
       produces:
         - application/json
       parameters:
+        - in: header
+          name: Function-Name
+          required: true
+          type: string
+          description: dislikeSubthread
         - in: path
-          name: parentThreadId
+          name: userId
           type: string
           required: true
-        - in: path
-          name: subthreadId
-          type: string
+        - in: body
+          name: body
+          description: ''
           required: true
+          schema:
+            type: object
+            properties:
+              subthreadId:
+                type: string
       responses:
         '200':
-          description: Subthread is liked
+          description: Subthread is disliked
         '405':
           description: Invalid input
   "/subthread/{userId}/likeComment":

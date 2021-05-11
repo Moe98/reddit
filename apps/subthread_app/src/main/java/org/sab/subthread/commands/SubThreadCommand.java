@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.report.SubThreadReportAttributes;
+import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class SubThreadCommand extends CommandWithVerification {
@@ -53,7 +54,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_ID_DB = SubThreadReportAttributes.PARENT_THREAD_ID.getDb();
     protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
-
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String ACTION_MAKER_ID = "userId";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";

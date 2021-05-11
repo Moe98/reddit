@@ -98,10 +98,10 @@ public class LikeComment extends CommentCommand{
 
 
         JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "127313");
+        body.put(COMMENT_ID, "87604");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "asdafsda");
+        uriParams.put(ACTION_MAKER_ID, "manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);

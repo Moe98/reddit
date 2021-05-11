@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
 import org.sab.models.ThreadAttributes;
+import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class ThreadCommand extends CommandWithVerification {
@@ -27,7 +28,8 @@ public abstract class ThreadCommand extends CommandWithVerification {
 
     // user attributes
     // TODO get from enum
-    protected static final String IS_DELETED_DB = "IsDeleted";
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";

@@ -27,10 +27,10 @@ public class Arango {
 
     private Arango() {
         builder = new ArangoDB.Builder()
-                .user("root")
-                .password("password")
-//                .user(System.getenv("ARANGO_USER"))
-//                .password(System.getenv("ARANGO_PASSWORD"))
+//                .user("root")
+//                .password("root")
+                .user(System.getenv("ARANGO_USER"))
+                .password(System.getenv("ARANGO_PASSWORD"))
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
@@ -246,6 +246,5 @@ public class Arango {
             data.put(object);
         });
         return data;
-
     }
 }
