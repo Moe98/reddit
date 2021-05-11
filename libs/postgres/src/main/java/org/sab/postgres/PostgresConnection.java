@@ -46,12 +46,12 @@ public class PostgresConnection {
                         System.getenv("POSTGRES_DB"));
     }
 
-    public Connection connect() throws SQLException {
+    Connection connect() throws SQLException {
         return DriverManager.getConnection(url, props);
     }
 
 
-    public static String procedureInitializer(String procedureName, int numParams) {
+    private static String procedureInitializer(String procedureName, int numParams) {
         StringBuilder ans = new StringBuilder("{").append("call");
         ans.append(" ").append(procedureName).append("(");
         for (int i = 0; i < numParams; i++)
@@ -66,17 +66,17 @@ public class PostgresConnection {
 
         PostgresConnection postgresConnection = getInstance();
         Connection connection = postgresConnection.connect();
+        ResultSet resultSet;
         try {
-            ResultSet resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, params);
+            resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, params);
             connection.close();
-            return resultSet;
-        } catch (SQLException exception) {
+        } finally {
             connection.close();
-            throw exception;
         }
+        return resultSet;
     }
 
-    public ResultSet call(String sql, Connection connection, Object... params) throws SQLException {
+    private ResultSet call(String sql, Connection connection, Object... params) throws SQLException {
 
 
         CallableStatement callableStatement = connection.prepareCall(sql);
@@ -133,7 +133,6 @@ public class PostgresConnection {
     public static void dbInit(boolean isTesting) throws IOException, EnvironmentVariableNotLoaded {
         createUsersTable(isTesting);
         createUsersProcedures(isTesting);
-
     }
 
 
