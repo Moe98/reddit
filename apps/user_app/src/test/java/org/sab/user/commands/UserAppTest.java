@@ -11,6 +11,7 @@ import org.sab.arango.Arango;
 import org.sab.auth.Auth;
 import org.sab.functions.Utilities;
 import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.user.UserApp;
 
 import java.util.Date;
@@ -226,9 +227,9 @@ public class UserAppTest {
         arango.connectIfNotConnected();
         BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
         Map props = user.getProperties();
-        boolean is_deleted = (boolean) props.get("is_deleted");
-        assertTrue(is_deleted);
-        int numberOfFollowers = (int) props.get("number_of_followers");
+        boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
+        assertTrue(isDeleted);
+        int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
         assertEquals(0, numberOfFollowers);
         arango.deleteDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
     }

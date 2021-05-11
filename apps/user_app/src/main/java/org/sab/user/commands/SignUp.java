@@ -1,7 +1,6 @@
 package org.sab.user.commands;
 
 import com.arangodb.ArangoDBException;
-import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.auth.Auth;
 import org.sab.models.user.User;
@@ -17,7 +16,6 @@ import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -76,13 +74,8 @@ public class SignUp extends UserCommand {
     }
 
     private void InsertUserInArango(String username) {
-
-        BaseDocument user = new BaseDocument(new HashMap<>(Map.of("is_deleted", false, "number_of_followers", 0)));
-        user.setKey(username);
-        Arango arango = Arango.getInstance();
-        arango.connectIfNotConnected();
-        arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), user);
-
+        Map<String, Object> properties = Map.of(UserAttributes.IS_DELETED.getArangoDb(), false, UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
+        Arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), properties, username);
     }
 
 

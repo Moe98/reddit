@@ -1,7 +1,6 @@
 package org.sab.user.commands;
 
 import com.arangodb.ArangoDBException;
-import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.cloudinary.CloudinaryUtilities;
@@ -18,7 +17,6 @@ import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,16 +72,11 @@ public class DeleteAccount extends UserCommand {
                 return Responder.makeErrorResponse(e.getMessage(), 400);
             }
 
-
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
 
 
     private void deleteFromArango(String username) {
-        BaseDocument user = new BaseDocument(new HashMap<>(Map.of("is_deleted", true)));
-        user.setKey(username);
-        Arango arango = Arango.getInstance();
-        arango.connectIfNotConnected();
-        arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), user, username);
+        Arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), Map.of(UserAttributes.IS_DELETED.getArangoDb(), true), username);
     }
 }
