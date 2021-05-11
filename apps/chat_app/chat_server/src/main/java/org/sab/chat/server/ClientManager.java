@@ -109,12 +109,14 @@ public class ClientManager {
     }
 
     public static void broadcastResponseToChatChannels(UUID chatId, JSONObject response) {
-        TextWebSocketFrame message = new TextWebSocketFrame(response.toString());
+        String responseString = response.toString();
+        TextWebSocketFrame message;
         ConcurrentLinkedQueue<UUID> memberIds = ClientManager.getChatMembers(chatId);
         for (UUID memberId : memberIds) {
             if (isUserOnline(memberId)) {
                 ConcurrentLinkedQueue<Channel> memberChannels = ClientManager.getUserChannels(memberId);
                 for (Channel channel : memberChannels) {
+                    message = new TextWebSocketFrame(responseString);
                     channel.writeAndFlush(message);
                 }
             } else {
