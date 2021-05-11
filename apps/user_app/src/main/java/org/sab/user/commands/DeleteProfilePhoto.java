@@ -2,6 +2,7 @@ package org.sab.user.commands;
 
 import org.sab.functions.CloudUtilities;
 import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -26,7 +27,7 @@ public class DeleteProfilePhoto extends UserCommand {
     @Override
     protected String execute() {
         boolean authenticated = authenticationParams.getBoolean(AUTHENTICATED);
-        if(!authenticated)
+        if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
 
 
@@ -34,7 +35,7 @@ public class DeleteProfilePhoto extends UserCommand {
 
         // getting the user
         try {
-            User user = getUser(username, PHOTO_URL);
+            User user = getUser(username, UserAttributes.PHOTO_URL);
             if (user.getPhotoUrl() == null)
                 return Responder.makeMsgResponse("You don't have a profile picture, you can't delete your avatar!");
 

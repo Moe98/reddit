@@ -10,6 +10,7 @@ public class User {
     private String photoUrl;
     private String birthdate;
     private String email;
+    private int numOfFollowers;
 
     public String getUserId() {
         return userId;
@@ -58,6 +59,15 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public int getNumOfFollowers() {
+        return numOfFollowers;
+    }
+
+    public void setNumOfFollowers(int numOfFollowers) {
+        this.numOfFollowers = numOfFollowers;
+    }
+
 
     public static String getCollectionName() {
         return "Users";

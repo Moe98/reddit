@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.functions.Auth;
 import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -65,7 +66,7 @@ public class SignUp extends UserCommand {
 
         // getting the user
         try {
-            User user = getUser(username, USER_ID, USERNAME, EMAIL, BIRTHDATE);
+            User user = getUser(username, UserAttributes.USER_ID, UserAttributes.USERNAME, UserAttributes.EMAIL, UserAttributes.BIRTHDATE);
             return Responder.makeDataResponse(user.toJSON());
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);

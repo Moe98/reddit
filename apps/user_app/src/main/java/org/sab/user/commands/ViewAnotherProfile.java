@@ -1,6 +1,7 @@
 package org.sab.user.commands;
 
 import org.sab.models.user.User;
+import org.sab.models.user.UserAttributes;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
@@ -16,7 +17,7 @@ public class ViewAnotherProfile extends UserCommand {
             return Responder.makeErrorResponse("You must add username in URIParams!", 400);
         String username = uriParams.getString(USERNAME);
         try {
-            User user = getUser(username, USERNAME, PHOTO_URL);
+            User user = getUser(username, UserAttributes.USERNAME, UserAttributes.PHOTO_URL);
             return Responder.makeDataResponse(user.toJSON());
         } catch (SQLException | EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);

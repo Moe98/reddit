@@ -14,6 +14,7 @@ public abstract class CommandWithVerification extends Command {
 
     protected JSONObject body, uriParams, authenticationParams;
     protected Schema schema;
+    protected static final String AUTHENTICATED = "isAuthenticated";
 
 
     @Override
