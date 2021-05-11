@@ -2,23 +2,26 @@ const React = require('react')
 const { Text, Box, useInput } = require('ink')
 const { useContext } = require('react')
 const ChatContext = require('../contexts/chat-context')
-const { mapSpecialIdToId } = require('../utils/id-mapper')
 const importJsx = require('import-jsx')
 const AppContext = require('../contexts/app-context')
+const { mapSpecialIdToId } = require('../utils/id-mapper')
 const TextInput = importJsx('./text-input')
 
 const { useState } = React
 
-const CreateDirectChat = ({ onBack }) => {
+const AddGroupMember = ({ onBack }) => {
 	const { userId } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
-	const [otherUserId, setOtherUserId] = useState('')
+	const [memberId, setMemberId] = useState('')
 
-	const onCreate = (targetUserId) => {
+    const chat = chatContext.highlightedChat
+
+	const onAction = (memberId) => {
 		chatContext.sendToChat({
-			type: 'CREATE_DIRECT_CHAT',
-			firstMember: userId,
-			secondMember: mapSpecialIdToId(targetUserId)
+			type: 'ADD_GROUP_MEMBER',
+			chatId: chat.chatId,
+			adminId: userId,
+			memberId: mapSpecialIdToId(memberId)
 		})
 		onBack()
 	}
@@ -31,16 +34,16 @@ const CreateDirectChat = ({ onBack }) => {
 
 	return (
 		<React.Fragment>
-			<Text bold>Create a DM</Text>
+			<Text bold>{`Add a new member to ${chat.name}`}</Text>
 			<Box>
 				<Box marginRight={1}>
 					<Text>{'>'}</Text>
 				</Box>
 				<TextInput
-					value={otherUserId}
-					placeholder={`Write other user id`}
-					onChange={setOtherUserId}
-					onSubmit={onCreate}
+					value={memberId}
+					placeholder={`Enter member id`}
+					onChange={setMemberId}
+					onSubmit={onAction}
 				/>
 			</Box>
 			<Text bold>{`\nPress “B” to go back`}</Text>
@@ -48,4 +51,4 @@ const CreateDirectChat = ({ onBack }) => {
 	)
 }
 
-module.exports = CreateDirectChat
+module.exports = AddGroupMember

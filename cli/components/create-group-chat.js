@@ -1,5 +1,5 @@
 const React = require('react')
-const { Text, Box } = require('ink')
+const { Text, Box, useInput } = require('ink')
 const { useContext } = require('react')
 const ChatContext = require('../contexts/chat-context')
 const importJsx = require('import-jsx')
@@ -23,6 +23,12 @@ const CreateGroupChat = ({ onBack }) => {
 		onBack()
 	}
 
+	useInput((input, _) => {
+		if (input === 'b') {
+			onBack()
+		}
+	})
+
 	return (
 		<React.Fragment>
 			<Text bold>Create a Group Chat</Text>
@@ -37,6 +43,7 @@ const CreateGroupChat = ({ onBack }) => {
 					onSubmit={onCreate}
 				/>
 			</Box>
+			<Text bold>{`\nPress “B” to go back`}</Text>
 		</React.Fragment>
 	)
 }

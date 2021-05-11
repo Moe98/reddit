@@ -12,6 +12,7 @@ const AppContext = importJsx('./contexts/app-context')
 const defaultChatContext = {
 	isLoadingChats: true,
 	isLoadingMessages: true,
+	highlightedChat: null,
 	directChats: [],
 	groupChats: [],
 	selectedChat: null,

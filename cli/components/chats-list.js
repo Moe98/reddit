@@ -7,16 +7,20 @@ const { useContext, useState } = require('react')
 const AppContext = require('../contexts/app-context')
 const { mapIdToSpecialId } = require('../utils/id-mapper')
 const ChatContext = require('../contexts/chat-context')
+const AddGroupMember = importJsx('./add-group-member')
+const RemoveGroupMember = importJsx('./remove-group-member')
 const CreateDirectChat = importJsx('./create-direct-chat')
 const CreateGroupChat = importJsx('./create-group-chat')
 
 const CHAT_LIST = 0
 const CREATING_DIRECT_CHAT = 1
 const CREATING_GROUP_CHAT = 2
+const ADDING_GROUP_MEMBER = 3
+const REMOVING_GROUP_MEMBER = 4
 
 const ChatsList = ({ onChatSelect }) => {
 	const { userId } = useContext(AppContext)
-	const [chatContext, _] = useContext(ChatContext)
+	const [chatContext, setChatContext] = useContext(ChatContext)
 	const [status, setStatus] = useState(CHAT_LIST)
 
 	const handleSelect = (item) => onChatSelect(item.value)
@@ -47,10 +51,10 @@ const ChatsList = ({ onChatSelect }) => {
 			return 1
 		})
 
-	const [highlightedItem, setHighlightedItem] = useState(
+	const [highlightedChat, setHighlightedChat] = useState(
 		!isChatListEmpty() ? items[0].value : null
 	)
-	const handleHighlight = (item) => setHighlightedItem(item.value)
+	const handleHighlight = (item) => setHighlightedChat(item.value)
 
 	const onBack = () => setStatus(CHAT_LIST)
 
@@ -59,13 +63,19 @@ const ChatsList = ({ onChatSelect }) => {
 			setStatus(CREATING_DIRECT_CHAT)
 		} else if (input === 'g' && status === CHAT_LIST) {
 			setStatus(CREATING_GROUP_CHAT)
-		} else if (input === 'l' && highlightedItem && highlightedItem.name) {
+		} else if (input === 'a' && status === CHAT_LIST) {
+			setChatContext({ ...chatContext, highlightedChat })
+			setStatus(ADDING_GROUP_MEMBER)
+		} else if (input === 'r' && status === CHAT_LIST) {
+			setChatContext({ ...chatContext, highlightedChat })
+			setStatus(REMOVING_GROUP_MEMBER)
+		} else if (input === 'l' && highlightedChat && highlightedChat.name) {
 			chatContext.sendToChat({
 				type: 'LEAVE_GROUP',
-				chatId: highlightedItem.chatId,
+				chatId: highlightedChat.chatId,
 				userId
 			})
-			setHighlightedItem(!isChatListEmpty() ? items[0].value : null)
+			setHighlightedChat(!isChatListEmpty() ? items[0].value : null)
 		}
 	})
 
@@ -96,15 +106,25 @@ const ChatsList = ({ onChatSelect }) => {
 						<Text underline>Controls</Text>
 						<Text>D - Create direct chat</Text>
 						<Text>G - Create Group chat</Text>
-						{highlightedItem && highlightedItem.name && (
+						{highlightedChat && highlightedChat.adminId === userId && (
+							<Text>A - Add member to group</Text>
+						)}
+						{highlightedChat && highlightedChat.adminId === userId && (
+							<Text>R - Remove member to group</Text>
+						)}
+						{highlightedChat && highlightedChat.name && (
 							<Text>L - Leave selected chat</Text>
 						)}
 					</Box>
 				</Box>
 			) : status === CREATING_DIRECT_CHAT ? (
 				<CreateDirectChat onBack={onBack} />
-			) : (
+			) : status === CREATING_GROUP_CHAT ? (
 				<CreateGroupChat onBack={onBack} />
+			) : status === ADDING_GROUP_MEMBER ? (
+				<AddGroupMember onBack={onBack} />
+			) : (
+				<RemoveGroupMember onBack={onBack} />
 			)}
 		</React.Fragment>
 	)
