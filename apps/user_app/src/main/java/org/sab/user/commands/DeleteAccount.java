@@ -58,19 +58,20 @@ public class DeleteAccount extends UserCommand {
         }
 
         JSONObject user = userAuth.getJSONObject("data");
-        if (user.has(UserAttributes.PHOTO_URL.toString()))
-            try {
-                deleteFromArango(username);
-            } catch (ArangoDBException e) {
-                return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
-            }
+
+        try {
+            deleteFromArango(username);
+        } catch (ArangoDBException e) {
+            return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
+        }
 
         // Deleting profile picture from Cloudinary
-        try {
-            CloudUtilities.deleteImage(user.getString(USER_ID));
-        } catch (IOException | EnvironmentVariableNotLoaded e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400);
-        }
+        if (user.has(UserAttributes.PHOTO_URL.toString()))
+            try {
+                CloudUtilities.deleteImage(user.getString(USER_ID));
+            } catch (IOException | EnvironmentVariableNotLoaded e) {
+                return Responder.makeErrorResponse(e.getMessage(), 400);
+            }
 
 
         return Responder.makeMsgResponse("Account Deleted Successfully!");
