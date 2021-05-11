@@ -1,4 +1,4 @@
-package org.sab.functions;
+package org.sab.Auth;
 
 import org.mindrot.jbcrypt.BCrypt;
 
