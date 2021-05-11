@@ -10,6 +10,7 @@ import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -95,4 +96,40 @@ public class DirectChatTableTest {
 
         directChats.getMapper().delete(chatId);
     }
+
+    @Test
+    public void whenHavingXDirectChats_UserGetsXChats() {
+        UUID firstMember = UUID.randomUUID();
+        int chatNumber = 10;
+
+        ArrayList<UUID> listOfChatIds = new ArrayList<>();
+        for (int i = 0; i < chatNumber; i++) {
+
+            UUID newMember = UUID.randomUUID();
+            UUID chatId = null;
+            try {
+                chatId = directChats.createDirectChat(firstMember, newMember).getChat_id();
+                listOfChatIds.add(chatId);
+            } catch (InvalidInputException e) {
+                fail("Failed to create direct chat: " + e.getMessage());
+            }
+
+        }
+
+        List<DirectChat> directChatsList = null;
+        try {
+            directChatsList = directChats.getDirectChats(firstMember);
+        } catch (InvalidInputException e) {
+            fail("Failed to retrieve user direct chats: " + e.getMessage());
+        }
+
+
+        assertEquals(chatNumber, directChatsList.size());
+
+        for (UUID chatId : listOfChatIds)
+            directChats.getMapper().delete(chatId);
+
+    }
+
+
 }
