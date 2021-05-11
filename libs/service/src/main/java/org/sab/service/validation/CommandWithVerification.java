@@ -22,10 +22,10 @@ public abstract class CommandWithVerification extends Command {
 
         schema = getSchema();
         uriParams = request.getJSONObject("uriParams");
-        String methodType = getMethodType().toString();
+        HTTPMethod methodType = getMethodType();
         if (!methodType.equals(request.getString("methodType")))
             return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
-        body = methodType.equals("GET") ? new JSONObject() : request.getJSONObject("body");
+        body = request.has("body") ? request.getJSONObject("body") : new JSONObject();
         authenticationParams = request.has("authenticationParams") ? request.getJSONObject("authenticationParams") : new JSONObject();
         try {
             verifyBody();
