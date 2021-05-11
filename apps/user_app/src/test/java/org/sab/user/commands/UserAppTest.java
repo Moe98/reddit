@@ -108,7 +108,17 @@ public class UserAppTest {
     }
 
     @Test
-    public void T05_Login() {
+    public void T05_GetUserWithoutLogin() {
+
+        JSONObject response = Requester.getUser();
+        int statusCode = response.getInt("statusCode");
+        String msg = response.getString("msg");
+        assertTrue(statusCode == 401 || statusCode == 403);
+        assertTrue(msg.contains("Unauthorized"));
+    }
+
+    @Test
+    public void T06_Login() {
 
 
         JSONObject response = Requester.login(username, password);
@@ -120,9 +130,9 @@ public class UserAppTest {
     }
 
     @Test
-    public void T06_GetUser() {
+    public void T07_GetUser() {
 
-        JSONObject response = Requester.getUser(username);
+        JSONObject response = Requester.getUser();
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = response.getJSONObject("data");
         assertEquals(username, data.getString("username"));
@@ -130,15 +140,6 @@ public class UserAppTest {
 
     }
 
-    @Test
-    public void T07_GetUserWithoutURIParams() {
-
-        JSONObject response = Requester.getUser(null);
-        int statusCode = response.getInt("statusCode");
-        String msg = response.getString("msg");
-        assertTrue(statusCode >= 400 && statusCode < 500);
-        assertTrue(msg.equals("You must add username in URIParams!"));
-    }
 
     @Test
     public void T08_updatePassword() {
@@ -150,7 +151,7 @@ public class UserAppTest {
 
         assertEquals("Account Updated Successfully!", response.getString("msg"));
 
-        JSONObject user = Requester.getUser(username).getJSONObject("data");
+        JSONObject user = Requester.getUser().getJSONObject("data");
         assertTrue(Auth.verifyHash(newPassword, user.getString("password")));
     }
 
@@ -189,7 +190,7 @@ public class UserAppTest {
     public void T12_viewAnotherProfile() {
 
         JSONObject response = Requester.viewAnotherProfile(username);
-        JSONObject user = Requester.getUser(username).getJSONObject("data");
+        JSONObject user = Requester.getUser().getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals(username, user.getString("username"));
         assertTrue(!Utilities.isDevelopmentMode() || user.has("photoUrl"));
@@ -201,7 +202,7 @@ public class UserAppTest {
             return;
 
         JSONObject response = Requester.deleteProfilePicture();
-        JSONObject user = Requester.getUser(username).getJSONObject("data");
+        JSONObject user = Requester.getUser().getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
         assertEquals("Profile Picture deleted successfully", response.getString("msg"));
         assertFalse(user.has("photoUrl"));
@@ -217,7 +218,7 @@ public class UserAppTest {
 
         assertEquals("Account Deleted Successfully!", response.getString("msg"));
 
-        JSONObject getUserResponse = Requester.getUser(username);
+        JSONObject getUserResponse = Requester.getUser();
         assertEquals("User not found!", getUserResponse.getString("msg"));
     }
 

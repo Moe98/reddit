@@ -10,7 +10,7 @@ public class Requester {
     Requester() {
     }
 
-    static JSONObject authenticationParams = new JSONObject();
+    static JSONObject authenticationParams = new JSONObject().put("isAuthenticated", false);
 
     private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
         JSONObject request = new JSONObject();
@@ -39,9 +39,8 @@ public class Requester {
         return new JSONObject(new Login().execute(request));
     }
 
-    public static JSONObject getUser(String username) {
-        JSONObject uriParams = new JSONObject().put("username", username);
-        JSONObject request = makeRequest(null, "GET", uriParams);
+    public static JSONObject getUser() {
+        JSONObject request = makeRequest(null, "GET", new JSONObject());
         return new JSONObject(new GetUser().execute(request));
     }
 

@@ -17,9 +17,8 @@ public class GetUser extends UserCommand {
         boolean authenticated = authenticationParams.getBoolean(AUTHENTICATED);
         if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 403);
-        if (!uriParams.has(USERNAME))
-            return Responder.makeErrorResponse("You must add username in URIParams!", 400);
-        String username = uriParams.getString(USERNAME);
+
+        String username = authenticationParams.getString(USERNAME);
         try {
             User user = getUser(username, UserAttributes.USERNAME, UserAttributes.PASSWORD, UserAttributes.EMAIL, UserAttributes.BIRTHDATE, UserAttributes.PHOTO_URL, UserAttributes.USER_ID);
             return Responder.makeDataResponse(user.toJSON());
