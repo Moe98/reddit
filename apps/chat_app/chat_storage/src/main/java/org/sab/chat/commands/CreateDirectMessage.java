@@ -22,8 +22,8 @@ public class CreateDirectMessage extends CommandWithVerification {
             CassandraConnector cassandra = new CassandraConnector();
             cassandra.connect();
             cassandra.initializeKeySpace();
-            directMessageTable = new DirectMessageTable(cassandra);
-            directMessageTable.createTable();
+            cassandra.createTables();
+            directMessageTable = cassandra.getDirectMessageTable();
         }
     }
 

@@ -10,6 +10,10 @@ import java.io.IOException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.sab.chat.storage.tables.DirectChatTable;
+import org.sab.chat.storage.tables.DirectMessageTable;
+import org.sab.chat.storage.tables.GroupChatTable;
+import org.sab.chat.storage.tables.GroupMessageTable;
 
 public class CassandraConnector {
     private Cluster cluster;
@@ -17,6 +21,10 @@ public class CassandraConnector {
     private Integer port;
     private Integer replicationFactor;
     private Session session;
+    private GroupChatTable groupChatTable;
+    private DirectChatTable directChatTable;
+    private DirectMessageTable directMessageTable;
+    private GroupMessageTable groupMessageTable;
 
     public CassandraConnector() {
         init();
@@ -52,6 +60,20 @@ public class CassandraConnector {
         KeyspaceInitializer.initializeKeyspace(session, keyspaceName, replicationStrategy, replicationFactor);
     }
 
+    public void createTables() {
+        groupChatTable = new GroupChatTable(this);
+        groupChatTable.createTable();
+
+        directChatTable = new DirectChatTable(this);
+        directChatTable.createTable();
+
+        groupMessageTable = new GroupMessageTable(this);
+        groupMessageTable.createTable();
+
+        directMessageTable = new DirectMessageTable(this);
+        directMessageTable.createTable();
+    }
+
     public ResultSet runQuery(String query) {
         return session.execute(query);
     }
@@ -62,6 +84,22 @@ public class CassandraConnector {
 
     public String getKeyspaceName() {
         return this.keyspaceName;
+    }
+
+    public GroupChatTable getGroupChatTable() {
+        return groupChatTable;
+    }
+
+    public DirectChatTable getDirectChatTable() {
+        return directChatTable;
+    }
+
+    public DirectMessageTable getDirectMessageTable() {
+        return directMessageTable;
+    }
+
+    public GroupMessageTable getGroupMessageTable() {
+        return groupMessageTable;
     }
 
     public void close() {

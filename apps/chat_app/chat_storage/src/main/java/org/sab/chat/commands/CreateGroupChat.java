@@ -24,8 +24,8 @@ public class CreateGroupChat extends CommandWithVerification {
             CassandraConnector cassandra = new CassandraConnector();
             cassandra.connect();
             cassandra.initializeKeySpace();
-            groupChatTable = new GroupChatTable(cassandra);
-            groupChatTable.createTable();
+            cassandra.createTables();
+            groupChatTable = cassandra.getGroupChatTable();
         }
     }
 
