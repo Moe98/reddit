@@ -9,7 +9,7 @@ const MessagesList = ({ messages }) => {
 	return (
 		<Box>
 			<Static items={messages}>
-				{(message) => <Message key={message.id} {...message} />}
+				{(message) => <Message key={message.timestamp} {...message} />}
 			</Static>
 		</Box>
 	)

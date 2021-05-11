@@ -108,6 +108,11 @@ public class ClientManager {
             userChats.get(memberId).add(chatId);
     }
 
+    public static void sendResponseToChannel(Channel channel, JSONObject response) {
+        TextWebSocketFrame message = new TextWebSocketFrame(response.toString());
+        channel.writeAndFlush(message);
+    }
+
     public static void broadcastResponseToChatChannels(UUID chatId, JSONObject response) {
         String responseString = response.toString();
         TextWebSocketFrame message;

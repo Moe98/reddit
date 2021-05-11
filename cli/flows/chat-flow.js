@@ -1,11 +1,14 @@
 'use strict'
 const React = require('react')
 const importJsx = require('import-jsx')
+const ChatContext = require('../contexts/chat-context')
+const { useEffect, useContext } = require('react')
+const useChatService = require('../hooks/chat-service')
 const LoadingSpinner = importJsx('../components/loading-spinner')
 const ChatsList = importJsx('../components/chats-list')
 const ChatView = importJsx('../components/chat-view')
 
-const { useState, useEffect } = React
+const { Text } = require('ink')
 
 const chatsData = [
 	{
@@ -26,30 +29,35 @@ const chatsData = [
 ]
 
 const ChatFlow = () => {
-	const [chats, setChats] = useState([])
-	const [selectedChat, setSelectedChat] = useState(null)
+	const [chatContext, setChatContext] = useContext(ChatContext)
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setChats(chatsData)
-		}, 1000)
+	const sendToChat = useChatService()
 
-		return () => {
-			clearTimeout(timer)
-		}
-	}, [])
+	useEffect(() => setChatContext({ ...chatContext, sendToChat }), [])
 
-	const onChatSelect = (chat) => setSelectedChat(chat)
-	const onChatExit = () => setSelectedChat(null)
+	const onChatSelect = (chat) => {
+		setChatContext({
+			...chatContext,
+			selectedChat: chat,
+			isLoadingMessages: true
+		})
+	}
+	const onChatExit = () => {
+		setChatContext({ ...chatContext, selectedChat: null })
+	}
 
 	return (
 		<React.Fragment>
-			{chats.length > 0 ? (
+			{!chatContext.isLoadingChats ? (
 				<React.Fragment>
-					{selectedChat ? (
-						<ChatView chat={selectedChat} onChatExit={onChatExit} />
+					{chatContext.selectedChat ? (
+						<ChatView chat={chatContext.selectedChat} onChatExit={onChatExit} />
 					) : (
-						<ChatsList chats={chats} onChatSelect={onChatSelect} />
+						<ChatsList
+							groupChats={chatContext.groupChats}
+							directChats={chatContext.directChats}
+							onChatSelect={onChatSelect}
+						/>
 					)}
 				</React.Fragment>
 			) : (

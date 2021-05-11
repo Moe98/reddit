@@ -54,6 +54,7 @@ public class GetDirectMessages extends CommandWithVerification {
 
             JSONObject responseBody = new JSONObject();
             responseBody.put("messages", messagesJson);
+            responseBody.put("chatId", chatId.toString());
 
             response.put("statusCode", 200);
             response.put("msg", "Chat messages fetched successfully");

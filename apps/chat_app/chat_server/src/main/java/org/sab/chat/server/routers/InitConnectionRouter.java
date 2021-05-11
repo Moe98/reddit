@@ -60,6 +60,6 @@ public class InitConnectionRouter extends Router {
 
         ClientManager.syncUserChats(userId, chats);
 
-        ctx.writeAndFlush(response.clone());
+        ClientManager.sendResponseToChannel(ctx.channel(), response);
     }
 }

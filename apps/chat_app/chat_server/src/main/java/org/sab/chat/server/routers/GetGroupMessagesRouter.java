@@ -2,6 +2,7 @@ package org.sab.chat.server.routers;
 
 import io.netty.channel.ChannelHandlerContext;
 import org.json.simple.JSONObject;
+import org.sab.chat.server.ClientManager;
 
 public class GetGroupMessagesRouter extends Router {
 
@@ -19,6 +20,6 @@ public class GetGroupMessagesRouter extends Router {
             return;
         }
 
-        ctx.writeAndFlush(response.clone());
+        ClientManager.sendResponseToChannel(ctx.channel(), response);
     }
 }

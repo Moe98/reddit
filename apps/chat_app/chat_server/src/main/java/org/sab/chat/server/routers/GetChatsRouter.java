@@ -22,6 +22,6 @@ public class GetChatsRouter extends Router {
             return;
         }
 
-        ctx.writeAndFlush(response.clone());
+        ClientManager.sendResponseToChannel(ctx.channel(), response);
     }
 }

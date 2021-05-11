@@ -3,6 +3,7 @@ package org.sab.chat.server.routers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.simple.JSONObject;
+import org.sab.chat.server.ClientManager;
 
 public abstract class Router {
 
@@ -27,7 +28,7 @@ public abstract class Router {
 
     public void handleError(ChannelHandlerContext ctx, JSONObject response) {
         response.put("type", "ERROR");
-        ctx.channel().writeAndFlush(response.clone());
+        ClientManager.sendResponseToChannel(ctx.channel(), response);
     }
 
     abstract public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request);

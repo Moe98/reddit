@@ -1,14 +1,14 @@
 const React = require('react')
 const { useState, useEffect, useContext } = require('react')
 const { Text, Box, useInput } = require('ink')
-const AppContext = require('./app-context')
+const AppContext = require('../contexts/app-context')
 
 const importJsx = require('import-jsx')
 const TextInput = importJsx('./text-input')
 const LoadingSpinner = importJsx('./loading-spinner')
 const MessagesList = importJsx('./messages-list')
 
-const useChatService = require('../hooks/chat-service')
+const ChatContext = require('../contexts/chat-context')
 
 const messagesData = [
 	{
@@ -62,55 +62,28 @@ const messagesData = [
 ]
 
 const ChatView = ({ chat, onChatExit }) => {
-	const [messages, setMessages] = useState([])
+	const { userId } = useContext(AppContext)
+	const [chatContext, _] = useContext(ChatContext)
 	const [newMessage, setNewMessage] = useState('')
-	const {userId, username} = useContext(AppContext)
-
-	const onNewFrameReceived = (frame) => {
-		const receivedMessage = {
-			id: messages.length + 1,
-			text: frame.data,
-			author: username,
-			date: new Date()
-		}
-		setMessages([...messages, receivedMessage])
-	}
-
-	const onErrorReceived = (error) => {
-		const sentMessage = {
-			id: messages.length + 1,
-			text: error.message,
-			author: 'Error',
-			date: new Date()
-		}
-		setMessages([...messages, sentMessage])
-	}
-
-	const sendToChat = useChatService(onNewFrameReceived, onErrorReceived)
 
 	const onNewMessageSent = (messageText) => {
-		const isAbleToSend = sendToChat(
-			JSON.stringify({
-				type: 'CREATE_GROUP_MESSAGE',
-				chatId: chat.id,
-				senderId: userId,
-				content: messageText
-			})
-		)
+		if (messageText.length == 0) return
+		const isAbleToSend = chatContext.sendToChat({
+			type: chat.name ? 'CREATE_GROUP_MESSAGE' : 'CREATE_DIRECT_MESSAGE',
+			chatId: chat.chatId,
+			senderId: userId,
+			content: messageText
+		})
 		if (isAbleToSend) setNewMessage('')
 		else setNewMessage(`Didn't connect to web socket`)
 	}
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			setMessages(
-				messagesData.filter((msg) => chat.membersList.includes(msg.author))
-			)
-		}, 750)
-
-		return () => {
-			clearTimeout(timer)
-		}
+		chatContext.sendToChat({
+			type: chat.name ? 'GET_GROUP_MESSAGES' : 'GET_DIRECT_MESSAGES',
+			chatId: chat.chatId,
+			userId
+		})
 	}, [])
 
 	useInput((input, _) => {
@@ -121,16 +94,22 @@ const ChatView = ({ chat, onChatExit }) => {
 
 	return (
 		<Box>
-			{messages.length > 0 ? (
+			{!chatContext.isLoadingMessages ? (
 				<Box flexDirection='column'>
-					<MessagesList messages={messages} />
+					<MessagesList messages={chatContext.messages[chat.chatId]} />
 					<Box>
 						<Box marginRight={1}>
 							<Text>{'>'}</Text>
 						</Box>
 						<TextInput
 							value={newMessage}
-							placeholder={`Chat with ${chat.name} here`}
+							placeholder={`Chat with ${
+								chat.name
+									? chat.name
+									: userId == chat.firstMember
+									? chat.secondMember
+									: chat.firstMember
+							} here`}
 							onChange={setNewMessage}
 							onSubmit={onNewMessageSent}
 						/>
