@@ -1,27 +1,94 @@
 package org.sab.models.user;
 
+import org.sab.strings.StringManipulation;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public enum UserAttributes {
 
-    // variables in a user object
-    ACTION_MAKER_ID("userId", "UserId"),
-    USER_ID("userId", "UserId"),
-    IS_DELETED("isDeleted", "IsDeleted"),
-    DATE_CREATED("dateCreated", "DateCreated"),
-    NUM_OF_FOLLOWERS("numOfFollowers", "NumOfFollowers");
+    ACTION_MAKER_ID("userId") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) {
+        }
+    },
+    USER_ID("userId") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setUserId(resultSet.getString(USER_ID.getPostgresDb()));
+        }
+    },
+    IS_DELETED("isDeleted") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) {
+        }
+    },
+    DATE_CREATED("dateCreated") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) {
+        }
+    },
+    NUM_OF_FOLLOWERS("numOfFollowers") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setNumOfFollowers(resultSet.getInt(NUM_OF_FOLLOWERS.getPostgresDb()));
+        }
+    },
+    PASSWORD("password") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setPassword(resultSet.getString(PASSWORD.getPostgresDb()));
+        }
+    },
+    USERNAME("username") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setUsername(resultSet.getString(USERNAME.getPostgresDb()));
+        }
+    },
+    EMAIL("email") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setEmail(resultSet.getString(EMAIL.getPostgresDb()));
+        }
 
-    private final String http;
-    private final String db;
+    },
+    BIRTHDATE("birthdate") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setBirthdate(resultSet.getString(BIRTHDATE.getPostgresDb()));
+        }
+    },
+    PHOTO_URL("photoUrl") {
+        @Override
+        public void setAttribute(User user, ResultSet resultSet) throws SQLException {
+            user.setPhotoUrl(resultSet.getString(PHOTO_URL.getPostgresDb()));
+        }
+    };
 
-    UserAttributes(String http, String db) {
-        this.http = http;
-        this.db = db;
+
+    private final String CAMELCASE;
+
+    UserAttributes(String camelCase) {
+        this.CAMELCASE = camelCase;
     }
 
     public String getHTTP() {
-        return http;
+        return CAMELCASE;
     }
 
-    public String getDb() {
-        return db;
+    public String getArangoDb() {
+        return StringManipulation.camelToPascalCase(CAMELCASE);
     }
+
+    public String getPostgresDb() {
+        return StringManipulation.camelToSnakeCase(CAMELCASE);
+    }
+
+    @Override
+    public String toString() {
+        return CAMELCASE;
+    }
+
+    public abstract void setAttribute(User user, ResultSet resultSet) throws SQLException;
 }

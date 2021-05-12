@@ -96,6 +96,14 @@ public class Arango {
         return readDocument(dbName, collectionName, baseDocument.getKey());
     }
 
+    public static BaseDocument createDocument(String dbName, String collectionName, Map<String, Object> properties, String key) {
+        BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
+        newDocument.setKey(key);
+        Arango arango = getInstance();
+        arango.connectIfNotConnected();
+        return arango.createDocument(dbName, collectionName, newDocument);
+    }
+
     public BaseEdgeDocument createEdgeDocument(String dbName, String collectionName, BaseEdgeDocument baseEdgeDocument) {
         arangoDB.db(dbName).collection(collectionName).insertDocument(baseEdgeDocument);
         return readEdgeDocument(dbName, collectionName, baseEdgeDocument.getKey());
@@ -112,6 +120,14 @@ public class Arango {
     public BaseDocument updateDocument(String dbName, String collectionName, BaseDocument updatedDocument, String documentKey) {
         arangoDB.db(dbName).collection(collectionName).updateDocument(documentKey, updatedDocument);
         return readDocument(dbName, collectionName, updatedDocument.getKey());
+    }
+
+    public static BaseDocument updateDocument(String dbName, String collectionName, Map<String, Object> updatedProperties, String documentKey) {
+        BaseDocument updatedDocument = new BaseDocument(new HashMap<>(updatedProperties));
+        updatedDocument.setKey(documentKey);
+        Arango arango = Arango.getInstance();
+        arango.connectIfNotConnected();
+        return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
     }
 
     public BaseEdgeDocument updateEdgeDocument(String dbName, String collectionName, BaseEdgeDocument updatedDocument, String documentKey) {
@@ -170,25 +186,25 @@ public class Arango {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
     }
 
-    public static String getSingleEdgeId(String dbName, String collectionName, String userId, String contentId){
+    public static String getSingleEdgeId(String dbName, String collectionName, String userId, String contentId) {
         String query = """
                 FOR content, edge IN 1..1 OUTBOUND @username @collectionName
                     FILTER content._id == @contentId
                     RETURN DISTINCT {edgeId:edge._key}
                 """;
 
-        Map<String, Object> bindVars =  new HashMap<>();
+        Map<String, Object> bindVars = new HashMap<>();
         bindVars.put("username", userId);
         bindVars.put("contentId", contentId);
         bindVars.put("collectionName", collectionName);
 
         ArangoCursor<BaseDocument> cursor = instance.query(dbName, query, bindVars);
         String edgeId = "";
-        
+
         if (cursor.hasNext()) {
-            edgeId = (String)cursor.next().getAttribute("edgeId");
+            edgeId = (String) cursor.next().getAttribute("edgeId");
         }
-        
+
         return edgeId;
     }
 

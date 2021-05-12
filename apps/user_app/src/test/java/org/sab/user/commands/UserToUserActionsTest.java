@@ -18,8 +18,8 @@ public class UserToUserActionsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-assertTrue(arango.isConnected());
-            arango.createDatabase(UserToUserCommand.TEST_DB_Name);
+            assertTrue(arango.isConnected());
+            arango.createDatabaseIfNotExists(UserToUserCommand.TEST_DB_Name);
 
             moe = new BaseDocument();
             moe.setKey(moeId);
