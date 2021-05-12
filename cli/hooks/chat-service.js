@@ -14,7 +14,6 @@ const useChatService = () => {
 		const data = frame.data
 
 		const isTargetMember = (id) => data.targetMemberId === id
-		const isGroupAdmin = (groupChat, id) => groupChat.adminId === id
 
 		let messages = {}
 		switch (frameType) {
@@ -79,23 +78,44 @@ const useChatService = () => {
 				})
 				break
 			case 'LEAVE_GROUP':
-				const isUserRemoved =
-					isGroupAdmin(data.targetMemberId) || isTargetMember(userId)
 				const groupChatsAfterLeave = chatContext.groupChats.filter(
 					(chat) => chat.chatId !== data.chatId
 				)
-				setChatContext({
-					...chatContext,
-					groupChats: isUserRemoved
-						? groupChatsAfterLeave
-						: chatContext.groupChats,
-					selectedChat:
-						isUserRemoved &&
-						chatContext.selectedChat &&
-						chatContext.selectedChat.chatId === data.chatId
-							? null
-							: chatContext.selectedChat
-				})
+				if (data.adminId === data.targetMemberId) {
+					setChatContext({
+						...chatContext,
+						groupChats: groupChatsAfterLeave,
+						selectedChat:
+							chatContext.selectedChat &&
+							chatContext.selectedChat.chatId === data.chatId
+								? null
+								: chatContext.selectedChat
+					})
+				} else {
+					const groupChatsAfterMemberLeft = [...chatContext.groupChats].map(
+						(chat) => {
+							if (chat.chatId !== data.chatId) return chat
+							return {
+								...chat,
+								memberIds: chat.memberIds.filter(
+									(memberId) => !isTargetMember(memberId)
+								)
+							}
+						}
+					)
+					setChatContext({
+						...chatContext,
+						groupChats: isTargetMember(userId)
+							? groupChatsAfterLeave
+							: groupChatsAfterMemberLeft,
+						selectedChat:
+							isTargetMember(userId) &&
+							chatContext.selectedChat &&
+							chatContext.selectedChat.chatId === data.chatId
+								? null
+								: chatContext.selectedChat
+					})
+				}
 				break
 			case 'REMOVE_GROUP_MEMBER':
 				const groupChatsAfterChatRemoved = chatContext.groupChats.filter(
