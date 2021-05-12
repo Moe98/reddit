@@ -47,7 +47,6 @@ public class UserAppTest {
 
 
         JSONObject response = Requester.signUp(username, email, password, birthdate);
-
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = response.getJSONObject("data");
         assertEquals(username, data.getString("username"));
@@ -218,6 +217,19 @@ public class UserAppTest {
 
         assertEquals("Account Deleted Successfully!", response.getString("msg"));
 
+        JSONObject getUserResponse = Requester.getUser();
+        assertEquals("User not found!", getUserResponse.getString("msg"));
+    }
+
+    @Test
+    public void T15_signUpAfterDeleteWillFailWithSameUsername() {
+
+        String email = username + "@gmail.com";
+        String birthdate = "1997-12-14";
+        JSONObject response = Requester.signUp(username, email, password, birthdate);
+        String msg = response.getString("msg");
+        assertEquals("This username is already in use, please try another one.", msg);
+        assertEquals(200, response.getInt("statusCode"));
         JSONObject getUserResponse = Requester.getUser();
         assertEquals("User not found!", getUserResponse.getString("msg"));
     }

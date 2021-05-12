@@ -18,3 +18,5 @@ DROP FUNCTION IF EXISTS update_profile_picture(in_username VARCHAR, new_photo_ur
 
 
 DROP FUNCTION IF EXISTS delete_profile_picture(in_username VARCHAR);
+
+DROP FUNCTION IF EXISTS is_username_deleted(VARCHAR);
