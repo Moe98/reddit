@@ -23,20 +23,24 @@ public class ReportSubThread extends SubThreadCommand{
 
     @Override
     public String execute() {
-        String userId = uriParams.getString(REPORTER_ID);
 
-        String typeOfReport = body.getString(TYPE_OF_REPORT);
-        String subthreadId = body.getString(REPORTED_SUBTHREAD_ID);
-        String threadId = body.getString(THREAD_ID);
-        String reportMsg = body.getString(REPORT_MSG);
-        long millis = System.currentTimeMillis();
-        java.sql.Date dateCreated = new java.sql.Date(millis);
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String msg = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            String userId = uriParams.getString(REPORTER_ID);
+
+            String typeOfReport = body.getString(TYPE_OF_REPORT);
+            String subthreadId = body.getString(REPORTED_SUBTHREAD_ID);
+            String threadId = body.getString(THREAD_ID);
+            String reportMsg = body.getString(REPORT_MSG);
+            long millis = System.currentTimeMillis();
+            java.sql.Date dateCreated = new java.sql.Date(millis);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME)) {
@@ -71,6 +75,9 @@ public class ReportSubThread extends SubThreadCommand{
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

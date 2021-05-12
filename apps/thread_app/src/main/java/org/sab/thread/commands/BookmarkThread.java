@@ -33,14 +33,19 @@ public class BookmarkThread extends ThreadCommand {
 
     @Override
     protected String execute() {
+
+        Arango arango = null;
+
         final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
-            Arango arango = Arango.getInstance();
-
             final String threadName = body.getString(THREAD_NAME);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
+           
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
@@ -50,15 +55,15 @@ public class BookmarkThread extends ThreadCommand {
                 arango.createCollection(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, true);
             }
 
-            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 responseMessage = "This thread does not exist.";
                 return Responder.makeErrorResponse(responseMessage, 400).toString();
             }
 
             final String bookmarkEdgeId = arango.getSingleEdgeId(DB_Name,
-                                        USER_BOOKMARK_THREAD_COLLECTION_NAME,
-                                        USER_COLLECTION_NAME + "/" + userId,
-                                        THREAD_COLLECTION_NAME + "/" + threadName);
+                    USER_BOOKMARK_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + userId,
+                    THREAD_COLLECTION_NAME + "/" + threadName);
 
             if (!bookmarkEdgeId.equals("")) {
                 responseMessage = "You have removed this Thread from your bookmarks.";
@@ -71,6 +76,9 @@ public class BookmarkThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", responseMessage);
         }
 

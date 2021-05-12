@@ -18,20 +18,20 @@ public class BookmarkSubThread extends SubThreadCommand {
         return new Schema(List.of(subthreadId));
     }
 
-
-
     @Override
     protected String execute() {
 
+        Arango arango = null;
+        
         JSONObject response = new JSONObject();
         String msg = "";
 
         try {
-
             String subthreadId = body.getString(SUBTHREAD_ID);
             String userId = uriParams.getString(REPORTER_ID);
 
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
@@ -44,17 +44,17 @@ public class BookmarkSubThread extends SubThreadCommand {
             }
 
             // check subthread exist
-            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             String userBookmarkEdgeId = arango.getSingleEdgeId(DB_Name,
-                                                                USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
-                                                                USER_COLLECTION_NAME + "/" + userId,
-                                                                SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
+                    USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + userId,
+                    SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
-            if(!userBookmarkEdgeId.equals("")){
+            if (!userBookmarkEdgeId.equals("")) {
                 msg = "Removed Subthread from Bookmarks";
                 // unbookmark
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, userBookmarkEdgeId);
@@ -75,7 +75,9 @@ public class BookmarkSubThread extends SubThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {
-            // arango.disconnect(arangoDB);
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", msg);
         }
 
@@ -83,24 +85,24 @@ public class BookmarkSubThread extends SubThreadCommand {
 
     }
 
-   public static void main(String[] args) {
-       BookmarkSubThread tc = new BookmarkSubThread();
+    public static void main(String[] args) {
+        BookmarkSubThread tc = new BookmarkSubThread();
 
-       JSONObject body = new JSONObject();
-       body.put("id", "126209");
+        JSONObject body = new JSONObject();
+        body.put("id", "126209");
 
-       JSONObject uriParams = new JSONObject();
-       uriParams.put("userId", "33366");
+        JSONObject uriParams = new JSONObject();
+        uriParams.put("userId", "33366");
 
-       JSONObject request = new JSONObject();
-       request.put("body", body);
-       request.put("methodType", "POST");
-       request.put("uriParams", uriParams);
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "POST");
+        request.put("uriParams", uriParams);
 
-       System.out.println(request);
-       System.out.println("----------");
+        System.out.println(request);
+        System.out.println("----------");
 
-       System.out.println(tc.execute(request));
-   }
+        System.out.println(tc.execute(request));
+    }
 
 }

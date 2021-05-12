@@ -13,14 +13,17 @@ import java.util.List;
 public class UpdateThread extends ThreadCommand {
     @Override
     protected String execute() {
+        Arango arango = null;
+
         final Thread thread;
 
         try {
-            final Arango arango = Arango.getInstance();
-
             final String description = body.getString(DESCRIPTION);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
             final String threadId = uriParams.getString(THREAD_NAME);
+            
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
@@ -52,6 +55,10 @@ public class UpdateThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
 
         return Responder.makeDataResponse(thread.toJSON()).toString();

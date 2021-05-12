@@ -36,7 +36,7 @@ public class FollowThread extends ThreadCommand {
 //        System.out.println(addComment.execute(request));
 
         Arango arango = Arango.getInstance();
-        ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME+"/lujine");
+        ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/lujine");
         ArrayList<String> arr = new ArrayList<>();
         arr.add(NUM_OF_FOLLOWERS_DB);
         arr.add(DESCRIPTION_DB);
@@ -51,11 +51,13 @@ public class FollowThread extends ThreadCommand {
 
     @Override
     protected String execute() {
+        Arango arango = null;
         final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             final String threadName = body.getString(THREAD_NAME);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
@@ -68,7 +70,7 @@ public class FollowThread extends ThreadCommand {
                 arango.createCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
             }
 
-            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 responseMessage = "This thread does not exist.";
                 return Responder.makeErrorResponse(responseMessage, 400).toString();
             }
@@ -101,7 +103,9 @@ public class FollowThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            // arango.disconnect(arangoDB);
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", responseMessage);
         }
 

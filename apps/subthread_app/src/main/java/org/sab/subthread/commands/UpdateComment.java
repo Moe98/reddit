@@ -13,10 +13,14 @@ import java.util.List;
 public class UpdateComment extends CommentCommand {
     @Override
     protected String execute() {
+
+        Arango arango = null;
+
         final Comment comment;
 
         try {
-            final Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             final String content = body.getString(CONTENT);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
@@ -59,6 +63,10 @@ public class UpdateComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
 
         return Responder.makeDataResponse(comment.toJSON()).toString();

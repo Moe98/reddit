@@ -24,6 +24,7 @@ public class AssignThreadModerator extends ThreadCommand {
     @Override
     protected String execute() {
 
+        Arango arango = null;
         JSONObject response = new JSONObject();
         String msg = "";
 
@@ -34,7 +35,9 @@ public class AssignThreadModerator extends ThreadCommand {
 
             String assignerId = uriParams.getString(ASSIGNER_ID);
 
-            Arango arango = Arango.getInstance();      
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
                 arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
@@ -47,17 +50,17 @@ public class AssignThreadModerator extends ThreadCommand {
             }
 
             // check if thread exists
-            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // check if assigner is a moderator on this thread
             String assignerModEdgeId = arango.getSingleEdgeId(DB_Name,
-                                                                USER_MOD_THREAD_COLLECTION_NAME,
-                                                                USER_COLLECTION_NAME + "/" + assignerId,
-                                                                THREAD_COLLECTION_NAME + "/" + threadId);
-            if(assignerModEdgeId.equals("")) {
+                    USER_MOD_THREAD_COLLECTION_NAME,
+                    USER_COLLECTION_NAME + "/" + assignerId,
+                    THREAD_COLLECTION_NAME + "/" + threadId);
+            if (assignerModEdgeId.equals("")) {
                 // assigner is not a mod
                 msg = "You don't have permission to assign a moderator for this thread";
                 return Responder.makeErrorResponse(msg, 404).toString();
@@ -87,6 +90,10 @@ public class AssignThreadModerator extends ThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
+            arango.disconnect();
             response.put("msg", msg);
         }
 

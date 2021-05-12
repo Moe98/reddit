@@ -9,6 +9,7 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+
 import java.util.List;
 
 public class CreateThread extends ThreadCommand {
@@ -32,17 +33,20 @@ public class CreateThread extends ThreadCommand {
 
     @Override
     public String execute() {
-        String name = body.getString(THREAD_NAME);
-        String description = body.getString(DESCRIPTION);
-        String creatorId = body.getString(CREATOR_ID);
-//        String date = body.getString(DATE_CREATED);
-//        long numOfFollowers = 0;
 
+        Arango arango = null;
+        
         // TODO change from empty constructor
         Thread thread = new Thread();
         
         try {
-            Arango arango = Arango.getInstance();
+            String name = body.getString(THREAD_NAME);
+            String description = body.getString(DESCRIPTION);
+            // TODO should be from uri
+            String creatorId = body.getString(CREATOR_ID);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
@@ -79,13 +83,17 @@ public class CreateThread extends ThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
         return Responder.makeDataResponse(thread.toJSON()).toString();
     }
 
     public static void main(String[] args) {
         Arango arango = Arango.getInstance();
-        arango.createCollection(DB_Name, "User", false);
+//        arango.createCollection(DB_Name, "User", false);
         BaseDocument myObject = new BaseDocument();
         myObject.setKey("manta");
         myObject.addAttribute("IsDeleted", false);

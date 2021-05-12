@@ -11,12 +11,15 @@ import java.util.List;
 public class GetSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
+
+        Arango arango = null;
         final SubThread subThread;
 
         try {
-            final Arango arango = Arango.getInstance();
-
             final String subThreadId = uriParams.getString(SUBTHREAD_ID);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
@@ -44,6 +47,10 @@ public class GetSubThread extends SubThreadCommand {
             subThread.setDislikes(dislikes);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
 
         return Responder.makeDataResponse(subThread.toJSON()).toString();

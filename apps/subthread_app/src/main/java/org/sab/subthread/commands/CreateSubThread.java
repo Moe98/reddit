@@ -33,6 +33,12 @@ public class CreateSubThread extends SubThreadCommand {
 
     @Override
     protected String execute() {
+
+        Arango arango = null;
+
+        SubThread subThread;
+
+        try {
         String parentThreadId = body.getString(PARENT_THREAD_ID);
         String creatorId = uriParams.getString(CREATOR_ID);
 
@@ -41,10 +47,8 @@ public class CreateSubThread extends SubThreadCommand {
 
         boolean hasImage = body.getBoolean(HASIMAGE);
 
-        SubThread subThread;
-
-        try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
@@ -93,10 +97,12 @@ public class CreateSubThread extends SubThreadCommand {
             subThread.setLikes(likes);
             subThread.setDislikes(dislikes);
 
-
-
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
         return Responder.makeDataResponse(subThread.toJSON()).toString();
 

@@ -21,14 +21,18 @@ public class DislikeComment extends CommentCommand{
 
     @Override
     public String execute() {
-        String commentId = body.getString(COMMENT_ID);
-        String userId = uriParams.getString(ACTION_MAKER_ID);
+
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String msg = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            String commentId = body.getString(COMMENT_ID);
+            String userId = uriParams.getString(ACTION_MAKER_ID);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
@@ -95,7 +99,9 @@ public class DislikeComment extends CommentCommand{
             // System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            // arango.disconnect(arangoDB);
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

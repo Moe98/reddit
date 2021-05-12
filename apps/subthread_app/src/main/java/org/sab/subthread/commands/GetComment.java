@@ -11,12 +11,15 @@ import java.util.List;
 public class GetComment extends CommentCommand {
     @Override
     protected String execute() {
+
+        Arango arango = null;
         final Comment comment;
 
         try {
-            final Arango arango = Arango.getInstance();
-
             final String commentId = uriParams.getString(COMMENT_ID);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
@@ -47,6 +50,10 @@ public class GetComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
 
         return Responder.makeDataResponse(comment.toJSON()).toString();

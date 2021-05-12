@@ -18,12 +18,16 @@ public class ModeratorSeeReports extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        String threadId = uriParams.getString(THREAD_ID);
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
 
         try {
-            Arango arango = Arango.getInstance();
+            // TODO why is the thread id not the user id in the URI?
+            String threadId = uriParams.getString(THREAD_ID);
+
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO can we bind the collection name in the query to SUBTHREAD_REPORTS_COLLECTION_NAME
             //  Same for the ThreadId attribute
@@ -58,6 +62,10 @@ public class ModeratorSeeReports extends SubThreadCommand {
             }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
         return Responder.makeDataResponse(response).toString();
     }

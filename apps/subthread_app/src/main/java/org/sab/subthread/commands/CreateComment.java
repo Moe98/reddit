@@ -37,18 +37,22 @@ public class CreateComment extends CommentCommand {
 
     @Override
     protected String execute() {
+
+        Arango arango = null;
+
         final int INITIAL_LIKES = 0;
         final int INITIAL_DISLIKES = 0;
 
+        final Comment comment;
+
+        try {
         String parentSubThreadId = body.getString(PARENT_SUBTHREAD_ID);
         String content = body.getString(CONTENT);
         String parentContentType = body.getString(PARENT_CONTENT_TYPE);
         final String userId = uriParams.getString(ACTION_MAKER_ID);
 
-        final Comment comment;
-
-        try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
@@ -115,6 +119,10 @@ public class CreateComment extends CommentCommand {
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
         return Responder.makeDataResponse(comment.toJSON()).toString();
     }

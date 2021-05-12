@@ -34,15 +34,18 @@ public class ModeratorBansUser extends ThreadCommand {
 
     @Override
     protected String execute() {
-        final String threadName = body.getString(THREAD_NAME);
-        final String bannedUserId = body.getString(BANNED_USER_ID);
-        final String userId = uriParams.getString(ACTION_MAKER_ID);
-
+        Arango arango = null;
+        
         final JSONObject response = new JSONObject();
         String messageResponse = "";
-
+        
         try {
-            Arango arango = Arango.getInstance();
+            final String threadName = body.getString(THREAD_NAME);
+            final String bannedUserId = body.getString(BANNED_USER_ID);
+            final String userId = uriParams.getString(ACTION_MAKER_ID);
+            
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB.
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
@@ -58,18 +61,18 @@ public class ModeratorBansUser extends ThreadCommand {
                 arango.createCollection(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
             }
 
-            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 messageResponse = "This thread does not exist.";
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
             // TODO what if this user is a mod??
-            if(!checkUserExists(arango, bannedUserId)){
+            if (!checkUserExists(arango, bannedUserId)) {
                 messageResponse = "The user you are trying to ban does not exist.";
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
-            final String threadModeratorEdgeKey =  arango.getSingleEdgeId(DB_Name,
+            final String threadModeratorEdgeKey = arango.getSingleEdgeId(DB_Name,
                     USER_MOD_THREAD_COLLECTION_NAME,
                     USER_COLLECTION_NAME + "/" + userId,
                     THREAD_COLLECTION_NAME + "/" + threadName);
@@ -97,6 +100,9 @@ public class ModeratorBansUser extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", messageResponse);
         }
 
