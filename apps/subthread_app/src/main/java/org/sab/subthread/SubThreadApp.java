@@ -1,21 +1,18 @@
 package org.sab.subthread;
 
-import com.arangodb.ArangoDB;
 import org.sab.arango.Arango;
 import org.sab.service.Service;
 
 import java.util.ArrayList;
 
 public class SubThreadApp extends Service {
-    private static Arango arango;
-    private static ArangoDB arangoDB;
     // TODO get from environment variables
-    protected static final String DB_Name = "ARANGO_DB";
-    // TODO move all connection establishment here
-    //  move all  DB creations here
-
+    protected static final String DB_Name = System.getenv("ARANGO_DB");
     // TODO get this from config file
     private static final String THREAD_APP_QUEUE = "THREAD_APP_REQ";
+    // TODO move all connection establishment here
+    //  move all  DB creations here
+    private static Arango arango;
 
     public static void main(String[] args) {
 
@@ -30,22 +27,6 @@ public class SubThreadApp extends Service {
         } finally {
             shutdownGracefully();
         }
-    }
-
-    // TODO get values of next methods from config files
-    @Override
-    public String getAppUriName() {
-        return "thread";
-    }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
     }
 
     public static void startArangoConnection() {
@@ -63,7 +44,7 @@ public class SubThreadApp extends Service {
 
     public static void createCollections(ArrayList<String> collectionNames, ArrayList<String> edgeCollectionNames) {
         try {
-        // TODO use a properties file
+            // TODO use a properties file
             for (String collectionName : collectionNames) {
                 if (!arango.collectionExists(DB_Name, collectionName)) {
                     arango.createCollection(DB_Name, collectionName, false);
@@ -79,6 +60,22 @@ public class SubThreadApp extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // TODO get values of next methods from config files
+    @Override
+    public String getAppUriName() {
+        return "subThread";
+    }
+
+    @Override
+    public int getThreadCount() {
+        return 10;
+    }
+
+    @Override
+    public String getConfigMapPath() {
+        return DEFAULT_PROPERTIES_FILENAME;
     }
 
 }
