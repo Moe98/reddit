@@ -3,6 +3,8 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CommentAttributes;
+import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
@@ -29,6 +31,15 @@ public abstract class ThreadCommand extends CommandWithVerification {
     // TODO get from enum
     protected static final String IS_DELETED_DB = "IsDeleted";
 
+    // subthread attributes
+    protected static final String SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
+    protected static final String PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
+    protected static final String SUBTHREAD_TITLE_DB = SubThreadAttributes.TITLE.getDb();
+    // comment attributes
+    protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
+    protected static final String PARENT_SUBTHREAD_ID_DB = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
+
+    // Messages
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
@@ -40,6 +51,9 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = "UserFollowThread";
     protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = "UserBookmarkThread";
     protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = "UserBannedFromThread";
+
+    protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
+    protected static final String COMMENT_COLLECTION_NAME = "Comment";
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;
