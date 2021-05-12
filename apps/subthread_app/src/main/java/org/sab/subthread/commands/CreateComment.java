@@ -53,6 +53,13 @@ public class CreateComment extends CommentCommand {
 //        System.out.println("=========");
 //
 //        System.out.println(addComment.execute(request));
+        
+//        body.put(PARENT_SUBTHREAD_ID, "74248");
+//        body.put(CONTENT, "no it is tasty!");
+//        body.put(PARENT_CONTENT_TYPE, "SubThread");
+
+//        JSONObject uriParams = new JSONObject();
+//        uriParams.put(ACTION_MAKER_ID, "manta");
 
         Arango arango = Arango.getInstance();
         ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, SubThreadCommand.PARENT_THREAD_ID_DB, "asmakElRayes7amido");

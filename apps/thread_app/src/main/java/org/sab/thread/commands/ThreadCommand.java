@@ -6,6 +6,7 @@ import org.sab.arango.Arango;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
+import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 public abstract class ThreadCommand extends CommandWithVerification {
@@ -29,7 +30,8 @@ public abstract class ThreadCommand extends CommandWithVerification {
 
     // user attributes
     // TODO get from enum
-    protected static final String IS_DELETED_DB = "IsDeleted";
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
 
     // subthread attributes
     protected static final String SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();

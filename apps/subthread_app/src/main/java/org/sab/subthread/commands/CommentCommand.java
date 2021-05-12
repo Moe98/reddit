@@ -1,6 +1,7 @@
 package org.sab.subthread.commands;
 
 import org.sab.models.CommentAttributes;
+import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
 
@@ -25,6 +26,7 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
     protected static final String PARENT_CONTENT_TYPE_DB = CommentAttributes.PARENT_CONTENT_TYPE.getDb();
 
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String ACTION_MAKER_ID = "userId";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";

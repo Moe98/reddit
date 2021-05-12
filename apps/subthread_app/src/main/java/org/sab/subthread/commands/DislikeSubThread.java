@@ -107,10 +107,10 @@ public class DislikeSubThread extends SubThreadCommand{
         DislikeSubThread tc = new DislikeSubThread();
 
         JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "126033");
+        body.put(SUBTHREAD_ID, "74248");
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "asdafsda");
+        uriParams.put(ACTION_MAKER_ID, "manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);
