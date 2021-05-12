@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class UpdateRecommendedSubThreads extends Command {
-
+    Arango arango;
     @Override
     public String execute(JSONObject request) {
         JSONArray data = new JSONArray();
@@ -33,7 +33,7 @@ public class UpdateRecommendedSubThreads extends Command {
             if (username.isBlank())
                 return Responder.makeErrorResponse("username must not be blank", 400).toString();
 
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
             // Recommended SubThreads are fetched by 2 ways combined together:
@@ -117,6 +117,8 @@ public class UpdateRecommendedSubThreads extends Command {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
+        } finally {
+            arango.disconnect();
         }
 
         if (data.length() != 0) {
