@@ -6,6 +6,7 @@ import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectMessage;
 import org.sab.chat.storage.tables.DirectMessageTable;
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -36,6 +37,10 @@ public class CreateDirectMessage extends CommandWithVerification {
         return new Schema(List.of(chatId, senderId, content));
     }
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
+    }
 
     @Override
     public String execute() {

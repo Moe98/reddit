@@ -8,6 +8,7 @@ import org.sab.chat.storage.models.GroupChat;
 import org.sab.chat.storage.tables.GroupChatTable;
 
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -38,6 +39,10 @@ public class CreateGroupChat extends CommandWithVerification {
         return new Schema(List.of(creator, name, description));
     }
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
+    }
 
     @Override
     public String execute() {

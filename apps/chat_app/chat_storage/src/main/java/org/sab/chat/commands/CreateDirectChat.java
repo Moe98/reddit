@@ -7,6 +7,7 @@ import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.tables.DirectChatTable;
 
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -36,6 +37,10 @@ public class CreateDirectChat extends CommandWithVerification {
         return new Schema(List.of(firstMember, secondMember));
     }
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
+    }
 
     @Override
     public String execute() {
