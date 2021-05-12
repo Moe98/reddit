@@ -14,10 +14,14 @@ import java.util.List;
 public class GetMyComments extends CommentCommand{
     @Override
     protected String execute() {
+        Arango arango = null;
         JSONArray response = new JSONArray();
-        final String userId = uriParams.getString(USER_ID);
+
         try {
-            final Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
+            final String userId = uriParams.getString(USER_ID);
 
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
@@ -42,7 +46,11 @@ public class GetMyComments extends CommentCommand{
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+        }finally {
+        if (arango != null) {
+            arango.disconnect();
         }
+    }
         return Responder.makeDataResponse(response).toString();
     }
 

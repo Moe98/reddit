@@ -11,15 +11,14 @@ import java.util.List;
 public class GetSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
-
         Arango arango = null;
         final SubThread subThread;
 
         try {
-            final String subThreadId = uriParams.getString(SUBTHREAD_ID);
-
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
+
+            final String subThreadId = uriParams.getString(SUBTHREAD_ID);
 
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
