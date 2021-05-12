@@ -83,12 +83,16 @@ public class ClientManager {
 
     public static void handleMemberAdded(UUID chatId, UUID memberId) {
         chatMembers.get(chatId).add(memberId);
+        if (isUserOnline(memberId))
+            chatsRefCount.get(chatId).add(true);
         if (userChats.containsKey(memberId))
             userChats.get(memberId).add(chatId);
     }
 
     public static void handleMemberRemoved(UUID chatId, UUID memberId) {
         chatMembers.get(chatId).remove(memberId);
+        if (isUserOnline(memberId))
+            chatsRefCount.get(chatId).remove(true);
         if (userChats.containsKey(memberId))
             userChats.get(memberId).remove(chatId);
     }
@@ -100,6 +104,7 @@ public class ClientManager {
                 if (userChats.containsKey(memberId))
                     userChats.get(memberId).remove(chatId);
             chatMembers.remove(chatId);
+            chatsRefCount.remove(chatId);
         } else {
             handleMemberRemoved(chatId, userId);
         }
@@ -107,9 +112,14 @@ public class ClientManager {
 
     public static void handleUserCreateChat(UUID chatId, List<UUID> memberIds) {
         chatMembers.putIfAbsent(chatId, new ConcurrentLinkedQueue<>(memberIds));
-        for (UUID memberId : memberIds)
+        chatsRefCount.putIfAbsent(chatId, new ConcurrentLinkedQueue<>());
+        for (UUID memberId : memberIds) {
             if (userChats.containsKey(memberId))
                 userChats.get(memberId).add(chatId);
+            if (isUserOnline(memberId))
+                chatsRefCount.get(chatId).add(true);
+        }
+
     }
 
     public static void sendResponseToChannel(Channel channel, JSONObject response) {
