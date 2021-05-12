@@ -83,19 +83,22 @@ public class ClientManager {
 
     public static void handleMemberAdded(UUID chatId, UUID memberId) {
         chatMembers.get(chatId).add(memberId);
-        userChats.get(memberId).add(chatId);
+        if (userChats.containsKey(memberId))
+            userChats.get(memberId).add(chatId);
     }
 
     public static void handleMemberRemoved(UUID chatId, UUID memberId) {
         chatMembers.get(chatId).remove(memberId);
-        userChats.get(memberId).remove(chatId);
+        if (userChats.containsKey(memberId))
+            userChats.get(memberId).remove(chatId);
     }
 
     public static void handleUserLeftGroup(UUID chatId, UUID userId, boolean isAdmin) {
         if (isAdmin) {
             ConcurrentLinkedQueue<UUID> chatMemberIds = getChatMembers(chatId);
             for (UUID memberId : chatMemberIds)
-                userChats.get(memberId).remove(chatId);
+                if (userChats.containsKey(memberId))
+                    userChats.get(memberId).remove(chatId);
             chatMembers.remove(chatId);
         } else {
             handleMemberRemoved(chatId, userId);
@@ -105,7 +108,8 @@ public class ClientManager {
     public static void handleUserCreateChat(UUID chatId, List<UUID> memberIds) {
         chatMembers.putIfAbsent(chatId, new ConcurrentLinkedQueue<>(memberIds));
         for (UUID memberId : memberIds)
-            userChats.get(memberId).add(chatId);
+            if (userChats.containsKey(memberId))
+                userChats.get(memberId).add(chatId);
     }
 
     public static void sendResponseToChannel(Channel channel, JSONObject response) {
@@ -115,7 +119,7 @@ public class ClientManager {
 
     public static void sendResponseToUser(UUID userId, JSONObject response) {
         String responseString = response.toString();
-        for(Channel channel : getUserChannels(userId))
+        for (Channel channel : getUserChannels(userId))
             channel.writeAndFlush(new TextWebSocketFrame(responseString));
     }
 
