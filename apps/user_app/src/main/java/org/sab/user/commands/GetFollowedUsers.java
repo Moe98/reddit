@@ -44,6 +44,13 @@ public class GetFollowedUsers extends UserToUserCommand {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
 
+            final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
+            final boolean isDeleted = Boolean.parseBoolean(String.valueOf(userDocument.getAttribute(IS_DELETED_DB)));
+
+            if (isDeleted) {
+                return Responder.makeErrorResponse(USER_DELETED_RESPONSE_MESSAGE, 404).toString();
+            }
+
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
             ArrayList<String> arr = new ArrayList<>();
             arr.add(IS_DELETED_DB);
@@ -65,7 +72,7 @@ public class GetFollowedUsers extends UserToUserCommand {
         JSONObject body = new JSONObject();
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "lujine");
+        uriParams.put(USER_ID, "Manta");
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "GET");

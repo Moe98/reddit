@@ -48,14 +48,14 @@ public class Arango {
     }
 
     public void connectIfNotConnected() {
-        if (!isConnected())
+        if (!isConnected()){
             connect();
+        }
     }
 
     public void disconnect() {
         if (arangoDB != null) {
             arangoDB.shutdown();
-            arangoDB = null;
         }
     }
 
