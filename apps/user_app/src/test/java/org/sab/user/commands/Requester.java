@@ -1,0 +1,96 @@
+package org.sab.user.commands;
+
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.json.JSONObject;
+import org.sab.service.authentication.Jwt;
+
+import java.util.Map;
+
+public class Requester {
+    Requester() {
+    }
+
+    static JSONObject authenticationParams = new JSONObject().put("isAuthenticated", false);
+
+    private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", methodType);
+        request.put("uriParams", uriParams);
+        request.put("authenticationParams", authenticationParams);
+        return request;
+    }
+
+    public static JSONObject signUp(String username, String email, String password, String birthdate) {
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("email", email);
+        body.put("password", password);
+        body.put("birthdate", birthdate);
+        JSONObject request = makeRequest(body, "POST", new JSONObject());
+        return new JSONObject(new SignUp().execute(request));
+    }
+
+    public static JSONObject login(String username, String password) {
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("password", password);
+        JSONObject request = makeRequest(body, "POST", new JSONObject());
+        return new JSONObject(new Login().execute(request));
+    }
+
+    public static JSONObject getUser() {
+        JSONObject request = makeRequest(null, "GET", new JSONObject());
+        return new JSONObject(new ViewMyProfile().execute(request));
+    }
+
+    public static JSONObject viewAnotherProfile(String username) {
+        JSONObject uriParams = new JSONObject().put("username", username);
+        JSONObject request = makeRequest(null, "GET", uriParams);
+        return new JSONObject(new ViewAnotherProfile().execute(request));
+    }
+
+    public static JSONObject updatePassword(String oldPassword, String newPassword) {
+        JSONObject body = new JSONObject();
+        body.put("oldPassword", oldPassword);
+        body.put("newPassword", newPassword);
+        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+        return new JSONObject(new UpdatePassword().execute(request));
+    }
+
+    static public JSONObject updateProfilePicture(String photoUrl) {
+        JSONObject body = new JSONObject();
+        body.put("photoUrl", photoUrl);
+
+        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+        return new JSONObject(new UpdateProfilePhoto().execute(request));
+    }
+
+    public static JSONObject deleteProfilePicture() {
+        JSONObject request = makeRequest(new JSONObject(), "DELETE", new JSONObject());
+        return new JSONObject(new DeleteProfilePhoto().execute(request));
+    }
+
+    public static JSONObject deleteAccount(String password) {
+        JSONObject body = new JSONObject();
+        body.put("password", password);
+
+        JSONObject request = makeRequest(body, "DELETE", new JSONObject());
+        return new JSONObject(new DeleteAccount().execute(request));
+    }
+
+    public static void decodeToken(String token) {
+        boolean authenticated;
+        try {
+            Map<String, Object> claims = Jwt.verifyAndDecode(token);
+            authenticated = true;
+            authenticationParams.put("username", claims.get("username"));
+            authenticationParams.put("jwt", token);
+        } catch (JWTVerificationException jwtVerificationException) {
+            authenticated = false;
+        }
+        authenticationParams.put("isAuthenticated", authenticated);
+    }
+
+
+}

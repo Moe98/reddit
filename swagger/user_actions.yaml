@@ -1,9 +1,9 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
-  description: ''
+  description: ""
   version: 1.2.1
-  title: Beta Stories
-  termsOfService: ''
+  title: User App
+  termsOfService: ""
 tags:
   - name: Users
     description: Everything about Users
@@ -17,8 +17,8 @@ paths:
     post:
       tags:
         - Users
-      summary: User signs up in to his account
-      description: ''
+      summary: User signs up in to their account
+      description: ""
       operationId: UserSignUp
       consumes:
         - application/json
@@ -32,32 +32,30 @@ paths:
           description: signUp
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
             properties:
-              id:
-                type: string
-                format: uuid
               username:
                 type: string
+                example: scale-a-bull
               email:
                 type: string
                 format: email
+                example: scale-a-bull@gmail.com
               password:
                 type: string
+                example: 123456
               birthDate:
                 type: string
                 format: date
-              hasProfilePhoto:
-                type: boolean
       responses:
-        '200':
+        "200":
           description: Signed up successfully
           schema:
-            $ref: '#/definitions/CompleteUser'
-        '405':
+            $ref: "#/definitions/CompleteUser"
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -65,12 +63,13 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}':
+                example: "Passwords must be at least 6 characters long"
+  "/api/users/{username}":
     get:
       tags:
         - Users
       summary: Getting a user's full record
-      description: CRUD based operation
+      description: CRUD based operation and allows users to view their profiles
       operationId: GetUser
       consumes:
         - application/json
@@ -87,11 +86,11 @@ paths:
           type: string
           description: getUser
       responses:
-        '200':
+        "200":
           description: User Fetched successfully
           schema:
-            $ref: '#/definitions/CompleteUser'
-        '405':
+            $ref: "#/definitions/CompleteUser"
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -99,44 +98,45 @@ paths:
             properties:
               msg:
                 type: string
+                example: User not found
+  "/api/users/delete":
     delete:
       tags:
         - Users
-      summary: User deletes his account
-      description: ''
+      summary: User deletes their account
+      description: ""
       operationId: UserDeleteAccount
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - in: path
-          name: username
-          type: string
-          required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
             properties:
               password:
                 type: string
+              username:
+                type: string
         - in: header
           name: Function-Name
           required: true
           type: string
-          description: deleteUser
+          description: DELETE_ACCOUNT
       responses:
-        '200':
+        "200":
           description: Account deleted successfully
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+                example: Accound deleted successfully!
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -144,12 +144,13 @@ paths:
             properties:
               msg:
                 type: string
+                example: Incorrect password!
   /api/users/logIn:
     post:
       tags:
         - Users
-      summary: User logs in to his account
-      description: ''
+      summary: User logs in to their account
+      description: ""
       operationId: UserLogin
       consumes:
         - application/json
@@ -163,7 +164,7 @@ paths:
           description: logIn
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -173,13 +174,12 @@ paths:
               password:
                 type: string
 
-
       responses:
-        '200':
+        "200":
           description: Logged in successfully
           schema:
-            $ref: '#/definitions/User'
-        '405':
+            $ref: "#/definitions/User"
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -187,39 +187,46 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/uploadProfilePicture':
+  "/api/users/updateProfilePicture":
     put:
       tags:
         - Users
-      summary: 'User uploades his profile picture '
-      description: ''
-      operationId: UploadProfilePicture
+      summary: "User updates their profile picture "
+      description: ""
+      operationId: UpdateProfilePicture
       consumes:
         - multipart/form-data
       produces:
         - application/json
       parameters:
-        - in: formData
-          name: photo
-          type: file
-        - in: path
-          name: username
-          type: string
+        - in: body
+          name: body
+          description: ""
           required: true
+          schema:
+            type: object
+            properties:
+              photoUrl:
+                type: string
+                example: https://picsum.photos/200
+              username:
+                type: string
+                example: scale-a-bull
         - in: header
           name: Function-Name
           required: true
           type: string
-          description: uploadProfilePicture
+          description: UPDATE_PROFILE_PICTURE
       responses:
-        '200':
-          description: Profile Picture Uploaded
+        "200":
+          description: Profile Picture Updated
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+                example: Profile Picture Updated succseffully
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -227,13 +234,14 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/deleteProfilePicture':
+                example: An error occured while uploading your photo
+  "/api/users/deleteProfilePhoto/{username}":
     delete:
       tags:
         - Users
-      summary: 'User deletes his profile picture '
-      description: ''
-      operationId: DeleteProfilePicture
+      summary: "User deletes their profile photo "
+      description: ""
+      operationId: DeleteProfilePhoto
       consumes:
         - application/json
       produces:
@@ -247,16 +255,17 @@ paths:
           name: Function-Name
           required: true
           type: string
-          description: deleteProfilePicture
+          description: deleteProfilePhoto
       responses:
-        '200':
-          description: Profile Picture Deleted
+        "200":
+          description: Profile Photo Deleted
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+                example: Profile Photo Deleted successfully
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -264,25 +273,22 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/editProfile':
+                example: User not found
+  "/api/users/updatePassword":
     post:
       tags:
         - Users
-      summary: User edits his profile
-      description: ''
+      summary: User updates their password (Edit Profile)
+      description: ""
       operationId: UserEditProfile
       consumes:
         - application/json
       produces:
         - application/json
       parameters:
-        - in: path
-          name: username
-          type: string
-          required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -291,20 +297,23 @@ paths:
                 type: string
               newPassword:
                 type: string
+              username:
+                type: string
         - in: header
           name: Function-Name
           required: true
           type: string
           description: editProfile
       responses:
-        '200':
+        "200":
           description: profile edited successfully
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+                example: Password updated succesffully
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -312,12 +321,13 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/viewProfile/{username}':
+                example: Your new password can't match your current password
+  "/api/users/viewProfile/{username}":
     get:
       tags:
         - Actions
       summary: user can view other user's profile
-      description: ''
+      description: ""
       operationId: UserViewProfile
       consumes:
         - application/json
@@ -334,11 +344,11 @@ paths:
           type: string
           description: viewProfile
       responses:
-        '200':
+        "200":
           description: Profile Fetched successfully
           schema:
-            $ref: '#/definitions/User'
-        '405':
+            $ref: "#/definitions/User"
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -346,12 +356,12 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/follow':
+  "/api/users/{username}/follow":
     post:
       tags:
         - Actions
       summary: User follows another User
-      description: ''
+      description: ""
       operationId: UserFollowUser
       consumes:
         - application/json
@@ -364,7 +374,7 @@ paths:
           required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -377,14 +387,14 @@ paths:
           type: string
           description: followUser
       responses:
-        '200':
+        "200":
           description: User succesffully followed
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -392,12 +402,12 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/unfollow':
+  "/api/users/{username}/unfollow":
     post:
       tags:
         - Actions
       summary: User unfollows another User
-      description: ''
+      description: ""
       operationId: UserUnfollowUser
       consumes:
         - application/json
@@ -410,7 +420,7 @@ paths:
           required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -423,14 +433,14 @@ paths:
           type: string
           description: unfollowUser
       responses:
-        '200':
+        "200":
           description: User succesffully unfollowed
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -438,12 +448,12 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/block':
+  "/api/users/{username}/block":
     post:
       tags:
         - Actions
       summary: User blocks another User
-      description: ''
+      description: ""
       operationId: UserBlockUser
       consumes:
         - application/json
@@ -456,7 +466,7 @@ paths:
           required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -469,14 +479,14 @@ paths:
           type: string
           description: blockUser
       responses:
-        '200':
+        "200":
           description: User succesffully blocked
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -484,12 +494,12 @@ paths:
             properties:
               msg:
                 type: string
-  '/api/users/{username}/unblock':
+  "/api/users/{username}/unblock":
     post:
       tags:
         - Actions
       summary: User unblocks another User
-      description: ''
+      description: ""
       operationId: UserUnBlockUser
       consumes:
         - application/json
@@ -502,7 +512,7 @@ paths:
           required: true
         - in: body
           name: body
-          description: ''
+          description: ""
           required: true
           schema:
             type: object
@@ -515,14 +525,14 @@ paths:
           type: string
           description: unblockUser
       responses:
-        '200':
+        "200":
           description: User succesffully unblocked
           schema:
             type: object
             properties:
               msg:
                 type: string
-        '405':
+        "405":
           description: Invalid input
           schema:
             description: type of error
@@ -534,7 +544,7 @@ definitions:
   CompleteUser:
     type: object
     properties:
-      id:
+      userId:
         type: string
         format: uuid
       username:
@@ -546,10 +556,8 @@ definitions:
         type: string
       birthDate:
         type: string
-        format: date-time
-      hasProfilePhoto:
-        type: boolean
-      profilePicture:
+        format: date
+      photoUrl:
         type: string
         format: uri
     xml:
@@ -561,14 +569,12 @@ definitions:
         type: string
       birthDate:
         type: string
-        format: date-time
-      hasProfilePhoto:
-        type: boolean
-      profilePicture:
+        format: date
+      photoUrl:
         type: string
         format: uri
     xml:
       name: User
 externalDocs:
   description: Find out more about Swagger
-  url: 'http://swagger.io'
+  url: "http://swagger.io"

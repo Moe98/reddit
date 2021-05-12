@@ -228,7 +228,7 @@ package-lock.json
 .classpath
 *.env
 config.json
+.idea/dataSources.xml
 
-# Mac OS
+# MacOS
 .DS_Store
-
