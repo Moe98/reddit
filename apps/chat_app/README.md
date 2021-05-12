@@ -1,17 +1,20 @@
 # Chat App
 
-This is the chatting application service of Reddit.
+The chatting application of Reddit.
 
-## Installation
+## Installing and Running Dependencies
 
-You have to use docker for running next commands.
+You must have docker installed for running the next commands.
 
-To run Cassandra
+### Install and Run Cassandra
 
 ```bash
 docker run -d \ -p 9042:9042 \ --name cassandra \ cassandra:latest
 ```
-To run Cassandra web (optional)
+
+#### Install and Run Cassandra Web (optional)
+
+If you want to view the chat database through online UI
 ```bash
 docker run -d \
 -e CASSANDRA_HOST_IP=$(docker inspect --format '{{.NetworkSettings.IPAddress}}' cassandra) \
@@ -20,15 +23,15 @@ docker run -d \
 --name cassandra-web \
 delermando/docker-cassandra-web:v0.4.0
 ```
-Check `http://localhost:3000/` if you want to view the chat database through online UI.
+You can view the UI on `http://localhost:3000/`.
 
-To run RabbitMQ
+### Install and Run RabbitMQ
 
 ```bash
 docker run -d -p 5672:5672 -p 15672:15672 rabbitmq:management
 ```
 
-## Running Apps
+## Running Chat App
 
-Now all you have to do is run the `ChatServer` class and `ChatStorageApp` class then enjoy using the chatting app.
+Now all you have to do is run the `ChatServer` class in `chat_server` module and `ChatStorageApp` class in `chat_storage` module, then enjoy using the chatting app.
 
