@@ -31,9 +31,9 @@ public class AddGroupMember extends CommandWithVerification {
     @Override
     protected Schema getSchema() {
 
-        Attribute chatId = new Attribute("chatId", DataType.STRING, true);
-        Attribute adminId = new Attribute("adminId", DataType.STRING, true);
-        Attribute memberId = new Attribute("memberId", DataType.STRING, true);
+        Attribute chatId = new Attribute("chatId", DataType.UUID, true);
+        Attribute adminId = new Attribute("adminId", DataType.UUID, true);
+        Attribute memberId = new Attribute("memberId", DataType.UUID, true);
 
         return new Schema(List.of(chatId, adminId, memberId));
     }

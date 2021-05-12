@@ -30,8 +30,8 @@ public class CreateGroupMessage extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
-        Attribute chatId = new Attribute("chatId", DataType.STRING, true);
-        Attribute senderId = new Attribute("senderId", DataType.STRING, true);
+        Attribute chatId = new Attribute("chatId", DataType.UUID, true);
+        Attribute senderId = new Attribute("senderId", DataType.UUID, true);
         Attribute content = new Attribute("content", DataType.STRING, true);
 
         return new Schema(List.of(chatId, senderId, content));

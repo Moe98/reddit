@@ -44,7 +44,7 @@ public class GetChats extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
-        Attribute chatId = new Attribute("userId", DataType.STRING, true);
+        Attribute chatId = new Attribute("userId", DataType.UUID, true);
         return new Schema(List.of(chatId));
     }
 

@@ -31,8 +31,8 @@ public class CreateDirectChat extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
-        Attribute firstMember = new Attribute("firstMember", DataType.STRING, true);
-        Attribute secondMember = new Attribute("secondMember", DataType.STRING, true);
+        Attribute firstMember = new Attribute("firstMember", DataType.UUID, true);
+        Attribute secondMember = new Attribute("secondMember", DataType.UUID, true);
 
         return new Schema(List.of(firstMember, secondMember));
     }

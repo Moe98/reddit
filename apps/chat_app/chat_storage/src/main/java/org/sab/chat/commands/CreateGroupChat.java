@@ -32,7 +32,7 @@ public class CreateGroupChat extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
-        Attribute creator = new Attribute("creator", DataType.STRING, true);
+        Attribute creator = new Attribute("creator", DataType.UUID, true);
         Attribute name = new Attribute("name", DataType.STRING, true);
         Attribute description = new Attribute("description", DataType.STRING, true);
 
