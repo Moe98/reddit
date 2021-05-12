@@ -15,11 +15,13 @@ import java.util.List;
 public class FollowUser extends UserToUserCommand {
     @Override
     protected String execute() {
+        Arango arango = null;
         final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             final String userId = body.getString(USER_ID);
             final String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
@@ -42,7 +44,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String actionMakerBlockedUser = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String actionMakerBlockedUser = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             // TODO: If user can unfollow a user they blocked, then delete this condition.
             if (actionMakerBlockedUser.length() != 0) {
@@ -50,7 +52,7 @@ public class FollowUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String userBlockedActionMaker = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            final String userBlockedActionMaker = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
 
             if (userBlockedActionMaker.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
@@ -59,14 +61,14 @@ public class FollowUser extends UserToUserCommand {
 
             // Get the user to check if they exist or have been deleted.
             final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
-            final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
+            final boolean isDeleted = Boolean.parseBoolean(String.valueOf(userDocument.getAttribute(IS_DELETED_DB)));
 
             if (isDeleted) {
                 responseMessage = USER_DELETED_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            final String edgeKey = Arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            final String edgeKey = arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
             int followerCount = Integer.parseInt(String.valueOf(userDocument.getAttribute(NUM_OF_FOLLOWERS_DB)));
 
             if (edgeKey.length() != 0) {
@@ -88,6 +90,9 @@ public class FollowUser extends UserToUserCommand {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", responseMessage);
         }
 
@@ -104,5 +109,23 @@ public class FollowUser extends UserToUserCommand {
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
+    }
+
+    public static void main(String[] args) {
+        FollowUser followUser = new FollowUser();
+        JSONObject body = new JSONObject();
+        body.put(USER_ID, "moe");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "manta");
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(followUser.execute(request));
     }
 }

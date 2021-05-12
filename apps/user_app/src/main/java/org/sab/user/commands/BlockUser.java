@@ -26,13 +26,16 @@ public class BlockUser extends UserToUserCommand {
 
     @Override
     protected String execute() {
-        String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
-        String userId = body.getString(USER_ID);
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String responseMessage = "";
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
+
+            String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = body.getString(USER_ID);
 
 //            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
@@ -47,7 +50,7 @@ public class BlockUser extends UserToUserCommand {
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String actionMakerBlockedEdge = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
+            String actionMakerBlockedEdge = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, USER_COLLECTION_NAME + "/" + actionMakerId);
             if (actionMakerBlockedEdge.length() != 0) {
                 responseMessage = USER_BLOCKED_ACTION_MAKER_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
@@ -55,14 +58,14 @@ public class BlockUser extends UserToUserCommand {
 
             // Get the user to check if they exist or have been deleted.
             final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
-            final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
+            final boolean isDeleted = Boolean.parseBoolean(String.valueOf(userDocument.getAttribute(IS_DELETED_DB)));
 
             if (isDeleted) {
                 responseMessage = USER_DELETED_RESPONSE_MESSAGE;
                 return Responder.makeErrorResponse(responseMessage, 404).toString();
             }
 
-            String blockEdgeId = Arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+            String blockEdgeId = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
             if (blockEdgeId.length() != 0) {
                 responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
@@ -77,8 +80,29 @@ public class BlockUser extends UserToUserCommand {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", responseMessage);
         }
         return Responder.makeDataResponse(response).toString();
+    }
+
+    public static void main(String[] args) {
+        BlockUser blockUser = new BlockUser();
+        JSONObject body = new JSONObject();
+        body.put(USER_ID, "moe");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(USER_ID, "lujine");
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(blockUser.execute(request));
     }
 }

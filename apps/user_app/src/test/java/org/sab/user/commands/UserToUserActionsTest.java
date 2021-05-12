@@ -18,6 +18,7 @@ public class UserToUserActionsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            arango.connectIfNotConnected();
             assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(UserToUserCommand.TEST_DB_Name);
 
@@ -130,7 +131,7 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.SUCCESSFULLY_FOLLOWED_USER, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
@@ -153,7 +154,7 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
@@ -176,7 +177,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
@@ -206,7 +207,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.ACTION_MAKER_BLOCKED_USER_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
@@ -232,7 +233,7 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was removed successfully.
@@ -252,7 +253,7 @@ public class UserToUserActionsTest {
         assertEquals(200, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.SUCCESSFULLY_UNFOLLOWED_USER, ((JSONObject) responseJson.get("data")).getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was removed successfully.
@@ -277,7 +278,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + moeId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
@@ -307,7 +308,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_FOLLOWS_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not removed.
@@ -333,7 +334,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
@@ -355,7 +356,7 @@ public class UserToUserActionsTest {
         assertEquals(404, responseJson.getInt("statusCode"));
         assertEquals(UserToUserCommand.USER_DELETED_RESPONSE_MESSAGE, responseJson.getString("msg"));
 
-        String edgeId = Arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
+        String edgeId = arango.getSingleEdgeId(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_BLOCK_USER_COLLECTION_NAME, UserToUserCommand.USER_COLLECTION_NAME + "/" + mantaId, UserToUserCommand.USER_COLLECTION_NAME + "/" + lujineId);
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means it was not added.
