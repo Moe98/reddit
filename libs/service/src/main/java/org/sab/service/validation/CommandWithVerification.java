@@ -12,28 +12,25 @@ import java.util.stream.Collectors;
 
 public abstract class CommandWithVerification extends Command {
 
-    protected JSONObject body, uriParams;
+    protected JSONObject body, uriParams, authenticationParams;
     protected Schema schema;
+    protected static final String AUTHENTICATED = "isAuthenticated";
 
-    protected String getFromUriParams(String attribute) {
-        return (String) uriParams.getJSONArray(attribute).get(0);
-    }
 
     @Override
     public final String execute(JSONObject request) {
 
         schema = getSchema();
         uriParams = request.getJSONObject("uriParams");
-        if (request.getString("methodType").equals("GET")) {
-            if (!schema.isEmpty())
-                return Responder.makeErrorResponse(String.format("%s expects a body. Don't use a GET Request!", getClass().getSimpleName()), 500).toString();
-            body = new JSONObject();
-        } else
-            body = request.getJSONObject("body");
+        HTTPMethod methodType = getMethodType();
+        if (!methodType.equals(request.getString("methodType")))
+            return Responder.makeErrorResponse(String.format("%s expects a %s Request!", getClass().getSimpleName(), methodType), 500);
+        body = request.has("body") ? request.getJSONObject("body") : new JSONObject();
+        authenticationParams = request.has("authenticationParams") ? request.getJSONObject("authenticationParams") : new JSONObject();
         try {
             verifyBody();
         } catch (RequestVerificationException e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         }
         return execute();
     }
@@ -43,9 +40,15 @@ public abstract class CommandWithVerification extends Command {
 
     protected abstract Schema getSchema();
 
+    protected abstract HTTPMethod getMethodType();
+
     //instance methods
     private boolean isFoundInBody(Attribute attribute) {
-        return body.keySet().contains(attribute.getAttributeName());
+        return isFoundInBody(attribute.getAttributeName());
+    }
+
+    protected boolean isFoundInBody(String attribute) {
+        return body.has(attribute);
     }
 
     private void verifyBody() throws RequestVerificationException {
@@ -82,7 +85,7 @@ public abstract class CommandWithVerification extends Command {
     }
 
     private String makeInvalidlyTypedAttributeMessage(Attribute attribute) {
-        return String.format("%s must be of type %s.%s", attribute.getAttributeName(),
+        return String.format("%s must be of type %s. %s", attribute.getAttributeName(),
                 attribute.getDataType().toString(), attribute.getDataType().getAdditionalErrorMessage());
     }
 }

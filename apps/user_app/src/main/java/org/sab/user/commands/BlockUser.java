@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -16,6 +17,11 @@ public class BlockUser extends UserToUserCommand {
     protected Schema getSchema() {
         final Attribute userId = new Attribute(USER_ID, DataType.STRING, true);
         return new Schema(List.of(userId));
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 
     @Override

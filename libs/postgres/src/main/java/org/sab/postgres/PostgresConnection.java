@@ -1,16 +1,13 @@
 package org.sab.postgres;
 
-//import io.github.cdimascio.dotenv.Dotenv;
-import org.json.simple.parser.ParseException;
-import org.sab.postgres.exceptions.PropertiesNotLoadedException;
 
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
+
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
+import java.io.InputStreamReader;
+import java.sql.*;
 import java.util.Properties;
 
 public class PostgresConnection {
@@ -18,34 +15,28 @@ public class PostgresConnection {
 
     private String url;
     private Properties props;
-    private Connection conn;
-    private final URL configPath = getClass().getClassLoader().getResource("config.json");
-    private final String[] propertiesParams = {"POSTGRES_DB","POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
-//    Dotenv dotenv = Dotenv.configure().load();
+    private static final String[] propertiesParams = {"POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "POSTGRES_HOST", "POSTGRES_PORT"};
 
     private PostgresConnection() {
     }
 
-    public static PostgresConnection getInstance() throws PropertiesNotLoadedException {
+
+    public static PostgresConnection getInstance() throws EnvironmentVariableNotLoaded {
         if (instance == null) {
             final PostgresConnection attemptedConnection = new PostgresConnection();
-            try {
-                attemptedConnection.loadProperties();
-                instance = attemptedConnection;
-            } catch (IOException | ParseException e) {
-                throw new PropertiesNotLoadedException(e);
-            }
+            attemptedConnection.loadProperties();
+            instance = attemptedConnection;
+
         }
         return instance;
     }
 
-    private void loadProperties() throws IOException, ParseException, PropertiesNotLoadedException {
-        //        JSONObject propertiesJson = (JSONObject) parser.parse(new FileReader(configPath.getFile()));
+    private void loadProperties() throws EnvironmentVariableNotLoaded {
         props = new Properties();
 
         for (String param : propertiesParams)
-            if (System.getenv(param)==null)
-                throw new PropertiesNotLoadedException(String.format("%s is not an environment variable", param));
+            if (System.getenv(param) == null)
+                throw new EnvironmentVariableNotLoaded(param);
         props.setProperty("user", System.getenv("POSTGRES_USER"));
         props.setProperty("password", System.getenv("POSTGRES_PASSWORD"));
         url =
@@ -56,36 +47,94 @@ public class PostgresConnection {
                         System.getenv("POSTGRES_DB"));
     }
 
-    public Connection connect() {
-        try{
-            conn = DriverManager.getConnection(url, props);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-        return conn;
+    Connection connect() throws SQLException {
+        return DriverManager.getConnection(url, props);
     }
 
-    public void closeConnection(Connection c) {
-        try {
-            c.close();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+
+    private static String procedureInitializer(String procedureName, int numParams) {
+        StringBuilder ans = new StringBuilder("{").append("call");
+        ans.append(" ").append(procedureName).append("(");
+        for (int i = 0; i < numParams; i++)
+            ans.append("?").append(i == numParams - 1 ? ")" : ",");
+
+        ans.append("}");
+        return ans.toString();
+
     }
 
-    public void run(String storedProcedure, List<Object> arguments) {
+    public static ResultSet call(String procedureName, Object... params) throws SQLException, EnvironmentVariableNotLoaded {
+
+        PostgresConnection postgresConnection = getInstance();
+        Connection connection = postgresConnection.connect();
+        ResultSet resultSet;
         try {
-            final PreparedStatement stmt = conn.prepareStatement("call " + storedProcedure + "(?)");
-            for (int i = 0; i < arguments.size(); i++) {
-                stmt.setObject(i + 1, arguments.get(i));
-            }
-            stmt.execute();
-            stmt.close();
-        } catch (Exception err) {
-            System.out.println("An error has occurred.");
-            System.out.println("See full details below.");
-            err.printStackTrace();
+            resultSet = postgresConnection.call(procedureInitializer(procedureName, params.length), connection, params);
+            connection.close();
+        } finally {
+            connection.close();
         }
+        return resultSet;
     }
+
+    private ResultSet call(String sql, Connection connection, Object... params) throws SQLException {
+
+
+        CallableStatement callableStatement = connection.prepareCall(sql);
+
+        for (int i = 0; i < params.length; i++) {
+            callableStatement.setObject(i + 1, params[i]);
+        }
+        boolean containsResults = callableStatement.execute();
+        ResultSet resultSet = null;
+        if (containsResults) {
+            resultSet = callableStatement.getResultSet();
+        }
+        return resultSet;
+    }
+
+    private static void createUsersTable() throws IOException, EnvironmentVariableNotLoaded {
+
+        runScript(getScriptPath("CreateUsersTable"));
+    }
+
+    private static void createUsersProcedures() throws IOException, EnvironmentVariableNotLoaded {
+        runScript(getScriptPath("CreateUserProcedures"));
+    }
+
+    private static void runScript(String scriptPath) throws IOException, EnvironmentVariableNotLoaded {
+        for (String param : propertiesParams)
+            if (System.getenv(param) == null)
+                throw new EnvironmentVariableNotLoaded(param);
+        String[] command = new String[]{
+                "psql",
+                "-f",
+                scriptPath,
+                String.format("postgresql://%s:%s@%s:%s/%s", System.getenv("POSTGRES_USER"),
+                        System.getenv("POSTGRES_PASSWORD"), System.getenv("POSTGRES_HOST"),
+                        System.getenv("POSTGRES_PORT"), System.getenv("POSTGRES_DB"))
+        };
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        while ((line = input.readLine()) != null)
+            System.out.println(line);
+
+
+    }
+
+    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
+        createUsersTable();
+        createUsersProcedures();
+    }
+
+    private static String getScriptPath(String sqlScriptName) {
+        ClassLoader classLoader = PostgresConnection.class.getClassLoader();
+        File file = new File(classLoader.getResource("sql/" + sqlScriptName + ".sql").getFile());
+        return file.getAbsolutePath();
+    }
+
 }
