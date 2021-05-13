@@ -36,7 +36,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     String queueName;
     JSONObject authenticationParams;
     HttpPostRequestDecoder requestDecoder;
-    String contentChunks = "";
+    boolean isFormDate;
 
     JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -82,34 +82,31 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             uriParams = getURIParams();
             headers = getHeaders();
             ctx.channel().attr(Server.REQ_KEY).set(req);
-            if (!methodType.equals("GET") && headers.getString("Content-Type").split(";")[0].equals("multipart/form-data")) {
-                requestDecoder = new HttpPostRequestDecoder(req);
-                requestDecoder.setDiscardThreshold(0);
-            }
+            isFormDate = headers.getString("Content-Type").split(";")[0].equals("multipart/form-data");
         }
-        if (msg instanceof HttpContent) {
+        if (msg instanceof HttpContent && !isFormDate) {
             HttpContent content = (HttpContent) msg;
-            if (requestDecoder != null)
-                requestDecoder.offer(content);
-            else {
-                ByteBuf jsonBuf = content.content();
-                contentChunks += jsonBuf.toString(CharsetUtil.UTF_8);
-            }
-        }
-        if (msg instanceof FullHttpRequest) {
-            // TODO what's the point of this?
-            System.out.println("FullHttpRequest");
-            System.out.println(msg);
-        }
-        if (msg instanceof LastHttpContent) {
-            if (!methodType.equals("GET") && !contentChunks.isEmpty() && requestDecoder == null) {
+            ByteBuf jsonBuf = content.content();
+            String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
+            if (!methodType.equals("GET") && !jsonStr.isEmpty()) {
                 try {
-                    body = new JSONObject(contentChunks);
+                    body = new JSONObject(jsonStr);
                 } catch (JSONException e) {
                     errorResponse(ctx, 400, "Incorrect Body");
                     return;
                 }
             }
+        }
+        if (msg instanceof FullHttpRequest) {
+            if (!methodType.equals("GET") && isFormDate) {
+                requestDecoder = new HttpPostRequestDecoder((FullHttpRequest) msg);
+                requestDecoder.setDiscardThreshold(0);
+            }
+            // TODO what's the point of this?
+            System.out.println("FullHttpRequest");
+            System.out.println(msg);
+        }
+        if (msg instanceof LastHttpContent) {
             if (queueName != null && Server.apps.contains(queueName.toLowerCase())) {
                 ctx.channel().attr(Server.QUEUE_KEY).set(queueName);
                 try {
@@ -196,7 +193,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 jsonFile.put("type", fileUpload.getContentType());
                 files.put(fileUpload.getName(), jsonFile);
             }
-            httpData.release();
         }
         return data.put("files", files);
     }
