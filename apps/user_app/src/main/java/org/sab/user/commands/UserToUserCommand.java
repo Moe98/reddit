@@ -32,6 +32,8 @@ public abstract class UserToUserCommand extends CommandWithVerification {
     protected static final String USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE = "You have blocked this User.";
     protected static final String USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE = "You have unblocked this user.";
 
+    protected static final String OBJECT_NOT_FOUND = "The data you are requesting does not exist.";
+
     protected final BaseEdgeDocument addEdgeFromUserToUser(String actionMakerId, String userId) {
         final String from = USER_COLLECTION_NAME + "/" + actionMakerId;
         final String to = USER_COLLECTION_NAME + "/" + userId;
