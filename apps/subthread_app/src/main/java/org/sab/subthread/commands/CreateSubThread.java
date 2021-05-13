@@ -78,7 +78,7 @@ public class CreateSubThread extends SubThreadCommand {
 
             String subThreadId = res.getKey();
             parentThreadId = (String) res.getAttribute(PARENT_THREAD_ID_DB);
-            creatorId = (String) res.getAttribute(CONTENT_DB);
+            creatorId = (String) res.getAttribute(CREATOR_ID_DB);
 
             title = (String) res.getAttribute(TITLE_DB);
             content = (String) res.getAttribute(CONTENT_DB);
