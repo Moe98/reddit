@@ -42,21 +42,16 @@ public class BookmarkThread extends ThreadCommand {
         try {
             final String threadName = body.getString(THREAD_NAME);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
-           
+
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
-                responseMessage = "This thread does not exist.";
+                responseMessage = THREAD_DOES_NOT_EXIST;
                 return Responder.makeErrorResponse(responseMessage, 400).toString();
             }
 
@@ -66,10 +61,10 @@ public class BookmarkThread extends ThreadCommand {
                     THREAD_COLLECTION_NAME + "/" + threadName);
 
             if (!bookmarkEdgeId.equals("")) {
-                responseMessage = "You have removed this Thread from your bookmarks.";
+                responseMessage = UNBOOKMARKED_THREAD_SUCCESSFULLY;
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, bookmarkEdgeId);
             } else {
-                responseMessage = "You have added this Thread to your bookmarks!";
+                responseMessage = BOOKMARKED_THREAD_SUCCESSFULLY;
                 final BaseEdgeDocument userBookmarkThreadEdge = addEdgeFromUserToThread(userId, threadName);
                 arango.createEdgeDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, userBookmarkThreadEdge);
             }

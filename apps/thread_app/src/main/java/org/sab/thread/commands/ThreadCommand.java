@@ -47,6 +47,8 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String THREAD_DOES_NOT_EXIST = "This thread does not exist.";
     protected static final String FOLLOWED_THREAD_SUCCESSFULLY = "You are now following this Thread!";
     protected static final String UNFOLLOWED_THREAD_SUCCESSFULLY = "You have unfollowed this Thread.";
+    protected static final String BOOKMARKED_THREAD_SUCCESSFULLY = "You have added this Thread to your bookmarks!";
+    protected static final String UNBOOKMARKED_THREAD_SUCCESSFULLY = "You have removed this Thread from your bookmarks.";
 
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
