@@ -2,8 +2,10 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/apps" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apps/chat_app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/chat_server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/chat_server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/chat_storage/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/chat_app/chat_storage/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/resources" charset="UTF-8" />

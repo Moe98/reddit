@@ -39,6 +39,34 @@ public enum DataType {
 
             return pattern.matcher(email).matches();
         }
+    }, PASSWORD("Passwords must be at least 6 characters long") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            if (!STRING.isOfValidType(object)) {
+                return false;
+            }
+            String password = (String) object;
+            return password.length() >= 6;
+        }
+    }, USERNAME("Usernames must be at least 3 characters long.") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            if (!STRING.isOfValidType(object)) {
+                return false;
+            }
+            String username = (String) object;
+            return username.length() >= 3;
+        }
+    }, UUID("UUIDs must be a valid UUID String") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            try {
+                java.util.UUID.fromString((String) object);
+                return true;
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+        }
     }, ARRAY_OF_STRING("") {
         @Override
         public boolean isOfValidType(Object object) {
@@ -47,9 +75,10 @@ public enum DataType {
     };
 
     private String additionalErrorMessage;
+
     public abstract boolean isOfValidType(Object object);
 
-    private DataType(String additionalErrorMessage) {
+    DataType(String additionalErrorMessage) {
         this.additionalErrorMessage = additionalErrorMessage;
     }
 
