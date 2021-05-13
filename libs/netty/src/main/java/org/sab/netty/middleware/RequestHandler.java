@@ -102,9 +102,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 requestDecoder = new HttpPostRequestDecoder((FullHttpRequest) msg);
                 requestDecoder.setDiscardThreshold(0);
             }
-            // TODO what's the point of this?
-            System.out.println("FullHttpRequest");
-            System.out.println(msg);
         }
         if (msg instanceof LastHttpContent) {
             if (queueName != null && Server.apps.contains(queueName.toLowerCase())) {
@@ -118,7 +115,6 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
                 }
             } else
                 errorResponse(ctx, 404, "Not Found");
-
         }
     }
 
