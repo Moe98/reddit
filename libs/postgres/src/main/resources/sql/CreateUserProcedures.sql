@@ -16,6 +16,9 @@ CREATE OR REPLACE FUNCTION delete_user(in_username VARCHAR)
 BEGIN
     DELETE FROM users
     WHERE username = in_username ;
+
+    INSERT INTO deleted_users (username)
+    VALUES (in_username);
 END; $$
 LANGUAGE PLPGSQL;
 
@@ -55,3 +58,16 @@ BEGIN
     WHERE username = in_username ;
 END; $$
 LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION is_username_deleted(in_username VARCHAR)
+    RETURNS bool
+AS
+$$
+declare
+    Successful bool;
+BEGIN
+    SELECT count(*) AS is_username_deleted INTO Successful FROM deleted_users where username = in_username;
+    return Successful;
+END;
+$$
+    LANGUAGE PLPGSQL;

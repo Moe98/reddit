@@ -77,6 +77,10 @@ public class DeleteAccount extends UserCommand {
 
 
     private void deleteFromArango(String username) {
-        Arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), Map.of(UserAttributes.IS_DELETED.getArangoDb(), true), username);
+        try {
+            Arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), Map.of(UserAttributes.IS_DELETED.getArangoDb(), true), username);
+        } finally {
+            Arango.getInstance().disconnect();
+        }
     }
 }
