@@ -42,10 +42,12 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String PARENT_SUBTHREAD_ID_DB = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
 
     // Messages
-    protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+    protected static final String OBJECT_NOT_FOUND = "The data you are requesting does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
+    protected static final String THREAD_DOES_NOT_EXIST = "This thread does not exist.";
+    protected static final String FOLLOWED_THREAD_SUCCESSFULLY = "You are now following this Thread!";
+    protected static final String UNFOLLOWED_THREAD_SUCCESSFULLY = "You have unfollowed this Thread.";
 
-    // TODO get from env vars
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
     protected static final String TEST_DB_Name = DB_Name;
@@ -58,6 +60,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
 
     protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
     protected static final String COMMENT_COLLECTION_NAME = "Comment";
+
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;
