@@ -232,7 +232,6 @@ public class Arango {
 
         Map<String, Object> bindVars =  new HashMap<>();
         bindVars.put("attributeValue", attributeValue);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
         return query(DB_Name, query, bindVars);
     }
 
@@ -245,7 +244,6 @@ public class Arango {
         Map<String, Object> bindVars =  new HashMap<>();
         bindVars.put("fromNodeId", fromNodeId);
         bindVars.put("collectionName", collectionName);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
         return query(DB_Name, query, bindVars);
     }
 
@@ -271,7 +269,6 @@ public class Arango {
         Map<String, Object> bindVars =  new HashMap<>();
         bindVars.put("fromNodeId", toNodeId);
         bindVars.put("collectionName", collectionName);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
         return query(DB_Name, query, bindVars);
     }
 }
