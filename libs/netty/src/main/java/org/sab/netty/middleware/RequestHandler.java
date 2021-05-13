@@ -202,7 +202,9 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     }
 
     private void cleanUp() {
-        if (requestDecoder != null)
+        if (requestDecoder != null) {
             requestDecoder.destroy();
+            requestDecoder = null;
+        }
     }
 }
