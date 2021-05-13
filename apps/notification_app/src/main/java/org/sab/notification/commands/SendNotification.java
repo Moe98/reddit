@@ -6,6 +6,7 @@ import org.sab.notification.GoogleCredentialsLoadingFailedException;
 import org.sab.notification.NotificationSendingFailedException;
 import org.sab.service.Responder;
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -38,5 +39,10 @@ public class SendNotification extends CommandWithVerification {
         } catch (NotificationSendingFailedException e) {
             return Responder.makeErrorResponse("Could not notify", 500).toString();
         }
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        throw new UnsupportedOperationException("This command is not a server-command that is available through an HTTP request");
     }
 }
