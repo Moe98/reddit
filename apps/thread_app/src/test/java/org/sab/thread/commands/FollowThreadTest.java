@@ -6,7 +6,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
-import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
@@ -89,6 +88,12 @@ public class FollowThreadTest {
         return userFollowsThread(userId, threadName);
     }
 
+    private boolean edgeExistsFromUserToThread(String edgeCollectionName, String userId, String threadId) {
+        final String edgeId = arango.getSingleEdgeId(DB_NAME, edgeCollectionName, ThreadCommand.USER_COLLECTION_NAME + "/" + userId, ThreadCommand.THREAD_COLLECTION_NAME + "/" + threadId);
+
+        return !edgeId.equals("");
+    }
+
     @Test
     public void userFollowsThread() {
         BaseDocument threadDocument = arango.readDocument(DB_NAME, ThreadCommand.THREAD_COLLECTION_NAME, threadId);
@@ -103,6 +108,8 @@ public class FollowThreadTest {
         final int updatedFollowerCount = Integer.parseInt(String.valueOf(threadDocument.getAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(initialFollowerCount + 1, updatedFollowerCount);
+
+        assertTrue(edgeExistsFromUserToThread(ThreadCommand.USER_FOLLOW_THREAD_COLLECTION_NAME, followerId, threadId));
 
         userUnfollowsThread(followerId, threadId);
     }
@@ -125,6 +132,8 @@ public class FollowThreadTest {
         final int updatedFollowerCount = Integer.parseInt(String.valueOf(threadDocument.getAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB)));
 
         assertEquals(initialFollowerCount, updatedFollowerCount);
+
+        assertFalse(edgeExistsFromUserToThread(ThreadCommand.USER_FOLLOW_THREAD_COLLECTION_NAME, followerId, threadId));
     }
 
     @Test
@@ -135,5 +144,7 @@ public class FollowThreadTest {
 
         assertEquals(400, response.getInt("statusCode"));
         assertEquals(ThreadCommand.THREAD_DOES_NOT_EXIST, response.get("msg"));
+
+        assertFalse(edgeExistsFromUserToThread(ThreadCommand.USER_FOLLOW_THREAD_COLLECTION_NAME, followerId, threadId));
     }
 }
