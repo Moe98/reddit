@@ -14,7 +14,7 @@ public class InitConnectionRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        // Should authenticate before this
+        // TODO: Should authenticate before this.
         UUID userId = UUID.fromString((String) request.get("userId"));
         ClientManager.handleUserOnline(userId, ctx.channel());
 
