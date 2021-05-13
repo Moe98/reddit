@@ -139,7 +139,7 @@ public class ClientManager {
             if (isUserOnline(memberId)) {
                 sendResponseToUser(memberId, response);
             } else {
-                // Notify
+                // TODO: Add notify logic here.
             }
         }
     }
