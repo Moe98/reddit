@@ -31,7 +31,7 @@ public class CreateComment extends CommentCommand {
         request.put("body", body);
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
-        return  request;
+        return request;
     }
 
     public static void main(String[] args) {
@@ -53,7 +53,7 @@ public class CreateComment extends CommentCommand {
 //        System.out.println("=========");
 //
 //        System.out.println(addComment.execute(request));
-        
+
 //        body.put(PARENT_SUBTHREAD_ID, "74248");
 //        body.put(CONTENT, "no it is tasty!");
 //        body.put(PARENT_CONTENT_TYPE, "SubThread");
@@ -67,20 +67,20 @@ public class CreateComment extends CommentCommand {
         ArrayList<String> attribs = new ArrayList();
         JSONArray asmakJsonArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, attribs);
         JSONObject req;
-        for (int i = 0 ; i < asmakJsonArr.length(); i++) {
+        for (int i = 0; i < asmakJsonArr.length(); i++) {
             String subthreadId = asmakJsonArr.getJSONObject(i).getString(SubThreadCommand.SUBTHREAD_ID_DB);
             // insert 5 comments
-            for(int j = 0; j < 5; j++) {
+            for (int j = 0; j < 5; j++) {
                 // insert comment
                 req = createCommentReq(subthreadId, "Comment_" + i + "_" + j, "SubThread", "manta");
                 JSONObject level1Comment = new JSONObject(addComment.execute(req));
-                String level1CommentId = ((JSONObject)level1Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
+                String level1CommentId = ((JSONObject) level1Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
                 //insert 2 comments each at level 2
-                for(int k = 0; k < 2; k++) {
+                for (int k = 0; k < 2; k++) {
                     // insert comment
                     req = createCommentReq(level1CommentId, "Comment_" + i + "_" + j + "_" + k, "Comment", "lujine");
                     JSONObject level2Comment = new JSONObject(addComment.execute(req));
-                    String level2CommentId = ((JSONObject)level2Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
+                    String level2CommentId = ((JSONObject) level2Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
 
                     // insert 1 comment at level 3
                     req = createCommentReq(level2CommentId, "Comment_" + i + "_" + j + "_" + k + "_1", "Comment", "manta");
@@ -110,10 +110,9 @@ public class CreateComment extends CommentCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
 
             // TODO check other things exist
             //  If the parent is a subthread check subthread exists
@@ -131,9 +130,6 @@ public class CreateComment extends CommentCommand {
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
 
             final BaseDocument res = arango.createDocument(DB_Name, COMMENT_COLLECTION_NAME, myObject);
-
-            System.out.println(res);
-            System.out.println("=========");
 
             final String commentId = res.getKey();
             parentSubThreadId = (String) res.getAttribute(PARENT_SUBTHREAD_ID_DB);
@@ -159,15 +155,6 @@ public class CreateComment extends CommentCommand {
 
             // Create an edge between user and comment.
             final BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToComment(comment);
-
-            // Create the edge collections if they do not already exist.
-            if (!arango.collectionExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
-            }
-
-            if (!arango.collectionExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
-            }
 
             // Add the edge documents.
             arango.createEdgeDocument(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
@@ -201,9 +188,9 @@ public class CreateComment extends CommentCommand {
         final String to = COMMENT_COLLECTION_NAME + "/" + commentId;
 
         // TODO The collection names should come from a config file.
-        switch (parentContentType) {
-            case "Comment" -> from = COMMENT_COLLECTION_NAME + "/" + parentId;
-            case "SubThread" -> from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;
+        switch (parentContentType.toLowerCase()) {
+            case "comment" -> from = COMMENT_COLLECTION_NAME + "/" + parentId;
+            case "subthread" -> from = SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + parentId;
         }
 
         return addEdgeFromTo(from, to);
