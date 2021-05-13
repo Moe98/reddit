@@ -38,12 +38,9 @@ public class BlockUser extends UserToUserCommand {
             String userId = body.getString(USER_ID);
 
 //            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
@@ -77,7 +74,6 @@ public class BlockUser extends UserToUserCommand {
                 arango.createEdgeDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {
@@ -86,23 +82,5 @@ public class BlockUser extends UserToUserCommand {
             response.put("msg", responseMessage);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-        BlockUser blockUser = new BlockUser();
-        JSONObject body = new JSONObject();
-        body.put(USER_ID, "moe");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "lujine");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(blockUser.execute(request));
     }
 }

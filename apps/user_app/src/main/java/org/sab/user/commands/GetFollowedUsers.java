@@ -34,12 +34,9 @@ public class GetFollowedUsers extends UserToUserCommand {
 
             final String userId = uriParams.getString(USER_ID);
 
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
+
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
@@ -52,10 +49,10 @@ public class GetFollowedUsers extends UserToUserCommand {
             }
 
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
-            ArrayList<String> arr = new ArrayList<>();
-            arr.add(IS_DELETED_DB);
-            arr.add(NUM_OF_FOLLOWERS_DB);
-            response = arango.parseOutput(cursor, USER_ID_DB, arr);
+            ArrayList<String> arrOfAttributes = new ArrayList<>();
+            arrOfAttributes.add(IS_DELETED_DB);
+            arrOfAttributes.add(NUM_OF_FOLLOWERS_DB);
+            response = arango.parseOutput(cursor, USER_ID_DB, arrOfAttributes);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

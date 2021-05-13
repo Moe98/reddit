@@ -27,17 +27,11 @@ public class FollowUser extends UserToUserCommand {
             final String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
 
-            if (!arango.collectionExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
 
-            if (!arango.collectionExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
@@ -87,7 +81,6 @@ public class FollowUser extends UserToUserCommand {
             userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
             arango.updateDocument(DB_Name, USER_COLLECTION_NAME, userDocument, userId);
         } catch (Exception e) {
-            e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {
@@ -109,23 +102,5 @@ public class FollowUser extends UserToUserCommand {
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
-    }
-
-    public static void main(String[] args) {
-        FollowUser followUser = new FollowUser();
-        JSONObject body = new JSONObject();
-        body.put(USER_ID, "moe");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "manta");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(followUser.execute(request));
     }
 }
