@@ -15,6 +15,7 @@ import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,13 @@ public class SignUp extends UserCommand {
         String email = body.getString(EMAIL);
         Date birthdate = Date.valueOf(body.getString(BIRTHDATE));
 
+        try {
+            if (isUsernameDeleted(username))
+                return Responder.makeMsgResponse("This username is already in use, please try another one.");
+        } catch (EnvironmentVariableNotLoaded | SQLException e) {
+            return Responder.makeErrorResponse(e.getMessage(), 502);
+        }
+
         // Calling the create_user SQL procedure
         try {
             PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate);
@@ -75,7 +83,17 @@ public class SignUp extends UserCommand {
 
     private void InsertUserInArango(String username) {
         Map<String, Object> properties = Map.of(UserAttributes.IS_DELETED.getArangoDb(), false, UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
-        Arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), properties, username);
+        try {
+            Arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), properties, username);
+        } finally {
+            Arango.getInstance().disconnect();
+        }
+    }
+
+    private boolean isUsernameDeleted(String username) throws SQLException, EnvironmentVariableNotLoaded {
+        ResultSet resultSet = PostgresConnection.call("is_username_deleted", username);
+        resultSet.next();
+        return resultSet.getBoolean(1);
     }
 
 

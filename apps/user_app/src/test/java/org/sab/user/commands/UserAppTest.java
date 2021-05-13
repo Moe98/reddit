@@ -47,7 +47,6 @@ public class UserAppTest {
 
 
         JSONObject response = Requester.signUp(username, email, password, birthdate);
-
         assertEquals(200, response.getInt("statusCode"));
         JSONObject data = response.getJSONObject("data");
         assertEquals(username, data.getString("username"));
@@ -222,16 +221,33 @@ public class UserAppTest {
         assertEquals("User not found!", getUserResponse.getString("msg"));
     }
 
+    @Test
+    public void T15_signUpAfterDeleteWillFailWithSameUsername() {
+
+        String email = username + "@gmail.com";
+        String birthdate = "1997-12-14";
+        JSONObject response = Requester.signUp(username, email, password, birthdate);
+        String msg = response.getString("msg");
+        assertEquals("This username is already in use, please try another one.", msg);
+        assertEquals(200, response.getInt("statusCode"));
+        JSONObject getUserResponse = Requester.getUser();
+        assertEquals("User not found!", getUserResponse.getString("msg"));
+    }
+
     @AfterClass
     public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
-        arango.connectIfNotConnected();
-        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
-        Map<String, Object> props = user.getProperties();
-        boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
-        assertTrue(isDeleted);
-        int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
-        assertEquals(0, numberOfFollowers);
-        arango.deleteDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
+        try {
+            arango.connectIfNotConnected();
+            BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
+            Map<String, Object> props = user.getProperties();
+            boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
+            assertTrue(isDeleted);
+            int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
+            assertEquals(0, numberOfFollowers);
+            arango.deleteDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), username);
+        } finally {
+            arango.disconnect();
+        }
     }
 }

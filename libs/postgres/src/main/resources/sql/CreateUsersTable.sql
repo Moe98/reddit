@@ -7,3 +7,9 @@ CREATE TABLE IF NOT EXISTS users
     photo_url text,
     user_id character varying(50) UNIQUE
 );
+
+
+CREATE TABLE IF NOT EXISTS deleted_users
+(
+    username character varying(255) PRIMARY KEY
+);
