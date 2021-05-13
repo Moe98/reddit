@@ -18,7 +18,6 @@ jobs:
         image: rabbitmq
         ports:
           - 5672:5672
-          
       cassandra:
         image: cassandra
         ports:
@@ -38,6 +37,10 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+      minio:
+        image: fclairamb/minio-github-actions
+        ports:
+          - 9000:9000
 
     steps:
       - uses: actions/checkout@v2
@@ -86,6 +89,10 @@ jobs:
           # JWT
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+          # MinIO
+          MINIO_HOST: localhost
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 180
