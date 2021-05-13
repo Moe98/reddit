@@ -1,1 +1,2 @@
 DROP TABLE users CASCADE;
+DROP TABLE deleted_users CASCADE;
