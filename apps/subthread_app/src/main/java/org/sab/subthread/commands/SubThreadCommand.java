@@ -1,6 +1,7 @@
 package org.sab.subthread.commands;
 
 import org.sab.models.SubThreadAttributes;
+import org.sab.models.ThreadAttributes;
 import org.sab.models.report.SubThreadReportAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
@@ -54,13 +55,41 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_ID_DB = SubThreadReportAttributes.PARENT_THREAD_ID.getDb();
     protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
-    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
-    protected static final String ACTION_MAKER_ID = "userId";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
 
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
+    protected static final String NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
+
+    protected static final String ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+    protected static final String USER_ID_DB = UserAttributes.USER_ID.getDb();
+    protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+
+    // Thread attributes
+    protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
+    protected static final String THREAD_DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
+    protected static final String THREAD_CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
+    protected static final String THREAD_NUM_OF_FOLLOWERS = ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP();
+    // TODO remove attribute
+    protected static final String THREAD_DATE_CREATED = ThreadAttributes.DATE_CREATED.getHTTP();
+
+    protected static final String THREAD_ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
+    protected static final String THREAD_MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
+    protected static final String THREAD_ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String THREAD_BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
+
+    protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
+    protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
+    protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
+    protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
+
     // Database attributes
-    protected static final String DB_Name = "ARANGO_DB";
+    protected static final String DB_Name = System.getenv("ARANGO_DB");
+    //TODO: use diff db for testing
+    protected static final String TEST_DB_Name = DB_Name;
 
     protected static final String THREAD_COLLECTION_NAME = "Thread";
     protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";

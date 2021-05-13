@@ -46,7 +46,9 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
     // TODO get from env vars
-    protected static final String DB_Name = "ARANGO_DB";
+    protected static final String DB_Name = System.getenv("ARANGO_DB");
+    //TODO: use diff db for testing
+    protected static final String TEST_DB_Name = DB_Name;
     protected static final String THREAD_COLLECTION_NAME = "Thread";
     protected static final String USER_COLLECTION_NAME = "User";
     protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";

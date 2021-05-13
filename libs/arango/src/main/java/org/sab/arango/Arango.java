@@ -59,7 +59,6 @@ public class Arango {
     public void disconnect() {
         if (arangoDB != null) {
             arangoDB.shutdown();
-            arangoDB = null;
         }
     }
 

@@ -67,7 +67,8 @@ public class GetSubThreads extends SubThreadCommand {
         JSONObject body = new JSONObject();
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(THREAD_ID, "asmakElRayes7amido");
+        System.out.println(THREAD_ID);
+        uriParams.put(THREAD_ID, "GelatiAzza");
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "GET");

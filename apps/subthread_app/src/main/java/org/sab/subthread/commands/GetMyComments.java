@@ -26,14 +26,14 @@ public class GetMyComments extends CommentCommand{
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
+            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
             }
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
-            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
+            ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, COMMENT_COLLECTION_NAME, CREATOR_ID_DB, userId);
             ArrayList<String> arr = new ArrayList<>();
             arr.add(PARENT_SUBTHREAD_ID_DB);
             arr.add(CREATOR_ID_DB);
@@ -64,7 +64,7 @@ public class GetMyComments extends CommentCommand{
         JSONObject body = new JSONObject();
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "lujine");
+        uriParams.put(USER_ID, "Manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);

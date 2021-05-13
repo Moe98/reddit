@@ -18,7 +18,7 @@ import java.util.List;
 public class FollowThread extends ThreadCommand {
 
     public static void main(String[] args) {
-        FollowThread addComment = new FollowThread();
+        FollowThread followThread = new FollowThread();
         JSONObject body = new JSONObject();
         body.put(THREAD_NAME, "GelatiAzza");
 
@@ -33,7 +33,7 @@ public class FollowThread extends ThreadCommand {
         System.out.println(request);
         System.out.println("=========");
 
-//        System.out.println(addComment.execute(request));
+//        System.out.println(followThread.execute(request));
 
         Arango arango = Arango.getInstance();
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/lujine");
