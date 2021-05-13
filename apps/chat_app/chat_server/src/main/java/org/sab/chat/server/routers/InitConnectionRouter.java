@@ -18,7 +18,7 @@ public class InitConnectionRouter extends Router {
         UUID userId = UUID.fromString((String) request.get("userId"));
         ClientManager.handleUserOnline(userId, ctx.channel());
 
-        // Get user chats
+        // TODO: Get user chats.
         String[] attributes = {"userId"};
         packAndForwardRequest(ctx, request, attributes);
     }
