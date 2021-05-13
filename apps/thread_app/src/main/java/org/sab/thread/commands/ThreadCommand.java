@@ -45,10 +45,14 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String OBJECT_NOT_FOUND = "The data you are requesting does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
     protected static final String THREAD_DOES_NOT_EXIST = "This thread does not exist.";
+    protected static final String USER_DOES_NOT_EXIST = "The user you are trying to ban does not exist.";
     protected static final String FOLLOWED_THREAD_SUCCESSFULLY = "You are now following this Thread!";
     protected static final String UNFOLLOWED_THREAD_SUCCESSFULLY = "You have unfollowed this Thread.";
     protected static final String BOOKMARKED_THREAD_SUCCESSFULLY = "You have added this Thread to your bookmarks!";
     protected static final String UNBOOKMARKED_THREAD_SUCCESSFULLY = "You have removed this Thread from your bookmarks.";
+    protected static final String NOT_A_MODERATOR = "You are not a moderator of this thread.";
+    protected static final String USER_ALREADY_BANNED = "User is already banned from this thread.";
+    protected static final String USER_BANNED_SUCCESSFULLY = "User has been successfully banned.";
 
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing

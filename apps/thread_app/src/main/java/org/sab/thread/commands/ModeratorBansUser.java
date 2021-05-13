@@ -35,40 +35,31 @@ public class ModeratorBansUser extends ThreadCommand {
     @Override
     protected String execute() {
         Arango arango = null;
-        
+
         final JSONObject response = new JSONObject();
         String messageResponse = "";
-        
+
         try {
             final String threadName = body.getString(THREAD_NAME);
             final String bannedUserId = body.getString(BANNED_USER_ID);
             final String userId = uriParams.getString(ACTION_MAKER_ID);
-            
+
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB.
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
-            }
-            if (!arango.collectionExists(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
-                messageResponse = "This thread does not exist.";
+                messageResponse = THREAD_DOES_NOT_EXIST;
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
             // TODO what if this user is a mod??
             if (!checkUserExists(arango, bannedUserId)) {
-                messageResponse = "The user you are trying to ban does not exist.";
+                messageResponse = USER_DOES_NOT_EXIST;
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
@@ -83,12 +74,12 @@ public class ModeratorBansUser extends ThreadCommand {
 
             if (threadModeratorEdgeKey.equals("")) {
                 // User isn't a moderator of this thread.
-                messageResponse = "You are not a moderator of this thread.";
+                messageResponse = NOT_A_MODERATOR;
                 return Responder.makeErrorResponse(messageResponse, 401).toString();
             }
             if (!bannedUserEdgeKey.equals("")) {
                 // User is already banned from this thread.
-                messageResponse = "User is already banned from this thread.";
+                messageResponse = USER_ALREADY_BANNED;
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
 
@@ -96,7 +87,7 @@ public class ModeratorBansUser extends ThreadCommand {
             // user has not been banned yet from the thread.
             final BaseEdgeDocument userBannedFromThreadEdge = addEdgeFromUserToThread(bannedUserId, threadName);
             arango.createEdgeDocument(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, userBannedFromThreadEdge);
-            messageResponse = "User has been successfully banned.";
+            messageResponse = USER_BANNED_SUCCESSFULLY;
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
