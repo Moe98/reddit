@@ -1,13 +1,11 @@
 package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
-import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
@@ -31,8 +29,8 @@ public class CreateSubThreadTest {
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
     // user attributes
-    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getDb();
-    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
+    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     // subthread attribs
 

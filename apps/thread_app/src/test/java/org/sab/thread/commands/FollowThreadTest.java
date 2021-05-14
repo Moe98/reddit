@@ -27,14 +27,14 @@ public class FollowThreadTest {
 
             threadOwner = new BaseDocument();
             threadOwner.setKey(threadOwnerId);
-            threadOwner.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            threadOwner.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            threadOwner.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            threadOwner.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(threadOwner, "User");
 
             follower = new BaseDocument();
             follower.setKey(followerId);
-            follower.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            follower.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            follower.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            follower.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(follower, "User");
 
             thread = new BaseDocument();

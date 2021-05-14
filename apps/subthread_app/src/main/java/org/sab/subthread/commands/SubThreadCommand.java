@@ -90,15 +90,15 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String USER_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
 
-    protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
+    protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getArangoDb();
     // TODO duplicate vars
-    protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
-    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+    protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
 
-    protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
-    protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+    protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
+    protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
-    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getDb();
+    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
 
 
 

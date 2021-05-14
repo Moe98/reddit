@@ -27,14 +27,14 @@ public class ModeratorBansUserTest {
 
             moderator = new BaseDocument();
             moderator.setKey(moderatorId);
-            moderator.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            moderator.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            moderator.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            moderator.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(moderator, "User");
 
             bannedUser = new BaseDocument();
             bannedUser.setKey(bannedUserId);
-            bannedUser.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            bannedUser.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            bannedUser.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            bannedUser.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(bannedUser, "User");
 
             JSONObject request = new JSONObject();
@@ -139,8 +139,8 @@ public class ModeratorBansUserTest {
         final String dummyUserId = "DummyUser";
         final BaseDocument dummyUserDocument = new BaseDocument();
         dummyUserDocument.setKey(dummyUserId);
-        dummyUserDocument.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-        dummyUserDocument.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+        dummyUserDocument.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+        dummyUserDocument.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
         addObjectToCollection(dummyUserDocument, "User");
 
         final JSONObject response = moderatorBansUserFromThread(dummyUserId, bannedUserId, threadId);

@@ -37,8 +37,8 @@ public class BookmarkSubThreadTest {
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
     // user attributes
-    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getDb();
-    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
+    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
         arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);

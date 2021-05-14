@@ -11,8 +11,8 @@ import org.sab.models.user.UserAttributes;
 public class TestUtils {
 
     // user attributes
-    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getDb();
-    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
+    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     // thread attribs
     protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();

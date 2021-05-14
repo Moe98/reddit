@@ -31,7 +31,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     // user attributes
     // TODO get from enum
     protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
-    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
 
     // subthread attributes
     protected static final String SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();

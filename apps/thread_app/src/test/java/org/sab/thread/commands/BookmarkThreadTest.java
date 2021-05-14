@@ -27,14 +27,14 @@ public class BookmarkThreadTest {
 
             threadOwner = new BaseDocument();
             threadOwner.setKey(threadOwnerId);
-            threadOwner.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            threadOwner.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            threadOwner.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            threadOwner.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(threadOwner, "User");
 
             bookmarkingUser = new BaseDocument();
             bookmarkingUser.setKey(bookmarkingUserId);
-            bookmarkingUser.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            bookmarkingUser.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            bookmarkingUser.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            bookmarkingUser.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(bookmarkingUser, "User");
 
             thread = new BaseDocument();

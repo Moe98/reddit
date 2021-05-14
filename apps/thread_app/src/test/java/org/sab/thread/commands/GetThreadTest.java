@@ -27,8 +27,8 @@ public class GetThreadTest {
 
             user = new BaseDocument();
             user.setKey(userId);
-            user.addAttribute(UserAttributes.IS_DELETED.getDb(), false);
-            user.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
+            user.addAttribute(UserAttributes.IS_DELETED.getArangoDb(), false);
+            user.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(user, "User");
         } catch (Exception e) {
             fail(e.getMessage());
