@@ -30,13 +30,13 @@ public class UpdateProfilePhoto extends UserCommand {
         if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
         if(files.length()!=1)
-            return Responder.makeErrorResponse("One profile image is only allowed per upload, Check Form-Data Files!", 400);
+            return Responder.makeErrorResponse("Only one profile image allowed per upload, Check Form-Data Files!", 400);
 
         // retrieving the body objects
         String username = authenticationParams.getString(USERNAME);
         String photo = files.getJSONObject("image").getString("data");
         String contentType = files.getJSONObject("image").getString("type");
-        String output = "";
+        String output;
         User user;
         // getting the user
         try {
@@ -44,15 +44,12 @@ public class UpdateProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-        String publicId =  user.getUserId().replaceAll("[-]", "");
+        String publicId =  user.reformatUserId(user.getUserId());
 
         try {
-//            photoUrl = CloudinaryUtilities.uploadImage(photoUrl, user.getUserId());
-          output =  MinIO.uploadObject("profile-picture-scaleabull",publicId,photo,contentType);
-          System.out.println(output);
-          if(output.isEmpty()){
+          output =  MinIO.uploadObject(BUCKETNAME,publicId,photo,contentType);
+          if(output.isEmpty())
               return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
-          }
         } catch (EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }

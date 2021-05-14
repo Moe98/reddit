@@ -1,6 +1,6 @@
 package org.sab.user.commands;
 
-import org.sab.cloudinary.CloudinaryUtilities;
+import org.sab.min_io.MinIO;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
@@ -9,7 +9,6 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class DeleteProfilePhoto extends UserCommand {
 
 
         String username = authenticationParams.getString(USERNAME);
-
+        boolean output;
         User user;
         // getting the user
         try {
@@ -43,11 +42,13 @@ public class DeleteProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-
-        // Deleting from Cloudinary
+        String publicId =  user.reformatUserId(user.getUserId());
         try {
-            CloudinaryUtilities.deleteImage(user.getUserId());
-        } catch (IOException | EnvironmentVariableNotLoaded e) {
+            output =  MinIO.deleteObject(BUCKETNAME,publicId);
+            if(!output)
+                return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
+
+        } catch (EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }
 
