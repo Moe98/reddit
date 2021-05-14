@@ -1,4 +1,4 @@
-package org.sab.subthread;
+package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
@@ -10,7 +10,6 @@ import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
-import org.sab.subthread.commands.CreateComment;
 
 import static org.junit.Assert.*;
 
