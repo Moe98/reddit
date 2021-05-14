@@ -21,6 +21,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String DISLIKES = SubThreadAttributes.DISLIKES.getHTTP();
 
     protected static final String HASIMAGE = SubThreadAttributes.HAS_IMAGE.getHTTP();
+    protected static final String ACTION_MAKER_ID = SubThreadAttributes.ACTION_MAKER_ID.getHTTP();
 
     // Subthread attributes
     // db
@@ -60,15 +61,6 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
 
-    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
-    protected static final String ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
-    protected static final String IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
-    protected static final String NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
-
-    protected static final String ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
-    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
-    protected static final String USER_ID_DB = UserAttributes.USER_ID.getDb();
-    protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
 
     // Thread attributes
     protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
@@ -89,15 +81,26 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
     // User attributes
-    protected static final String USER_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
+
+    // TODO something is weird
+    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String USR_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
+
     protected static final String USER_IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
     protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String USER_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
 
     protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
+    // TODO duplicate vars
     protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
-    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getDb();
+    protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+
     protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+    protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+
+    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getDb();
+
+
 
     // Database attributes
     protected static final String DB_Name = System.getenv("ARANGO_DB");

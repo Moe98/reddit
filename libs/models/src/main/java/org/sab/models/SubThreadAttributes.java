@@ -15,7 +15,10 @@ public enum SubThreadAttributes {
 
     HAS_IMAGE("hasImage", "HasImage"),
 
-    DATE_CREATED("dateCreated", "DateCreated");
+    DATE_CREATED("dateCreated", "DateCreated"),
+
+    // additional attributes
+    ACTION_MAKER_ID("userId", null);
 
     private final String http;
     private final String db;
