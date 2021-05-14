@@ -86,7 +86,7 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
           # MinIO
-          MINIO_HOST: localhost
+          MINIO_HOST: https://play.min.io/
           MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
           MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
         uses: nick-invision/retry@v2

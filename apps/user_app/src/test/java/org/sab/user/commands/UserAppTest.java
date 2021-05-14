@@ -185,6 +185,7 @@ public class UserAppTest {
         } catch (IOException e) {
             fail(e.getMessage());
         }
+        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
         String msg = response.getString("msg");
         assertTrue(msg.startsWith("Profile Picture uploaded successfully"));
