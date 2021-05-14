@@ -20,6 +20,7 @@ public class DeleteThread extends ThreadCommand {
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected Schema getSchema() {
         Attribute threadId = new Attribute(THREAD_NAME, DataType.STRING, true);

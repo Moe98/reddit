@@ -2,7 +2,6 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
@@ -14,12 +13,12 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class CreateThread extends ThreadCommand {
+    private final long INITIAL_NUM_FOLLOWERS = 0;
+
     @Override
     protected boolean isAuthNeeded() {
         return true;
     }
-
-    private final long INITIAL_NUM_FOLLOWERS = 0;
 
     @Override
     protected Schema getSchema() {

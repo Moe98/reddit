@@ -14,11 +14,12 @@ public class AddImageToSubThread extends SubThreadCommand {
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
     }
-    
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
@@ -46,7 +47,7 @@ public class AddImageToSubThread extends SubThreadCommand {
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            
+
             // check subthread exist
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
@@ -63,7 +64,7 @@ public class AddImageToSubThread extends SubThreadCommand {
             }
 
             String publicId = subthreadId.replaceAll("[-]", "");
-            
+
             output = MinIO.uploadObject(BUCKETNAME, publicId, files.getJSONObject("image"));
             if (output.isEmpty()) {
                 return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
@@ -71,7 +72,7 @@ public class AddImageToSubThread extends SubThreadCommand {
 
             arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadDocument, subthreadId);
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {

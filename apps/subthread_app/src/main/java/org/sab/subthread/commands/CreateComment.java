@@ -3,7 +3,6 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
@@ -13,15 +12,9 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-
 import java.util.List;
 
 public class CreateComment extends CommentCommand {
-
-    @Override
-    protected boolean isAuthNeeded() {
-        return true;
-    }
 
     public static JSONObject createCommentReq(String parentId, String content, String parentContentType, String commenterId) {
 
@@ -38,6 +31,11 @@ public class CreateComment extends CommentCommand {
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
         return request;
+    }
+
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override

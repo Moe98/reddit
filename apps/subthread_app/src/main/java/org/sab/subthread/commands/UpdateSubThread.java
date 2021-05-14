@@ -11,12 +11,13 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-public class UpdateSubThread extends SubThreadCommand{
+public class UpdateSubThread extends SubThreadCommand {
 
     @Override
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected Schema getSchema() {
         final Attribute content = new Attribute(CONTENT, DataType.STRING, false);
@@ -41,9 +42,9 @@ public class UpdateSubThread extends SubThreadCommand{
             arango.connectIfNotConnected();
 
             String content = null, title = null;
-            if(body.has(CONTENT))
+            if (body.has(CONTENT))
                 content = body.getString(CONTENT);
-            if(body.has(TITLE))
+            if (body.has(TITLE))
                 title = body.getString(TITLE);
 
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
@@ -65,10 +66,10 @@ public class UpdateSubThread extends SubThreadCommand{
                 return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
             }
 
-            if(content != null) {
+            if (content != null) {
                 subthreadDocument.updateAttribute(CONTENT_DB, content);
             }
-            if(title != null) {
+            if (title != null) {
                 subthreadDocument.updateAttribute(TITLE_DB, title);
             }
 

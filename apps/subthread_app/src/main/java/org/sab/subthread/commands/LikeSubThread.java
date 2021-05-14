@@ -13,7 +13,7 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class LikeSubThread extends SubThreadCommand {
-    
+
     @Override
     protected boolean isAuthNeeded() {
         return true;

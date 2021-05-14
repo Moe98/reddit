@@ -9,7 +9,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-
 import java.util.List;
 
 public class CreateSubThread extends SubThreadCommand {
@@ -75,10 +74,10 @@ public class CreateSubThread extends SubThreadCommand {
             myObject.addAttribute(LIKES_DB, INITIAL_LIKES);
             myObject.addAttribute(DISLIKES_DB, INITIAL_DISLIKES);
             myObject.addAttribute(HASIMAGE_DB, hasImage);
-            
-            if(hasImage) {
+
+            if (hasImage) {
                 // TODO handle adding the image to the DB
-                
+
             }
 
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());

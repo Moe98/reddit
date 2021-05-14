@@ -3,7 +3,6 @@ package org.sab.thread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -17,6 +16,7 @@ public class GetFollowedThreads extends ThreadCommand {
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;

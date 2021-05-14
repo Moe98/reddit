@@ -12,11 +12,12 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class ReportSubThread extends SubThreadCommand {
-    
+
     @Override
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected Schema getSchema() {
         Attribute typeOfReport = new Attribute(TYPE_OF_REPORT, DataType.STRING, true);

@@ -83,7 +83,7 @@ public class AssignThreadModeratorTest {
 
         JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, assignerId);
         AuthParamsHandler.putAuthorizedParams(request, claims);
-        
+
         return new JSONObject(assignThreadModerator.execute(request));
     }
 

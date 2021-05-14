@@ -3,7 +3,6 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;

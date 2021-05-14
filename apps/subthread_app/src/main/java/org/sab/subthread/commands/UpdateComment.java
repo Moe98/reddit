@@ -37,7 +37,7 @@ public class UpdateComment extends CommentCommand {
             final String content = body.getString(CONTENT);
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
             // String userId = uriParams.getString(SubThreadCommand.ACTION_MAKER_ID);
-            
+
             final String commentId = uriParams.getString(COMMENT_ID);
 
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);

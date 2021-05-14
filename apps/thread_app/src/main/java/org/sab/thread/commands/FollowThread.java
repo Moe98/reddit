@@ -1,9 +1,7 @@
 package org.sab.thread.commands;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
@@ -12,8 +10,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
@@ -21,6 +17,7 @@ public class FollowThread extends ThreadCommand {
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;

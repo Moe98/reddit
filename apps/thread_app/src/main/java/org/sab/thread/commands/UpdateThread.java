@@ -16,6 +16,7 @@ public class UpdateThread extends ThreadCommand {
     protected boolean isAuthNeeded() {
         return true;
     }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;

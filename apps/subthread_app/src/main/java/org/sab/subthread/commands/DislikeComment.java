@@ -13,7 +13,7 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class DislikeComment extends CommentCommand {
-    
+
     @Override
     protected boolean isAuthNeeded() {
         return true;

@@ -108,7 +108,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     // Comment attributes
     // db
     protected static final String PARENT_SUBTHREAD_ID_DB = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
-//    protected static final String CREATOR_ID_DB = CommentAttributes.CREATOR_ID.getDb();
+    //    protected static final String CREATOR_ID_DB = CommentAttributes.CREATOR_ID.getDb();
 //    protected static final String LIKES_DB = CommentAttributes.LIKES.getDb();
 //    protected static final String DISLIKES_DB = CommentAttributes.DISLIKES.getDb();
 //    protected static final String CONTENT_DB = CommentAttributes.CONTENT.getDb();
