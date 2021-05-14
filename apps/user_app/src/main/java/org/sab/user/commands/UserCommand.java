@@ -19,14 +19,15 @@ public abstract class UserCommand extends CommandWithVerification {
     protected static final String PASSWORD = UserAttributes.PASSWORD.toString();
     protected static final String BIRTHDATE = UserAttributes.BIRTHDATE.toString();
     protected static final String PHOTO_URL = UserAttributes.PHOTO_URL.toString();
-    protected static final String NEW_PASSWORD = "newPassword";
     protected static final String USER_ID = UserAttributes.USER_ID.toString();
+    protected static final String NEW_PASSWORD = "newPassword";
     protected static final String OLD_PASSWORD = "oldPassword";
     protected static final String BUCKETNAME = "profile-picture-scaleabull";
+
     protected JSONObject authenticateUser(String username, String password) {
         boolean checkPassword;
-
         User user;
+
         try {
             user = getUser(username, UserAttributes.PASSWORD, UserAttributes.USER_ID, UserAttributes.PHOTO_URL);
             String hashedPassword = user.getPassword();
@@ -34,9 +35,10 @@ public abstract class UserCommand extends CommandWithVerification {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return new JSONObject().put("msg", e.getMessage()).put("statusCode", 502);
         }
-        if (!checkPassword) {
+
+        if (!checkPassword)
             return new JSONObject().put("msg", "Password is incorrect").put("statusCode", 401);
-        }
+        
         return new JSONObject().put("msg", "User Authentication successful!").put("statusCode", 200).put("data", user.toJSON());
     }
 
