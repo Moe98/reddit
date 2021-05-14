@@ -48,7 +48,6 @@ public class GetSubThreadTest {
     @AfterClass
     public static void tearDown() {
         removeObjectFromCollection(thread, "Thread");
-//        removeObjectFromCollection(subThread, "Subthread");
         removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
     }
