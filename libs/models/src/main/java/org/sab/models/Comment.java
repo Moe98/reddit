@@ -90,7 +90,7 @@ public class Comment {
     }
 
     public JSONObject toJSON() {
-
+                
         JSONObject comment = new JSONObject();
         comment.put(CommentAttributes.COMMENT_ID.getHTTP(), id);
         comment.put(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP(), parentSubthreadId);
@@ -100,7 +100,7 @@ public class Comment {
         comment.put(CommentAttributes.CONTENT.getHTTP(), content);
         comment.put(CommentAttributes.DATE_CREATED.getHTTP(), dateCreated);
         comment.put(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP(), parentContentType);
-        System.out.println(comment);
+        
         return comment;
     }
 }
