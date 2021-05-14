@@ -10,8 +10,14 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class DislikeComment extends CommentCommand{
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
+    }
+
     @Override
     protected Schema getSchema() {
         Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);

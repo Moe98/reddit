@@ -5,10 +5,17 @@ import org.sab.arango.Arango;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
 public class GetSubThread extends SubThreadCommand {
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
+    }
+
     @Override
     protected String execute() {
         Arango arango = null;

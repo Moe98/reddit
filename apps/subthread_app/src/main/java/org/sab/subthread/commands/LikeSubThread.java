@@ -8,6 +8,7 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class LikeSubThread extends SubThreadCommand{
     protected Schema getSchema() {
         Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
         return new Schema(List.of(subthreadId));
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 
     @Override

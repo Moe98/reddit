@@ -12,9 +12,14 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class DeleteSubThread extends SubThreadCommand {
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.DELETE;
+    }
     @Override
     protected Schema getSchema() {
         Attribute threadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);

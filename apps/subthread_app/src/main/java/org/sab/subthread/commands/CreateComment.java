@@ -12,11 +12,16 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import org.sab.service.validation.HTTPMethod;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateComment extends CommentCommand {
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
+    }
     public static JSONObject createCommentReq(String parentId, String content, String parentContentType, String commenterId) {
 
         JSONObject body = new JSONObject();

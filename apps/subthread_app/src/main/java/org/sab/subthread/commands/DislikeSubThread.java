@@ -10,8 +10,13 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class DislikeSubThread extends SubThreadCommand{
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
+    }
     @Override
     protected Schema getSchema() {
         Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);

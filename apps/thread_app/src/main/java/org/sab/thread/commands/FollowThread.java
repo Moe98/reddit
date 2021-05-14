@@ -10,12 +10,18 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
+    }
 
     public static void main(String[] args) {
         FollowThread followThread = new FollowThread();

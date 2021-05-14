@@ -12,8 +12,13 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class GetComments extends CommentCommand {
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
+    }
     @Override
     protected Schema getSchema() {
         final Attribute parentId = new Attribute(PARENT_SUBTHREAD_ID, DataType.STRING, true);

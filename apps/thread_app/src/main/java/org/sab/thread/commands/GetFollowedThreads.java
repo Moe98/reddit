@@ -7,12 +7,19 @@ import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class GetFollowedThreads extends ThreadCommand {
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
+    }
+
     @Override
     protected String execute() {
         Arango arango = null;

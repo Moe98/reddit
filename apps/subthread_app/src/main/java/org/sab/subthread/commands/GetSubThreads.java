@@ -10,12 +10,19 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class GetSubThreads extends SubThreadCommand {
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
+    }
+
     @Override
     protected String execute() {
         Arango arango = null;

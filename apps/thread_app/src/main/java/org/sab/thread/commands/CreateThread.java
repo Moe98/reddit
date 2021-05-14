@@ -9,6 +9,7 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
@@ -23,6 +24,11 @@ public class CreateThread extends ThreadCommand {
         Attribute numOfFollowers = new Attribute(NUM_OF_FOLLOWERS, DataType.INT);
 
         return new Schema(List.of(threadName, description, numOfFollowers));
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
     }
 
     // private Arango arango;

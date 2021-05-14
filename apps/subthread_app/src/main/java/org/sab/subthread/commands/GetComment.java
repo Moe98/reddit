@@ -7,8 +7,14 @@ import org.sab.service.Responder;
 import org.sab.validation.Schema;
 
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class GetComment extends CommentCommand {
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.GET;
+    }
+
     @Override
     protected String execute() {
 

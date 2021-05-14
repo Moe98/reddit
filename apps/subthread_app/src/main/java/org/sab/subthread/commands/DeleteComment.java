@@ -12,9 +12,13 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class DeleteComment extends CommentCommand {
-
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.DELETE;
+    }
     @Override
     protected Schema getSchema() {
         Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);

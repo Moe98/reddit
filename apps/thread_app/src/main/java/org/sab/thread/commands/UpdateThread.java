@@ -7,10 +7,17 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
 public class UpdateThread extends ThreadCommand {
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
+    }
+
     @Override
     protected String execute() {
         Arango arango = null;

@@ -8,6 +8,7 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
@@ -19,6 +20,11 @@ public class ReportSubThread extends SubThreadCommand{
         Attribute threadId = new Attribute(THREAD_ID, DataType.STRING, true);
         Attribute reportMsg = new Attribute(REPORT_MSG, DataType.STRING, true);
         return new Schema(List.of(typeOfReport,subthreadId,threadId,reportMsg));
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
     }
 
     @Override
@@ -66,7 +72,7 @@ public class ReportSubThread extends SubThreadCommand{
             java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
             myObject.addAttribute(DATE_CREATED_DB, sqlDate);
             myObject.addAttribute(REPORT_MSG_DB, reportMsg);
-            myObject.addAttribute(SUBTHREAD_ID_DB, subthreadId);
+            myObject.addAttribute(REPORTED_SUBTHREAD_ID, subthreadId);
 
             BaseDocument res = arango.createDocument(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
             msg = "Created Subthread Report";

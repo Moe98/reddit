@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -20,6 +21,11 @@ public class AssignThreadModerator extends ThreadCommand {
         return new Schema(List.of(parentSubthreadId, newModeratorId));
     }
 
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
+    }
+    
 
     @Override
     protected String execute() {

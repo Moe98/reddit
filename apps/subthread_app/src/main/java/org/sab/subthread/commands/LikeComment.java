@@ -8,6 +8,7 @@ import org.sab.service.Responder;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
@@ -16,6 +17,10 @@ public class LikeComment extends CommentCommand{
     protected Schema getSchema() {
         Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);
         return new Schema(List.of(commentId));
+    }
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 
     @Override

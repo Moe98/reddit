@@ -13,8 +13,13 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.sab.service.validation.HTTPMethod;
 
 public class CreateSubThread extends SubThreadCommand {
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.POST;
+    }
     final long INITIAL_LIKES = 0;
     final long INITIAL_DISLIKES = 0;
 
