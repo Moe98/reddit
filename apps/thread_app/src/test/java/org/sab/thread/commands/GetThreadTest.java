@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
@@ -59,11 +60,14 @@ public class GetThreadTest {
         body.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
+//        uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
 
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
+
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         CreateThread createThread = new CreateThread();
         return new JSONObject(createThread.execute(request));
@@ -88,7 +92,6 @@ public class GetThreadTest {
         final String threadName = "Epsilon", description = "Rules!";
         final JSONObject createThreadResponse = createThread(threadName, userId, description);
 
-        System.out.println(createThreadResponse);
         assertEquals(200, createThreadResponse.getInt("statusCode"));
 
         final JSONObject response = getThread(threadName);

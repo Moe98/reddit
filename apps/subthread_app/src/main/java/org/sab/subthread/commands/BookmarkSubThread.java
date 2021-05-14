@@ -13,24 +13,9 @@ import java.util.List;
 
 public class BookmarkSubThread extends SubThreadCommand {
 
-    public static void main(String[] args) {
-        BookmarkSubThread tc = new BookmarkSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put("id", "126209");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("userId", "33366");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -54,7 +39,7 @@ public class BookmarkSubThread extends SubThreadCommand {
 
         try {
             String subthreadId = body.getString(SUBTHREAD_ID);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
@@ -97,7 +82,6 @@ public class BookmarkSubThread extends SubThreadCommand {
 
 
         } catch (Exception e) {
-//            System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {

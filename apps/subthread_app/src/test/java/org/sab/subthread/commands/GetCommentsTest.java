@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
@@ -123,9 +124,11 @@ public class GetCommentsTest {
         body.put(CommentCommand.PARENT_CONTENT_TYPE, contentType);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentCommand.ACTION_MAKER_ID, userId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.GET);
+
+//        JSONObject claims = new JSONObject().put(SubThreadCommand.USERNAME, userId);
+//        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         GetComments getComments = new GetComments();
         return new JSONObject(getComments.execute(request));

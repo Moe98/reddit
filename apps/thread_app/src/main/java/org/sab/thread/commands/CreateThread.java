@@ -2,7 +2,6 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
@@ -14,57 +13,11 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class CreateThread extends ThreadCommand {
-
     private final long INITIAL_NUM_FOLLOWERS = 0;
 
-    public static void main(String[] args) {
-        Arango arango = Arango.getInstance();
-        arango.createDatabaseIfNotExists(DB_Name);
-//        arango.createCollection(DB_Name, "User", false);
-        arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
-
-//        BaseDocument myObject = new BaseDocument();
-//        myObject.setKey("manta");
-//        myObject.addAttribute("IsDeleted", false);
-//        myObject.addAttribute("NumOfFollowers", 0);
-//        arango.createDocument(DB_Name, "User", myObject);
-//
-//        BaseDocument myObject2 = new BaseDocument();
-//        myObject2.setKey("lujine");
-//        myObject2.addAttribute("IsDeleted", false);
-//        myObject2.addAttribute("NumOfFollowers", 0);
-//        arango.createDocument(DB_Name, "User", myObject2);
-
-        CreateThread tc = new CreateThread();
-        JSONObject request = new JSONObject();
-
-        JSONObject body = new JSONObject();
-        body.put("name", "asmakElRayes7amido");
-
-        body.put("description", "agmad subreddit fl wogod");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("creatorId", "manta");
-        request.put("body", body);
-        request.put("uriParams", uriParams);
-        request.put("methodType", "POST");
-        System.out.println(request);
-        System.out.println(tc.execute(request));
-
-        JSONObject request2 = new JSONObject();
-
-        JSONObject body2 = new JSONObject();
-        body2.put("name", "GelatiAzza");
-
-        body2.put("description", "tany agmad subreddit fl wogod");
-
-        JSONObject uriParams2 = new JSONObject();
-        uriParams2.put("creatorId", "lujine");
-        request2.put("body", body2);
-        request2.put("uriParams", uriParams2);
-        request2.put("methodType", "POST");
-        System.out.println(request2);
-        System.out.println(tc.execute(request2));
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -95,7 +48,7 @@ public class CreateThread extends ThreadCommand {
         try {
             String name = body.getString(THREAD_NAME);
             String description = body.getString(DESCRIPTION);
-            String creatorId = uriParams.getString(CREATOR_ID);
+            String creatorId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();

@@ -3,7 +3,6 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -13,24 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetSubThreads extends SubThreadCommand {
-
-    public static void main(String[] args) {
-        GetSubThreads getSubthreads = new GetSubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        System.out.println(THREAD_ID);
-        uriParams.put(THREAD_ID, "GelatiAzza");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getSubthreads.execute(request));
-    }
 
     @Override
     protected HTTPMethod getMethodType() {

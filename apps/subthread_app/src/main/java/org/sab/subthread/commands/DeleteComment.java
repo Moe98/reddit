@@ -16,6 +16,11 @@ import java.util.List;
 
 public class DeleteComment extends CommentCommand {
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+
+    @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.DELETE;
     }
@@ -35,11 +40,9 @@ public class DeleteComment extends CommentCommand {
 
         JSONArray commentJsonArr;
 
-        // TODO add authentication
         try {
             String commentId = body.getString(COMMENT_ID);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
-
+            String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 

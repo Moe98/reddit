@@ -12,6 +12,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class UpdateThread extends ThreadCommand {
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
 
     @Override
     protected HTTPMethod getMethodType() {
@@ -26,8 +30,8 @@ public class UpdateThread extends ThreadCommand {
 
         try {
             final String description = body.getString(DESCRIPTION);
-            final String userId = uriParams.getString(ACTION_MAKER_ID);
             final String threadId = uriParams.getString(THREAD_NAME);
+            String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();

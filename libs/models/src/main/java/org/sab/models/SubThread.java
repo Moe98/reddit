@@ -154,7 +154,7 @@ public class SubThread {
     
     // TODO fix enums
     public static String getCollectionName() {
-        return "SubThreads";
+        return CollectionNames.SUBTHREAD.get();
     }
 
     public static String getIdAttributeName() {

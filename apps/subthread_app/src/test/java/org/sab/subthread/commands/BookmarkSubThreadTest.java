@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
@@ -96,9 +97,11 @@ public class BookmarkSubThreadTest {
         body.put(SubThreadAttributes.SUBTHREAD_ID.getHTTP(), subthreadId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadAttributes.ACTION_MAKER_ID.getHTTP(), userId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
+
+        JSONObject claims = new JSONObject().put(SubThreadCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         BookmarkSubThread bookmarkSubThread = new BookmarkSubThread();
 
@@ -115,7 +118,6 @@ public class BookmarkSubThreadTest {
 
         // manta bookmarks both subThreads
         JSONObject response = bookmarkSubThread(mantaId, fishSubthreadId);
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         assertTrue(edgeExistsFromUserToSubThread(
@@ -175,7 +177,6 @@ public class BookmarkSubThreadTest {
 
         // moe bookmarks nonexistent subthread
         JSONObject response = bookmarkSubThread(moeId, "1");
-        System.out.println(response);
         assertEquals(400, response.getInt("statusCode"));
 
         assertEquals("Subthread does not exist", response.getString("msg"));

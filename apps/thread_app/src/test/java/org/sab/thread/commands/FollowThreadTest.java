@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
@@ -71,7 +72,6 @@ public class FollowThreadTest {
         body.put(ThreadAttributes.THREAD_NAME.getHTTP(), threadName);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadAttributes.ACTION_MAKER_ID.getHTTP(), userId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -79,7 +79,8 @@ public class FollowThreadTest {
         request.put("uriParams", uriParams);
 
         FollowThread followThread = new FollowThread();
-
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return new JSONObject(followThread.execute(request));
     }
 

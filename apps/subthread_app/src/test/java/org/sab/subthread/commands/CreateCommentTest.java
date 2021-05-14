@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
@@ -84,12 +85,14 @@ public class CreateCommentTest {
         body.put(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP(), parentContentType);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentAttributes.ACTION_MAKER_ID.getHTTP(), actionMakerId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, actionMakerId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         CreateComment createComment = new CreateComment();
 

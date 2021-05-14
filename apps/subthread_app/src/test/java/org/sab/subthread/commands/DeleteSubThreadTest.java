@@ -8,6 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
@@ -130,10 +131,12 @@ public class DeleteSubThreadTest {
         body.put(SubThreadCommand.SUBTHREAD_ID, subthreadId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadCommand.ACTION_MAKER_ID, userId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.DELETE);
 
+        JSONObject claims = new JSONObject().put(SubThreadCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
+        
         DeleteSubThread deletesubThread = new DeleteSubThread();
         return new JSONObject(deletesubThread.execute(request));
     }
@@ -166,7 +169,6 @@ public class DeleteSubThreadTest {
     @Test
     public void T03_CreatorDeleteSubThread() {
         JSONObject response = deleteSubThread(fishSubthread1Id, mantaId);
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         assertTrue(arango.documentExists(DB_NAME, THREAD_COLLECTION_NAME, fishName));

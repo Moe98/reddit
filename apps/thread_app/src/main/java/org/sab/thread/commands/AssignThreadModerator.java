@@ -12,26 +12,9 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class AssignThreadModerator extends ThreadCommand {
-
-    public static void main(String[] args) {
-        AssignThreadModerator tc = new AssignThreadModerator();
-
-        JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
-        body.put(MODERATOR_ID, "33366");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ASSIGNER_ID, "32930");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -59,7 +42,7 @@ public class AssignThreadModerator extends ThreadCommand {
             String threadId = body.getString(THREAD_NAME);
             String modId = body.getString(MODERATOR_ID);
 
-            String assignerId = uriParams.getString(ASSIGNER_ID);
+            String assignerId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();

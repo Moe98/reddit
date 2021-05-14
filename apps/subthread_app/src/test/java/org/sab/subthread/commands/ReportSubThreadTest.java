@@ -8,6 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
@@ -128,6 +129,9 @@ public class ReportSubThreadTest {
         uriParams.put(SubThreadCommand.REPORTER_ID, reporterId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.POST);
+
+        JSONObject claims = new JSONObject().put(SubThreadCommand.USERNAME, reporterId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         return tc.execute(request);
     }

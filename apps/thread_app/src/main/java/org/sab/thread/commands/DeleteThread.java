@@ -16,25 +16,9 @@ import java.util.List;
 
 public class DeleteThread extends ThreadCommand {
 
-    public static void main(String[] args) {
-
-        DeleteThread tc = new DeleteThread();
-
-        JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("userId", "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-        System.out.println(tc.execute(request));
-
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -64,7 +48,7 @@ public class DeleteThread extends ThreadCommand {
             arango.connectIfNotConnected();
 
             String threadName = body.getString(THREAD_NAME);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {

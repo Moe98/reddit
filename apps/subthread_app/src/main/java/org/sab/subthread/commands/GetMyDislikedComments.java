@@ -13,23 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetMyDislikedComments extends CommentCommand {
-    public static void main(String[] args) {
-        GetMyDislikedComments getMyDislikedComments = new GetMyDislikedComments();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMyDislikedComments.execute(request));
-
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -46,7 +32,7 @@ public class GetMyDislikedComments extends CommentCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            final String userId = uriParams.getString(USER_ID);
+            String userId = authenticationParams.getString(CommentCommand.USERNAME);
 
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);

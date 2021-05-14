@@ -1,5 +1,6 @@
 package org.sab.subthread.commands;
 
+import org.sab.models.CollectionNames;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
@@ -65,6 +66,7 @@ public abstract class CommentCommand extends CommandWithVerification {
 
 
     // User attributes
+    protected static final String USERNAME = UserAttributes.USERNAME.toString();
     protected static final String USER_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
     protected static final String USER_IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
     protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
@@ -97,12 +99,13 @@ public abstract class CommentCommand extends CommandWithVerification {
     // TODO get from env vars
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     protected static final String TEST_DB_Name = DB_Name;
-    protected static final String COMMENT_COLLECTION_NAME = "Comment";
-    protected static final String CONTENT_COMMENT_COLLECTION_NAME = "ContentComment";
-    protected static final String USER_COLLECTION_NAME = "User";
-    protected static final String USER_CREATE_COMMENT_COLLECTION_NAME = "UserCreateComment";
-    protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = "UserLikeComment";
-    protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = "UserDislikeComment";
-    protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
-    protected static final String THREAD_COLLECTION_NAME = "Thread";
+    // TODO bad name
+    protected static final String COMMENT_COLLECTION_NAME = CollectionNames.COMMENT.get();
+    protected static final String CONTENT_COMMENT_COLLECTION_NAME = CollectionNames.CONTENT_COMMENT.get();
+    protected static final String USER_COLLECTION_NAME = CollectionNames.USER.get();
+    protected static final String USER_CREATE_COMMENT_COLLECTION_NAME = CollectionNames.USER_CREATE_COMMENT.get();
+    protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = CollectionNames.USER_LIKE_COMMENT.get();
+    protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = CollectionNames.USER_DISLIKE_COMMENT.get();
+    protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
+    protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
 }

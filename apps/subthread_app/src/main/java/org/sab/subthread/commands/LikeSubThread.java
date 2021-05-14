@@ -13,24 +13,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class LikeSubThread extends SubThreadCommand {
-    public static void main(String[] args) {
-        LikeSubThread tc = new LikeSubThread();
 
-        JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "74248");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -54,8 +40,7 @@ public class LikeSubThread extends SubThreadCommand {
 
         try {
             String subthreadId = body.getString(SUBTHREAD_ID);
-            String userId = uriParams.getString(REPORTER_ID);
-
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 

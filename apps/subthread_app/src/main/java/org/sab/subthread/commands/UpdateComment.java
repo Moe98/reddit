@@ -14,6 +14,11 @@ import java.util.List;
 public class UpdateComment extends CommentCommand {
 
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+
+    @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
     }
@@ -30,7 +35,9 @@ public class UpdateComment extends CommentCommand {
             arango.connectIfNotConnected();
 
             final String content = body.getString(CONTENT);
-            final String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
+            // String userId = uriParams.getString(SubThreadCommand.ACTION_MAKER_ID);
+
             final String commentId = uriParams.getString(COMMENT_ID);
 
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);

@@ -3,7 +3,6 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -14,21 +13,9 @@ import java.util.List;
 
 public class GetMySubThreads extends SubThreadCommand {
 
-    public static void main(String[] args) {
-        GetMySubThreads getMySubthreads = new GetMySubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "Manta");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMySubthreads.execute(request));
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -44,7 +31,7 @@ public class GetMySubThreads extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            final String userId = uriParams.getString(USER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);

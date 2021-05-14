@@ -3,7 +3,6 @@ package org.sab.thread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -13,24 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetFollowedThreads extends ThreadCommand {
-
-    public static void main(String[] args) {
-        GetFollowedThreads getFollowedThreads = new GetFollowedThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "Manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getFollowedThreads.execute(request));
-
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -46,7 +30,7 @@ public class GetFollowedThreads extends ThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            final String userId = uriParams.getString(USER_ID);
+            String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);

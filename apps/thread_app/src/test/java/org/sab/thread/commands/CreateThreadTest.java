@@ -8,6 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 
 import java.util.ArrayList;
 
@@ -84,10 +85,13 @@ public class CreateThreadTest {
         body.put(ThreadCommand.DESCRIPTION, description);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
+
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
+
         return tc.execute(request);
     }
 
@@ -96,10 +100,11 @@ public class CreateThreadTest {
         JSONObject request = new JSONObject();
         JSONObject body = new JSONObject();
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return tc.execute(request);
     }
 
@@ -109,10 +114,11 @@ public class CreateThreadTest {
         JSONObject body = new JSONObject();
         body.put(ThreadCommand.DESCRIPTION, description);
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return tc.execute(request);
     }
 
@@ -122,10 +128,11 @@ public class CreateThreadTest {
         JSONObject body = new JSONObject();
         body.put(ThreadCommand.THREAD_NAME, name);
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return tc.execute(request);
     }
 

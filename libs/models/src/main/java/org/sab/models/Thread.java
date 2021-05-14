@@ -78,7 +78,7 @@ public class Thread {
 
     // TODO use enums
     public static String getCollectionName() {
-        return "Threads";
+        return CollectionNames.THREAD.get();
     }
 
     public static String getNameAttributeName() {

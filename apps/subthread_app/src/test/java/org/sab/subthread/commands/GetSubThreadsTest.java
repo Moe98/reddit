@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -86,12 +87,15 @@ public class GetSubThreadsTest {
         body.put(SubThreadCommand.HASIMAGE, hasImage);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put("creatorId", creatorId);
+//        uriParams.put("creatorId", creatorId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         tc.execute(request);
     }
@@ -106,12 +110,15 @@ public class GetSubThreadsTest {
             body.put(SubThreadCommand.HASIMAGE, hasImage);
 
             JSONObject uriParams = new JSONObject();
-            uriParams.put("creatorId", creatorId);
+//            uriParams.put("creatorId", creatorId);
 
             JSONObject request = new JSONObject();
             request.put("body", body);
             request.put("methodType", "POST");
             request.put("uriParams", uriParams);
+
+            JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, creatorId);
+            AuthParamsHandler.putAuthorizedParams(request, claims);
 
             tc.execute(request);
         }
@@ -127,7 +134,7 @@ public class GetSubThreadsTest {
         request.put("body", body);
         request.put("methodType", "GET");
         request.put("uriParams", uriParams);
-
+        
         return getSubthreads.execute(request);
     }
 
