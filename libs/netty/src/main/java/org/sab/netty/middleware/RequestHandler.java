@@ -1,7 +1,6 @@
 package org.sab.netty.middleware;
 
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,8 +15,8 @@ import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.netty.Server;
-import org.sab.auth.Jwt;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +61,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             JSONObject httpData = readHttpData();
             httpData.keySet().forEach(key -> request.put(key, httpData.getJSONObject(key)));
         }
-        
+
         return authenticate(request);
     }
 
@@ -150,25 +149,15 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     private JSONObject authenticate(JSONObject request) {
         // JWT token
         // set token if auth header is set
-        // format: Bearer xxxxxx-xxxxxx-xxxxxx
-        authenticationParams = new JSONObject();
-        Boolean authenticated = false;
+        // format: Bearer xxxxxx-xxxxxx-xxxxxx     
         String authHeader = headers.has("Authorization") ? headers.getString("Authorization") : null;
+        JSONObject authenticationParams = AuthParamsHandler.getUnauthorizedAuthParams();
         if (authHeader != null) {
             String[] auth = authHeader.split(" ");
             if (auth.length > 1) {
-                try {
-                    Map<String, Object> claims = Jwt.verifyAndDecode(auth[1]);
-                    authenticated = true;
-                    authenticationParams.put("username", claims.get("username"));
-                    authenticationParams.put("jwt", auth[1]);
-                } catch (JWTVerificationException jwtVerificationException) {
-                    System.out.println(jwtVerificationException.getMessage());
-                    authenticated = false;
-                }
+                authenticationParams = AuthParamsHandler.decodeToken(auth[1]);
             }
         }
-        authenticationParams.put("isAuthenticated", authenticated);
         request.put("authenticationParams", authenticationParams);
         return request;
     }

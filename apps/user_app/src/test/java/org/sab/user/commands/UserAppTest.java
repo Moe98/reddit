@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
 import org.sab.auth.Auth;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.functions.Utilities;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
@@ -125,7 +126,7 @@ public class UserAppTest {
         assertEquals("Login Successful!", response.getString("msg"));
         assertTrue(response.has("token"));
         token = response.getString("token");
-        Requester.decodeToken(token);
+        Requester.authenticationParams = AuthParamsHandler.decodeToken(token);
     }
 
     @Test

@@ -1,10 +1,6 @@
 package org.sab.user.commands;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.json.JSONObject;
-import org.sab.service.authentication.Jwt;
-
-import java.util.Map;
 
 public class Requester {
     Requester() {
@@ -77,19 +73,6 @@ public class Requester {
 
         JSONObject request = makeRequest(body, "DELETE", new JSONObject());
         return new JSONObject(new DeleteAccount().execute(request));
-    }
-
-    public static void decodeToken(String token) {
-        boolean authenticated;
-        try {
-            Map<String, Object> claims = Jwt.verifyAndDecode(token);
-            authenticated = true;
-            authenticationParams.put("username", claims.get("username"));
-            authenticationParams.put("jwt", token);
-        } catch (JWTVerificationException jwtVerificationException) {
-            authenticated = false;
-        }
-        authenticationParams.put("isAuthenticated", authenticated);
     }
 
 
