@@ -56,7 +56,6 @@ public class MinIO {
                             .bucket(bucketName)
                             .object(id)
                             .build());
-            System.out.println(url);
         } catch (MinioException | IOException | NoSuchAlgorithmException | InvalidKeyException e) {
             e.printStackTrace();
         }
