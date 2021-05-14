@@ -65,20 +65,4 @@ public class GetBlockedUsers extends UserToUserCommand {
         return Responder.makeDataResponse(response).toString();
     }
 
-    public static void main(String[] args) {
-        GetBlockedUsers getBlockedUsers = new GetBlockedUsers();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "manta");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getBlockedUsers.execute(request));
-    }
 }

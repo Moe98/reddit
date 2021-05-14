@@ -64,20 +64,4 @@ public class GetFollowedUsers extends UserToUserCommand {
         return Responder.makeDataResponse(response).toString();
     }
 
-    public static void main(String[] args) {
-        GetFollowedUsers getFollowedUsers = new GetFollowedUsers();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "Manta");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getFollowedUsers.execute(request));
-    }
 }
