@@ -68,11 +68,12 @@ public class User {
         this.numOfFollowers = numOfFollowers;
     }
 
-
     public static String getCollectionName() {
         return "Users";
     }
-
+    public static String reformatUserId(String userId){
+        return userId.replaceAll("[-]", "");
+    }
     @Override
     public String toString() {
         return "User{" +
