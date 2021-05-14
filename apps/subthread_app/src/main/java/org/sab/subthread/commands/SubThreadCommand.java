@@ -116,4 +116,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_DISLIKE_SUBTHREAD_COLLECTION_NAME = "UserDislikeSubthread";
     protected static final String SUBTHREAD_REPORTS_COLLECTION_NAME = "SubthreadReports";
     protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";
+
+    // image attributes
+    protected static final String BUCKETNAME = "subthread-picture-scaleabull";
 }
