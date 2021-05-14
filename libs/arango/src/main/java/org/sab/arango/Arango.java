@@ -31,8 +31,6 @@ public class Arango {
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
-
-        connect();
     }
 
     public static Arango getInstance() {

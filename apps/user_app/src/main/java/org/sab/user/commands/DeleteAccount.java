@@ -3,7 +3,7 @@ package org.sab.user.commands;
 import com.arangodb.ArangoDBException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.cloudinary.CloudinaryUtilities;
+import org.sab.minio.MinIO;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
@@ -15,7 +15,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -63,15 +62,17 @@ public class DeleteAccount extends UserCommand {
         }
 
         JSONObject user = userAuth.getJSONObject("data");
-
-        // Deleting profile picture from Cloudinary
-        if (user.has(UserAttributes.PHOTO_URL.toString()))
+        if (user.has(UserAttributes.PHOTO_URL.toString())) {
             try {
-                CloudinaryUtilities.deleteImage(user.getString(USER_ID));
-            } catch (IOException | EnvironmentVariableNotLoaded e) {
+                String publicId =  user.getString(UserAttributes.USER_ID.toString()).replaceAll("[-]", "");
+                boolean output = MinIO.deleteObject(BUCKETNAME, publicId);
+                if (!output)
+                    return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
+
+            } catch (EnvironmentVariableNotLoaded e) {
                 return Responder.makeErrorResponse(e.getMessage(), 400);
             }
-
+        }
         return Responder.makeMsgResponse("Account Deleted Successfully!");
     }
 
