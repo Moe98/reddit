@@ -9,6 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
+    </properties>
+
     <artifactId>arango</artifactId>
     <build>
         <plugins>
@@ -57,10 +63,4 @@
         </dependency>
 
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
-    </properties>
-
 </project>

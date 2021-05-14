@@ -1,15 +1,30 @@
 package org.sab.models;
 
+import org.json.JSONObject;
+
 @SuppressWarnings("unused")
 public class Thread {
-    String name;
-    String description;
-    String creator;
-    long numOfFollowers;
-    String dateCreated;
+    private String name;
+    private String description;
+    private String creatorId;
+    private long numOfFollowers;
+    private String dateCreated;
 
     public Thread() {
         super();
+    }
+    private Thread(String name, String creatorId,
+                      String description) {
+
+        this.name = name;
+        this.creatorId = creatorId;
+        this.description = description;
+    }
+
+    public static Thread createNewThread(String name, String creatorId,
+                                               String description) {
+
+        return new Thread(name, creatorId, description);
     }
 
     public String getName() {
@@ -21,23 +36,32 @@ public class Thread {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
+    // TODO fix duplicate methods
+    public String getCreatorId() {
+        return this.creatorId;
+    }
+
     public String getCreator() {
-        return creator;
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
     public void setCreator(String creator) {
-        this.creator = creator;
+        this.creatorId = creator;
     }
 
     public long getNumOfFollowers() {
-        return numOfFollowers;
+        return this.numOfFollowers;
     }
 
     public void setNumOfFollowers(long numOfFollowers) {
@@ -45,13 +69,14 @@ public class Thread {
     }
 
     public String getDateCreated() {
-        return dateCreated;
+        return this.dateCreated;
     }
 
     public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 
+    // TODO use enums
     public static String getCollectionName() {
         return "Threads";
     }
@@ -81,9 +106,19 @@ public class Thread {
         return "Thread{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", creator='" + creator + '\'' +
+                ", creator='" + creatorId + '\'' +
                 ", numOfFollowers=" + numOfFollowers +
                 ", dateCreated='" + dateCreated + '\'' +
                 '}';
+    }
+
+    public JSONObject toJSON() {
+        JSONObject thread = new JSONObject();
+        thread.put(ThreadAttributes.THREAD_NAME.getHTTP(), name);
+        thread.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
+        thread.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
+        thread.put(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP(), numOfFollowers);
+        thread.put(ThreadAttributes.DATE_CREATED.getHTTP(), dateCreated);
+        return thread;
     }
 }

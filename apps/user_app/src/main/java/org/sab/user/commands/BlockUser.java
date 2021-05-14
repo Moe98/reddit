@@ -81,6 +81,7 @@ public class BlockUser extends UserToUserCommand {
             }
             response.put("msg", responseMessage);
         }
+
         return Responder.makeDataResponse(response).toString();
     }
 }

@@ -13,6 +13,19 @@ public enum DataType {
         public boolean isOfValidType(Object object) {
             return object instanceof Integer;
         }
+    }, BOOLEAN("") {
+        @Override
+        public boolean isOfValidType(Object object) {
+
+            if (!STRING.isOfValidType(object)) {
+                return false;
+            }
+
+            final String booleanString = (String) object;
+            Pattern pattern = Pattern.compile("true|false");
+            return pattern.matcher(booleanString).matches();
+
+        }
     }, SQL_DATE("SQLDates must be formatted as Strings of the form (yyyy-[m]m-[d]d)") {
         @Override
         public boolean isOfValidType(Object object) {

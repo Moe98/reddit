@@ -13,6 +13,8 @@
     <module>user_app</module>
     <module>recommendation_app</module>
     <module>search_app</module>
+    <module>thread_app</module>
+    <module>subthread_app</module>
   </modules>
   <packaging>pom</packaging>
 

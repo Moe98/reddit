@@ -26,6 +26,8 @@ public class Arango {
 
     private Arango() {
         builder = new ArangoDB.Builder()
+//                .user("root")
+//                .password("root")
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
                 .serializer(new ArangoJack())
@@ -186,28 +188,27 @@ public class Arango {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
     }
 
-    public String getSingleEdgeId(String dbName, String collectionName, String userId, String contentId) {
+    public String getSingleEdgeId(String DB_Name, String collectionName, String fromNodeId, String toNodeId){
         String query = """
-                FOR content, edge IN 1..1 OUTBOUND @username @collectionName
-                    FILTER content._id == @contentId
+                FOR node, edge IN 1..1 OUTBOUND @fromNodeId @collectionName
+                    FILTER node._id == @toNodeId
                     RETURN DISTINCT {edgeId:edge._key}
                 """;
 
-        Map<String, Object> bindVars = new HashMap<>();
-        bindVars.put("username", userId);
-        bindVars.put("contentId", contentId);
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("fromNodeId", fromNodeId);
+        bindVars.put("toNodeId", toNodeId);
         bindVars.put("collectionName", collectionName);
-
-        ArangoCursor<BaseDocument> cursor = query(dbName, query, bindVars);
+        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
+        ArangoCursor<BaseDocument> cursor = query(DB_Name, query, bindVars);
         String edgeId = "";
-
         if (cursor.hasNext()) {
             edgeId = (String) cursor.next().getAttribute("edgeId");
         }
-
         return edgeId;
     }
 
+    
     public boolean containsDatabase(String dbName) {
         return arangoDB.getDatabases().contains(dbName);
     }
