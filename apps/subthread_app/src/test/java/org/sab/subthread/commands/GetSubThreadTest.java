@@ -40,19 +40,6 @@ public class GetSubThreadTest {
             thread.addAttribute(ThreadAttributes.DATE_CREATED.getDb(), sqlDate);
             thread.addAttribute(ThreadAttributes.NUM_OF_FOLLOWERS.getDb(), 0);
             addObjectToCollection(thread, "Thread");
-
-//            subThread = new BaseDocument();
-//            subThread.setKey(subThreadId);
-//            subThread.addAttribute(SubThreadAttributes.PARENT_THREAD_ID.getDb(), threadId);
-//            subThread.addAttribute(SubThreadAttributes.CREATOR_ID.getDb(), userId);
-//            subThread.addAttribute(SubThreadAttributes.TITLE.getDb(), "title");
-//            subThread.addAttribute(SubThreadAttributes.CONTENT.getDb(), "content");
-//            subThread.addAttribute(SubThreadAttributes.LIKES.getDb(), 0);
-//            subThread.addAttribute(SubThreadAttributes.DISLIKES.getDb(), 0);
-//            subThread.addAttribute(SubThreadAttributes.HAS_IMAGE.getDb(), false);
-//            sqlDate = new java.sql.Date(System.currentTimeMillis());
-//            subThread.addAttribute(SubThreadAttributes.DATE_CREATED.getDb(), sqlDate);
-//            addObjectToCollection(subThread, "Subthread");
         } catch (Exception e) {
             fail(e.getMessage());
         }
