@@ -71,9 +71,11 @@ public class User {
     public static String getCollectionName() {
         return "Users";
     }
-    public static String reformatUserId(String userId){
+
+    public String reformatUserId() {
         return userId.replaceAll("[-]", "");
     }
+
     @Override
     public String toString() {
         return "User{" +

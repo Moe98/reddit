@@ -14,7 +14,6 @@ public class Login extends UserCommand {
 
 
     protected Schema getSchema() {
-
         Attribute username = new Attribute(USERNAME, DataType.USERNAME, true);
         Attribute password = new Attribute(PASSWORD, DataType.PASSWORD, true);
         return new Schema(List.of(username, password));
@@ -27,16 +26,13 @@ public class Login extends UserCommand {
 
     @Override
     protected String execute() {
-        // retrieving the body objects
-
         String username = body.getString(USERNAME);
         String password = body.getString(PASSWORD);
 
-        // Authentication
         JSONObject userAuth = authenticateUser(username, password);
         if (userAuth.getInt("statusCode") != 200)
             return userAuth.toString();
-        // Add token parameters
+
         Map<String, String> claims = Map.of(USERNAME, username);
         String token = Jwt.generateToken(claims, 60);
 

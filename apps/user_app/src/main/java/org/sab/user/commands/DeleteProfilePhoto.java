@@ -24,16 +24,15 @@ public class DeleteProfilePhoto extends UserCommand {
     }
 
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+
+    @Override
     protected String execute() {
-        boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
-        if (!authenticated)
-            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
-
-
         String username = authenticationParams.getString(USERNAME);
-        boolean output;
         User user;
-        // getting the user
+
         try {
             user = getUser(username, UserAttributes.PHOTO_URL, UserAttributes.USER_ID);
             if (user.getPhotoUrl() == null)
@@ -42,17 +41,14 @@ public class DeleteProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-        String publicId =  user.reformatUserId(user.getUserId());
-        try {
-            output =  MinIO.deleteObject(BUCKETNAME,publicId);
-            if(!output)
-                return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
 
+        try {
+            if (!MinIO.deleteObject(BUCKETNAME, user.reformatUserId()))
+                return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
         } catch (EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }
 
-        //calling the appropriate SQL procedure
         try {
             PostgresConnection.call("delete_profile_picture", username);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {

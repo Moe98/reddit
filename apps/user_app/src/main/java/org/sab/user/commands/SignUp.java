@@ -41,8 +41,6 @@ public class SignUp extends UserCommand {
 
     @Override
     protected String execute() {
-
-        // retrieving the body objects
         String username = body.getString(USERNAME);
         String userId = UUID.randomUUID().toString();
         String hashedPassword = Auth.hash(body.getString(PASSWORD));
@@ -56,7 +54,6 @@ public class SignUp extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
-        // Calling the create_user SQL procedure
         try {
             PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
@@ -69,15 +66,12 @@ public class SignUp extends UserCommand {
             return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
         }
 
-
-        // getting the user
         try {
             User user = getUser(username, UserAttributes.USER_ID, UserAttributes.USERNAME, UserAttributes.EMAIL, UserAttributes.BIRTHDATE);
             return Responder.makeDataResponse(user.toJSON());
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-
 
     }
 

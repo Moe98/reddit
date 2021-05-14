@@ -42,10 +42,9 @@ public class UpdateProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-        String publicId = user.reformatUserId(user.getUserId());
-
+        
         try {
-            output = MinIO.uploadObject(BUCKETNAME, publicId, files.getJSONObject("image"));
+            output = MinIO.uploadObject(BUCKETNAME, user.reformatUserId(), files.getJSONObject("image"));
             if (output.isEmpty())
                 return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
         } catch (EnvironmentVariableNotLoaded e) {

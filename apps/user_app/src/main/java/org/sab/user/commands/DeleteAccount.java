@@ -33,27 +33,24 @@ public class DeleteAccount extends UserCommand {
     }
 
     @Override
-    protected String execute() {
-        boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
-        if (!authenticated)
-            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
+    protected boolean isAuthNeeded() {
+        return true;
+    }
 
-        // retrieving the body objects
+    @Override
+    protected String execute() {
         String username = authenticationParams.getString(USERNAME);
         String password = body.getString(PASSWORD);
 
-        // Authentication
         JSONObject userAuth = authenticateUser(username, password);
         if (userAuth.getInt("statusCode") != 200)
             return userAuth.toString();
 
-        //calling the delete SQL procedure
         try {
             PostgresConnection.call("delete_user", username);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-
 
         try {
             deleteFromArango(username);
@@ -62,13 +59,11 @@ public class DeleteAccount extends UserCommand {
         }
 
         JSONObject user = userAuth.getJSONObject("data");
-        if (user.has(UserAttributes.PHOTO_URL.toString())) {
+        if (user.has(PHOTO_URL)) {
             try {
-                String publicId =  user.getString(UserAttributes.USER_ID.toString()).replaceAll("[-]", "");
-                boolean output = MinIO.deleteObject(BUCKETNAME, publicId);
-                if (!output)
+                String publicId = user.getString(USER_ID).replaceAll("[-]", "");
+                if (!MinIO.deleteObject(BUCKETNAME, publicId))
                     return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
-
             } catch (EnvironmentVariableNotLoaded e) {
                 return Responder.makeErrorResponse(e.getMessage(), 400);
             }
