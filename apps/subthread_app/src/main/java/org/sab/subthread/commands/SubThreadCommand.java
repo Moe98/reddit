@@ -1,5 +1,7 @@
 package org.sab.subthread.commands;
 
+import org.sab.models.CollectionNames;
+import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.report.SubThreadReportAttributes;
@@ -58,12 +60,12 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_ID_DB = SubThreadReportAttributes.PARENT_THREAD_ID.getDb();
     protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
-
+    // messages
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
-
     // Thread attributes
+    // http
     protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
     protected static final String THREAD_DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
     protected static final String THREAD_CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
@@ -76,14 +78,16 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
     protected static final String THREAD_BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
 
+    // Thread attributes
+    // http
     protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
     // User attributes
-
     // TODO something is weird
+    protected static final String USERNAME = UserAttributes.USERNAME.toString();
     protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String USR_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
 
@@ -101,21 +105,32 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
 
+    // Comment attributes
+    // db
+    protected static final String PARENT_SUBTHREAD_ID_DB = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
+//    protected static final String CREATOR_ID_DB = CommentAttributes.CREATOR_ID.getDb();
+//    protected static final String LIKES_DB = CommentAttributes.LIKES.getDb();
+//    protected static final String DISLIKES_DB = CommentAttributes.DISLIKES.getDb();
+//    protected static final String CONTENT_DB = CommentAttributes.CONTENT.getDb();
+//    protected static final String DATE_CREATED_DB = CommentAttributes.DATE_CREATED.getDb();
+    protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
+    protected static final String PARENT_CONTENT_TYPE_DB = CommentAttributes.PARENT_CONTENT_TYPE.getDb();
 
     // Database attributes
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
     protected static final String TEST_DB_Name = DB_Name;
 
-    protected static final String THREAD_COLLECTION_NAME = "Thread";
-    protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
-    protected static final String USER_COLLECTION_NAME = "User";
+    protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
+    protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
+    protected static final String USER_COLLECTION_NAME = CollectionNames.USER.get();
+    protected static final String COMMENT_COLLECTION_NAME = CollectionNames.COMMENT.get();
 
-    protected static final String USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME = "UserBookmarkSubthread";
-    protected static final String USER_LIKE_SUBTHREAD_COLLECTION_NAME = "UserLikeSubthread";
-    protected static final String USER_DISLIKE_SUBTHREAD_COLLECTION_NAME = "UserDislikeSubthread";
-    protected static final String SUBTHREAD_REPORTS_COLLECTION_NAME = "SubthreadReports";
-    protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";
+    protected static final String USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_BOOKMARK_SUBTHREAD.get();
+    protected static final String USER_LIKE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_LIKE_SUBTHREAD.get();
+    protected static final String USER_DISLIKE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_DISLIKE_SUBTHREAD.get();
+    protected static final String SUBTHREAD_REPORTS_COLLECTION_NAME = CollectionNames.SUBTHREAD_REPORTS.get();
+    protected static final String USER_MOD_THREAD_COLLECTION_NAME = CollectionNames.USER_MOD_THREAD.get();
 
     // image attributes
     protected static final String BUCKETNAME = "subthread-picture-scaleabull";

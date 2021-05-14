@@ -3,6 +3,7 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CollectionNames;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
@@ -30,6 +31,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
 
     // user attributes
     // TODO get from enum
+    protected static final String USERNAME = UserAttributes.USERNAME.toString();
     protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
 
@@ -57,16 +59,15 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
     protected static final String TEST_DB_Name = DB_Name;
-    protected static final String THREAD_COLLECTION_NAME = "Thread";
-    protected static final String USER_COLLECTION_NAME = "User";
-    protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";
-    protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = "UserFollowThread";
-    protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = "UserBookmarkThread";
-    protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = "UserBannedFromThread";
+    protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
+    protected static final String USER_COLLECTION_NAME = CollectionNames.USER.get();
+    protected static final String USER_MOD_THREAD_COLLECTION_NAME = CollectionNames.USER_MOD_THREAD.get();
+    protected static final String USER_FOLLOW_THREAD_COLLECTION_NAME = CollectionNames.USER_FOLLOW_THREAD.get();
+    protected static final String USER_BOOKMARK_THREAD_COLLECTION_NAME = CollectionNames.USER_BOOKMARK_THREAD.get();
+    protected static final String USER_BANNED_FROM_THREAD_COLLECTION_NAME = CollectionNames.USER_BANNED_FROM_THREAD.get();
 
-    protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
-    protected static final String COMMENT_COLLECTION_NAME = "Comment";
-
+    protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
+    protected static final String COMMENT_COLLECTION_NAME = CollectionNames.COMMENT.get();
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;
