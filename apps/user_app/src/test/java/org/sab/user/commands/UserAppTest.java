@@ -159,8 +159,6 @@ public class UserAppTest {
 
     @Test
     public void T09_updatePasswordBack() {
-
-
         JSONObject response = Requester.updatePassword("123456", password);
         assertEquals(200, response.getInt("statusCode"));
         assertEquals("Account Updated Successfully!", response.getString("msg"));
@@ -168,8 +166,6 @@ public class UserAppTest {
 
     @Test
     public void T10_newPasswordCannotMatchPreviousPassword() {
-
-
         JSONObject response = Requester.updatePassword(password, password);
         int statusCode = response.getInt("statusCode");
         assertTrue(statusCode >= 400);
@@ -185,7 +181,6 @@ public class UserAppTest {
         } catch (IOException e) {
             fail(e.getMessage());
         }
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
         String msg = response.getString("msg");
         assertTrue(msg.startsWith("Profile Picture uploaded successfully"));
@@ -204,7 +199,7 @@ public class UserAppTest {
 
     @Test
     public void T13_deleteProfilePicture() {
-    
+
         JSONObject response = Requester.deleteProfilePicture();
         JSONObject user = Requester.getUser().getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));
