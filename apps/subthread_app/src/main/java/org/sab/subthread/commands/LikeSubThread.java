@@ -5,14 +5,34 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
-public class LikeSubThread extends SubThreadCommand{
+public class LikeSubThread extends SubThreadCommand {
+    public static void main(String[] args) {
+        LikeSubThread tc = new LikeSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put(SUBTHREAD_ID, "74248");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "lujine");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
+    }
+
     @Override
     protected Schema getSchema() {
         Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
@@ -51,7 +71,7 @@ public class LikeSubThread extends SubThreadCommand{
             }
 
             // TODO check if subthread exists
-            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -59,18 +79,17 @@ public class LikeSubThread extends SubThreadCommand{
             String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
             // if user already likes the subthread, then remove his like and update like count
-            if(!likeEdgeId.equals("")){
+            if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
 
                 BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB)))-1;
-                originalSubthread.updateAttribute(LIKES_DB,newLikes);
+                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) - 1;
+                originalSubthread.updateAttribute(LIKES_DB, newLikes);
                 // putting the comment with the updated amount of likes
-                arango.updateDocument(DB_Name,SUBTHREAD_COLLECTION_NAME,originalSubthread,subthreadId);
+                arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
                 msg = "removed your like on the subthread";
-            }
-            else { // then user wants to like this subthread, so we create an edge and update the number of likes
+            } else { // then user wants to like this subthread, so we create an edge and update the number of likes
                 msg = "added your like on the subthread";
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
@@ -105,25 +124,5 @@ public class LikeSubThread extends SubThreadCommand{
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-        LikeSubThread tc = new LikeSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "74248");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
     }
 }

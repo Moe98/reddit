@@ -4,14 +4,34 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
 public class BookmarkSubThread extends SubThreadCommand {
+
+    public static void main(String[] args) {
+        BookmarkSubThread tc = new BookmarkSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put("id", "126209");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put("userId", "33366");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "POST");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
+    }
 
     @Override
     protected HTTPMethod getMethodType() {
@@ -28,7 +48,7 @@ public class BookmarkSubThread extends SubThreadCommand {
     protected String execute() {
 
         Arango arango = null;
-        
+
         JSONObject response = new JSONObject();
         String msg = "";
 
@@ -89,26 +109,6 @@ public class BookmarkSubThread extends SubThreadCommand {
 
         return Responder.makeDataResponse(response).toString();
 
-    }
-
-    public static void main(String[] args) {
-        BookmarkSubThread tc = new BookmarkSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put("id", "126209");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("userId", "33366");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
     }
 
 }

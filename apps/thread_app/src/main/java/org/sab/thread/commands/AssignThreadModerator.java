@@ -13,6 +13,27 @@ import java.util.List;
 
 public class AssignThreadModerator extends ThreadCommand {
 
+    public static void main(String[] args) {
+        AssignThreadModerator tc = new AssignThreadModerator();
+
+        JSONObject body = new JSONObject();
+        body.put(THREAD_NAME, "asmakElRayes7amido");
+        body.put(MODERATOR_ID, "33366");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ASSIGNER_ID, "32930");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "POST");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
+    }
+
     @Override
     protected Schema getSchema() {
         Attribute parentSubthreadId = new Attribute(THREAD_NAME, DataType.STRING, true);
@@ -25,7 +46,6 @@ public class AssignThreadModerator extends ThreadCommand {
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
     }
-    
 
     @Override
     protected String execute() {
@@ -105,27 +125,6 @@ public class AssignThreadModerator extends ThreadCommand {
 
         return Responder.makeDataResponse(response).toString();
 
-    }
-
-    public static void main(String[] args) {
-        AssignThreadModerator tc = new AssignThreadModerator();
-
-        JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
-        body.put(MODERATOR_ID, "33366");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ASSIGNER_ID, "32930");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
     }
 
 }

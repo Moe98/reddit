@@ -12,24 +12,20 @@ import org.sab.arango.Arango;
 import org.sab.service.validation.HTTPMethod;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AssignThreadModeratorTest {
-    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String fishName = "AsmakElRayes7amido", iceCreamName = "GelatiAzza";
-
-    private static Arango arango;
-    private static BaseDocument moe, manta, lujine,
-            fishThread, iceCreamThread;
-
     // db attribs
     final static String DB_NAME = ThreadCommand.DB_Name;
-
     // collections
     final static String THREAD_COLLECTION_NAME = ThreadCommand.THREAD_COLLECTION_NAME;
     final static String USER_COLLECTION_NAME = ThreadCommand.USER_COLLECTION_NAME;
     final static String USER_MOD_THREAD_COLLECTION_NAME = ThreadCommand.USER_MOD_THREAD_COLLECTION_NAME;
+    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
+    final private static String fishName = "AsmakElRayes7amido", iceCreamName = "GelatiAzza";
+    private static Arango arango;
+    private static BaseDocument moe, manta, lujine,
+            fishThread, iceCreamThread;
 
     @BeforeClass
     public static void setUp() {
@@ -45,13 +41,14 @@ public class AssignThreadModeratorTest {
             moe = TestUtils.setUpUser(moeId, false, 0);
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
-            manta = TestUtils.setUpUser(mantaId, false, 0);;
+            manta = TestUtils.setUpUser(mantaId, false, 0);
+            ;
             TestUtils.addObjectToCollection(arango, manta, USER_COLLECTION_NAME);
 
             lujine = TestUtils.setUpUser(lujineId, false, 0);
             TestUtils.addObjectToCollection(arango, lujine, USER_COLLECTION_NAME);
 
-            fishThread  = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
+            fishThread = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
             TestUtils.addObjectToCollection(arango, fishThread, THREAD_COLLECTION_NAME);
             // assign creator to be mod
             BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
@@ -59,7 +56,7 @@ public class AssignThreadModeratorTest {
             edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + fishName);
             arango.createEdgeDocument(DB_NAME, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
-            iceCreamThread  = TestUtils.setUpThread(iceCreamName, lujineId, 0, "I love Gelati Azza");
+            iceCreamThread = TestUtils.setUpThread(iceCreamName, lujineId, 0, "I love Gelati Azza");
             TestUtils.addObjectToCollection(arango, iceCreamThread, THREAD_COLLECTION_NAME);
             BaseEdgeDocument edgeDocument2 = new BaseEdgeDocument();
             edgeDocument2.setFrom(USER_COLLECTION_NAME + "/" + lujineId);
@@ -87,6 +84,11 @@ public class AssignThreadModeratorTest {
         return new JSONObject(assignThreadModerator.execute(request));
     }
 
+    @AfterClass
+    public static void tearDown() {
+        arango.disconnect();
+        arango.dropDatabase(DB_NAME);
+    }
 
     @Test
     public void T01_NonModUserAssignMod() {
@@ -193,11 +195,5 @@ public class AssignThreadModeratorTest {
                 ThreadCommand.THREAD_COLLECTION_NAME + "/" + threadId);
 
         return !edgeId.equals("");
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        arango.disconnect();
-        arango.dropDatabase(DB_NAME);
     }
 }

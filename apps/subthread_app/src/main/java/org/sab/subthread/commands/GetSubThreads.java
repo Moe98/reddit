@@ -3,20 +3,34 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
-import org.sab.validation.Attribute;
-import org.sab.validation.DataType;
-import org.sab.validation.Schema;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.validation.Schema;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class GetSubThreads extends SubThreadCommand {
+
+    public static void main(String[] args) {
+        GetSubThreads getSubthreads = new GetSubThreads();
+        JSONObject body = new JSONObject();
+
+        JSONObject uriParams = new JSONObject();
+        System.out.println(THREAD_ID);
+        uriParams.put(THREAD_ID, "GelatiAzza");
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "GET");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(getSubthreads.execute(request));
+    }
 
     @Override
     protected HTTPMethod getMethodType() {
@@ -57,7 +71,7 @@ public class GetSubThreads extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
+        } finally {
             if (arango != null) {
                 arango.disconnect();
             }
@@ -68,23 +82,5 @@ public class GetSubThreads extends SubThreadCommand {
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
-    }
-
-    public static void main(String[] args) {
-        GetSubThreads getSubthreads = new GetSubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        System.out.println(THREAD_ID);
-        uriParams.put(THREAD_ID, "GelatiAzza");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getSubthreads.execute(request));
     }
 }

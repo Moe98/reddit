@@ -6,19 +6,20 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
 public class GetComments extends CommentCommand {
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
     }
+
     @Override
     protected Schema getSchema() {
         final Attribute parentId = new Attribute(PARENT_SUBTHREAD_ID, DataType.STRING, true);
@@ -40,7 +41,7 @@ public class GetComments extends CommentCommand {
             final String parentType = body.getString(PARENT_CONTENT_TYPE);
             final String parentCollection;
             // TODO do better
-            if(parentType.equals("Subthread")) {
+            if (parentType.equals("Subthread")) {
                 parentCollection = SUBTHREAD_COLLECTION_NAME;
             } else {
                 parentCollection = COMMENT_COLLECTION_NAME;
@@ -63,7 +64,7 @@ public class GetComments extends CommentCommand {
             ArrayList<String> attribs = new ArrayList<>();
 
             JSONArray commentJsonArr = new JSONArray();
-            if(parentType.equals("Subthread")) {
+            if (parentType.equals("Subthread")) {
                 commentJsonArr = arango.parseOutput(cursor, CommentCommand.COMMENT_ID_DB, attribs);
                 JSONArray commentsToGetChildrenOf = new JSONArray();
                 commentsToGetChildrenOf.putAll(commentJsonArr);

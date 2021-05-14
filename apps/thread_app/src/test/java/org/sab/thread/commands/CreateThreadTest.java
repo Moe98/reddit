@@ -8,13 +8,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+
 import java.util.ArrayList;
+
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class CreateThreadTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-      private static Arango arango;
+    private static Arango arango;
     private static BaseDocument moe, manta, lujine;
 
     @BeforeClass
@@ -48,12 +49,12 @@ public class CreateThreadTest {
     }
 
     @AfterClass
-    public static void tearDown(){
+    public static void tearDown() {
         arango.connectIfNotConnected();
         arango.dropDatabase(ThreadCommand.TEST_DB_Name);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(ThreadCommand.IS_DELETED_DB, false);
@@ -95,33 +96,33 @@ public class CreateThreadTest {
         JSONObject request = new JSONObject();
         JSONObject body = new JSONObject();
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID,creatorId);
+        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
         return tc.execute(request);
     }
 
-    public static String createThreadWithoutName(String creatorId,String description) {
+    public static String createThreadWithoutName(String creatorId, String description) {
         CreateThread tc = new CreateThread();
         JSONObject request = new JSONObject();
         JSONObject body = new JSONObject();
         body.put(ThreadCommand.DESCRIPTION, description);
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID,creatorId);
+        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
         return tc.execute(request);
     }
 
-    public static String createThreadWithoutDesc(String creatorId,String name) {
+    public static String createThreadWithoutDesc(String creatorId, String name) {
         CreateThread tc = new CreateThread();
         JSONObject request = new JSONObject();
         JSONObject body = new JSONObject();
         body.put(ThreadCommand.THREAD_NAME, name);
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.CREATOR_ID,creatorId);
+        uriParams.put(ThreadCommand.CREATOR_ID, creatorId);
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
@@ -138,7 +139,7 @@ public class CreateThreadTest {
 
         // checking the response of the command
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONObject data = (JSONObject)(responseJson.get("data"));
+        JSONObject data = (JSONObject) (responseJson.get("data"));
         assertEquals(description, data.get(ThreadCommand.DESCRIPTION));
         assertEquals(0, data.get(ThreadCommand.NUM_OF_FOLLOWERS));
         assertEquals(mantaId, data.get(ThreadCommand.CREATOR_ID));
@@ -154,24 +155,24 @@ public class CreateThreadTest {
         threadAtt.add(ThreadCommand.DATE_CREATED_DB);
         JSONArray threadArr = arango.parseOutput(cursor, ThreadCommand.THREAD_NAME, threadAtt);
         assertEquals(1, threadArr.length());
-        assertEquals(description, ((JSONObject)threadArr.get(0)).get(ThreadCommand.DESCRIPTION_DB));
-        assertEquals(0, ((JSONObject)threadArr.get(0)).get(ThreadCommand.NUM_OF_FOLLOWERS_DB));
-        assertEquals(mantaId, ((JSONObject)threadArr.get(0)).get(ThreadCommand.CREATOR_ID_DB));
-        assertEquals(threadName, ((JSONObject)threadArr.get(0)).get(ThreadCommand.THREAD_NAME));
+        assertEquals(description, ((JSONObject) threadArr.get(0)).get(ThreadCommand.DESCRIPTION_DB));
+        assertEquals(0, ((JSONObject) threadArr.get(0)).get(ThreadCommand.NUM_OF_FOLLOWERS_DB));
+        assertEquals(mantaId, ((JSONObject) threadArr.get(0)).get(ThreadCommand.CREATOR_ID_DB));
+        assertEquals(threadName, ((JSONObject) threadArr.get(0)).get(ThreadCommand.THREAD_NAME));
 
         // checking the creator is a mod
         arango.connectIfNotConnected();
-        ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(ThreadCommand.DB_Name, ThreadCommand.USER_MOD_THREAD_COLLECTION_NAME, ThreadCommand.USER_COLLECTION_NAME+"/"+mantaId);
+        ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(ThreadCommand.DB_Name, ThreadCommand.USER_MOD_THREAD_COLLECTION_NAME, ThreadCommand.USER_COLLECTION_NAME + "/" + mantaId);
         JSONArray threadArr2 = arango.parseOutput(cursor2, ThreadCommand.THREAD_NAME, threadAtt);
         assertEquals(1, threadArr2.length());
-        assertEquals(description, ((JSONObject)threadArr2.get(0)).get(ThreadCommand.DESCRIPTION_DB));
-        assertEquals(0, ((JSONObject)threadArr2.get(0)).get(ThreadCommand.NUM_OF_FOLLOWERS_DB));
-        assertEquals(mantaId, ((JSONObject)threadArr2.get(0)).get(ThreadCommand.CREATOR_ID_DB));
-        assertEquals(threadName, ((JSONObject)threadArr2.get(0)).get(ThreadCommand.THREAD_NAME));
+        assertEquals(description, ((JSONObject) threadArr2.get(0)).get(ThreadCommand.DESCRIPTION_DB));
+        assertEquals(0, ((JSONObject) threadArr2.get(0)).get(ThreadCommand.NUM_OF_FOLLOWERS_DB));
+        assertEquals(mantaId, ((JSONObject) threadArr2.get(0)).get(ThreadCommand.CREATOR_ID_DB));
+        assertEquals(threadName, ((JSONObject) threadArr2.get(0)).get(ThreadCommand.THREAD_NAME));
     }
 
     @Test
-    public void T02_UserCreateThreadWithoutNameAndDesc(){
+    public void T02_UserCreateThreadWithoutNameAndDesc() {
         arango.connectIfNotConnected();
         String response = createThreadWithoutNameAndDesc(mantaId);
         JSONObject responseJson = new JSONObject(response);
@@ -180,17 +181,17 @@ public class CreateThreadTest {
     }
 
     @Test
-    public void T02_UserCreateThreadWithoutName(){
+    public void T02_UserCreateThreadWithoutName() {
         String description = "description";
         arango.connectIfNotConnected();
-        String response = createThreadWithoutName(mantaId,description);
+        String response = createThreadWithoutName(mantaId, description);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(400, responseJson.getInt("statusCode"));
         assertEquals("Some attributes were missing: name", responseJson.get("msg"));
     }
 
     @Test
-    public void T02_UserCreateThreadWithoutDesc(){
+    public void T02_UserCreateThreadWithoutDesc() {
         String name = "name";
         arango.connectIfNotConnected();
         String response = createThreadWithoutDesc(mantaId, name);

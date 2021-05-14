@@ -6,17 +6,37 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
-public class GetMyComments extends CommentCommand{
+public class GetMyComments extends CommentCommand {
+    public static void main(String[] args) {
+        GetMyComments getMyComments = new GetMyComments();
+        JSONObject body = new JSONObject();
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(USER_ID, "Manta");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "GET");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(getMyComments.execute(request));
+
+    }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
     }
+
     @Override
     protected String execute() {
         Arango arango = null;
@@ -51,35 +71,16 @@ public class GetMyComments extends CommentCommand{
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
-        if (arango != null) {
-            arango.disconnect();
+        } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
         }
-    }
         return Responder.makeDataResponse(response).toString();
     }
 
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
-    }
-
-    public static void main(String[] args) {
-        GetMyComments getMyComments = new GetMyComments();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "Manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMyComments.execute(request));
-
     }
 }

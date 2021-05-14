@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetMyDislikedSubThreadsTest {
     final private static String parentThreadId1 = "asmakElRayes7amido";
@@ -26,12 +26,12 @@ public class GetMyDislikedSubThreadsTest {
             arango.connectIfNotConnected();
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
-            insertSubthread("20301", parentThreadId1, mantaId, "title","content");
-            insertSubthread("20201", parentThreadId1, moeId, "title","content");
-            insertSubthread("20202", parentThreadId1, lujineId, "title","content");
-            insertSubthread("20203", parentThreadId2, mantaId, "title","content");
-            insertSubthread("20204", parentThreadId2, moeId, "title","content");
-            insertSubthread("20205", parentThreadId2, lujineId, "title","content");
+            insertSubthread("20301", parentThreadId1, mantaId, "title", "content");
+            insertSubthread("20201", parentThreadId1, moeId, "title", "content");
+            insertSubthread("20202", parentThreadId1, lujineId, "title", "content");
+            insertSubthread("20203", parentThreadId2, mantaId, "title", "content");
+            insertSubthread("20204", parentThreadId2, moeId, "title", "content");
+            insertSubthread("20205", parentThreadId2, lujineId, "title", "content");
 
             dislikeSubthread(mantaId, "20301");
             dislikeSubthread(mantaId, "20201");
@@ -72,7 +72,7 @@ public class GetMyDislikedSubThreadsTest {
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(SubThreadCommand.IS_DELETED_DB, false);
@@ -96,7 +96,7 @@ public class GetMyDislikedSubThreadsTest {
         BaseDocument subThread = new BaseDocument();
         subThread.setKey(subthreadId);
         subThread.addAttribute(SubThreadCommand.PARENT_THREAD_ID_DB, parentThreadId);
-        subThread.addAttribute(SubThreadCommand.CREATOR_ID_DB,  creatorId);
+        subThread.addAttribute(SubThreadCommand.CREATOR_ID_DB, creatorId);
         subThread.addAttribute(SubThreadCommand.TITLE_DB, title);
         subThread.addAttribute(SubThreadCommand.CONTENT_DB, content);
         subThread.addAttribute(SubThreadCommand.LIKES_DB, 0);
@@ -110,13 +110,13 @@ public class GetMyDislikedSubThreadsTest {
 
     public static void dislikeSubthread(String userId, String subthreadId) {
         BaseEdgeDocument like = new BaseEdgeDocument();
-        like.setFrom(SubThreadCommand.USER_COLLECTION_NAME+"/"+userId);
-        like.setTo(SubThreadCommand.SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
+        like.setFrom(SubThreadCommand.USER_COLLECTION_NAME + "/" + userId);
+        like.setTo(SubThreadCommand.SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
         addObjectToEdgeCollection(like, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME);
     }
 
-    public static String getMyDislikedSubThreads(String userId){
+    public static String getMyDislikedSubThreads(String userId) {
         GetMyDislikedSubThreads GetMyDislikedSubThreads = new GetMyDislikedSubThreads();
         JSONObject body = new JSONObject();
 
@@ -138,7 +138,7 @@ public class GetMyDislikedSubThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(5, dataArr.length());
     }
 
@@ -149,7 +149,7 @@ public class GetMyDislikedSubThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(0, dataArr.length());
     }
 }

@@ -6,15 +6,36 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DeleteThread extends ThreadCommand {
+
+    public static void main(String[] args) {
+
+        DeleteThread tc = new DeleteThread();
+
+        JSONObject body = new JSONObject();
+        body.put(THREAD_NAME, "asmakElRayes7amido");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put("userId", "lujine");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "POST");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+        System.out.println(tc.execute(request));
+
+    }
 
     @Override
     protected Schema getSchema() {
@@ -134,27 +155,6 @@ public class DeleteThread extends ThreadCommand {
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-
-        DeleteThread tc = new DeleteThread();
-
-        JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "asmakElRayes7amido");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put("userId", "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-        System.out.println(tc.execute(request));
-
     }
 }
 

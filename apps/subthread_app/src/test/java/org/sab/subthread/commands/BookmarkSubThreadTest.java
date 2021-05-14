@@ -14,32 +14,28 @@ import org.sab.service.validation.HTTPMethod;
 import static org.junit.Assert.*;
 
 public class BookmarkSubThreadTest {
-    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String fishName = "AsmakElRayes7amido", iceCreamName = "GelatiAzza";
-    final private static String fishSubthreadId = "1234", iceCreamSubthreadId = "5678";
-    private static Arango arango;
-    private static BaseDocument moe, manta, lujine,
-                                fishThread, iceCreamThread,
-                                fishSubThread, iceCreamSubThread;
-
-    // db attribs
-    final static String DB_NAME = SubThreadCommand.DB_Name;
-
-    // collections
-    final static String THREAD_COLLECTION_NAME = SubThreadCommand.THREAD_COLLECTION_NAME;
-    final static String USER_COLLECTION_NAME = SubThreadCommand.USER_COLLECTION_NAME;
-    final static String SUBTHREAD_COLLECTION_NAME = SubThreadCommand.SUBTHREAD_COLLECTION_NAME;
-    final static String USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME = SubThreadCommand.USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME;
-
     // thread attribs
     protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
-
+    // db attribs
+    final static String DB_NAME = SubThreadCommand.DB_Name;
+    // collections
+    final static String THREAD_COLLECTION_NAME = SubThreadCommand.THREAD_COLLECTION_NAME;
+    final static String USER_COLLECTION_NAME = SubThreadCommand.USER_COLLECTION_NAME;
+    final static String SUBTHREAD_COLLECTION_NAME = SubThreadCommand.SUBTHREAD_COLLECTION_NAME;
+    final static String USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME = SubThreadCommand.USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME;
     // user attributes
     final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
     final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
+    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
+    final private static String fishName = "AsmakElRayes7amido", iceCreamName = "GelatiAzza";
+    final private static String fishSubthreadId = "1234", iceCreamSubthreadId = "5678";
+    private static Arango arango;
+    private static BaseDocument moe, manta, lujine,
+            fishThread, iceCreamThread,
+            fishSubThread, iceCreamSubThread;
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
         arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
@@ -62,20 +58,21 @@ public class BookmarkSubThreadTest {
             moe = TestUtils.setUpUser(moeId, false, 0);
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
-            manta = TestUtils.setUpUser(mantaId, false, 0);;
+            manta = TestUtils.setUpUser(mantaId, false, 0);
+            ;
             TestUtils.addObjectToCollection(arango, manta, SubThreadCommand.USER_COLLECTION_NAME);
 
             lujine = TestUtils.setUpUser(lujineId, false, 0);
             TestUtils.addObjectToCollection(arango, lujine, SubThreadCommand.USER_COLLECTION_NAME);
 
-            fishThread  = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
+            fishThread = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
             TestUtils.addObjectToCollection(arango, fishThread, THREAD_COLLECTION_NAME);
 
-            iceCreamThread  = TestUtils.setUpThread(iceCreamName, lujineId, 0, "I love Gelati Azza");
+            iceCreamThread = TestUtils.setUpThread(iceCreamName, lujineId, 0, "I love Gelati Azza");
             TestUtils.addObjectToCollection(arango, iceCreamThread, THREAD_COLLECTION_NAME);
 
             fishSubThread = TestUtils.setUpSubThreadNoImage(fishSubthreadId, fishName, mantaId, "First Subthread",
-                                                        "Fish is Love. Fish is life", 0, 0);
+                    "Fish is Love. Fish is life", 0, 0);
             TestUtils.addObjectToCollection(arango, fishSubThread, SUBTHREAD_COLLECTION_NAME);
 
             iceCreamSubThread = TestUtils.setUpSubThreadNoImage(iceCreamSubthreadId, iceCreamName, lujineId, "Second Subthread",
@@ -88,6 +85,30 @@ public class BookmarkSubThreadTest {
 
     }
 
+    @AfterClass
+    public static void tearDown() {
+        arango.disconnect();
+        arango.dropDatabase(SubThreadCommand.DB_Name);
+    }
+
+    private static JSONObject bookmarkSubThread(String userId, String subthreadId) {
+        JSONObject body = new JSONObject();
+        body.put(SubThreadAttributes.SUBTHREAD_ID.getHTTP(), subthreadId);
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(SubThreadAttributes.ACTION_MAKER_ID.getHTTP(), userId);
+
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
+
+        BookmarkSubThread bookmarkSubThread = new BookmarkSubThread();
+
+        return new JSONObject(bookmarkSubThread.execute(request));
+    }
+
+    private static JSONObject unbookmarkSubThread(String userId, String subthreadId) {
+        return bookmarkSubThread(userId, subthreadId);
+    }
+
     // TODO can user bookmark their own subthread?
     @Test
     public void T01_UserBookmarkUnbookmarksSubThreads() {
@@ -98,9 +119,9 @@ public class BookmarkSubThreadTest {
         assertEquals(200, response.getInt("statusCode"));
 
         assertTrue(edgeExistsFromUserToSubThread(
-                        SubThreadCommand.USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
-                        mantaId,
-                        fishSubthreadId));
+                SubThreadCommand.USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
+                mantaId,
+                fishSubthreadId));
 
         response = bookmarkSubThread(mantaId, iceCreamSubthreadId);
         assertEquals(200, response.getInt("statusCode"));
@@ -159,30 +180,6 @@ public class BookmarkSubThreadTest {
 
         assertEquals("Subthread does not exist", response.getString("msg"));
 
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        arango.disconnect();
-        arango.dropDatabase(SubThreadCommand.DB_Name);
-    }
-
-    private static JSONObject bookmarkSubThread( String userId, String subthreadId) {
-        JSONObject body = new JSONObject();
-        body.put(SubThreadAttributes.SUBTHREAD_ID.getHTTP(), subthreadId);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadAttributes.ACTION_MAKER_ID.getHTTP(), userId);
-
-        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
-
-        BookmarkSubThread bookmarkSubThread = new BookmarkSubThread();
-
-        return new JSONObject(bookmarkSubThread.execute(request));
-    }
-
-    private static JSONObject unbookmarkSubThread(String userId, String subthreadId) {
-        return bookmarkSubThread(userId, subthreadId);
     }
 
     private boolean edgeExistsFromUserToSubThread(String edgeCollectionName, String userId, String subthreadId) {

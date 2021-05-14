@@ -9,7 +9,8 @@ import org.sab.arango.Arango;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetThreadTest {
     private static final String DB_NAME = System.getenv("ARANGO_DB");
