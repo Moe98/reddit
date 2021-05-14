@@ -17,7 +17,7 @@ import io.netty.util.CharsetUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.netty.Server;
-import org.sab.service.authentication.Jwt;
+import org.sab.auth.Jwt;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +62,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             JSONObject httpData = readHttpData();
             httpData.keySet().forEach(key -> request.put(key, httpData.getJSONObject(key)));
         }
-
+        
         return authenticate(request);
     }
 

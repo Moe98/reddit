@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.service.authentication.Jwt;
+import org.sab.auth.Jwt;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
