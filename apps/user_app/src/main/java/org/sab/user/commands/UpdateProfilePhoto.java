@@ -1,6 +1,6 @@
 package org.sab.user.commands;
 
-import org.sab.min_io.MinIO;
+import org.sab.minio.MinIO;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;

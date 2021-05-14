@@ -1,4 +1,4 @@
-package org.sab.min_io;
+package org.sab.minio;
 
 import io.minio.*;
 import io.minio.errors.*;
@@ -23,23 +23,31 @@ public class MinIO {
         CONFIG.put("MINIO_ROOT_PASSWORD", System.getenv("MINIO_ROOT_PASSWORD"));
     }
 
-    private final MinioClient minioClient;
+    private static MinIO instance = null;
+    private final MinioClient MINIO_CLIENT;
 
     private MinIO() throws EnvironmentVariableNotLoaded {
         for (Map.Entry<String, String> entry : CONFIG.entrySet())
             if (entry.getValue() == null)
                 throw new EnvironmentVariableNotLoaded(entry.getKey());
 
-        minioClient = MinioClient.builder()
+        MINIO_CLIENT = MinioClient.builder()
                 .endpoint(CONFIG.get("MINIO_HOST"))
                 .credentials(CONFIG.get("MINIO_ROOT_USER"), CONFIG.get("MINIO_ROOT_PASSWORD"))
                 .build();
     }
 
+    public static MinIO getInstance() throws EnvironmentVariableNotLoaded {
+        if (instance == null) {
+            instance = new MinIO();
+        }
+        return instance;
+    }
+
     public static String uploadObject(String bucketName, String id, String data, String contentType) throws EnvironmentVariableNotLoaded {
         String url = "";
         try {
-            MinioClient minioClient = new MinIO().minioClient;
+            MinioClient minioClient = MinIO.getInstance().MINIO_CLIENT;
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build()))
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
 
@@ -65,7 +73,7 @@ public class MinIO {
     public static boolean deleteObject(String bucketName, String id) throws EnvironmentVariableNotLoaded {
         boolean deleted = false;
         try {
-            MinioClient minioClient = new MinIO().minioClient;
+            MinioClient minioClient = MinIO.getInstance().MINIO_CLIENT;
             minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(id).build());
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(id).build());
             deleted = true;

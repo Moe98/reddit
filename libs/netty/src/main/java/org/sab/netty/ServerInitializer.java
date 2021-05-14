@@ -18,6 +18,7 @@ import org.sab.netty.middleware.ResponseHandler;
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
+    private static final int MAX_CONTENT_LENGTH = 5 * (1 << 20);    // 5MB
 
     public ServerInitializer(SslContext sslCtx) {
         this.sslCtx = sslCtx;
@@ -41,7 +42,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpServerExpectContinueHandler());
         p.addLast(new CorsHandler(corsConfig));
-        p.addLast(new HttpObjectAggregator((int) (5 * Math.pow(2, 20))));   // Max content size 5MB
+        p.addLast(new HttpObjectAggregator(MAX_CONTENT_LENGTH));
         p.addLast(new RequestHandler());
         p.addLast("QueueHandler", new QueueHandler());
         p.addLast(new ResponseHandler());

@@ -80,10 +80,6 @@ jobs:
           ARANGO_USER: ${{ secrets.ARANGO_USER }}
           ARANGO_PASSWORD: ${{ secrets.ARANGO_PASSWORD }}
           ARANGO_DB: 'Reddit'
-          # Cloudinary
-          COLOUDINARY_CLOUD_NAME: ${{ secrets.COLOUDINARY_CLOUD_NAME }}
-          COLOUDINARY_API_SECRET: ${{ secrets.COLOUDINARY_API_SECRET }}
-          COLOUDINARY_API_KEY: ${{ secrets.COLOUDINARY_API_KEY }}
           # ENV_TYPE
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
           # JWT
