@@ -7,21 +7,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
-
-    @Override
-    protected HTTPMethod getMethodType() {
-        return HTTPMethod.PUT;
-    }
 
     public static void main(String[] args) {
         FollowThread followThread = new FollowThread();
@@ -53,6 +48,11 @@ public class FollowThread extends ThreadCommand {
             JSONObject j = (JSONObject) it.next();
             System.out.println(j.toString());
         }
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 
     @Override

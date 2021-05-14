@@ -1,25 +1,48 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoDB;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
-public class ReportSubThread extends SubThreadCommand{
+public class ReportSubThread extends SubThreadCommand {
+    public static void main(String[] args) {
+        ReportSubThread tc = new ReportSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put(TYPE_OF_REPORT, "SubthreadReport");
+        body.put(REPORTED_SUBTHREAD_ID, "126209");
+        body.put(THREAD_ID, "GelatiAzza");
+        body.put(REPORT_MSG, "This highly offends me!!");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(REPORTER_ID, "asdafsda");
+
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
+    }
+
     @Override
     protected Schema getSchema() {
         Attribute typeOfReport = new Attribute(TYPE_OF_REPORT, DataType.STRING, true);
         Attribute subthreadId = new Attribute(REPORTED_SUBTHREAD_ID, DataType.STRING, true);
         Attribute threadId = new Attribute(THREAD_ID, DataType.STRING, true);
         Attribute reportMsg = new Attribute(REPORT_MSG, DataType.STRING, true);
-        return new Schema(List.of(typeOfReport,subthreadId,threadId,reportMsg));
+        return new Schema(List.of(typeOfReport, subthreadId, threadId, reportMsg));
     }
 
     @Override
@@ -52,13 +75,13 @@ public class ReportSubThread extends SubThreadCommand{
             }
 
             // check if thread exists
-            if(!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // check if subthread exists
-            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -86,29 +109,5 @@ public class ReportSubThread extends SubThreadCommand{
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-        ReportSubThread tc = new ReportSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put(TYPE_OF_REPORT, "SubthreadReport");
-        body.put(REPORTED_SUBTHREAD_ID, "126209");
-        body.put(THREAD_ID, "GelatiAzza");
-        body.put(REPORT_MSG, "This highly offends me!!");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(REPORTER_ID, "asdafsda");
-
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
     }
 }

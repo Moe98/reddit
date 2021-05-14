@@ -16,27 +16,22 @@ import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DeleteThreadTest {
-    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String fishName = "AsmakElRayes7amido";
-    final private static String fishSubthread1Id = "1234", fishSubthread2Id = "5678";
-    private static Arango arango;
-
-    private static BaseDocument moe, manta, lujine,
-            fishThread,
-            fishSubThread1, fishSubThread2;
-
-    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
-    private static ArrayList<String> s2Level1Comm, s2Level2Comm, s2Level3Comm;
-
     // db attribs
     final static String DB_NAME = ThreadCommand.DB_Name;
-
     // collections
     final static String THREAD_COLLECTION_NAME = ThreadCommand.THREAD_COLLECTION_NAME;
     final static String USER_COLLECTION_NAME = ThreadCommand.USER_COLLECTION_NAME;
     final static String SUBTHREAD_COLLECTION_NAME = ThreadCommand.SUBTHREAD_COLLECTION_NAME;
     final static String COMMENT_COLLECTION_NAME = ThreadCommand.COMMENT_COLLECTION_NAME;
-
+    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
+    final private static String fishName = "AsmakElRayes7amido";
+    final private static String fishSubthread1Id = "1234", fishSubthread2Id = "5678";
+    private static Arango arango;
+    private static BaseDocument moe, manta, lujine,
+            fishThread,
+            fishSubThread1, fishSubThread2;
+    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
+    private static ArrayList<String> s2Level1Comm, s2Level2Comm, s2Level3Comm;
 
     @BeforeClass
     public static void setUp() {
@@ -53,13 +48,14 @@ public class DeleteThreadTest {
             moe = TestUtils.setUpUser(moeId, false, 0);
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
-            manta = TestUtils.setUpUser(mantaId, false, 0);;
+            manta = TestUtils.setUpUser(mantaId, false, 0);
+            ;
             TestUtils.addObjectToCollection(arango, manta, USER_COLLECTION_NAME);
 
             lujine = TestUtils.setUpUser(lujineId, false, 0);
             TestUtils.addObjectToCollection(arango, lujine, USER_COLLECTION_NAME);
 
-            fishThread  = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
+            fishThread = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
             TestUtils.addObjectToCollection(arango, fishThread, THREAD_COLLECTION_NAME);
 
             fishSubThread1 = TestUtils.setUpSubThreadNoImage(fishSubthread1Id, fishName, mantaId, "First Subthread",
@@ -75,10 +71,10 @@ public class DeleteThreadTest {
             s1Level2Comm = new ArrayList<>();
             s1Level3Comm = new ArrayList<>();
 
-            for(String commId : s1Level1Comm) {
+            for (String commId : s1Level1Comm) {
                 s1Level2Comm.addAll(insertNestedComments(commId, moeId, 3));
             }
-            for(String commId : s1Level2Comm) {
+            for (String commId : s1Level2Comm) {
                 s1Level3Comm.addAll(insertNestedComments(commId, mantaId, 2));
             }
 
@@ -87,10 +83,10 @@ public class DeleteThreadTest {
             s2Level2Comm = new ArrayList<>();
             s2Level3Comm = new ArrayList<>();
 
-            for(String commId : s2Level1Comm) {
+            for (String commId : s2Level1Comm) {
                 s2Level2Comm.addAll(insertNestedComments(commId, mantaId, 3));
             }
-            for(String commId : s2Level2Comm) {
+            for (String commId : s2Level2Comm) {
                 s2Level3Comm.addAll(insertNestedComments(commId, lujineId, 2));
             }
 
@@ -138,6 +134,12 @@ public class DeleteThreadTest {
         return new JSONObject(deleteThread.execute(request));
     }
 
+    @AfterClass
+    public static void tearDown() {
+        arango.disconnect();
+        arango.dropDatabase(DB_NAME);
+    }
+
     @Test
     public void T01_NonCreatorDeleteThread() {
         JSONObject response = deleteThread(fishName, moeId);
@@ -173,16 +175,10 @@ public class DeleteThreadTest {
         allComments.addAll(s2Level1Comm);
         allComments.addAll(s2Level2Comm);
         allComments.addAll(s2Level3Comm);
-        for(String commentId : allComments) {
+        for (String commentId : allComments) {
             assertFalse(arango.documentExists(DB_NAME, COMMENT_COLLECTION_NAME, commentId));
         }
 
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        arango.disconnect();
-        arango.dropDatabase(DB_NAME);
     }
 
 }

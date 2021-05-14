@@ -6,17 +6,37 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
-public class GetMyDislikedSubThreads extends SubThreadCommand{
+public class GetMyDislikedSubThreads extends SubThreadCommand {
+    public static void main(String[] args) {
+        GetMyLikedSubThreads getMyLikedSubThreads = new GetMyLikedSubThreads();
+        JSONObject body = new JSONObject();
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(USER_ID, "manta");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "GET");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(getMyLikedSubThreads.execute(request));
+
+    }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
     }
+
     @Override
     protected String execute() {
         Arango arango = null;
@@ -37,7 +57,7 @@ public class GetMyDislikedSubThreads extends SubThreadCommand{
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
-            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
+            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arr = new ArrayList<>();
             arr.add(PARENT_THREAD_ID_DB);
             arr.add(CREATOR_ID_DB);
@@ -51,7 +71,7 @@ public class GetMyDislikedSubThreads extends SubThreadCommand{
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
+        } finally {
             if (arango != null) {
                 arango.disconnect();
             }
@@ -62,24 +82,5 @@ public class GetMyDislikedSubThreads extends SubThreadCommand{
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
-    }
-
-    public static void main(String[] args) {
-        GetMyLikedSubThreads getMyLikedSubThreads = new GetMyLikedSubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMyLikedSubThreads.execute(request));
-
     }
 }

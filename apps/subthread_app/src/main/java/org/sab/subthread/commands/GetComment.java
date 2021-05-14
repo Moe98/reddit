@@ -4,10 +4,10 @@ import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
 public class GetComment extends CommentCommand {
     @Override

@@ -5,24 +5,44 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
-public class DislikeSubThread extends SubThreadCommand{
+public class DislikeSubThread extends SubThreadCommand {
+    public static void main(String[] args) {
+        DislikeSubThread tc = new DislikeSubThread();
+
+        JSONObject body = new JSONObject();
+        body.put(SUBTHREAD_ID, "74248");
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(ACTION_MAKER_ID, "manta");
+
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "PUT");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("----------");
+
+        System.out.println(tc.execute(request));
+    }
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
     }
+
     @Override
     protected Schema getSchema() {
         Attribute subthreadId = new Attribute(SUBTHREAD_ID, DataType.STRING, true);
         return new Schema(List.of(subthreadId));
     }
-
 
     @Override
     public String execute() {
@@ -51,39 +71,38 @@ public class DislikeSubThread extends SubThreadCommand{
             }
 
             // TODO check if subthread exists
-            if(!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
-            String dislikeEdgeId = arango.getSingleEdgeId(DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
+            String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
             // if user already dislikes the subthread, then remove his dislike and update dislike count
-            if(!dislikeEdgeId.equals("")){
+            if (!dislikeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, dislikeEdgeId);
 
                 BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newDisikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB)))-1;
-                originalSubthread.updateAttribute(DISLIKES_DB,newDisikes);
+                int newDisikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) - 1;
+                originalSubthread.updateAttribute(DISLIKES_DB, newDisikes);
                 // putting the comment with the updated amount of dislikes
-                arango.updateDocument(DB_Name,SUBTHREAD_COLLECTION_NAME,originalSubthread,subthreadId);
+                arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
                 msg = "removed your dislike on the subthread";
-            }
-            else { // then user wants to dislike this subthread, so we create an edge and update the number of dislikes
+            } else { // then user wants to dislike this subthread, so we create an edge and update the number of dislikes
                 msg = "added your dislike on the subthread";
 
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
-                edgeDocument.setFrom(USER_COLLECTION_NAME +"/" + userId);
-                edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME +"/" + subthreadId);
+                edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
+                edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
                 // adding new edgeDocument representing that a user dislikes a subthread
                 arango.createEdgeDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of dislikes and likes
                 BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB)))+1;
+                int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) + 1;
                 int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB)));
-                String likeEdgeId = arango.getSingleEdgeId(DB_Name,USER_LIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
+                String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
                 //checking if the user likes this subthread to remove his like
                 if (!likeEdgeId.equals("")) {
                     arango.deleteDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
@@ -105,25 +124,5 @@ public class DislikeSubThread extends SubThreadCommand{
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();
-    }
-
-    public static void main(String[] args) {
-        DislikeSubThread tc = new DislikeSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put(SUBTHREAD_ID, "74248");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
     }
 }

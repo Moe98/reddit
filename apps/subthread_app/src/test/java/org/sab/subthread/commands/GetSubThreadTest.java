@@ -10,7 +10,8 @@ import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetSubThreadTest {
     private static final String DB_NAME = System.getenv("ARANGO_DB");

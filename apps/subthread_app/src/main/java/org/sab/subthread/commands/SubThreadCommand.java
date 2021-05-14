@@ -102,7 +102,6 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
 
 
-
     // Database attributes
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing

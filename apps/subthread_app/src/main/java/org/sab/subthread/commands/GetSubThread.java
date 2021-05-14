@@ -4,8 +4,8 @@ import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
-import org.sab.validation.Schema;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.validation.Schema;
 
 import java.util.List;
 

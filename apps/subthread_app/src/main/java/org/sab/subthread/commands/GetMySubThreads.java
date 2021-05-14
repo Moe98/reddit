@@ -6,19 +6,36 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
 public class GetMySubThreads extends SubThreadCommand {
+
+    public static void main(String[] args) {
+        GetMySubThreads getMySubthreads = new GetMySubThreads();
+        JSONObject body = new JSONObject();
+
+        JSONObject uriParams = new JSONObject();
+        uriParams.put(USER_ID, "Manta");
+        JSONObject request = new JSONObject();
+        request.put("body", body);
+        request.put("methodType", "GET");
+        request.put("uriParams", uriParams);
+
+        System.out.println(request);
+        System.out.println("=========");
+
+        System.out.println(getMySubthreads.execute(request));
+    }
 
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
     }
-    
+
     @Override
     protected String execute() {
         Arango arango = null;
@@ -55,7 +72,7 @@ public class GetMySubThreads extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
+        } finally {
             if (arango != null) {
                 arango.disconnect();
             }
@@ -66,22 +83,5 @@ public class GetMySubThreads extends SubThreadCommand {
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
-    }
-
-    public static void main(String[] args) {
-        GetMySubThreads getMySubthreads = new GetMySubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "Manta");
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMySubthreads.execute(request));
     }
 }

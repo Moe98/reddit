@@ -8,8 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetMyCommentsTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
@@ -28,10 +28,10 @@ public class GetMyCommentsTest {
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             createThreads();
-            createSubThread(subThreadId1,parentThreadId1,"content",mantaId,"SubThread",hasImage1);
-            createSubThread(subThreadId2,parentThreadId1,"content",moeId,"SubThread",hasImage1);
-            createComments(subThreadId1, "content", mantaId, "SubThread", 50) ;
-            createComments(subThreadId2, "content", mantaId, "SubThread", 44) ;
+            createSubThread(subThreadId1, parentThreadId1, "content", mantaId, "SubThread", hasImage1);
+            createSubThread(subThreadId2, parentThreadId1, "content", moeId, "SubThread", hasImage1);
+            createComments(subThreadId1, "content", mantaId, "SubThread", 50);
+            createComments(subThreadId2, "content", mantaId, "SubThread", 44);
             insertComments("20201", subThreadId2, "content", mantaId, "SubThread");
             insertComments("20202", "20201", "content", mantaId, "Comment");
             insertComments("20203", "20202", "content", mantaId, "Comment");
@@ -69,7 +69,7 @@ public class GetMyCommentsTest {
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(CommentCommand.USER_IS_DELETED_DB, false);
@@ -89,11 +89,11 @@ public class GetMyCommentsTest {
         addObjectToCollection(lujine, CommentCommand.USER_COLLECTION_NAME);
     }
 
-    public static void createThreads(){
+    public static void createThreads() {
         thread1 = new BaseDocument();
         thread1.setKey(parentThreadId1);
         thread1.addAttribute(CommentCommand.THREAD_CREATOR_ID_DB, mantaId);
-        thread1.addAttribute(CommentCommand.THREAD_DESCRIPTION_DB,  "agmad subreddit fl wogod");
+        thread1.addAttribute(CommentCommand.THREAD_DESCRIPTION_DB, "agmad subreddit fl wogod");
         java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
         thread1.addAttribute(CommentCommand.THREAD_DATE_CREATED_DB, sqlDate);
         thread1.addAttribute(CommentCommand.THREAD_NUM_OF_FOLLOWERS_DB, 0);
@@ -102,7 +102,7 @@ public class GetMyCommentsTest {
         thread2 = new BaseDocument();
         thread2.setKey(parentThreadId2);
         thread2.addAttribute(CommentCommand.THREAD_CREATOR_ID_DB, moeId);
-        thread2.addAttribute(CommentCommand.THREAD_DESCRIPTION_DB,  "tany agmad subreddit fl wogod");
+        thread2.addAttribute(CommentCommand.THREAD_DESCRIPTION_DB, "tany agmad subreddit fl wogod");
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         thread2.addAttribute(CommentCommand.THREAD_DATE_CREATED_DB, sqlDate2);
         thread2.addAttribute(CommentCommand.THREAD_NUM_OF_FOLLOWERS_DB, 0);
@@ -114,7 +114,7 @@ public class GetMyCommentsTest {
         BaseDocument comment = new BaseDocument();
         comment.setKey(subThreadId);
         comment.addAttribute(CommentCommand.SUBTHREAD_PARENT_THREAD_ID_DB, parentThreadId);
-        comment.addAttribute(CommentCommand.SUBTHREAD_CREATOR_ID_DB,  creatorId);
+        comment.addAttribute(CommentCommand.SUBTHREAD_CREATOR_ID_DB, creatorId);
         comment.addAttribute(CommentCommand.SUBTHREAD_CONTENT_DB, content);
         comment.addAttribute(CommentCommand.SUBTHREAD_TITLE_DB, title);
         comment.addAttribute(CommentCommand.SUBTHREAD_LIKES_DB, 0);
@@ -130,7 +130,7 @@ public class GetMyCommentsTest {
         BaseDocument comment = new BaseDocument();
         comment.setKey(commentId);
         comment.addAttribute(CommentCommand.PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
-        comment.addAttribute(CommentCommand.CREATOR_ID_DB,  creatorId);
+        comment.addAttribute(CommentCommand.CREATOR_ID_DB, creatorId);
         comment.addAttribute(CommentCommand.CONTENT_DB, content);
         comment.addAttribute(CommentCommand.PARENT_CONTENT_TYPE_DB, parentContentType);
         comment.addAttribute(CommentCommand.LIKES_DB, 0);
@@ -140,11 +140,12 @@ public class GetMyCommentsTest {
 
         addObjectToCollection(comment, CommentCommand.COMMENT_COLLECTION_NAME);
     }
+
     public static void createComments(String parentSubThreadId, String content, String creatorId, String parentContentType, int amount) {
-        for(int i = 0; i < amount; i++) {
+        for (int i = 0; i < amount; i++) {
             BaseDocument comment = new BaseDocument();
             comment.addAttribute(CommentCommand.PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
-            comment.addAttribute(CommentCommand.CREATOR_ID_DB,  creatorId);
+            comment.addAttribute(CommentCommand.CREATOR_ID_DB, creatorId);
             comment.addAttribute(CommentCommand.CONTENT_DB, content);
             comment.addAttribute(CommentCommand.PARENT_CONTENT_TYPE_DB, parentContentType);
             comment.addAttribute(CommentCommand.LIKES_DB, 0);
@@ -156,7 +157,7 @@ public class GetMyCommentsTest {
         }
     }
 
-    public static String getMyComments(String userId){
+    public static String getMyComments(String userId) {
         GetMyComments getMyComments = new GetMyComments();
         JSONObject body = new JSONObject();
 
@@ -178,10 +179,10 @@ public class GetMyCommentsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(100, dataArr.length());
-        for(int i = 0; i<100;i++)
-            assertEquals(mantaId, ((JSONObject)dataArr.get(i)).getString(SubThreadCommand.CREATOR_ID_DB));
+        for (int i = 0; i < 100; i++)
+            assertEquals(mantaId, ((JSONObject) dataArr.get(i)).getString(SubThreadCommand.CREATOR_ID_DB));
     }
 
     @Test
@@ -191,7 +192,7 @@ public class GetMyCommentsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(0, dataArr.length());
     }
 }

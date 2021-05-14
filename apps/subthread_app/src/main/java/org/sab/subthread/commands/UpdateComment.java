@@ -4,15 +4,15 @@ import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
-import org.sab.service.validation.HTTPMethod;
 
 import java.util.List;
 
 public class UpdateComment extends CommentCommand {
-    
+
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
@@ -33,9 +33,7 @@ public class UpdateComment extends CommentCommand {
             final String userId = uriParams.getString(ACTION_MAKER_ID);
             final String commentId = uriParams.getString(COMMENT_ID);
 
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();

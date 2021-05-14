@@ -14,29 +14,23 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 public class GetCommentsTest {
-    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String fishName = "AsmakElRayes7amido";
-    final private static String fishSubthread1Id = "1234";
-    private static Arango arango;
-
-    private static BaseDocument moe, manta, lujine,
-            fishThread,
-            fishSubThread1;
-
-    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
-
-    private static String commentWithChildren;
-    private static ArrayList<String> children;
-
     // db attribs
     final static String DB_NAME = CommentCommand.DB_Name;
-
     // collections
     final static String THREAD_COLLECTION_NAME = CommentCommand.THREAD_COLLECTION_NAME;
     final static String USER_COLLECTION_NAME = CommentCommand.USER_COLLECTION_NAME;
     final static String SUBTHREAD_COLLECTION_NAME = CommentCommand.SUBTHREAD_COLLECTION_NAME;
     final static String COMMENT_COLLECTION_NAME = CommentCommand.COMMENT_COLLECTION_NAME;
-
+    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
+    final private static String fishName = "AsmakElRayes7amido";
+    final private static String fishSubthread1Id = "1234";
+    private static Arango arango;
+    private static BaseDocument moe, manta, lujine,
+            fishThread,
+            fishSubThread1;
+    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
+    private static String commentWithChildren;
+    private static ArrayList<String> children;
 
     @BeforeClass
     public static void setUp() {
@@ -80,14 +74,14 @@ public class GetCommentsTest {
             for (String commId : s1Level1Comm) {
                 arr = insertNestedComments(commId, moeId, 3);
                 s1Level2Comm.addAll(arr);
-                if(commId.equals(commentWithChildren)) {
+                if (commId.equals(commentWithChildren)) {
                     children.addAll(arr);
                 }
             }
             for (String commId : s1Level2Comm) {
                 arr = insertNestedComments(commId, mantaId, 2);
                 s1Level3Comm.addAll(arr);
-                if(children.contains(commId)) {
+                if (children.contains(commId)) {
                     children.addAll(arr);
                 }
             }
@@ -151,6 +145,12 @@ public class GetCommentsTest {
 //
 //    }
 
+    @AfterClass
+    public static void tearDown() {
+        arango.disconnect();
+        arango.dropDatabase(DB_NAME);
+    }
+
     @Test
     public void T02_GetNonexistentComment() {
         JSONObject response = getComments("lala", "Subthread", moeId);
@@ -174,7 +174,7 @@ public class GetCommentsTest {
 
         JSONArray data = response.getJSONArray("data");
         assertTrue(commentsExpected.size() == data.length());
-        for(int i = 0; i < data.length(); i++) {
+        for (int i = 0; i < data.length(); i++) {
             JSONObject comment = data.getJSONObject(i);
 
             String commentId = comment.getString(CommentCommand.COMMENT_ID_DB);
@@ -196,18 +196,12 @@ public class GetCommentsTest {
 
         JSONArray data = response.getJSONArray("data");
         assertTrue(commentsExpected.size() == data.length());
-        for(int i = 0; i < data.length(); i++) {
+        for (int i = 0; i < data.length(); i++) {
             JSONObject comment = data.getJSONObject(i);
 
             String commentId = comment.getString(CommentCommand.COMMENT_ID_DB);
             assertTrue(commentsExpected.contains(commentId));
         }
 
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        arango.disconnect();
-        arango.dropDatabase(DB_NAME);
     }
 }

@@ -12,16 +12,16 @@ import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class ReportSubThreadTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
     final private static String parentThreadId1 = "asmakElRayes7amido", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
     final private static String parentThreadId2 = "GelatiAzza", title2 = "fish is better", content2 = "fish is better", hasImage2 = "false";
+    final private static String subthreadId1 = "20001", subthreadId2 = "20002", subthreadId3 = "20003";
     private static Arango arango;
     private static BaseDocument moe, manta, lujine, thread1, thread2;
-    final private static String subthreadId1 = "20001", subthreadId2 = "20002", subthreadId3 = "20003";
 
     @BeforeClass
     public static void setUp() {
@@ -31,7 +31,7 @@ public class ReportSubThreadTest {
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
-            createSubThread(subthreadId1,parentThreadId1,content1,mantaId,title1,hasImage1);
+            createSubThread(subthreadId1, parentThreadId1, content1, mantaId, title1, hasImage1);
         } catch (Exception e) {
             System.out.println("failed");
             fail(e.getMessage());
@@ -66,7 +66,7 @@ public class ReportSubThreadTest {
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(SubThreadCommand.USER_IS_DELETED_DB, false);
@@ -91,7 +91,7 @@ public class ReportSubThreadTest {
         BaseDocument comment = new BaseDocument();
         comment.setKey(subThreadId);
         comment.addAttribute(SubThreadCommand.PARENT_THREAD_ID_DB, parentThreadId);
-        comment.addAttribute(SubThreadCommand.CREATOR_ID_DB,  creatorId);
+        comment.addAttribute(SubThreadCommand.CREATOR_ID_DB, creatorId);
         comment.addAttribute(SubThreadCommand.CONTENT_DB, content);
         comment.addAttribute(SubThreadCommand.TITLE_DB, title);
         comment.addAttribute(SubThreadCommand.LIKES_DB, 0);
@@ -103,18 +103,19 @@ public class ReportSubThreadTest {
         addObjectToCollection(comment, SubThreadCommand.SUBTHREAD_COLLECTION_NAME);
     }
 
-    public static void createThreads(){
+    public static void createThreads() {
         thread1 = new BaseDocument();
         thread1.setKey(parentThreadId1);
         thread1.addAttribute(SubThreadCommand.THREAD_CREATOR_ID_DB, mantaId);
-        thread1.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB,  "agmad subreddit fl wogod");
+        thread1.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB, "agmad subreddit fl wogod");
         java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
         thread1.addAttribute(SubThreadCommand.THREAD_DATE_CREATED_DB, sqlDate);
         thread1.addAttribute(SubThreadCommand.THREAD_NUM_OF_FOLLOWERS_DB, 0);
         addObjectToCollection(thread1, SubThreadCommand.THREAD_COLLECTION_NAME);
     }
+
     public static String reportSubthread(String reporterId, String typeOfReport,
-                                         String reportedSubthredId, String threadId, String reportMsg){
+                                         String reportedSubthredId, String threadId, String reportMsg) {
         ReportSubThread tc = new ReportSubThread();
 
         JSONObject body = new JSONObject();
@@ -138,7 +139,7 @@ public class ReportSubThreadTest {
         String reportedSubthreadId = subthreadId1;
         String threadId = parentThreadId1;
         String reportMsg = "ban this scammer naw!";
-        String response = reportSubthread(mantaId,typeOfReport,reportedSubthreadId,threadId,reportMsg);
+        String response = reportSubthread(mantaId, typeOfReport, reportedSubthreadId, threadId, reportMsg);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -156,12 +157,12 @@ public class ReportSubThreadTest {
         reportAtt.add(SubThreadCommand.REPORTED_SUBTHREAD_ID);
         JSONArray reportArr = arango.parseOutput(cursor, SubThreadCommand.REPORT_ID_DB, reportAtt);
         assertEquals(1, reportArr.length());
-        assertEquals(mantaId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORTER_ID_DB));
-        assertEquals(typeOfReport, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.TYPE_OF_REPORT_DB));
-        assertEquals(threadId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.THREAD_ID_DB));
-        assertEquals(reportMsg, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORT_MSG_DB));
+        assertEquals(mantaId, ((JSONObject) reportArr.get(0)).get(SubThreadCommand.REPORTER_ID_DB));
+        assertEquals(typeOfReport, ((JSONObject) reportArr.get(0)).get(SubThreadCommand.TYPE_OF_REPORT_DB));
+        assertEquals(threadId, ((JSONObject) reportArr.get(0)).get(SubThreadCommand.THREAD_ID_DB));
+        assertEquals(reportMsg, ((JSONObject) reportArr.get(0)).get(SubThreadCommand.REPORT_MSG_DB));
         // TODO test fails
-        assertEquals(reportedSubthreadId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORTED_SUBTHREAD_ID));
+        assertEquals(reportedSubthreadId, ((JSONObject) reportArr.get(0)).get(SubThreadCommand.REPORTED_SUBTHREAD_ID));
     }
 
     @Test
@@ -171,7 +172,7 @@ public class ReportSubThreadTest {
         String reportedSubthreadId = subthreadId1;
         String threadId = parentThreadId2;
         String reportMsg = "ban this scammer naw!";
-        String response = reportSubthread(mantaId,typeOfReport,reportedSubthreadId,threadId,reportMsg);
+        String response = reportSubthread(mantaId, typeOfReport, reportedSubthreadId, threadId, reportMsg);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(400, responseJson.getInt("statusCode"));
@@ -185,7 +186,7 @@ public class ReportSubThreadTest {
         String reportedSubthreadId = subthreadId2;
         String threadId = parentThreadId1;
         String reportMsg = "ban this scammer naw!";
-        String response = reportSubthread(mantaId,typeOfReport,reportedSubthreadId,threadId,reportMsg);
+        String response = reportSubthread(mantaId, typeOfReport, reportedSubthreadId, threadId, reportMsg);
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(400, responseJson.getInt("statusCode"));

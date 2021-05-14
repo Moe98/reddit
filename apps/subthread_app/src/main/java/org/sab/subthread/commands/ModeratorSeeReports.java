@@ -3,23 +3,21 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
-import org.sab.validation.Schema;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.validation.Schema;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class ModeratorSeeReports extends SubThreadCommand {
-    
+
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
     }
+
     @Override
     protected HTTPMethod getMethodType() {
         // TODO get?

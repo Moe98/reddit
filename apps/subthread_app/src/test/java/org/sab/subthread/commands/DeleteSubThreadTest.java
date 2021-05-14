@@ -13,33 +13,27 @@ import org.sab.service.validation.HTTPMethod;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DeleteSubThreadTest {
 
-    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String fishName = "AsmakElRayes7amido";
-    final private static String fishSubthread1Id = "1234", fishSubthread2Id = "5678";
-    private static Arango arango;
-
-    private static BaseDocument moe, manta, lujine,
-            fishThread,
-            fishSubThread1, fishSubThread2;
-
-    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
-    private static ArrayList<String> s2Level1Comm, s2Level2Comm, s2Level3Comm;
-
     // db attribs
     final static String DB_NAME = SubThreadCommand.DB_Name;
-
     // collections
     final static String THREAD_COLLECTION_NAME = SubThreadCommand.THREAD_COLLECTION_NAME;
     final static String USER_COLLECTION_NAME = SubThreadCommand.USER_COLLECTION_NAME;
     final static String SUBTHREAD_COLLECTION_NAME = SubThreadCommand.SUBTHREAD_COLLECTION_NAME;
     final static String COMMENT_COLLECTION_NAME = CommentCommand.COMMENT_COLLECTION_NAME;
-
+    final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
+    final private static String fishName = "AsmakElRayes7amido";
+    final private static String fishSubthread1Id = "1234", fishSubthread2Id = "5678";
+    private static Arango arango;
+    private static BaseDocument moe, manta, lujine,
+            fishThread,
+            fishSubThread1, fishSubThread2;
+    private static ArrayList<String> s1Level1Comm, s1Level2Comm, s1Level3Comm;
+    private static ArrayList<String> s2Level1Comm, s2Level2Comm, s2Level3Comm;
 
     @BeforeClass
     public static void setUp() {
@@ -144,6 +138,12 @@ public class DeleteSubThreadTest {
         return new JSONObject(deletesubThread.execute(request));
     }
 
+    @AfterClass
+    public static void tearDown() {
+        arango.disconnect();
+        arango.dropDatabase(DB_NAME);
+    }
+
     @Test
     public void T01_NonCreatorDeleteSubThread() {
         JSONObject response = deleteSubThread(fishSubthread1Id, moeId);
@@ -189,12 +189,6 @@ public class DeleteSubThreadTest {
             assertTrue(arango.documentExists(DB_NAME, COMMENT_COLLECTION_NAME, commentId));
         }
 
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        arango.disconnect();
-        arango.dropDatabase(DB_NAME);
     }
 
 }

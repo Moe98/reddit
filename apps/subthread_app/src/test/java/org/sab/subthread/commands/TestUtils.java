@@ -11,16 +11,11 @@ import org.sab.service.validation.HTTPMethod;
 
 public class TestUtils {
 
-    // user attributes
-    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
-    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
-
     // thread attribs
     protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
-
     // subthread attribs
     protected static final String SUBTHREAD_PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
     protected static final String SUBTHREAD_CREATOR_ID_DB = SubThreadAttributes.CREATOR_ID.getDb();
@@ -30,17 +25,19 @@ public class TestUtils {
     protected static final String SUBTHREAD_DISLIKES_DB = SubThreadAttributes.DISLIKES.getDb();
     protected static final String SUBTHREAD_HAS_IMAGE_DB = SubThreadAttributes.HAS_IMAGE.getDb();
     protected static final String SUBTHREAD_DATE_CREATED_DB = SubThreadAttributes.DATE_CREATED.getDb();
-
-    // comment attributes
-
     protected static final String COMM_CREATOR_ID = CommentAttributes.CREATOR_ID.getDb();
     // TODO parent could be a comment...
     protected static final String COMM_PARENT_SUBTHREAD_ID = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
+
+    // comment attributes
     protected static final String COMM_PARENT_CONTENT_TYPE = CommentAttributes.PARENT_CONTENT_TYPE.getDb();
     protected static final String COMM_CONTENT = CommentAttributes.CONTENT.getDb();
     protected static final String COMM_DATE_CREATED = CommentAttributes.DATE_CREATED.getDb();
     protected static final String COMM_LIKES = CommentAttributes.LIKES.getDb();
     protected static final String COMM_DISLIKES = CommentAttributes.DISLIKES.getDb();
+    // user attributes
+    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
+    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     protected static BaseDocument addObjectToCollection(Arango arango, BaseDocument document, String collectionName) {
         // TODO: Add testing DB.
@@ -55,9 +52,9 @@ public class TestUtils {
         baseDocument.addAttribute(USR_NUM_OF_FOLLOWERS, numFollowers);
         return baseDocument;
     }
-    
+
     protected static BaseDocument setUpThread(String threadName, String creatorId, int numFollowers, String description) {
-        BaseDocument baseDocument  = new BaseDocument();
+        BaseDocument baseDocument = new BaseDocument();
 
         baseDocument.setKey(threadName);
         baseDocument.addAttribute(THREAD_CREATOR_ID_DB, creatorId);
@@ -69,9 +66,9 @@ public class TestUtils {
         return baseDocument;
     }
 
-    protected static BaseDocument setUpSubThreadNoImage(String subthreadId, String parentThreadId, String  creatorId, String title, String content,
-                                                 int likes, int dislikes) {
-        BaseDocument baseDocument  = new BaseDocument();
+    protected static BaseDocument setUpSubThreadNoImage(String subthreadId, String parentThreadId, String creatorId, String title, String content,
+                                                        int likes, int dislikes) {
+        BaseDocument baseDocument = new BaseDocument();
 
         baseDocument.setKey(subthreadId);
         baseDocument.addAttribute(SUBTHREAD_PARENT_THREAD_ID_DB, parentThreadId);
@@ -90,7 +87,7 @@ public class TestUtils {
     protected static BaseDocument setUpComment(String creatorId, String parentId, String parentType,
                                                String content, int likes, int dislikes) {
 
-        BaseDocument baseDocument  = new BaseDocument();
+        BaseDocument baseDocument = new BaseDocument();
         baseDocument.addAttribute(COMM_CREATOR_ID, creatorId);
         baseDocument.addAttribute(COMM_PARENT_SUBTHREAD_ID, parentId);
         baseDocument.addAttribute(COMM_PARENT_CONTENT_TYPE, parentType);

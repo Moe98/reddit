@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetFollowedThreadsTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
@@ -29,9 +29,9 @@ public class GetFollowedThreadsTest {
 
             createUsers();
             createThreads();
-            followThread(parentThreadId1,mantaId);
-            followThread(parentThreadId2,mantaId);
-            followThread(parentThreadId3,lujineId);
+            followThread(parentThreadId1, mantaId);
+            followThread(parentThreadId2, mantaId);
+            followThread(parentThreadId3, lujineId);
 
         } catch (Exception e) {
             System.out.println("failed");
@@ -67,11 +67,11 @@ public class GetFollowedThreadsTest {
         arango.dropDatabase(ThreadCommand.TEST_DB_Name);
     }
 
-    public static void createThreads(){
+    public static void createThreads() {
         thread1 = new BaseDocument();
         thread1.setKey(parentThreadId1);
         thread1.addAttribute(ThreadCommand.CREATOR_ID_DB, lujineId);
-        thread1.addAttribute(ThreadCommand.DESCRIPTION_DB,  "agmad subreddit fl wogod");
+        thread1.addAttribute(ThreadCommand.DESCRIPTION_DB, "agmad subreddit fl wogod");
         java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
         thread1.addAttribute(ThreadCommand.DATE_CREATED_DB, sqlDate);
         thread1.addAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
@@ -80,7 +80,7 @@ public class GetFollowedThreadsTest {
         thread2 = new BaseDocument();
         thread2.setKey(parentThreadId2);
         thread2.addAttribute(ThreadCommand.CREATOR_ID_DB, lujineId);
-        thread2.addAttribute(ThreadCommand.DESCRIPTION_DB,  "tany agmad subreddit fl wogod");
+        thread2.addAttribute(ThreadCommand.DESCRIPTION_DB, "tany agmad subreddit fl wogod");
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         thread2.addAttribute(ThreadCommand.DATE_CREATED_DB, sqlDate2);
         thread2.addAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
@@ -89,14 +89,14 @@ public class GetFollowedThreadsTest {
         thread2 = new BaseDocument();
         thread2.setKey(parentThreadId3);
         thread2.addAttribute(ThreadCommand.CREATOR_ID_DB, mantaId);
-        thread2.addAttribute(ThreadCommand.DESCRIPTION_DB,  "tany agmad subreddit fl wogod");
+        thread2.addAttribute(ThreadCommand.DESCRIPTION_DB, "tany agmad subreddit fl wogod");
         java.sql.Date sqlDate3 = new java.sql.Date(System.currentTimeMillis());
         thread2.addAttribute(ThreadCommand.DATE_CREATED_DB, sqlDate3);
         thread2.addAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
         addObjectToCollection(thread2, ThreadCommand.THREAD_COLLECTION_NAME);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(ThreadCommand.IS_DELETED_DB, false);
@@ -116,10 +116,10 @@ public class GetFollowedThreadsTest {
         addObjectToCollection(lujine, ThreadCommand.USER_COLLECTION_NAME);
     }
 
-    public static void followThread(String threadName, String actionMakerId){
+    public static void followThread(String threadName, String actionMakerId) {
         BaseEdgeDocument follow = new BaseEdgeDocument();
-        follow.setFrom(ThreadCommand.USER_COLLECTION_NAME+"/"+actionMakerId);
-        follow.setTo(ThreadCommand.THREAD_COLLECTION_NAME+"/"+threadName);
+        follow.setFrom(ThreadCommand.USER_COLLECTION_NAME + "/" + actionMakerId);
+        follow.setTo(ThreadCommand.THREAD_COLLECTION_NAME + "/" + threadName);
 
         addObjectToEdgeCollection(follow, ThreadCommand.USER_FOLLOW_THREAD_COLLECTION_NAME);
     }
@@ -146,10 +146,10 @@ public class GetFollowedThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(2, dataArr.length());
-        for(int i = 0; i<2;i++)
-            assertEquals(lujineId, ((JSONObject)dataArr.get(i)).getString(ThreadCommand.CREATOR_ID_DB));
+        for (int i = 0; i < 2; i++)
+            assertEquals(lujineId, ((JSONObject) dataArr.get(i)).getString(ThreadCommand.CREATOR_ID_DB));
     }
 
     @Test
@@ -159,9 +159,9 @@ public class GetFollowedThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(1, dataArr.length());
-        assertEquals(mantaId, ((JSONObject)dataArr.get(0)).getString(ThreadCommand.CREATOR_ID_DB));
+        assertEquals(mantaId, ((JSONObject) dataArr.get(0)).getString(ThreadCommand.CREATOR_ID_DB));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class GetFollowedThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(0, dataArr.length());
     }
 }

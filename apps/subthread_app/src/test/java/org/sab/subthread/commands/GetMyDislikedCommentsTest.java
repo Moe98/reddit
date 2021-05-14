@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GetMyDislikedCommentsTest {
     final private static String parentThreadId1 = "asmakElRayes7amido";
@@ -78,7 +78,7 @@ public class GetMyDislikedCommentsTest {
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
     }
 
-    public static void createUsers(){
+    public static void createUsers() {
         moe = new BaseDocument();
         moe.setKey(moeId);
         moe.addAttribute(CommentCommand.USER_IS_DELETED_DB, false);
@@ -102,7 +102,7 @@ public class GetMyDislikedCommentsTest {
         BaseDocument comment = new BaseDocument();
         comment.setKey(commentId);
         comment.addAttribute(CommentCommand.PARENT_SUBTHREAD_ID_DB, parentSubThreadId);
-        comment.addAttribute(CommentCommand.CREATOR_ID_DB,  creatorId);
+        comment.addAttribute(CommentCommand.CREATOR_ID_DB, creatorId);
         comment.addAttribute(CommentCommand.CONTENT_DB, content);
         comment.addAttribute(CommentCommand.PARENT_CONTENT_TYPE_DB, parentContentType);
         comment.addAttribute(CommentCommand.LIKES_DB, 0);
@@ -115,13 +115,13 @@ public class GetMyDislikedCommentsTest {
 
     public static void dislikeComment(String userId, String commentId) {
         BaseEdgeDocument like = new BaseEdgeDocument();
-        like.setFrom("User/"+userId);
-        like.setTo("Comment/"+commentId);
+        like.setFrom("User/" + userId);
+        like.setTo("Comment/" + commentId);
 
         addObjectToEdgeCollection(like, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
     }
 
-    public static String getMyDislikedComments(String userId){
+    public static String getMyDislikedComments(String userId) {
         GetMyDislikedComments getMyDislikedComments = new GetMyDislikedComments();
         JSONObject body = new JSONObject();
 
@@ -143,7 +143,7 @@ public class GetMyDislikedCommentsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(6, dataArr.length());
     }
 
@@ -154,7 +154,7 @@ public class GetMyDislikedCommentsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(0, dataArr.length());
     }
 }

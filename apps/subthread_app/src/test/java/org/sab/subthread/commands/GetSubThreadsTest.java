@@ -7,9 +7,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
-import org.sab.models.user.User;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 public class GetSubThreadsTest {
     final private static String moeId = "Moe", mantaId = "Manta";
     final private static String parentThreadId1 = "asmakElRayes7amido", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
@@ -25,8 +26,8 @@ public class GetSubThreadsTest {
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
 
             createThreads();
-            createOneSubThread(parentThreadId1,title1,content1,hasImage1,moeId);
-            create100SubThread(parentThreadId2,title2,content2,hasImage2,mantaId);
+            createOneSubThread(parentThreadId1, title1, content1, hasImage1, moeId);
+            create100SubThread(parentThreadId2, title2, content2, hasImage2, mantaId);
 
 
         } catch (Exception e) {
@@ -54,11 +55,11 @@ public class GetSubThreadsTest {
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
-    public static void createThreads(){
+    public static void createThreads() {
         thread1 = new BaseDocument();
         thread1.setKey(parentThreadId1);
         thread1.addAttribute(SubThreadCommand.THREAD_CREATOR_ID_DB, mantaId);
-        thread1.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB,  "agmad subreddit fl wogod");
+        thread1.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB, "agmad subreddit fl wogod");
         java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
         thread1.addAttribute(SubThreadCommand.THREAD_DATE_CREATED_DB, sqlDate);
         thread1.addAttribute(SubThreadCommand.THREAD_NUM_OF_FOLLOWERS_DB, 0);
@@ -67,13 +68,14 @@ public class GetSubThreadsTest {
         thread2 = new BaseDocument();
         thread2.setKey(parentThreadId2);
         thread2.addAttribute(SubThreadCommand.THREAD_CREATOR_ID_DB, moeId);
-        thread2.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB,  "tany agmad subreddit fl wogod");
+        thread2.addAttribute(SubThreadCommand.THREAD_DESCRIPTION_DB, "tany agmad subreddit fl wogod");
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         thread2.addAttribute(SubThreadCommand.THREAD_DATE_CREATED_DB, sqlDate2);
         thread2.addAttribute(SubThreadCommand.THREAD_NUM_OF_FOLLOWERS_DB, 0);
         addObjectToCollection(thread2, SubThreadCommand.THREAD_COLLECTION_NAME);
 
     }
+
     public static void createOneSubThread(String parentThreadId, String title, String content, String hasImage, String creatorId) {
         CreateSubThread tc = new CreateSubThread();
 
@@ -96,7 +98,7 @@ public class GetSubThreadsTest {
 
     public static void create100SubThread(String parentThreadId, String title, String content, String hasImage, String creatorId) {
         CreateSubThread tc = new CreateSubThread();
-        for(int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             JSONObject body = new JSONObject();
             body.put(SubThreadCommand.PARENT_THREAD_ID, parentThreadId);
             body.put(SubThreadCommand.TITLE, title);
@@ -136,9 +138,9 @@ public class GetSubThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(1, dataArr.length());
-        assertEquals(moeId, ((JSONObject)dataArr.get(0)).getString(SubThreadCommand.CREATOR_ID_DB));
+        assertEquals(moeId, ((JSONObject) dataArr.get(0)).getString(SubThreadCommand.CREATOR_ID_DB));
     }
 
     @Test
@@ -148,10 +150,10 @@ public class GetSubThreadsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(100, dataArr.length());
-        for(int i = 0;i<100;i++)
-            assertEquals(mantaId, ((JSONObject)dataArr.get(i)).getString(SubThreadCommand.CREATOR_ID_DB));
+        for (int i = 0; i < 100; i++)
+            assertEquals(mantaId, ((JSONObject) dataArr.get(i)).getString(SubThreadCommand.CREATOR_ID_DB));
     }
 
     @Test

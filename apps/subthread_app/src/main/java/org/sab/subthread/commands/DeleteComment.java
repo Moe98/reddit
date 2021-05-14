@@ -6,19 +6,20 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.sab.service.validation.HTTPMethod;
 
 public class DeleteComment extends CommentCommand {
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.DELETE;
     }
+
     @Override
     protected Schema getSchema() {
         Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);
