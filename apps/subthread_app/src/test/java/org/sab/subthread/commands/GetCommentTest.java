@@ -122,7 +122,7 @@ public class GetCommentTest {
 
         final JSONObject response = getComment(commentId);
 
-        assertEquals(200, createCommentResponse.getInt("statusCode"));
+        assertEquals(200, response.getInt("statusCode"));
 
         final JSONObject responseData = response.getJSONObject("data");
 
