@@ -181,8 +181,8 @@ public class DeleteThreadTest {
 
     @AfterClass
     public static void tearDown() {
-//        arango.disconnect();
-//        arango.dropDatabase(DB_NAME);
+        arango.disconnect();
+        arango.dropDatabase(DB_NAME);
     }
 
 }
