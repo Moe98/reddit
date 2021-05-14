@@ -1,12 +1,13 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
+import org.sab.auth.AuthParamsHandler;
 
 public class Requester {
     Requester() {
     }
 
-    static JSONObject authenticationParams = new JSONObject().put("isAuthenticated", false);
+    static JSONObject authenticationParams = AuthParamsHandler.getUnauthorizedAuthParams();
 
     private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
         JSONObject request = new JSONObject();

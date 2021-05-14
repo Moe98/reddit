@@ -27,6 +27,7 @@ public abstract class UserCommand extends CommandWithVerification {
     protected JSONObject authenticateUser(String username, String password) {
         boolean checkPassword;
         User user;
+
         try {
             user = getUser(username, UserAttributes.PASSWORD, UserAttributes.USER_ID, UserAttributes.PHOTO_URL);
             String hashedPassword = user.getPassword();
@@ -34,9 +35,10 @@ public abstract class UserCommand extends CommandWithVerification {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return new JSONObject().put("msg", e.getMessage()).put("statusCode", 502);
         }
-        if (!checkPassword) {
+
+        if (!checkPassword)
             return new JSONObject().put("msg", "Password is incorrect").put("statusCode", 401);
-        }
+        
         return new JSONObject().put("msg", "User Authentication successful!").put("statusCode", 200).put("data", user.toJSON());
     }
 

@@ -10,12 +10,11 @@ import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class UpdateProfilePhoto extends UserCommand {
     @Override
     protected Schema getSchema() {
-        return new Schema(List.of());
+        return Schema.emptySchema();
 
     }
 
@@ -42,7 +41,7 @@ public class UpdateProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-        
+
         try {
             output = MinIO.uploadObject(BUCKETNAME, user.reformatUserId(), files.getJSONObject("image"));
             if (output.isEmpty())
