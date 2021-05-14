@@ -18,6 +18,7 @@ public class CommandNeedingClaimsTest {
         JSONObject response = new JSONObject(new CommandNeedingAuth().execute(request));
         int statusCode = response.getInt("statusCode");
         assertTrue(statusCode == 401 || statusCode == 403);
+        assertTrue(response.getString("msg").startsWith("Unauthorized"));
     }
 
     @Test
