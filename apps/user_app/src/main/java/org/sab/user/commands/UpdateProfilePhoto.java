@@ -57,6 +57,6 @@ public class UpdateProfilePhoto extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeMsgResponse("Profile Picture uploaded successfully");
+        return Responder.makeMsgResponse(String.format("Profile Picture uploaded successfully. You can find at %s", photoUrl));
     }
 }

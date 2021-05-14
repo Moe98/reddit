@@ -15,6 +15,7 @@ import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.user.UserApp;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class UserAppTest {
     static String username = "scale-a-bull" + new Date().getTime();
     static String password = "12345678";
     static String token;
-
+    static String userId;
 
     @BeforeClass
     public static void connectToDbs() {
@@ -53,6 +54,7 @@ public class UserAppTest {
         assertEquals(username, data.getString("username"));
         assertEquals(birthdate, data.getString("birthdate"));
         assertEquals(email, data.getString("email"));
+        userId = data.getString("userId");
 
     }
 
@@ -176,14 +178,17 @@ public class UserAppTest {
 
     @Test
     public void T11_updateProfilePicture() {
-        if (!Utilities.isDevelopmentMode())
-            return;
-        String photoUrl = "https://picsum.photos/200";
-        JSONObject response = Requester.updateProfilePicture(photoUrl);
+
+        JSONObject response = null;
+        try {
+            response = Requester.updateProfilePicture();
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals("Profile Picture uploaded successfully", response.getString("msg"));
-
-
+        String msg = response.getString("msg");
+        assertTrue(msg.startsWith("Profile Picture uploaded successfully"));
+        assertTrue(msg.contains(Utilities.formatUUID(userId)));
     }
 
     @Test
@@ -198,9 +203,7 @@ public class UserAppTest {
 
     @Test
     public void T13_deleteProfilePicture() {
-        if (!Utilities.isDevelopmentMode())
-            return;
-
+    
         JSONObject response = Requester.deleteProfilePicture();
         JSONObject user = Requester.getUser().getJSONObject("data");
         assertEquals(200, response.getInt("statusCode"));

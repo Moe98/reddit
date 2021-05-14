@@ -9,4 +9,7 @@ public class Utilities {
         return mode != null && mode.equals("Development");
     }
 
+    public static String formatUUID(String UUID) {
+        return UUID.replaceAll("[-]", "");
+    }
 }

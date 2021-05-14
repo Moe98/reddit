@@ -3,6 +3,7 @@ package org.sab.user.commands;
 import com.arangodb.ArangoDBException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.functions.Utilities;
 import org.sab.minio.MinIO;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
@@ -61,7 +62,7 @@ public class DeleteAccount extends UserCommand {
         JSONObject user = userAuth.getJSONObject("data");
         if (user.has(PHOTO_URL)) {
             try {
-                String publicId = user.getString(USER_ID).replaceAll("[-]", "");
+                String publicId = Utilities.formatUUID(user.getString(USER_ID));
                 if (!MinIO.deleteObject(BUCKETNAME, publicId))
                     return Responder.makeErrorResponse("Error Occurred While Deleting Your Image!", 404);
             } catch (EnvironmentVariableNotLoaded e) {

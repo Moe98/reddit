@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class FileSimulation {
-    private static final String SAMPLE_IMAGE_NAME = "SampleImagee.png";
+    private static final String SAMPLE_IMAGE_NAME = "SampleImage.png";
     private static final String SAMPLE_IMAGE_TYPE = "image/png";
 
     public static JSONObject generateImageJson() throws IOException {
