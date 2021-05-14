@@ -4,7 +4,7 @@ import com.rabbitmq.client.*;
 import org.junit.Test;
 import org.sab.demo.ExampleApp;
 
-
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,9 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.concurrent.*;
 
-import javax.net.ssl.SSLException;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class ServerTest {
     int NUM_THREADS = 5;
@@ -33,7 +32,9 @@ public class ServerTest {
      */
     public String get(String uri, String functionName) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uri)).header("Function-Name", functionName)
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uri))
+                .setHeader("Function-Name", functionName)
+                .setHeader("Content-Type", "application/json")
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -75,7 +76,7 @@ public class ServerTest {
                 try {
                     receivedMessage = new String(delivery.getBody(), StandardCharsets.UTF_8);
                 } finally {
-                    
+
                     AMQP.BasicProperties replyProps = new AMQP.BasicProperties
                             .Builder()
                             .correlationId(delivery.getProperties().getCorrelationId())
@@ -102,38 +103,39 @@ public class ServerTest {
             }
         });
 
-        while (!declareQueuesFuture.isDone());
+        while (!declareQueuesFuture.isDone()) ;
 
         threadPool.submit(startServer);
 
         final Future<?> sendRequestFuture = threadPool.submit(runRabbitClient);
         final Future<String> sendResponseFuture = threadPool.submit(respondToClient);
 
-        while (!sendRequestFuture.isDone() || !sendResponseFuture.isDone());
+        while (!sendRequestFuture.isDone() || !sendResponseFuture.isDone()) ;
 
         final Future<?> shutdownServerFuture = threadPool.submit(shutdownServer);
 
-        while (!shutdownServerFuture.isDone());
+        while (!shutdownServerFuture.isDone()) ;
 
         System.out.println("Done with callables");
         assertEquals(expectedReplyMessage, response);
     }
 
-    public void runServer(){
+    public void runServer() {
         new Thread(() -> {
             try {
                 Server.main(null);
             } catch (Exception e) {
-                fail("Server did not start\n" +e.getMessage());
+                fail("Server did not start\n" + e.getMessage());
             }
         }).start();
     }
-    public void runExampleApp(){
+
+    public void runExampleApp() {
         new Thread(() -> {
             try {
                 ExampleApp.main(null);
             } catch (Exception e) {
-                fail("Example App did not start\n" +e.getMessage());
+                fail("Example App did not start\n" + e.getMessage());
             }
         }).start();
     }
@@ -142,9 +144,9 @@ public class ServerTest {
     public void callingExampleAppAPI() {
         runServer();
         runExampleApp();
-        String response= null;
+        String response = null;
         try {
-            response = get("http://localhost:8080/api/example_app","HELLO_WORLD");
+            response = get("http://localhost:8080/api/example_app", "HELLO_WORLD");
         } catch (IOException | InterruptedException e) {
             fail(e.getMessage());
         }
