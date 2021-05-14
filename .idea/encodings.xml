@@ -16,6 +16,10 @@
     <file url="file://$PROJECT_DIR$/apps/recommendation_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/search_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/search_app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/subthread_app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/subthread_app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/thread_app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/thread_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/user_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/user_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs" charset="UTF-8" />
