@@ -4,11 +4,12 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.sab.auth.AuthParamsHandler;
 import org.sab.demo.commands.CommandNeedingAuth;
+import org.sab.demo.commands.CommandNeedingClaims;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CommandNeedingAuthTest {
+public class CommandNeedingClaimsTest {
 
     @Test
     public void willFailDueToUnAuthentication() {
@@ -22,11 +23,12 @@ public class CommandNeedingAuthTest {
     @Test
     public void willSucceedAfterAuthentication() {
         JSONObject request = new JSONObject().put("uriParams", new JSONObject()).put("methodType", "GET");
-        AuthParamsHandler.putAuthorizedParams(request);
-        JSONObject response = new JSONObject(new CommandNeedingAuth().execute(request));
+        String username = "scale-a-bull";
+        JSONObject claims = new JSONObject().put("username", username);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
+        JSONObject response = new JSONObject(new CommandNeedingClaims().execute(request));
         assertEquals(200, response.getInt("statusCode"));
-        assertEquals("Authentication successful!", response.getString("msg"));
+        assertEquals(String.format("Hello %s!", username), response.getString("msg"));
     }
-
 
 }

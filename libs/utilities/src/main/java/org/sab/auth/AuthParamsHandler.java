@@ -39,8 +39,11 @@ public class AuthParamsHandler {
         return request.put(AUTHENTICATION_PARAMS, authParams);
     }
 
-    public static JSONObject putAuthorizedParams(JSONObject request, String username) {
-        JSONObject authParams = new JSONObject().put(IS_AUTHENTICATED, true).put("username", username);
+    
+    public static JSONObject putAuthorizedParams(JSONObject request, JSONObject claims) {
+        JSONObject authParams = new JSONObject().put(IS_AUTHENTICATED, true);
+        for (String key : claims.keySet())
+            authParams.put(key, claims.get(key));
         return request.put(AUTHENTICATION_PARAMS, authParams);
     }
 }
