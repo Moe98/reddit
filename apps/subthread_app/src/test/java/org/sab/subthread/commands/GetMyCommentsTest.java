@@ -25,7 +25,6 @@ public class GetMyCommentsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             createThreads();

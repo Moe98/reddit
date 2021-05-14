@@ -21,8 +21,7 @@ public class GetThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
-            // TODO: Use a test DB if possible.
+            arango.connectIfNotConnected();
             arango.createDatabaseIfNotExists(DB_NAME);
 
             user = new BaseDocument();
@@ -50,15 +49,16 @@ public class GetThreadTest {
         arango.deleteDocument(DB_NAME, collectionName, document.getKey());
     }
 
+    // TODO should be direct insert
     private static JSONObject createThread(String threadName, String creatorId, String description) {
         JSONObject request = new JSONObject();
 
         JSONObject body = new JSONObject();
         body.put(ThreadAttributes.THREAD_NAME.getHTTP(), threadName);
-        body.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
         body.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
 
         JSONObject uriParams = new JSONObject();
+        uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
 
         request.put("body", body);
         request.put("uriParams", uriParams);
@@ -87,6 +87,7 @@ public class GetThreadTest {
         final String threadName = "Epsilon", description = "Rules!";
         final JSONObject createThreadResponse = createThread(threadName, userId, description);
 
+        System.out.println(createThreadResponse);
         assertEquals(200, createThreadResponse.getInt("statusCode"));
 
         final JSONObject response = getThread(threadName);

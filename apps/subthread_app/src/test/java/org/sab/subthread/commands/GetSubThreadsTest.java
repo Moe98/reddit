@@ -22,8 +22,6 @@ public class GetSubThreadsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
-//            arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
 
             createThreads();
@@ -52,10 +50,6 @@ public class GetSubThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
-        removeObjectFromCollection(thread1, SubThreadCommand.THREAD_COLLECTION_NAME);
-        arango.connectIfNotConnected();
-        removeObjectFromCollection(thread2, SubThreadCommand.THREAD_COLLECTION_NAME);
         arango.connectIfNotConnected();
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }

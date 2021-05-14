@@ -21,9 +21,10 @@ public class ModeratorBansUserTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
-            // TODO: Use a test DB if possible.
+            arango.connectIfNotConnected();
             arango.createDatabaseIfNotExists(DB_NAME);
+
+            arango.createCollection(DB_NAME, ThreadCommand.THREAD_COLLECTION_NAME, false);
 
             moderator = new BaseDocument();
             moderator.setKey(moderatorId);
@@ -37,14 +38,17 @@ public class ModeratorBansUserTest {
             bannedUser.addAttribute(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
             addObjectToCollection(bannedUser, "User");
 
+            // TODO should be DB insert
+//            BaseDocument thread = TestUtils.setUpThread(threadId, moderatorId, 0, "description");
+//            TestUtils.addObjectToCollection(arango, thread, ThreadCommand.THREAD_COLLECTION_NAME);
             JSONObject request = new JSONObject();
 
             JSONObject body = new JSONObject();
             body.put(ThreadAttributes.THREAD_NAME.getHTTP(), threadId);
-            body.put(ThreadAttributes.CREATOR_ID.getHTTP(), moderatorId);
             body.put(ThreadAttributes.DESCRIPTION.getHTTP(), "description");
 
             JSONObject uriParams = new JSONObject();
+            uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), moderatorId);
 
             request.put("body", body);
             request.put("uriParams", uriParams);
@@ -122,6 +126,7 @@ public class ModeratorBansUserTest {
     public void cannotBanUserTwice() {
         JSONObject response = moderatorBansUserFromThread(moderatorId, bannedUserId, threadId);
 
+        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         response = moderatorBansUserFromThread(moderatorId, bannedUserId, threadId);
@@ -145,6 +150,7 @@ public class ModeratorBansUserTest {
 
         final JSONObject response = moderatorBansUserFromThread(dummyUserId, bannedUserId, threadId);
 
+        System.out.println(response);
         assertEquals(401, response.getInt("statusCode"));
         assertEquals(ThreadCommand.NOT_A_MODERATOR, response.get("msg"));
 

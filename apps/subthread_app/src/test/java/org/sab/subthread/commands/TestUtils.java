@@ -7,6 +7,7 @@ import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
+import org.sab.service.validation.HTTPMethod;
 
 public class TestUtils {
 
@@ -103,10 +104,10 @@ public class TestUtils {
     }
 
 
-    public static JSONObject makePutRequest(JSONObject body, JSONObject uriParams) {
+    public static JSONObject makeRequest(JSONObject body, JSONObject uriParams, HTTPMethod httpMethod) {
         JSONObject request = new JSONObject();
         request.put("body", body);
-        request.put("methodType", "PUT");
+        request.put("methodType", httpMethod.toString());
         request.put("uriParams", uriParams);
         return request;
     }

@@ -24,7 +24,6 @@ public class GetMyDislikedCommentsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertComments("20301", parentThreadId1, "content", mantaId, "SubThread");

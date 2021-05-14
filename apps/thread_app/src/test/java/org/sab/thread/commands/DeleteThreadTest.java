@@ -8,6 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 
@@ -41,8 +42,7 @@ public class DeleteThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
-//            arango.dropDatabase(DB_NAME);
+            arango.connectIfNotConnected();
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
@@ -132,7 +132,7 @@ public class DeleteThreadTest {
         JSONObject uriParams = new JSONObject();
         uriParams.put(ThreadCommand.ACTION_MAKER_ID, userId);
 
-        JSONObject request = TestUtils.makePutRequest(body, uriParams);
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.DELETE);
 
         DeleteThread deleteThread = new DeleteThread();
         return new JSONObject(deleteThread.execute(request));

@@ -9,6 +9,7 @@ import org.sab.arango.Arango;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
+import org.sab.service.validation.HTTPMethod;
 
 import static org.junit.Assert.*;
 
@@ -48,6 +49,7 @@ public class BookmarkSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            arango.connectIfNotConnected();
             assertTrue(arango.isConnected());
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
@@ -172,7 +174,7 @@ public class BookmarkSubThreadTest {
         JSONObject uriParams = new JSONObject();
         uriParams.put(SubThreadAttributes.ACTION_MAKER_ID.getHTTP(), userId);
 
-        JSONObject request = TestUtils.makePutRequest(body, uriParams);
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
         BookmarkSubThread bookmarkSubThread = new BookmarkSubThread();
 

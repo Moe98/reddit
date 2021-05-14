@@ -25,8 +25,6 @@ public class GetFollowedThreadsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
-
             arango.createDatabaseIfNotExists(ThreadCommand.TEST_DB_Name);
 
             createUsers();

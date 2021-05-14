@@ -9,6 +9,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
+import org.sab.service.validation.HTTPMethod;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -34,8 +35,7 @@ public class AssignThreadModeratorTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
-            arango.dropDatabase(DB_NAME);
+            arango.connectIfNotConnected();
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
@@ -80,7 +80,7 @@ public class AssignThreadModeratorTest {
         JSONObject uriParams = new JSONObject();
         uriParams.put(ThreadCommand.ASSIGNER_ID, assignerId);
 
-        JSONObject request = TestUtils.makePutRequest(body, uriParams);
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
         AssignThreadModerator assignThreadModerator = new AssignThreadModerator();
 
@@ -198,6 +198,6 @@ public class AssignThreadModeratorTest {
     @AfterClass
     public static void tearDown() {
         arango.disconnect();
-//        arango.dropDatabase(DB_NAME);
+        arango.dropDatabase(DB_NAME);
     }
 }

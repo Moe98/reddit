@@ -28,8 +28,6 @@ public class LikeSubThreadTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
-
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createSubThread(subthreadId1,parentThreadId1,content1,mantaId,title1,hasImage1);

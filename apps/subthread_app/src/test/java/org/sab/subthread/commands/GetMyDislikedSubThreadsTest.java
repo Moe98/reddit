@@ -24,7 +24,6 @@ public class GetMyDislikedSubThreadsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertSubthread("20301", parentThreadId1, mantaId, "title","content");

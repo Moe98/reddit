@@ -8,6 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 
@@ -27,7 +28,6 @@ public class ReportSubThreadTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
@@ -126,10 +126,7 @@ public class ReportSubThreadTest {
         JSONObject uriParams = new JSONObject();
         uriParams.put(SubThreadCommand.REPORTER_ID, reporterId);
 
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.POST);
 
         return tc.execute(request);
     }
@@ -156,14 +153,15 @@ public class ReportSubThreadTest {
         reportAtt.add(SubThreadCommand.THREAD_ID_DB);
         reportAtt.add(SubThreadCommand.DATE_CREATED_DB);
         reportAtt.add(SubThreadCommand.REPORT_MSG_DB);
-        reportAtt.add(SubThreadCommand.SUBTHREAD_ID_DB);
+        reportAtt.add(SubThreadCommand.REPORTED_SUBTHREAD_ID);
         JSONArray reportArr = arango.parseOutput(cursor, SubThreadCommand.REPORT_ID_DB, reportAtt);
         assertEquals(1, reportArr.length());
         assertEquals(mantaId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORTER_ID_DB));
         assertEquals(typeOfReport, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.TYPE_OF_REPORT_DB));
         assertEquals(threadId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.THREAD_ID_DB));
         assertEquals(reportMsg, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORT_MSG_DB));
-        assertEquals(reportedSubthreadId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.SUBTHREAD_ID_DB));
+        // TODO test fails
+        assertEquals(reportedSubthreadId, ((JSONObject)reportArr.get(0)).get(SubThreadCommand.REPORTED_SUBTHREAD_ID));
     }
 
     @Test

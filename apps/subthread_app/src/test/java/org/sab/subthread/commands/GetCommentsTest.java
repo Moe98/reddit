@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
 
@@ -41,6 +42,7 @@ public class GetCommentsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            arango.connectIfNotConnected();
             assertTrue(arango.isConnected());
             arango.createDatabase(DB_NAME);
 
@@ -129,7 +131,7 @@ public class GetCommentsTest {
         JSONObject uriParams = new JSONObject();
         uriParams.put(CommentCommand.ACTION_MAKER_ID, userId);
 
-        JSONObject request = TestUtils.makePutRequest(body, uriParams);
+        JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.GET);
 
         GetComments getComments = new GetComments();
         return new JSONObject(getComments.execute(request));

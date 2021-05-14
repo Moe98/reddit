@@ -21,8 +21,7 @@ public class BookmarkThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
-            // TODO: Use a test DB if possible.
+            arango.connectIfNotConnected();
             arango.createDatabaseIfNotExists(DB_NAME);
 
             threadOwner = new BaseDocument();

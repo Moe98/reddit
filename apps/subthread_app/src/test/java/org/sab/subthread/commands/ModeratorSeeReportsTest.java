@@ -25,7 +25,6 @@ public class ModeratorSeeReportsTest {
         try {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
@@ -170,6 +169,7 @@ public class ModeratorSeeReportsTest {
         arango.connectIfNotConnected();
         String response = moderatorSeeReports(parentThreadId1);
         JSONObject responseJson = new JSONObject(response);
+        System.out.println(response);
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONArray dataArr = (JSONArray)(responseJson.get("data"));
         assertEquals(3, dataArr.length());
