@@ -36,7 +36,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     String queueName;
     JSONObject authenticationParams;
     HttpPostRequestDecoder requestDecoder;
-    boolean isFormDate;
+    boolean isFormData;
 
     JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
@@ -82,9 +82,9 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             uriParams = getURIParams();
             headers = getHeaders();
             ctx.channel().attr(Server.REQ_KEY).set(req);
-            isFormDate = headers.getString("Content-Type").split(";")[0].equals("multipart/form-data");
+            isFormData = headers.getString("Content-Type").split(";")[0].equals("multipart/form-data");
         }
-        if (msg instanceof HttpContent && !isFormDate) {
+        if (msg instanceof HttpContent && !isFormData) {
             HttpContent content = (HttpContent) msg;
             ByteBuf jsonBuf = content.content();
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
@@ -98,7 +98,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
             }
         }
         if (msg instanceof FullHttpRequest) {
-            if (!methodType.equals("GET") && isFormDate) {
+            if (!methodType.equals("GET") && isFormData) {
                 requestDecoder = new HttpPostRequestDecoder((FullHttpRequest) msg);
                 requestDecoder.setDiscardThreshold(0);
             }
