@@ -9,6 +9,7 @@
   <modules>
     <module>example_app</module>
     <module>chat_app</module>
+    <module>notification_app</module>
     <module>user_app</module>
     <module>recommendation_app</module>
     <module>search_app</module>

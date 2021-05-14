@@ -16,12 +16,12 @@ import org.sab.service.Command;
 import org.sab.service.Responder;
 
 public class UpdatePopularThreads extends Command {
-
+    Arango arango;
     @Override
     public String execute(JSONObject request) {
         JSONArray data = new JSONArray();
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
             String query = """
@@ -45,6 +45,8 @@ public class UpdatePopularThreads extends Command {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
+        } finally {
+            arango.disconnect();
         }
 
         if (data.length() != 0) {

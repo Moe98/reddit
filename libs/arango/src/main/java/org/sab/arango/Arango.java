@@ -14,7 +14,6 @@ import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,9 +33,6 @@ public class Arango {
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
-
-        connect();
-
     }
 
     public static Arango getInstance() {
@@ -52,8 +48,9 @@ public class Arango {
     }
 
     public void connectIfNotConnected() {
-        if (!isConnected())
+        if (!isConnected()){
             connect();
+        }
     }
 
     public void disconnect() {
@@ -101,6 +98,14 @@ public class Arango {
         return readDocument(dbName, collectionName, baseDocument.getKey());
     }
 
+    public static BaseDocument createDocument(String dbName, String collectionName, Map<String, Object> properties, String key) {
+        BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
+        newDocument.setKey(key);
+        Arango arango = getInstance();
+        arango.connectIfNotConnected();
+        return arango.createDocument(dbName, collectionName, newDocument);
+    }
+
     public BaseEdgeDocument createEdgeDocument(String dbName, String collectionName, BaseEdgeDocument baseEdgeDocument) {
         arangoDB.db(dbName).collection(collectionName).insertDocument(baseEdgeDocument);
         return readEdgeDocument(dbName, collectionName, baseEdgeDocument.getKey());
@@ -117,6 +122,14 @@ public class Arango {
     public BaseDocument updateDocument(String dbName, String collectionName, BaseDocument updatedDocument, String documentKey) {
         arangoDB.db(dbName).collection(collectionName).updateDocument(documentKey, updatedDocument);
         return readDocument(dbName, collectionName, updatedDocument.getKey());
+    }
+
+    public static BaseDocument updateDocument(String dbName, String collectionName, Map<String, Object> updatedProperties, String documentKey) {
+        BaseDocument updatedDocument = new BaseDocument(new HashMap<>(updatedProperties));
+        updatedDocument.setKey(documentKey);
+        Arango arango = Arango.getInstance();
+        arango.connectIfNotConnected();
+        return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
     }
 
     public BaseEdgeDocument updateEdgeDocument(String dbName, String collectionName, BaseEdgeDocument updatedDocument, String documentKey) {
@@ -190,7 +203,7 @@ public class Arango {
         ArangoCursor<BaseDocument> cursor = query(DB_Name, query, bindVars);
         String edgeId = "";
         if (cursor.hasNext()) {
-            edgeId = (String)cursor.next().getAttribute("edgeId");
+            edgeId = (String) cursor.next().getAttribute("edgeId");
         }
         return edgeId;
     }
@@ -208,7 +221,6 @@ public class Arango {
         return arangoDB.db(dbName).collection(collectionName).count().getCount().intValue();
     }
 
-
     public ArangoCursor<BaseDocument> filterCollection(String DB_Name, String collectionName, String attributeName, String attributeValue){
         JSONArray data = new JSONArray();
         String query = """
@@ -219,9 +231,9 @@ public class Arango {
 
         Map<String, Object> bindVars =  new HashMap<>();
         bindVars.put("attributeValue", attributeValue);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
         return query(DB_Name, query, bindVars);
     }
+
     public ArangoCursor<BaseDocument> filterEdgeCollection(String DB_Name, String collectionName, String fromNodeId){
         String query = """
                     FOR node IN 1..1 OUTBOUND @fromNodeId @collectionName
@@ -231,19 +243,31 @@ public class Arango {
         Map<String, Object> bindVars =  new HashMap<>();
         bindVars.put("fromNodeId", fromNodeId);
         bindVars.put("collectionName", collectionName);
-        // TODO: System.getenv("ARANGO_DB") instead of writing the DB
         return query(DB_Name, query, bindVars);
     }
+
     public JSONArray parseOutput(ArangoCursor<BaseDocument> cursor, String keyName, ArrayList<String> attributeNames) {
         JSONArray data = new JSONArray();
         cursor.forEachRemaining(document -> {
             JSONObject object = new JSONObject();
-            object.put(keyName, document.getKey());
             for(String attribute : attributeNames) {
                 object.put(attribute, document.getProperties().get(attribute));
             }
+            object.put(keyName, document.getKey());
             data.put(object);
         });
         return data;
+    }
+
+    public ArangoCursor<BaseDocument> filterEdgeCollectionInbound(String DB_Name, String collectionName, String toNodeId){
+        String query = """
+                    FOR node IN 1..1 INBOUND @fromNodeId @collectionName
+                    RETURN node
+                    """;
+
+        Map<String, Object> bindVars =  new HashMap<>();
+        bindVars.put("fromNodeId", toNodeId);
+        bindVars.put("collectionName", collectionName);
+        return query(DB_Name, query, bindVars);
     }
 }

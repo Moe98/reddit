@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -14,27 +15,23 @@ import java.util.List;
 public class FollowUser extends UserToUserCommand {
     @Override
     protected String execute() {
+        Arango arango = null;
         final JSONObject response = new JSONObject();
         String responseMessage = "";
 
         try {
-            Arango arango = Arango.getInstance();
+            arango = Arango.getInstance();
+            arango.connectIfNotConnected();
 
             final String userId = body.getString(USER_ID);
             final String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
 
-            if (!arango.collectionExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
 
-            if (!arango.collectionExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
@@ -58,7 +55,7 @@ public class FollowUser extends UserToUserCommand {
 
             // Get the user to check if they exist or have been deleted.
             final BaseDocument userDocument = arango.readDocument(DB_Name, USER_COLLECTION_NAME, userId);
-            final boolean isDeleted = (boolean) userDocument.getAttribute(IS_DELETED_DB);
+            final boolean isDeleted = Boolean.parseBoolean(String.valueOf(userDocument.getAttribute(IS_DELETED_DB)));
 
             if (isDeleted) {
                 responseMessage = USER_DELETED_RESPONSE_MESSAGE;
@@ -84,9 +81,11 @@ public class FollowUser extends UserToUserCommand {
             userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
             arango.updateDocument(DB_Name, USER_COLLECTION_NAME, userDocument, userId);
         } catch (Exception e) {
-            e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
+            if (arango != null) {
+                arango.disconnect();
+            }
             response.put("msg", responseMessage);
         }
 
@@ -98,5 +97,10 @@ public class FollowUser extends UserToUserCommand {
         final Attribute userId = new Attribute(USER_ID, DataType.STRING, true);
 
         return new Schema(List.of(userId));
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 }
