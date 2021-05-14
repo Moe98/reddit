@@ -13,23 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetMyDislikedSubThreads extends SubThreadCommand {
-    public static void main(String[] args) {
-        GetMyLikedSubThreads getMyLikedSubThreads = new GetMyLikedSubThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(USER_ID, "manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getMyLikedSubThreads.execute(request));
-
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -45,7 +31,7 @@ public class GetMyDislikedSubThreads extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            final String userId = uriParams.getString(USER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);

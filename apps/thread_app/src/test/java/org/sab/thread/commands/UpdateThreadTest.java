@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.HTTPMethod;
@@ -55,14 +56,14 @@ public class UpdateThreadTest {
         body.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
 
         request.put("body", body);
         request.put("uriParams", uriParams);
         request.put("methodType", "POST");
 
         CreateThread createThread = new CreateThread();
-
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return new JSONObject(createThread.execute(request));
     }
 
@@ -71,13 +72,13 @@ public class UpdateThreadTest {
         body.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadAttributes.ACTION_MAKER_ID.getHTTP(), actionMakerId);
         uriParams.put(ThreadAttributes.THREAD_NAME.getHTTP(), threadName);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
         UpdateThread updateThread = new UpdateThread();
-
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, actionMakerId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return new JSONObject(updateThread.execute(request));
     }
 

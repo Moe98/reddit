@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
@@ -85,11 +86,13 @@ public class UpdateCommentTest {
         body.put(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP(), parentContentType);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentAttributes.ACTION_MAKER_ID.getHTTP(), actionMakerId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.POST);
 
         CreateComment createComment = new CreateComment();
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, actionMakerId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         return new JSONObject(createComment.execute(request));
     }
@@ -99,12 +102,14 @@ public class UpdateCommentTest {
         body.put(CommentAttributes.CONTENT.getHTTP(), content);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentAttributes.ACTION_MAKER_ID.getHTTP(), actionMakerId);
         uriParams.put(CommentAttributes.COMMENT_ID.getHTTP(), commentId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
         UpdateComment updateComment = new UpdateComment();
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, actionMakerId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         return new JSONObject(updateComment.execute(request));
     }

@@ -35,7 +35,6 @@ public class GetThread extends ThreadCommand {
 
             final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
 
-            System.out.println(threadDocument);
             final String description = (String) threadDocument.getAttribute(DESCRIPTION_DB);
             final String creatorId = (String) threadDocument.getAttribute(CREATOR_ID_DB);
             final String dateCreated = (String) threadDocument.getAttribute(DATE_CREATED_DB);

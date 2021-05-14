@@ -10,7 +10,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class AddImageToSubThread extends SubThreadCommand {
-    
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
@@ -37,10 +40,7 @@ public class AddImageToSubThread extends SubThreadCommand {
 //            }
 
             // retrieving the body objects
-            String userId = uriParams.getString(USER_ID);
-            System.out.println("---------------");
-            System.out.println(uriParams);
-            System.out.println("---------------");
+            String userId = authenticationParams.getString(USERNAME);
             String subthreadId = uriParams.getString(SUBTHREAD_ID);
             String output;
 

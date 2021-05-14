@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
@@ -121,10 +122,12 @@ public class DeleteCommentTest {
         body.put(CommentCommand.COMMENT_ID, commentId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentCommand.ACTION_MAKER_ID, userId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.DELETE);
-
+        
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
+        
         DeleteComment deleteComment = new DeleteComment();
         return new JSONObject(deleteComment.execute(request));
     }

@@ -9,6 +9,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import static org.junit.Assert.*;
@@ -75,12 +76,14 @@ public class AssignThreadModeratorTest {
         body.put(ThreadCommand.MODERATOR_ID, modId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.ASSIGNER_ID, assignerId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
         AssignThreadModerator assignThreadModerator = new AssignThreadModerator();
 
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, assignerId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
+        
         return new JSONObject(assignThreadModerator.execute(request));
     }
 

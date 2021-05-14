@@ -12,30 +12,11 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class ReportSubThread extends SubThreadCommand {
-    public static void main(String[] args) {
-        ReportSubThread tc = new ReportSubThread();
-
-        JSONObject body = new JSONObject();
-        body.put(TYPE_OF_REPORT, "SubthreadReport");
-        body.put(REPORTED_SUBTHREAD_ID, "126209");
-        body.put(THREAD_ID, "GelatiAzza");
-        body.put(REPORT_MSG, "This highly offends me!!");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(REPORTER_ID, "asdafsda");
-
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(tc.execute(request));
+    
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
-
     @Override
     protected Schema getSchema() {
         Attribute typeOfReport = new Attribute(TYPE_OF_REPORT, DataType.STRING, true);
@@ -59,7 +40,7 @@ public class ReportSubThread extends SubThreadCommand {
         String msg = "";
 
         try {
-            String userId = uriParams.getString(REPORTER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
             String typeOfReport = body.getString(TYPE_OF_REPORT);
             String subthreadId = body.getString(REPORTED_SUBTHREAD_ID);

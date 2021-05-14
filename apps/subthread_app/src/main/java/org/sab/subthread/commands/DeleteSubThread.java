@@ -17,6 +17,11 @@ import java.util.List;
 public class DeleteSubThread extends SubThreadCommand {
 
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+
+    @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.DELETE;
     }
@@ -39,7 +44,7 @@ public class DeleteSubThread extends SubThreadCommand {
         // TODO add authentication
         try {
             String subthreadId = body.getString(SUBTHREAD_ID);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
@@ -51,8 +56,8 @@ public class DeleteSubThread extends SubThreadCommand {
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
             }
-            if (!arango.collectionExists(DB_Name, CommentCommand.COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, false);
+            if (!arango.collectionExists(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME)) {
+                arango.createCollection(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, false);
             }
 
             // check if subthread exists
@@ -70,12 +75,12 @@ public class DeleteSubThread extends SubThreadCommand {
             }
 
             // get all children comments at level 1
-            ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, CommentCommand.PARENT_SUBTHREAD_ID_DB, subthreadId);
+            ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, SubThreadCommand.PARENT_SUBTHREAD_ID_DB, subthreadId);
 
 //            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
-            commentJsonArr = arango.parseOutput(cursor, CommentCommand.COMMENT_ID_DB, attribs);
+            commentJsonArr = arango.parseOutput(cursor, SubThreadCommand.COMMENT_ID_DB, attribs);
             JSONArray commentsToGetChildrenOf = new JSONArray();
             commentsToGetChildrenOf.putAll(commentJsonArr);
 
@@ -84,10 +89,10 @@ public class DeleteSubThread extends SubThreadCommand {
             do {
                 for (int i = 0; i < commentsToGetChildrenOf.length(); i++) {
                     JSONObject comment = commentsToGetChildrenOf.getJSONObject(0);
-                    String commentId = comment.getString(CommentCommand.COMMENT_ID_DB);
+                    String commentId = comment.getString(SubThreadCommand.COMMENT_ID_DB);
                     commentsToGetChildrenOf.remove(0);
-                    cursor = arango.filterCollection(DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, CommentCommand.PARENT_SUBTHREAD_ID_DB, commentId);
-                    currComments = arango.parseOutput(cursor, CommentCommand.COMMENT_ID_DB, attribs);
+                    cursor = arango.filterCollection(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, SubThreadCommand.PARENT_SUBTHREAD_ID_DB, commentId);
+                    currComments = arango.parseOutput(cursor, SubThreadCommand.COMMENT_ID_DB, attribs);
                     commentJsonArr.putAll(currComments);
                     commentsToGetChildrenOf.putAll(currComments);
                 }
@@ -101,8 +106,8 @@ public class DeleteSubThread extends SubThreadCommand {
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
-                String commentId = commentJsonArr.getJSONObject(i).getString(CommentCommand.COMMENT_ID_DB);
-                arango.deleteDocument(DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, commentId);
+                String commentId = commentJsonArr.getJSONObject(i).getString(SubThreadCommand.COMMENT_ID_DB);
+                arango.deleteDocument(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, commentId);
             }
 
             msg = "Deleted subthread: " + subthreadId + " with it's " + numOfComments + " comments.";

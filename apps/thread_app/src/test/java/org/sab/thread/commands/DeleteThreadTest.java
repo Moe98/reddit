@@ -8,6 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.service.validation.HTTPMethod;
 
 import java.util.ArrayList;
@@ -126,11 +127,12 @@ public class DeleteThreadTest {
         body.put(ThreadCommand.THREAD_NAME, threadName);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.ACTION_MAKER_ID, userId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.DELETE);
 
         DeleteThread deleteThread = new DeleteThread();
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return new JSONObject(deleteThread.execute(request));
     }
 
@@ -143,7 +145,6 @@ public class DeleteThreadTest {
     @Test
     public void T01_NonCreatorDeleteThread() {
         JSONObject response = deleteThread(fishName, moeId);
-//        System.out.println(response);
         assertEquals(401, response.getInt("statusCode"));
         assertEquals("You are not authorized to delete this thread!", response.getString("msg"));
 
@@ -160,7 +161,6 @@ public class DeleteThreadTest {
     @Test
     public void T03_CreatorDeleteThread() {
         JSONObject response = deleteThread(fishName, mantaId);
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         assertFalse(arango.documentExists(DB_NAME, THREAD_COLLECTION_NAME, fishName));

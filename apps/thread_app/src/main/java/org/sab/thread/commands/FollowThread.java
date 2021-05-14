@@ -17,39 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 
 public class FollowThread extends ThreadCommand {
-
-    public static void main(String[] args) {
-        FollowThread followThread = new FollowThread();
-        JSONObject body = new JSONObject();
-        body.put(THREAD_NAME, "GelatiAzza");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-//        System.out.println(followThread.execute(request));
-
-        Arango arango = Arango.getInstance();
-        ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/lujine");
-        ArrayList<String> arr = new ArrayList<>();
-        arr.add(NUM_OF_FOLLOWERS_DB);
-        arr.add(DESCRIPTION_DB);
-        arr.add(CREATOR_ID_DB);
-        arr.add(DATE_CREATED_DB);
-        JSONArray jsonArr = arango.parseOutput(cursor, THREAD_NAME, arr);
-        for (Iterator<Object> it = jsonArr.iterator(); it.hasNext(); ) {
-            JSONObject j = (JSONObject) it.next();
-            System.out.println(j.toString());
-        }
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
-
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.PUT;
@@ -66,7 +37,7 @@ public class FollowThread extends ThreadCommand {
             arango.connectIfNotConnected();
 
             final String threadName = body.getString(THREAD_NAME);
-            final String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);

@@ -13,26 +13,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class DislikeComment extends CommentCommand {
-    public static void main(String[] args) {
-        DislikeComment dc = new DislikeComment();
-//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
-
-
-        JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "87604");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "lujine");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(dc.execute(request));
+    
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -56,8 +40,7 @@ public class DislikeComment extends CommentCommand {
 
         try {
             String commentId = body.getString(COMMENT_ID);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
-
+            String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 

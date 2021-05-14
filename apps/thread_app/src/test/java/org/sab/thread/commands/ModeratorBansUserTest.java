@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 
@@ -48,7 +49,10 @@ public class ModeratorBansUserTest {
             body.put(ThreadAttributes.DESCRIPTION.getHTTP(), "description");
 
             JSONObject uriParams = new JSONObject();
-            uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), moderatorId);
+//            uriParams.put(ThreadAttributes.CREATOR_ID.getHTTP(), moderatorId);
+
+            JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, moderatorId);
+            AuthParamsHandler.putAuthorizedParams(request, claims);
 
             request.put("body", body);
             request.put("uriParams", uriParams);
@@ -83,7 +87,6 @@ public class ModeratorBansUserTest {
         body.put(ThreadAttributes.BANNED_USER_ID.getHTTP(), bannedUserId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadAttributes.ACTION_MAKER_ID.getHTTP(), moderatorId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
@@ -91,7 +94,8 @@ public class ModeratorBansUserTest {
         request.put("uriParams", uriParams);
 
         ModeratorBansUser moderatorBansUser = new ModeratorBansUser();
-
+        JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, moderatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return new JSONObject(moderatorBansUser.execute(request));
     }
 
@@ -126,7 +130,6 @@ public class ModeratorBansUserTest {
     public void cannotBanUserTwice() {
         JSONObject response = moderatorBansUserFromThread(moderatorId, bannedUserId, threadId);
 
-        System.out.println(response);
         assertEquals(200, response.getInt("statusCode"));
 
         response = moderatorBansUserFromThread(moderatorId, bannedUserId, threadId);
@@ -150,7 +153,6 @@ public class ModeratorBansUserTest {
 
         final JSONObject response = moderatorBansUserFromThread(dummyUserId, bannedUserId, threadId);
 
-        System.out.println(response);
         assertEquals(401, response.getInt("statusCode"));
         assertEquals(ThreadCommand.NOT_A_MODERATOR, response.get("msg"));
 

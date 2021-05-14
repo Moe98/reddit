@@ -9,6 +9,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 
 import java.util.ArrayList;
 
@@ -125,13 +126,14 @@ public class LikeCommentTest {
         body.put(CommentCommand.COMMENT_ID, commentId);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(CommentCommand.ACTION_MAKER_ID, userId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "PUT");
         request.put("uriParams", uriParams);
 
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return lc.execute(request);
     }
 

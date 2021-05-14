@@ -14,11 +14,15 @@ import java.util.List;
 public class UpdateSubThread extends SubThreadCommand{
 
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+    @Override
     protected Schema getSchema() {
         final Attribute content = new Attribute(CONTENT, DataType.STRING, false);
         final Attribute title = new Attribute(TITLE, DataType.STRING, false);
 
-        return new Schema(List.of(content));
+        return new Schema(List.of(content, title));
     }
 
     @Override
@@ -42,7 +46,7 @@ public class UpdateSubThread extends SubThreadCommand{
             if(body.has(TITLE))
                 title = body.getString(TITLE);
 
-            final String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
             final String subthreadId = uriParams.getString(SUBTHREAD_ID);
 
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {

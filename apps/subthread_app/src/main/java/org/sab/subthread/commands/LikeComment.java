@@ -13,24 +13,10 @@ import org.sab.validation.Schema;
 import java.util.List;
 
 public class LikeComment extends CommentCommand {
-    public static void main(String[] args) {
-        LikeComment lc = new LikeComment();
-
-        JSONObject body = new JSONObject();
-        body.put(COMMENT_ID, "87604");
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("----------");
-
-        System.out.println(lc.execute(request));
+    
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 
     @Override
@@ -54,7 +40,7 @@ public class LikeComment extends CommentCommand {
 
         try {
             String commentId = body.getString(COMMENT_ID);
-            String userId = uriParams.getString(ACTION_MAKER_ID);
+            String userId = authenticationParams.getString(CommentCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();

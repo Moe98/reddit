@@ -13,26 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetFollowedThreads extends ThreadCommand {
-
-    public static void main(String[] args) {
-        GetFollowedThreads getFollowedThreads = new GetFollowedThreads();
-        JSONObject body = new JSONObject();
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "Manta");
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "GET");
-        request.put("uriParams", uriParams);
-
-        System.out.println(request);
-        System.out.println("=========");
-
-        System.out.println(getFollowedThreads.execute(request));
-
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
-
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
@@ -46,7 +30,7 @@ public class GetFollowedThreads extends ThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            final String userId = uriParams.getString(USER_ID);
+            String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);

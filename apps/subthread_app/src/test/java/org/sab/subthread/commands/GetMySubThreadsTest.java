@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -112,6 +113,9 @@ public class GetMySubThreadsTest {
             request.put("methodType", "POST");
             request.put("uriParams", uriParams);
 
+            JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, creatorId);
+            AuthParamsHandler.putAuthorizedParams(request, claims);
+
             tc.execute(request);
         }
     }
@@ -121,12 +125,13 @@ public class GetMySubThreadsTest {
         JSONObject body = new JSONObject();
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadCommand.USER_ID, userId);
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "GET");
         request.put("uriParams", uriParams);
 
+        JSONObject claims = new JSONObject().put(SubThreadCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         return getMySubthreads.execute(request);
     }
 

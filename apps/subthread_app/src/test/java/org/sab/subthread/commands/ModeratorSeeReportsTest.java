@@ -162,7 +162,7 @@ public class ModeratorSeeReportsTest {
         request.put("body", body);
         request.put("methodType", "GET");
         request.put("uriParams", uriParams);
-
+        
         return moderatorSeeReports.execute(request);
     }
 
@@ -171,7 +171,6 @@ public class ModeratorSeeReportsTest {
         arango.connectIfNotConnected();
         String response = moderatorSeeReports(parentThreadId1);
         JSONObject responseJson = new JSONObject(response);
-        System.out.println(response);
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONArray dataArr = (JSONArray) (responseJson.get("data"));
         assertEquals(3, dataArr.length());

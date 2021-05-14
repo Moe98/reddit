@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
@@ -69,12 +70,15 @@ public class GetSubThreadTest {
         body.put(SubThreadAttributes.HAS_IMAGE.getHTTP(), Boolean.toString(hasImage));
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
+//        uriParams.put(SubThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
 
         JSONObject request = new JSONObject();
         request.put("body", body);
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, creatorId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         CreateSubThread createSubThread = new CreateSubThread();
         return new JSONObject(createSubThread.execute(request));

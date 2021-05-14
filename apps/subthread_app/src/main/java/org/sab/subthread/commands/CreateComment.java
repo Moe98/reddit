@@ -1,9 +1,9 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoCursor;
+
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
@@ -13,10 +13,15 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class CreateComment extends CommentCommand {
+
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
 
     public static JSONObject createCommentReq(String parentId, String content, String parentContentType, String commenterId) {
 
@@ -33,63 +38,6 @@ public class CreateComment extends CommentCommand {
         request.put("methodType", "POST");
         request.put("uriParams", uriParams);
         return request;
-    }
-
-    public static void main(String[] args) {
-        CreateComment addComment = new CreateComment();
-//        JSONObject body = new JSONObject();
-//        body.put(PARENT_SUBTHREAD_ID, "126171");
-//        body.put(CONTENT, "I think their fish is bad!");
-//        body.put(PARENT_CONTENT_TYPE, "SubThread");
-//
-//        JSONObject uriParams = new JSONObject();
-//        uriParams.put(ACTION_MAKER_ID, "32930");
-//
-//        JSONObject request = new JSONObject();
-//        request.put("body", body);
-//        request.put("methodType", "POST");
-//        request.put("uriParams", uriParams);
-//
-//        System.out.println(request);
-//        System.out.println("=========");
-//
-//        System.out.println(addComment.execute(request));
-
-//        body.put(PARENT_SUBTHREAD_ID, "74248");
-//        body.put(CONTENT, "no it is tasty!");
-//        body.put(PARENT_CONTENT_TYPE, "SubThread");
-
-//        JSONObject uriParams = new JSONObject();
-//        uriParams.put(ACTION_MAKER_ID, "manta");
-
-        Arango arango = Arango.getInstance();
-        ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, SubThreadCommand.PARENT_THREAD_ID_DB, "asmakElRayes7amido");
-
-        ArrayList<String> attribs = new ArrayList();
-        JSONArray asmakJsonArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, attribs);
-        JSONObject req;
-        for (int i = 0; i < asmakJsonArr.length(); i++) {
-            String subthreadId = asmakJsonArr.getJSONObject(i).getString(SubThreadCommand.SUBTHREAD_ID_DB);
-            // insert 5 comments
-            for (int j = 0; j < 5; j++) {
-                // insert comment
-                req = createCommentReq(subthreadId, "Comment_" + i + "_" + j, "SubThread", "manta");
-                JSONObject level1Comment = new JSONObject(addComment.execute(req));
-                String level1CommentId = ((JSONObject) level1Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
-                //insert 2 comments each at level 2
-                for (int k = 0; k < 2; k++) {
-                    // insert comment
-                    req = createCommentReq(level1CommentId, "Comment_" + i + "_" + j + "_" + k, "Comment", "lujine");
-                    JSONObject level2Comment = new JSONObject(addComment.execute(req));
-                    String level2CommentId = ((JSONObject) level2Comment.get("data")).getString(PARENT_SUBTHREAD_ID);
-
-                    // insert 1 comment at level 3
-                    req = createCommentReq(level2CommentId, "Comment_" + i + "_" + j + "_" + k + "_1", "Comment", "manta");
-                    addComment.execute(req);
-
-                }
-            }
-        }
     }
 
     @Override
@@ -111,7 +59,7 @@ public class CreateComment extends CommentCommand {
             String parentSubThreadId = body.getString(PARENT_SUBTHREAD_ID);
             String content = body.getString(CONTENT);
             String parentContentType = body.getString(PARENT_CONTENT_TYPE);
-            final String userId = uriParams.getString(ACTION_MAKER_ID);
+            final String userId = authenticationParams.getString(CommentCommand.USERNAME);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();

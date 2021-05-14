@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.SubThreadAttributes;
 import org.sab.service.validation.HTTPMethod;
 
@@ -196,11 +197,12 @@ public class UpdateSubThreadTest {
         body.put(SubThreadCommand.TITLE, title);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadCommand.ACTION_MAKER_ID, userId);
         uriParams.put(SubThreadCommand.SUBTHREAD_ID, subthreadId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         UpdateSubThread updateSubThread = new UpdateSubThread();
         return new JSONObject(updateSubThread.execute(request));
     }
@@ -210,11 +212,12 @@ public class UpdateSubThreadTest {
         body.put(SubThreadCommand.CONTENT, content);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadCommand.ACTION_MAKER_ID, userId);
         uriParams.put(SubThreadCommand.SUBTHREAD_ID, subthreadId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
 
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
         UpdateSubThread updateSubThread = new UpdateSubThread();
         return new JSONObject(updateSubThread.execute(request));
     }
@@ -226,10 +229,12 @@ public class UpdateSubThreadTest {
         body.put(SubThreadCommand.TITLE, title);
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(SubThreadCommand.ACTION_MAKER_ID, userId);
         uriParams.put(SubThreadCommand.SUBTHREAD_ID, subthreadId);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.PUT);
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         UpdateSubThread updateSubThread = new UpdateSubThread();
         return new JSONObject(updateSubThread.execute(request));

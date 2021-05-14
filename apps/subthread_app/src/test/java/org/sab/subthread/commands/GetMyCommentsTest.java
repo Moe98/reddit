@@ -7,6 +7,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
+import org.sab.auth.AuthParamsHandler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -168,6 +169,9 @@ public class GetMyCommentsTest {
         request.put("body", body);
         request.put("methodType", "GET");
         request.put("uriParams", uriParams);
+
+        JSONObject claims = new JSONObject().put(CommentCommand.USERNAME, userId);
+        AuthParamsHandler.putAuthorizedParams(request, claims);
 
         return getMyComments.execute(request);
     }
