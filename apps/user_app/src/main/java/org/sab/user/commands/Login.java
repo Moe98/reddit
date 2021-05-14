@@ -1,7 +1,7 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
-import org.sab.service.authentication.Jwt;
+import org.sab.auth.Jwt;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
@@ -38,7 +38,6 @@ public class Login extends UserCommand {
             return userAuth.toString();
         // Add token parameters
         Map<String, String> claims = Map.of(USERNAME, username);
-        // Generate Authentication headers
         String token = Jwt.generateToken(claims, 60);
 
         return makeJwtResponse(token);

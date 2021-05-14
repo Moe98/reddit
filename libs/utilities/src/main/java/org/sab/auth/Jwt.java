@@ -1,4 +1,4 @@
-package org.sab.service.authentication;
+package org.sab.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
