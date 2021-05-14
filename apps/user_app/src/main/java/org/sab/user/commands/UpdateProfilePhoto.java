@@ -29,13 +29,11 @@ public class UpdateProfilePhoto extends UserCommand {
         boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
         if (!authenticated)
             return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
-        if(files.length()!=1)
+        if (files.length() != 1)
             return Responder.makeErrorResponse("Only one profile image allowed per upload, Check Form-Data Files!", 400);
 
         // retrieving the body objects
         String username = authenticationParams.getString(USERNAME);
-        String photo = files.getJSONObject("image").getString("data");
-        String contentType = files.getJSONObject("image").getString("type");
         String output;
         User user;
         // getting the user
@@ -44,12 +42,12 @@ public class UpdateProfilePhoto extends UserCommand {
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
-        String publicId =  user.reformatUserId(user.getUserId());
+        String publicId = user.reformatUserId(user.getUserId());
 
         try {
-          output =  MinIO.uploadObject(BUCKETNAME,publicId,photo,contentType);
-          if(output.isEmpty())
-              return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
+            output = MinIO.uploadObject(BUCKETNAME, publicId, files.getJSONObject("image"));
+            if (output.isEmpty())
+                return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
         } catch (EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }
