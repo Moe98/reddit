@@ -58,10 +58,10 @@ public class DeleteThread extends ThreadCommand {
 
             // TODO check person deleting is creator
             BaseDocument threadDoc = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
-            String creatorID = (String) threadDoc.getAttribute(CREATOR_ID);
+            String creatorID = (String) threadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this thread!";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 401).toString();
             }
 
             // get all children subthreads

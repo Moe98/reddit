@@ -63,7 +63,7 @@ public class AssignThreadModerator extends ThreadCommand {
             if (assignerModEdgeId.equals("")) {
                 // assigner is not a mod
                 msg = "You don't have permission to assign a moderator for this thread";
-                return Responder.makeErrorResponse(msg, 404).toString();
+                return Responder.makeErrorResponse(msg, 401).toString();
             }
 
             String moderatorModEdgeId = arango.getSingleEdgeId(DB_Name,

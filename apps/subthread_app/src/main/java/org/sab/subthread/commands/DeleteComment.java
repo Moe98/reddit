@@ -17,8 +17,8 @@ public class DeleteComment extends CommentCommand {
 
     @Override
     protected Schema getSchema() {
-        Attribute threadId = new Attribute(COMMENT_ID, DataType.STRING, true);
-        return new Schema(List.of(threadId));
+        Attribute commentId = new Attribute(COMMENT_ID, DataType.STRING, true);
+        return new Schema(List.of(commentId));
     }
 
     @Override
@@ -54,10 +54,10 @@ public class DeleteComment extends CommentCommand {
 
             // check person deleting is creator
             BaseDocument subthreadDoc = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
-            String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID);
+            String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
-                msg = "You are not authorized to delete this thread!";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                msg = "You are not authorized to delete this comment!";
+                return Responder.makeErrorResponse(msg, 401).toString();
             }
 
             // get all children comments at level 1
@@ -67,7 +67,9 @@ public class DeleteComment extends CommentCommand {
             ArrayList<String> attribs = new ArrayList<>();
 
             commentJsonArr = new JSONArray();
-            commentJsonArr.put(commentId);
+            JSONObject comment = new JSONObject();
+            comment.put(COMMENT_ID_DB, commentId);
+            commentJsonArr.put(comment);
 
             JSONArray commentsToGetChildrenOf = new JSONArray();
             commentsToGetChildrenOf.putAll(commentJsonArr);
@@ -76,8 +78,8 @@ public class DeleteComment extends CommentCommand {
             JSONArray currComments = new JSONArray();
             do {
                 for (int i = 0; i < commentsToGetChildrenOf.length(); i++) {
-                    JSONObject comment = commentsToGetChildrenOf.getJSONObject(0);
-                    String currCommentId = comment.getString(COMMENT_ID_DB);
+                    JSONObject currComment = commentsToGetChildrenOf.getJSONObject(0);
+                    String currCommentId = currComment.getString(COMMENT_ID_DB);
                     commentsToGetChildrenOf.remove(0);
                     cursor = arango.filterCollection(DB_Name, COMMENT_COLLECTION_NAME, PARENT_SUBTHREAD_ID_DB, currCommentId);
                     currComments = arango.parseOutput(cursor, COMMENT_ID_DB, attribs);

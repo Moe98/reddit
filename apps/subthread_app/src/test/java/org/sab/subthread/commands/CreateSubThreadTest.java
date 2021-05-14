@@ -41,15 +41,6 @@ public class CreateSubThreadTest {
     final static String USER_COLLECTION_NAME = SubThreadCommand.USER_COLLECTION_NAME;
     final static String SUBTHREAD_COLLECTION_NAME = SubThreadCommand.SUBTHREAD_COLLECTION_NAME;
 
-    private static void addObjectToCollection(BaseDocument document, String collectionName) {
-        // TODO: Add testing DB.
-//        if (!arango.collectionExists(DB_NAME, collectionName)) {
-//            arango.createCollection(DB_NAME, collectionName, false);
-//        }
-
-        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
-    }
-
     @BeforeClass
     public static void setUp() {
         try {
@@ -61,48 +52,20 @@ public class CreateSubThreadTest {
             arango.createCollection(DB_NAME, THREAD_COLLECTION_NAME, false);
             arango.createCollection(DB_NAME, SUBTHREAD_COLLECTION_NAME, false);
 
-            moe = new BaseDocument();
-            moe.setKey(moeId);
-            moe.addAttribute(USR_IS_DELETED, false);
-            moe.addAttribute(USR_NUM_OF_FOLLOWERS, 0);
+            moe = TestUtils.setUpUser(moeId, false, 0);
+            TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
-            addObjectToCollection(moe, USER_COLLECTION_NAME);
+            manta = TestUtils.setUpUser(mantaId, false, 0);;
+            TestUtils.addObjectToCollection(arango, manta, SubThreadCommand.USER_COLLECTION_NAME);
 
-            manta = new BaseDocument();
-            manta.setKey(mantaId);
-            manta.addAttribute(USR_IS_DELETED, false);
-            manta.addAttribute(USR_NUM_OF_FOLLOWERS, 0);
+            lujine = TestUtils.setUpUser(lujineId, false, 0);
+            TestUtils.addObjectToCollection(arango, lujine, SubThreadCommand.USER_COLLECTION_NAME);
 
-            addObjectToCollection(manta, SubThreadCommand.USER_COLLECTION_NAME);
+            fishThread  = TestUtils.setUpThread(fishName, mantaId, 0, "I love Asmak El Rayes 7amido");
+            TestUtils.addObjectToCollection(arango, fishThread, THREAD_COLLECTION_NAME);
 
-            lujine = new BaseDocument();
-            lujine.setKey(lujineId);
-            lujine.addAttribute(USR_IS_DELETED, false);
-            lujine.addAttribute(USR_NUM_OF_FOLLOWERS, 0);
-
-            addObjectToCollection(lujine, SubThreadCommand.USER_COLLECTION_NAME);
-
-            fishThread  = new BaseDocument();
-
-            fishThread.setKey(fishName);
-            fishThread.addAttribute(THREAD_CREATOR_ID_DB, mantaId);
-            fishThread.addAttribute(THREAD_NUM_OF_FOLLOWERS_DB, 0);
-            fishThread.addAttribute(THREAD_DESCRIPTION_DB, "I love Asmak El Rayes 7amido");
-            java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-            fishThread.addAttribute(THREAD_DATE_CREATED_DB, sqlDate);
-
-            addObjectToCollection(fishThread, THREAD_COLLECTION_NAME);
-
-            iceCreamThread  = new BaseDocument();
-
-            iceCreamThread.setKey(iceCreamName);
-            iceCreamThread.addAttribute(THREAD_CREATOR_ID_DB, lujineId);
-            iceCreamThread.addAttribute(THREAD_NUM_OF_FOLLOWERS_DB, 0);
-            iceCreamThread.addAttribute(THREAD_DESCRIPTION_DB, "I love Gelati Azza");
-            sqlDate = new java.sql.Date(System.currentTimeMillis());
-            iceCreamThread.addAttribute(THREAD_DATE_CREATED_DB, sqlDate);
-
-            addObjectToCollection(iceCreamThread, THREAD_COLLECTION_NAME);
+            iceCreamThread  = TestUtils.setUpThread(iceCreamName, lujineId, 0, "I love Gelati Azza");
+            TestUtils.addObjectToCollection(arango, iceCreamThread, THREAD_COLLECTION_NAME);
 
         } catch (Exception e) {
             fail(e.getMessage());

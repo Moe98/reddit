@@ -57,10 +57,10 @@ public class DeleteSubThread extends SubThreadCommand {
 
             // check person deleting is creator
             BaseDocument subthreadDoc = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-            String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID);
+            String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
-                msg = "You are not authorized to delete this thread!";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                msg = "You are not authorized to delete this subthread!";
+                return Responder.makeErrorResponse(msg, 401).toString();
             }
 
             // get all children comments at level 1

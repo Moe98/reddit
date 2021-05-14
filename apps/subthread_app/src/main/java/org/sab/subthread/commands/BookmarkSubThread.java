@@ -28,7 +28,7 @@ public class BookmarkSubThread extends SubThreadCommand {
 
         try {
             String subthreadId = body.getString(SUBTHREAD_ID);
-            String userId = uriParams.getString(REPORTER_ID);
+            String userId = uriParams.getString(ACTION_MAKER_ID);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
@@ -45,7 +45,7 @@ public class BookmarkSubThread extends SubThreadCommand {
 
             // check subthread exist
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
-                msg = "Thread does not exist";
+                msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
