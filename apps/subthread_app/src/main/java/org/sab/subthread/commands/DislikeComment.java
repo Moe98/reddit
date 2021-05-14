@@ -35,18 +35,14 @@ public class DislikeComment extends CommentCommand{
             arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                // TODO if this doesn't exist something is wrong!
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
-            }
-            if (!arango.collectionExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
-            }
 
-            // TODO check if comment exists
+                // TODO if this doesn't exist something is wrong!
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
+
             if(!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 msg = "Comment does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();

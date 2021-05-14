@@ -61,7 +61,7 @@ public class GetFollowedThreads extends ThreadCommand {
         JSONObject body = new JSONObject();
 
         JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, "manta");
+        uriParams.put(ACTION_MAKER_ID, "Manta");
 
         JSONObject request = new JSONObject();
         request.put("body", body);

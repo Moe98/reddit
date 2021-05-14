@@ -1,6 +1,7 @@
 package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -49,16 +50,21 @@ public class GetFollowedThreadsTest {
         arango.createDocument(ThreadCommand.TEST_DB_Name, collectionName, document);
     }
 
+    private static void addObjectToEdgeCollection(BaseDocument document, String collectionName) {
+        // TODO: Add testing DB.
+        if (!arango.collectionExists(ThreadCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(ThreadCommand.TEST_DB_Name, collectionName, true);
+        }
+
+        arango.createDocument(ThreadCommand.TEST_DB_Name, collectionName, document);
+    }
+
     private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
         arango.deleteDocument(ThreadCommand.TEST_DB_Name, collectionName, document.getKey());
     }
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
-        removeObjectFromCollection(thread1, ThreadCommand.THREAD_COLLECTION_NAME);
-        arango.connectIfNotConnected();
-        removeObjectFromCollection(thread2, ThreadCommand.THREAD_COLLECTION_NAME);
         arango.connectIfNotConnected();
         arango.dropDatabase(ThreadCommand.TEST_DB_Name);
     }
@@ -113,19 +119,11 @@ public class GetFollowedThreadsTest {
     }
 
     public static void followThread(String threadName, String actionMakerId){
-        FollowThread followThread = new FollowThread();
-        JSONObject body = new JSONObject();
-        body.put(ThreadCommand.THREAD_NAME, threadName);
+        BaseEdgeDocument follow = new BaseEdgeDocument();
+        follow.setFrom(ThreadCommand.USER_COLLECTION_NAME+"/"+actionMakerId);
+        follow.setTo(ThreadCommand.THREAD_COLLECTION_NAME+"/"+threadName);
 
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ThreadCommand.ACTION_MAKER_ID, actionMakerId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "PUT");
-        request.put("uriParams", uriParams);
-
-        followThread.execute(request);
+        addObjectToEdgeCollection(follow, ThreadCommand.USER_FOLLOW_THREAD_COLLECTION_NAME);
     }
 
     public static String getFollowedThreads(String actionMakerId) {

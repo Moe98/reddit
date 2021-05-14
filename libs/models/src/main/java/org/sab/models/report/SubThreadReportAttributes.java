@@ -3,7 +3,7 @@ package org.sab.models.report;
 public enum SubThreadReportAttributes {
 
     // variables in a Report object
-    Report_Id("id", null),
+    Report_Id("id", "Id"),
 
 
     SUBTHREAD_Id("subthreadId", "SubthreadId"),

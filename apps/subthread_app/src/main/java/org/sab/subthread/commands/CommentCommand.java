@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
+import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
@@ -35,34 +36,62 @@ public abstract class CommentCommand extends CommandWithVerification {
 
     // Subthread attributes
     // http
-    protected static final String THREAD_SUBTHREAD_ID = SubThreadAttributes.SUBTHREAD_ID.getHTTP();
-    protected static final String THREAD_PARENT_THREAD_ID = SubThreadAttributes.PARENT_THREAD_ID.getHTTP();
-    protected static final String THREAD_CREATOR_ID = SubThreadAttributes.CREATOR_ID.getHTTP();
+    protected static final String SUBTHREAD_ID = SubThreadAttributes.SUBTHREAD_ID.getHTTP();
+    protected static final String SUBTHREAD_PARENT_THREAD_ID = SubThreadAttributes.PARENT_THREAD_ID.getHTTP();
+    protected static final String SUBTHREAD_CREATOR_ID = SubThreadAttributes.CREATOR_ID.getHTTP();
 
-    protected static final String THREAD_TITLE = SubThreadAttributes.TITLE.getHTTP();
-    protected static final String THREAD_CONTENT = SubThreadAttributes.CONTENT.getHTTP();
+    protected static final String SUBTHREAD_TITLE = SubThreadAttributes.TITLE.getHTTP();
+    protected static final String SUBTHREAD_CONTENT = SubThreadAttributes.CONTENT.getHTTP();
 
-    protected static final String THREAD_LIKES = SubThreadAttributes.LIKES.getHTTP();
-    protected static final String THREAD_DISLIKES = SubThreadAttributes.DISLIKES.getHTTP();
+    protected static final String SUBTHREAD_LIKES = SubThreadAttributes.LIKES.getHTTP();
+    protected static final String SUBTHREAD_DISLIKES = SubThreadAttributes.DISLIKES.getHTTP();
 
-    protected static final String THREAD_HASIMAGE = SubThreadAttributes.HAS_IMAGE.getHTTP();
+    protected static final String SUBTHREAD_HASIMAGE = SubThreadAttributes.HAS_IMAGE.getHTTP();
 
     // Subthread attributes
     // db
-    protected static final String THREAD_SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
-    protected static final String THREAD_PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
-    protected static final String THREAD_CREATOR_ID_DB = SubThreadAttributes.CREATOR_ID.getDb();
+    protected static final String SUBTHREAD_SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
+    protected static final String SUBTHREAD_PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
+    protected static final String SUBTHREAD_CREATOR_ID_DB = SubThreadAttributes.CREATOR_ID.getDb();
 
-    protected static final String THREAD_TITLE_DB = SubThreadAttributes.TITLE.getDb();
-    protected static final String THREAD_CONTENT_DB = SubThreadAttributes.CONTENT.getDb();
+    protected static final String SUBTHREAD_TITLE_DB = SubThreadAttributes.TITLE.getDb();
+    protected static final String SUBTHREAD_CONTENT_DB = SubThreadAttributes.CONTENT.getDb();
 
-    protected static final String THREAD_LIKES_DB = SubThreadAttributes.LIKES.getDb();
-    protected static final String THREAD_DISLIKES_DB = SubThreadAttributes.DISLIKES.getDb();
+    protected static final String SUBTHREAD_LIKES_DB = SubThreadAttributes.LIKES.getDb();
+    protected static final String SUBTHREAD_DISLIKES_DB = SubThreadAttributes.DISLIKES.getDb();
 
-    protected static final String THREAD_HASIMAGE_DB = SubThreadAttributes.HAS_IMAGE.getDb();
-    protected static final String THREAD_DATE_CREATED_DB = SubThreadAttributes.DATE_CREATED.getDb();
+    protected static final String SUBTHREAD_HASIMAGE_DB = SubThreadAttributes.HAS_IMAGE.getDb();
+    protected static final String SUBTHREAD_DATE_CREATED_DB = SubThreadAttributes.DATE_CREATED.getDb();
 
 
+    // User attributes
+    protected static final String USER_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String USER_IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
+    protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String USER_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
+
+    protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
+    protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getDb();
+    protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+
+    // Thread attributes
+    protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
+    protected static final String THREAD_DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
+    protected static final String THREAD_CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
+    protected static final String THREAD_NUM_OF_FOLLOWERS = ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP();
+    // TODO remove attribute
+    protected static final String THREAD_DATE_CREATED = ThreadAttributes.DATE_CREATED.getHTTP();
+
+    protected static final String THREAD_ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
+    protected static final String THREAD_MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
+    protected static final String THREAD_ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String THREAD_BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
+
+    protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
+    protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
+    protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
+    protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
     // TODO add attribs from enums
 
     // TODO get from env vars
@@ -75,4 +104,5 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String USER_LIKE_COMMENT_COLLECTION_NAME = "UserLikeComment";
     protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = "UserDislikeComment";
     protected static final String SUBTHREAD_COLLECTION_NAME = "Subthread";
+    protected static final String THREAD_COLLECTION_NAME = "Thread";
 }

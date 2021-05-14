@@ -13,6 +13,19 @@ public class Thread {
     public Thread() {
         super();
     }
+    private Thread(String name, String creatorId,
+                      String description) {
+
+        this.name = name;
+        this.creatorId = creatorId;
+        this.description = description;
+    }
+
+    public static Thread createNewThread(String name, String creatorId,
+                                               String description) {
+
+        return new Thread(name, creatorId, description);
+    }
 
     public String getName() {
         return name;

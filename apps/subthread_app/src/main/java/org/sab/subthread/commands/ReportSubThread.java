@@ -36,8 +36,6 @@ public class ReportSubThread extends SubThreadCommand{
             String subthreadId = body.getString(REPORTED_SUBTHREAD_ID);
             String threadId = body.getString(THREAD_ID);
             String reportMsg = body.getString(REPORT_MSG);
-            long millis = System.currentTimeMillis();
-            java.sql.Date dateCreated = new java.sql.Date(millis);
 
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
@@ -65,9 +63,10 @@ public class ReportSubThread extends SubThreadCommand{
             myObject.addAttribute(REPORTER_ID_DB, userId);
             myObject.addAttribute(TYPE_OF_REPORT_DB, typeOfReport);
             myObject.addAttribute(THREAD_ID_DB, threadId);
-            myObject.addAttribute(DATE_CREATED_DB, dateCreated);
-            myObject.addAttribute(REPORT_MSG, reportMsg);
-            myObject.addAttribute(SUBTHREAD_ID, subthreadId);
+            java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+            myObject.addAttribute(DATE_CREATED_DB, sqlDate);
+            myObject.addAttribute(REPORT_MSG_DB, reportMsg);
+            myObject.addAttribute(SUBTHREAD_ID_DB, subthreadId);
 
             BaseDocument res = arango.createDocument(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
             msg = "Created Subthread Report";

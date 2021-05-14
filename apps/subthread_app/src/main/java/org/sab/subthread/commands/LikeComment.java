@@ -34,15 +34,11 @@ public class LikeComment extends CommentCommand{
             arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
-            }
-            if (!arango.collectionExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
 
             String likeEdgeId = arango.getSingleEdgeId(DB_Name,USER_LIKE_COMMENT_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,COMMENT_COLLECTION_NAME+"/"+commentId);
 
@@ -102,8 +98,6 @@ public class LikeComment extends CommentCommand{
 
     public static void main(String[] args) {
         LikeComment lc = new LikeComment();
-//        JSONObject request = new JSONObject("{\"body\":{\"commentId\":\"21289\"},\"uriParams\":{\"userId\":\"asdafsda\"},\"methodType\":\"PUT\"}");
-
 
         JSONObject body = new JSONObject();
         body.put(COMMENT_ID, "87604");

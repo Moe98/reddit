@@ -52,7 +52,6 @@ public class DislikeSubThread extends SubThreadCommand{
             }
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name,USER_DISLIKE_SUBTHREAD_COLLECTION_NAME,USER_COLLECTION_NAME+"/"+userId,SUBTHREAD_COLLECTION_NAME+"/"+subthreadId);
-            System.out.println(dislikeEdgeId);
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if(!dislikeEdgeId.equals("")){
                 arango.deleteDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, dislikeEdgeId);

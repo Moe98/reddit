@@ -39,6 +39,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     // Report atributes
     // http
+    protected static final String REPORT_ID = SubThreadReportAttributes.Report_Id.getHTTP();
     protected static final String REPORTED_SUBTHREAD_ID = SubThreadReportAttributes.SUBTHREAD_Id.getHTTP();
     protected static final String REPORTER_ID = SubThreadReportAttributes.REPORTER_ID.getHTTP();
     protected static final String TYPE_OF_REPORT = SubThreadReportAttributes.TYPE_OF_REPORT.getHTTP();
@@ -48,6 +49,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     // Report atributes
     // db
+    protected static final String REPORT_ID_DB = SubThreadReportAttributes.Report_Id.getDb();
     protected static final String REPORTED_SUBTHREAD_ID_DB = SubThreadReportAttributes.SUBTHREAD_Id.getDb();
     protected static final String REPORTER_ID_DB = SubThreadReportAttributes.REPORTER_ID.getDb();
     protected static final String TYPE_OF_REPORT_DB = SubThreadReportAttributes.TYPE_OF_REPORT.getDb();
@@ -86,6 +88,17 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
     protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
+    // User attributes
+    protected static final String USER_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
+    protected static final String USER_IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
+    protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
+    protected static final String USER_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
+
+    protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getDb();
+    protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getDb();
+    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getDb();
+    protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getDb();
+
     // Database attributes
     protected static final String DB_Name = System.getenv("ARANGO_DB");
     //TODO: use diff db for testing
@@ -99,4 +112,5 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_LIKE_SUBTHREAD_COLLECTION_NAME = "UserLikeSubthread";
     protected static final String USER_DISLIKE_SUBTHREAD_COLLECTION_NAME = "UserDislikeSubthread";
     protected static final String SUBTHREAD_REPORTS_COLLECTION_NAME = "SubthreadReports";
+    protected static final String USER_MOD_THREAD_COLLECTION_NAME = "UserModThread";
 }

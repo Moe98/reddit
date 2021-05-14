@@ -66,37 +66,37 @@ public class GetMyDislikedCommentsTest {
             arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, true);
         }
 
-        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
+        arango.createDocument(CommentCommand.TEST_DB_Name, collectionName, document);
     }
 
     private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
-        arango.deleteDocument(SubThreadCommand.TEST_DB_Name, collectionName, document.getKey());
+        arango.deleteDocument(CommentCommand.TEST_DB_Name, collectionName, document.getKey());
     }
 
     @AfterClass
     public static void tearDown() {
         arango.connectIfNotConnected();
-        arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
+        arango.dropDatabase(CommentCommand.TEST_DB_Name);
     }
 
     public static void createUsers(){
         moe = new BaseDocument();
         moe.setKey(moeId);
-        moe.addAttribute(SubThreadCommand.IS_DELETED_DB, false);
-        moe.addAttribute(SubThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
-        addObjectToCollection(moe, SubThreadCommand.USER_COLLECTION_NAME);
+        moe.addAttribute(CommentCommand.USER_IS_DELETED_DB, false);
+        moe.addAttribute(CommentCommand.USER_NUM_OF_FOLLOWERS_DB, 0);
+        addObjectToCollection(moe, CommentCommand.USER_COLLECTION_NAME);
 
         manta = new BaseDocument();
         manta.setKey(mantaId);
-        manta.addAttribute(SubThreadCommand.IS_DELETED_DB, false);
-        manta.addAttribute(SubThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
-        addObjectToCollection(manta, SubThreadCommand.USER_COLLECTION_NAME);
+        manta.addAttribute(CommentCommand.USER_IS_DELETED_DB, false);
+        manta.addAttribute(CommentCommand.USER_NUM_OF_FOLLOWERS_DB, 0);
+        addObjectToCollection(manta, CommentCommand.USER_COLLECTION_NAME);
 
         lujine = new BaseDocument();
         lujine.setKey(lujineId);
-        lujine.addAttribute(SubThreadCommand.IS_DELETED_DB, false);
-        lujine.addAttribute(SubThreadCommand.NUM_OF_FOLLOWERS_DB, 0);
-        addObjectToCollection(lujine, SubThreadCommand.USER_COLLECTION_NAME);
+        lujine.addAttribute(CommentCommand.USER_IS_DELETED_DB, false);
+        lujine.addAttribute(CommentCommand.USER_NUM_OF_FOLLOWERS_DB, 0);
+        addObjectToCollection(lujine, CommentCommand.USER_COLLECTION_NAME);
     }
 
     public static void insertComments(String commentId, String parentSubThreadId, String content, String creatorId, String parentContentType) {
