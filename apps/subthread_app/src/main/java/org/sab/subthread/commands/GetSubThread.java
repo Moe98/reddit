@@ -20,15 +20,13 @@ public class GetSubThread extends SubThreadCommand {
 
             final String subThreadId = uriParams.getString(SUBTHREAD_ID);
 
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
 
-            final BaseDocument subThreadDocument = arango.readDocument(DB_Name, subThreadId, subThreadId);
+            final BaseDocument subThreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId);
 
             final String parentThreadId = (String) subThreadDocument.getAttribute(PARENT_THREAD_ID_DB);
             final String creatorId = (String) subThreadDocument.getAttribute(CREATOR_ID_DB);
