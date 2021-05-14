@@ -76,7 +76,7 @@ public class GetCommentTest {
         arango.deleteDocument(DB_NAME, collectionName, document.getKey());
     }
 
-    public static JSONObject createComment(String parentId, String content, String parentContentType, String actionMakerId) {
+    private static JSONObject createComment(String parentId, String content, String parentContentType, String actionMakerId) {
         JSONObject body = new JSONObject();
         body.put(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP(), parentId);
         body.put(CommentAttributes.CONTENT.getHTTP(), content);
@@ -95,7 +95,7 @@ public class GetCommentTest {
         return new JSONObject(createComment.execute(request));
     }
 
-    public static JSONObject getComment(String commentId) {
+    private static JSONObject getComment(String commentId) {
         JSONObject uriParams = new JSONObject();
         uriParams.put(CommentAttributes.COMMENT_ID.getHTTP(), commentId);
 
