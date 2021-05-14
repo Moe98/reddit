@@ -33,9 +33,7 @@ public class UpdateComment extends CommentCommand {
             final String userId = uriParams.getString(ACTION_MAKER_ID);
             final String commentId = uriParams.getString(COMMENT_ID);
 
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
