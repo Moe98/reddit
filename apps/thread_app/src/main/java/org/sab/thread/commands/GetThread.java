@@ -16,14 +16,11 @@ public class GetThread extends ThreadCommand {
 
         try {
             final String threadId = uriParams.getString(THREAD_NAME);
-            
+
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
