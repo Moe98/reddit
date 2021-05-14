@@ -24,6 +24,7 @@ public class GetSubThreads extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
+            // TODO not a uri param
             final String threadId = uriParams.getString(THREAD_ID);
 
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
