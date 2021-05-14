@@ -9,6 +9,10 @@ public class Schema {
         this.attributeList = attributeList;
     }
 
+    public static Schema emptySchema() {
+        return new Schema(List.of());
+    }
+
     public List<Attribute> getAttributeList() {
         return attributeList;
     }
