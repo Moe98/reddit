@@ -1,6 +1,7 @@
 package org.sab.models.user;
 
 import org.json.JSONObject;
+import org.sab.functions.Utilities;
 
 public class User {
 
@@ -71,9 +72,11 @@ public class User {
     public static String getCollectionName() {
         return "Users";
     }
-    public static String reformatUserId(String userId){
-        return userId.replaceAll("[-]", "");
+
+    public String reformatUserId() {
+        return Utilities.formatUUID(userId);
     }
+
     @Override
     public String toString() {
         return "User{" +

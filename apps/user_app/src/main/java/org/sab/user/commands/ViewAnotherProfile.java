@@ -8,7 +8,6 @@ import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class ViewAnotherProfile extends UserCommand {
     @Override
@@ -16,6 +15,7 @@ public class ViewAnotherProfile extends UserCommand {
         if (!uriParams.has(USERNAME))
             return Responder.makeErrorResponse("You must add username in URIParams!", 400);
         String username = uriParams.getString(USERNAME);
+
         try {
             User user = getUser(username, UserAttributes.USERNAME, UserAttributes.PHOTO_URL);
             return Responder.makeDataResponse(user.toJSON());
@@ -27,7 +27,7 @@ public class ViewAnotherProfile extends UserCommand {
 
     @Override
     protected Schema getSchema() {
-        return new Schema(List.of());
+        return Schema.emptySchema();
     }
 
     @Override

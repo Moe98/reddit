@@ -1,12 +1,15 @@
 package org.sab.user.commands;
 
 import org.json.JSONObject;
+import org.sab.auth.AuthParamsHandler;
+
+import java.io.IOException;
 
 public class Requester {
     Requester() {
     }
 
-    static JSONObject authenticationParams = new JSONObject().put("isAuthenticated", false);
+    static JSONObject authenticationParams = AuthParamsHandler.getUnauthorizedAuthParams();
 
     private static JSONObject makeRequest(JSONObject body, String methodType, JSONObject uriParams) {
         JSONObject request = new JSONObject();
@@ -54,11 +57,10 @@ public class Requester {
         return new JSONObject(new UpdatePassword().execute(request));
     }
 
-    static public JSONObject updateProfilePicture(String photoUrl) {
-        JSONObject body = new JSONObject();
-        body.put("photoUrl", photoUrl);
-
-        JSONObject request = makeRequest(body, "PUT", new JSONObject());
+    static public JSONObject updateProfilePicture() throws IOException {
+        JSONObject request = makeRequest(new JSONObject(), "PUT", new JSONObject());
+        JSONObject files = new JSONObject().put("image", org.sab.minio.FileSimulation.generateImageJson());
+        request.put("files", files);
         return new JSONObject(new UpdateProfilePhoto().execute(request));
     }
 

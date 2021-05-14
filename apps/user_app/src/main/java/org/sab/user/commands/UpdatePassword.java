@@ -28,11 +28,12 @@ public class UpdatePassword extends UserCommand {
     }
 
     @Override
-    protected String execute() {
-        boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
-        if (!authenticated)
-            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
+    protected boolean isAuthNeeded() {
+        return true;
+    }
 
+    @Override
+    protected String execute() {
 
         String username = authenticationParams.getString(USERNAME);
         String oldPassword = body.getString(OLD_PASSWORD);
@@ -40,12 +41,11 @@ public class UpdatePassword extends UserCommand {
 
         if (oldPassword.equals(newPassword))
             return Responder.makeErrorResponse("Your new password cannot match your last one.", 400);
-        // Authentication
+
         JSONObject userAuth = authenticateUser(username, oldPassword);
         if (userAuth.getInt("statusCode") != 200)
             return userAuth.toString();
 
-        //calling the appropriate SQL procedure
         try {
             newPassword = Auth.hash(newPassword);
             PostgresConnection.call("update_user_password", username, newPassword);

@@ -8,17 +8,12 @@ import org.sab.validation.Schema;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class ViewMyProfile extends UserCommand {
     @Override
     protected String execute() {
-
-        boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
-        if (!authenticated)
-            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 403);
-
         String username = authenticationParams.getString(USERNAME);
+
         try {
             User user = getUser(username, UserAttributes.USERNAME, UserAttributes.PASSWORD, UserAttributes.EMAIL, UserAttributes.BIRTHDATE, UserAttributes.PHOTO_URL, UserAttributes.USER_ID);
             return Responder.makeDataResponse(user.toJSON());
@@ -29,11 +24,16 @@ public class ViewMyProfile extends UserCommand {
 
     @Override
     protected Schema getSchema() {
-        return new Schema(List.of());
+        return Schema.emptySchema();
     }
 
     @Override
     protected HTTPMethod getMethodType() {
         return HTTPMethod.GET;
+    }
+
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 }
