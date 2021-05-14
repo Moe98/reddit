@@ -24,18 +24,18 @@ public class UpdateProfilePhoto extends UserCommand {
     }
 
     @Override
+    protected boolean isAuthNeeded() {
+        return true;
+    }
+
+    @Override
     protected String execute() {
-        boolean authenticated = authenticationParams.getBoolean(IS_AUTHENTICATED);
-        if (!authenticated)
-            return Responder.makeErrorResponse("Unauthorized action! Please Login!", 401);
         if (files.length() != 1)
             return Responder.makeErrorResponse("Only one profile image allowed per upload, Check Form-Data Files!", 400);
 
-        // retrieving the body objects
         String username = authenticationParams.getString(USERNAME);
-        String output;
+        String photoUrl;
         User user;
-        // getting the user
         try {
             user = getUser(username, UserAttributes.USER_ID);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
@@ -43,17 +43,16 @@ public class UpdateProfilePhoto extends UserCommand {
         }
 
         try {
-            output = MinIO.uploadObject(BUCKETNAME, user.reformatUserId(), files.getJSONObject("image"));
-            if (output.isEmpty())
+            photoUrl = MinIO.uploadObject(BUCKETNAME, user.reformatUserId(), files.getJSONObject("image"));
+            if (photoUrl.isEmpty())
                 return Responder.makeErrorResponse("Error Occurred While Uploading Your Image!", 404);
         } catch (EnvironmentVariableNotLoaded e) {
             return Responder.makeErrorResponse(e.getMessage(), 400);
         }
 
 
-        //calling the appropriate SQL procedure
         try {
-            PostgresConnection.call("update_profile_picture", username, output);
+            PostgresConnection.call("update_profile_picture", username, photoUrl);
         } catch (EnvironmentVariableNotLoaded | SQLException e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         }
