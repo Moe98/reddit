@@ -98,6 +98,7 @@ public abstract class Service {
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             return "{\"statusCode\": 504, \"msg\": \"Function-Name class: not operational\"}";
         } catch (InvocationTargetException e) {
+            e.printStackTrace();
             return "{\"statusCode\": 510, \"msg\": \"Function-Name class: threw an exception\"}";
         }
     }
