@@ -3,6 +3,7 @@ package org.sab.minio;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
+import org.json.JSONObject;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.ByteArrayInputStream;
@@ -42,6 +43,10 @@ public class MinIO {
             instance = new MinIO();
         }
         return instance;
+    }
+
+    public static String uploadObject(String bucketName, String id, JSONObject file) throws EnvironmentVariableNotLoaded {
+        return uploadObject(bucketName, id, file.getString("data"), file.getString("type"));
     }
 
     public static String uploadObject(String bucketName, String id, String data, String contentType) throws EnvironmentVariableNotLoaded {
