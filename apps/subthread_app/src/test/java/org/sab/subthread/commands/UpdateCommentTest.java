@@ -13,7 +13,6 @@ import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.HTTPMethod;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 public class UpdateCommentTest {
     private static final String DB_NAME = System.getenv("ARANGO_DB");
