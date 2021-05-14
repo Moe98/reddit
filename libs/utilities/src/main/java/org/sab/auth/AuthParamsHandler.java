@@ -12,10 +12,8 @@ public class AuthParamsHandler {
         try {
             Map<String, Object> claims = Jwt.verifyAndDecode(token);
             authenticated = true;
-            // for(Map.Entry<String,Object> entry:claims)
-            // authenticationParams.put(entry.getKey(),entry.getValue();
-            authenticationParams.put("username", claims.get("username"));
-            authenticationParams.put("jwt", token);
+            for (Map.Entry<String, Object> entry : claims.entrySet())
+                authenticationParams.put(entry.getKey(), entry.getValue());
         } catch (JWTVerificationException jwtVerificationException) {
             authenticated = false;
         }
