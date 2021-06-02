@@ -15,6 +15,7 @@
     <module>search_app</module>
     <module>thread_app</module>
     <module>subthread_app</module>
+    <module>user_to_user_actions_app</module>
   </modules>
   <packaging>pom</packaging>
 

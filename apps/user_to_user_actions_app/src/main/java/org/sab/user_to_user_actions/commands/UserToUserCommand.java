@@ -1,4 +1,4 @@
-package org.sab.user.commands;
+package org.sab.user_to_user_actions.commands;
 
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.models.user.UserAttributes;

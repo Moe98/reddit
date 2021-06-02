@@ -1,19 +1,17 @@
-package org.sab.user.commands;
-
-import org.sab.service.validation.HTTPMethod;
-import org.sab.validation.Schema;
+package org.sab.user_to_user_actions.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
+import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetBlockedUsers extends UserToUserCommand {
+public class GetFollowedUsers extends UserToUserCommand {
     @Override
     protected Schema getSchema() {
         return new Schema(List.of());
@@ -36,7 +34,7 @@ public class GetBlockedUsers extends UserToUserCommand {
             final String userId = uriParams.getString(USER_ID);
 
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
-            arango.createCollectionIfNotExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
@@ -49,7 +47,7 @@ public class GetBlockedUsers extends UserToUserCommand {
                 return Responder.makeErrorResponse(USER_DELETED_RESPONSE_MESSAGE, 404).toString();
             }
 
-            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
+            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arrOfAttributes = new ArrayList<>();
             arrOfAttributes.add(IS_DELETED_DB);
             arrOfAttributes.add(NUM_OF_FOLLOWERS_DB);
@@ -57,7 +55,7 @@ public class GetBlockedUsers extends UserToUserCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
+        } finally {
             if (arango != null) {
                 arango.disconnect();
             }
