@@ -10,7 +10,7 @@ public class UserToUserActionsApp extends Service {
 
     @Override
     public String getAppUriName() {
-        return "user-to-user-actions";
+        return "useraction";
     }
 
     @Override
