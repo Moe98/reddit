@@ -1,4 +1,4 @@
-package org.sab.user_to_user_actions;
+package org.sab.useractions;
 
 import org.sab.service.Service;
 
