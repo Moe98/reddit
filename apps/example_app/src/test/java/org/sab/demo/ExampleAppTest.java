@@ -34,8 +34,7 @@ public class ExampleAppTest {
 
     @Test
     public void getThreadsCountFromConfigFile() {
-        System.out.println(new ExampleApp().getThreadCount());
-        assertEquals(10, new ExampleApp().getThreadCount());
+        assertEquals(11, new ExampleApp().getThreadCount());
     }
 
 }

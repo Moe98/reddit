@@ -34,7 +34,7 @@ public abstract class Service {
 
     public int getThreadCount() {
         final Properties properties = new Properties();
-        final InputStream threadsCountStream = getClass().getClassLoader().getResourceAsStream(THREADS_COUNT_PROPERTY_NAME + ".properties");
+        final InputStream threadsCountStream = getClass().getClassLoader().getResourceAsStream(THREADS_COUNT_PROPERTY_NAME.toLowerCase() + ".properties");
 
         if (threadsCountStream == null)
             return DEFAULT_THREADS_COUNT;
