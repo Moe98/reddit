@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+    chat_server:
+        build: 
+            - context: ../../
+            - dockerfile: apps/chat_app/chat_server/Dockerfile
+        ports:
+            - 5000:5000
+    rabbitmq:
+        image: rabbitmq
+        ports:
+            - 5672:5672
+    cassandra:
+        image: cassandra
+        ports:
+            - 9042:9042
