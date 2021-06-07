@@ -20,6 +20,7 @@
     <module>arango</module>
     <module>models</module>
     <module>utilities</module>
+      <module>reddis</module>
   </modules>
     
   <packaging>pom</packaging>
