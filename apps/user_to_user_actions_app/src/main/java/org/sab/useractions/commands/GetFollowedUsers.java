@@ -1,9 +1,8 @@
-package org.sab.user.commands;
+package org.sab.useractions.commands;
 
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -48,7 +47,7 @@ public class GetFollowedUsers extends UserToUserCommand {
                 return Responder.makeErrorResponse(USER_DELETED_RESPONSE_MESSAGE, 404).toString();
             }
 
-            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME+"/"+userId);
+            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arrOfAttributes = new ArrayList<>();
             arrOfAttributes.add(IS_DELETED_DB);
             arrOfAttributes.add(NUM_OF_FOLLOWERS_DB);
@@ -56,7 +55,7 @@ public class GetFollowedUsers extends UserToUserCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        }finally {
+        } finally {
             if (arango != null) {
                 arango.disconnect();
             }
