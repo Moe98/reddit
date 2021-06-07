@@ -1,21 +1,18 @@
 package org.sab.demo;
 
-import static org.junit.Assert.assertTrue;
-
 import org.json.JSONObject;
 import org.junit.Test;
 import org.sab.demo.commands.GoodByeWorld;
 import org.sab.demo.commands.HelloWorld;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Unit test for Example App.
  */
 public class ExampleAppTest {
-    /**
-     * Rigorous Test :-)
-     * Amazing!
-     * verification++
-     */
+
     @Test
     public void helloWorldCorrectFunctionality() {
 
@@ -34,4 +31,10 @@ public class ExampleAppTest {
 
         assertTrue(result.equals("{\"msg\":\"GoodBye World\"}"));
     }
+
+    @Test
+    public void getThreadsCountFromConfigFile() {
+        assertEquals(11, new ExampleApp().getThreadCount());
+    }
+
 }
