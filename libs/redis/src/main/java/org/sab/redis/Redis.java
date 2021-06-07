@@ -1,10 +1,220 @@
 package org.sab.redis;
 
-/**
- * Hello world!
- */
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import javax.naming.TimeLimitExceededException;
+
+import io.lettuce.core.LettuceFutures;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisFuture;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+
 public class Redis {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+
+    StatefulRedisConnection<String, String> connection;
+    RedisClient redisClient;
+    RedisAsyncCommands<String, String> asyncCommands;
+    // Very top secret password.
+    String password = "password";
+
+    // TODO get from config file
+    private final int OPERATION_TIMEOUT = 1;
+
+    // TODO singleton?
+    //  check if we can pool the connection
+    public Redis() {
+        /*
+        connection scheme
+            redis :// [password@] host [: port] [/ database]
+                [? [timeout=timeout[d|h|m|s|ms|us|ns]]
+                [&_database=database_]]
+        */
+
+        // or
+        int port = 6379;
+
+        // TODO check DB and password
+        RedisURI uri = RedisURI.Builder.redis("127.0.0.1", port)
+//                        .withPassword(password)
+//                        .withDatabase(1)
+                        .build();
+        
+        redisClient = RedisClient.create(uri);
+        redisClient.setDefaultTimeout(Duration.ofSeconds(60));
+        
+        connection = redisClient.connect();
     }
+
+    public void connect() {
+        connection = redisClient.connect();
+    }
+
+    public void getCommand() {
+        asyncCommands = connection.async();
+    }
+    
+    public void setKeyVal(String key, String value) throws TimeLimitExceededException {
+        RedisFuture<String> future = asyncCommands.set(key, value);
+        
+        try{
+            future.await(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e){
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+    }
+
+    public String getKeyVal(String key) throws TimeLimitExceededException {
+        
+        String value;
+        try {
+            RedisFuture<String> future = asyncCommands.get(key);
+            value = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+            
+        } catch (Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return value;
+    }
+
+    public void deleteKey(String... keys) throws TimeLimitExceededException {
+        RedisFuture<Long> future = asyncCommands.del(keys);
+        
+        try{
+            future.await(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e){
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+    }
+    
+    public long existsKey(String... keys) throws TimeLimitExceededException {
+        long num;
+
+        RedisFuture<Long> future = asyncCommands.exists(keys);
+        
+        try{
+            num = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e){
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return num;
+    }
+
+    public boolean expireKey(String key, long seconds) throws TimeLimitExceededException {
+
+        boolean willExpire;
+        try{
+            RedisFuture<Boolean> future = asyncCommands.expire(key, seconds);   
+            willExpire = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return willExpire;
+    }
+
+    public void setAllKeyVal(ArrayList<String> keys, ArrayList<String> values) throws TimeLimitExceededException {
+        // TODO length of 2 lists
+        
+        List<RedisFuture<String>> futures = new ArrayList<>();
+
+        int i = 0;
+        for (String key : keys) {
+            futures.add(asyncCommands.set(key, values.get(i)));
+            i++;
+        }   
+
+        try {
+            LettuceFutures.awaitAll(OPERATION_TIMEOUT, TimeUnit.MINUTES, futures.toArray(new RedisFuture[futures.size()]));
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+        
+
+    }
+
+    public long setArr(String arrName, String... values) throws TimeLimitExceededException {
+        
+        long newLen;
+
+        RedisFuture<Long> future = asyncCommands.rpushx(arrName, values);
+        try{
+            newLen = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return newLen;
+    }
+
+    public long appendToArr(String arrName, String... items) throws TimeLimitExceededException {
+        long newLen;
+
+        try{
+            RedisFuture<Long> future = asyncCommands.rpush(arrName, items);   
+            newLen = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return newLen;
+    }
+    
+    public long getArrLength(String arrName) throws TimeLimitExceededException {
+        long len;
+        
+        try{
+            RedisFuture<Long> future = asyncCommands.llen(arrName);
+            len = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+            
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return len;
+    }
+
+    public List<String> getArrRange(String arrName, int start, int stop) throws TimeLimitExceededException {
+        List<String> arr;
+        
+        try{ 
+            RedisFuture<List<String>> future = asyncCommands.lrange(arrName, start, stop);
+            arr = future.get(OPERATION_TIMEOUT, TimeUnit.MINUTES);
+        } catch(Exception e) {
+            throw new TimeLimitExceededException("Could not complete within the timeout");
+        }
+
+        return arr;
+    }
+
+
+    public void closeConnection() {
+        connection.close();
+    }
+
+    public void shutdown() {
+        redisClient.shutdown();
+    }
+
+    public static void main(String[] args) {
+
+        Redis redis = new Redis();
+        redis.getCommand();
+        try {
+            redis.setKeyVal("test", "val1");
+            String s = redis.getKeyVal("lala");
+            redis.deleteKey("test", "lala");
+
+        } catch (TimeLimitExceededException e) {
+            System.out.println("ERROR!!!");
+            e.printStackTrace();
+        }
+
+    }
+    
 }
