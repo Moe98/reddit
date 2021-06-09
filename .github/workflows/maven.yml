@@ -41,6 +41,15 @@ jobs:
         image: fclairamb/minio-github-actions
         ports:
           - 9000:9000
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
@@ -63,6 +72,12 @@ jobs:
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
           couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
+      - name: Connect to Redis
+        env:
+          # The hostname used to communicate with the Redis service container
+          REDIS_HOST: redis
+          # The default Redis port
+          REDIS_PORT: 6379
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
