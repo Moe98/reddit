@@ -5,7 +5,7 @@
     "bucketType": "ephemeral",
     "authType": "sasl",
     "saslPassword": "",
-    "evictionPolicy": "notRecentlyUsed",
+    "evictionPolicy": "nruEviction",
     "replicaNumber": 0,
     "flushEnabled": 1
   },
@@ -15,7 +15,7 @@
     "bucketType": "ephemeral",
     "authType": "sasl",
     "saslPassword": "",
-    "evictionPolicy": "notRecentlyUsed",
+    "evictionPolicy": "nruEviction",
     "replicaNumber": 0,
     "flushEnabled": 1
   },
@@ -25,7 +25,7 @@
     "bucketType": "ephemeral",
     "authType": "sasl",
     "saslPassword": "",
-    "evictionPolicy": "notRecentlyUsed",
+    "evictionPolicy": "nruEviction",
     "replicaNumber": 0,
     "flushEnabled": 1
   },
@@ -35,7 +35,7 @@
     "bucketType": "ephemeral",
     "authType": "sasl",
     "saslPassword": "",
-    "evictionPolicy": "notRecentlyUsed",
+    "evictionPolicy": "nruEviction",
     "replicaNumber": 0,
     "flushEnabled": 1
   },
@@ -45,7 +45,7 @@
     "bucketType": "ephemeral",
     "authType": "sasl",
     "saslPassword": "",
-    "evictionPolicy": "notRecentlyUsed",
+    "evictionPolicy": "nruEviction",
     "replicaNumber": 0,
     "flushEnabled": 1
   }
