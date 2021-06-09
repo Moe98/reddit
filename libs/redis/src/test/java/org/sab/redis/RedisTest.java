@@ -7,6 +7,9 @@ import org.junit.Test;
 
 import javax.naming.TimeLimitExceededException;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 import static org.junit.Assert.*;
 
 /**
@@ -75,6 +78,26 @@ public class RedisTest {
         }
 
         assertEquals(value, valueRetrieved);
+    }
+
+    @Test
+    public void setArrWithValues() {
+        String key = "key";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        try {
+            redis.setArr(key, values);
+            List<String> returnedValues = redis.getArrRange(key, 0, -1);
+
+            assertEquals(returnedValues.size(), values.length);
+            IntStream.range(0, returnedValues.size()).
+                    forEach(index -> assertEquals(returnedValues.get(index), values[index]));
+        } catch (TimeLimitExceededException e) {
+            fail();
+            e.printStackTrace();
+        }
+
+        deleteKey(key);
     }
 
     @AfterClass
