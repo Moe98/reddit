@@ -1,4 +1,4 @@
-package org.sab.user.commands;
+package org.sab.useractions.commands;
 
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;

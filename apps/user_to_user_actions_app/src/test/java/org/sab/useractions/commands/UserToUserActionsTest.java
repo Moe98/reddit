@@ -1,4 +1,4 @@
-package org.sab.user.commands;
+package org.sab.useractions.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
@@ -7,14 +7,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
-import org.sab.models.user.User;
 
 import static org.junit.Assert.*;
 
 public class UserToUserActionsTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
     private static Arango arango;
-    private static BaseDocument moe, manta, lujine;
 
     @BeforeClass
     public static void setUp() {
@@ -24,21 +22,21 @@ public class UserToUserActionsTest {
             assertTrue(arango.isConnected());
             arango.createDatabaseIfNotExists(UserToUserCommand.TEST_DB_Name);
 
-            moe = new BaseDocument();
+            BaseDocument moe = new BaseDocument();
             moe.setKey(moeId);
             moe.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             moe.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
 
             addObjectToCollection(moe, UserToUserCommand.USER_COLLECTION_NAME);
 
-            manta = new BaseDocument();
+            BaseDocument manta = new BaseDocument();
             manta.setKey(mantaId);
             manta.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             manta.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
 
             addObjectToCollection(manta, UserToUserCommand.USER_COLLECTION_NAME);
 
-            lujine = new BaseDocument();
+            BaseDocument lujine = new BaseDocument();
             lujine.setKey(lujineId);
             lujine.addAttribute(UserToUserCommand.IS_DELETED_DB, false);
             lujine.addAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB, 0);
@@ -125,7 +123,7 @@ public class UserToUserActionsTest {
         return userBlockUser(actionMaker, userId);
     }
 
-    public static String getBlockedUsers(String actionMaker){
+    public static String getBlockedUsers(String actionMaker) {
         GetBlockedUsers getBlockedUsers = new GetBlockedUsers();
         JSONObject body = new JSONObject();
 
@@ -139,7 +137,7 @@ public class UserToUserActionsTest {
         return getBlockedUsers.execute(request);
     }
 
-    public static String getFollowedUsers(String actionMaker){
+    public static String getFollowedUsers(String actionMaker) {
         GetFollowedUsers getFollowedUsers = new GetFollowedUsers();
         JSONObject body = new JSONObject();
 
@@ -150,10 +148,10 @@ public class UserToUserActionsTest {
         request.put("methodType", "GET");
         request.put("uriParams", uriParams);
 
-       return getFollowedUsers.execute(request);
+        return getFollowedUsers.execute(request);
     }
 
-    public static String getMyFollowers(String actionMaker){
+    public static String getMyFollowers(String actionMaker) {
         GetMyFollowers getMyFollowers = new GetMyFollowers();
         JSONObject body = new JSONObject();
 
@@ -479,11 +477,11 @@ public class UserToUserActionsTest {
         JSONObject responseJson = new JSONObject(response);
 
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
 
         assertEquals(2, dataArr.length());
-        boolean scenario1 = lujineId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
-        boolean scenario2 = moeId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
+        boolean scenario1 = lujineId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
+        boolean scenario2 = moeId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
         assertTrue(scenario1 || scenario2);
 
         arango.connectIfNotConnected();
@@ -491,16 +489,16 @@ public class UserToUserActionsTest {
         JSONObject responseJson2 = new JSONObject(response2);
 
         assertEquals(200, responseJson2.getInt("statusCode"));
-        JSONArray dataArr2 = (JSONArray)(responseJson2.get("data"));
+        JSONArray dataArr2 = (JSONArray) (responseJson2.get("data"));
         assertEquals(1, dataArr2.length());
-        assertEquals(moeId, ((JSONObject)dataArr2.get(0)).getString("UserId"));
+        assertEquals(moeId, ((JSONObject) dataArr2.get(0)).getString("UserId"));
 
         arango.connectIfNotConnected();
         String response3 = getBlockedUsers(moeId);
         JSONObject responseJson3 = new JSONObject(response3);
 
         assertEquals(200, responseJson3.getInt("statusCode"));
-        JSONArray dataArr3 = (JSONArray)(responseJson3.get("data"));
+        JSONArray dataArr3 = (JSONArray) (responseJson3.get("data"));
         assertEquals(0, dataArr3.length());
 
         //removing test effects
@@ -527,11 +525,11 @@ public class UserToUserActionsTest {
         String response = getFollowedUsers(mantaId);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
 
         assertEquals(2, dataArr.length());
-        boolean scenario1 = lujineId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
-        boolean scenario2 = moeId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
+        boolean scenario1 = lujineId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
+        boolean scenario2 = moeId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
         assertTrue(scenario1 || scenario2);
 
         arango.connectIfNotConnected();
@@ -539,16 +537,16 @@ public class UserToUserActionsTest {
         JSONObject responseJson2 = new JSONObject(response2);
 
         assertEquals(200, responseJson2.getInt("statusCode"));
-        JSONArray dataArr2 = (JSONArray)(responseJson2.get("data"));
+        JSONArray dataArr2 = (JSONArray) (responseJson2.get("data"));
         assertEquals(1, dataArr2.length());
-        assertEquals(moeId, ((JSONObject)dataArr2.get(0)).getString("UserId"));
+        assertEquals(moeId, ((JSONObject) dataArr2.get(0)).getString("UserId"));
 
         arango.connectIfNotConnected();
         String response3 = getFollowedUsers(moeId);
         JSONObject responseJson3 = new JSONObject(response3);
 
         assertEquals(200, responseJson3.getInt("statusCode"));
-        JSONArray dataArr3 = (JSONArray)(responseJson3.get("data"));
+        JSONArray dataArr3 = (JSONArray) (responseJson3.get("data"));
         assertEquals(0, dataArr3.length());
 
         //removing test effects
@@ -575,11 +573,11 @@ public class UserToUserActionsTest {
         String response = getMyFollowers(mantaId);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(200, responseJson.getInt("statusCode"));
-        JSONArray dataArr = (JSONArray)(responseJson.get("data"));
+        JSONArray dataArr = (JSONArray) (responseJson.get("data"));
 
         assertEquals(2, dataArr.length());
-        boolean scenario1 = lujineId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
-        boolean scenario2 = moeId.equals(((JSONObject)dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject)dataArr.get(1)).getString("UserId"));
+        boolean scenario1 = lujineId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & moeId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
+        boolean scenario2 = moeId.equals(((JSONObject) dataArr.get(0)).getString("UserId")) & lujineId.equals(((JSONObject) dataArr.get(1)).getString("UserId"));
         assertTrue(scenario1 || scenario2);
 
         arango.connectIfNotConnected();
@@ -587,16 +585,16 @@ public class UserToUserActionsTest {
         JSONObject responseJson2 = new JSONObject(response2);
 
         assertEquals(200, responseJson2.getInt("statusCode"));
-        JSONArray dataArr2 = (JSONArray)(responseJson2.get("data"));
+        JSONArray dataArr2 = (JSONArray) (responseJson2.get("data"));
         assertEquals(1, dataArr2.length());
-        assertEquals(moeId, ((JSONObject)dataArr2.get(0)).getString("UserId"));
+        assertEquals(moeId, ((JSONObject) dataArr2.get(0)).getString("UserId"));
 
         arango.connectIfNotConnected();
         String response3 = getMyFollowers(moeId);
         JSONObject responseJson3 = new JSONObject(response3);
 
         assertEquals(200, responseJson3.getInt("statusCode"));
-        JSONArray dataArr3 = (JSONArray)(responseJson3.get("data"));
+        JSONArray dataArr3 = (JSONArray) (responseJson3.get("data"));
         assertEquals(0, dataArr3.length());
 
         //removing test effects

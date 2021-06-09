@@ -22,6 +22,8 @@
     <file url="file://$PROJECT_DIR$/apps/thread_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/user_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/user_app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/user_to_user_actions_app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/user_to_user_actions_app/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/arango/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/couchbase/src/main/java" charset="UTF-8" />
@@ -35,5 +37,6 @@
     <file url="file://$PROJECT_DIR$/libs/rabbitmq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/utilities/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/utilities/src/main/resources" charset="UTF-8" />
   </component>
 </project>
