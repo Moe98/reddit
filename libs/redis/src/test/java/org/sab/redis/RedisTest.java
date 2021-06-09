@@ -158,6 +158,33 @@ public class RedisTest {
         }
     }
 
+    @Test
+    public void getArrRange() {
+        String key = "key";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        try {
+            redis.setArr(key, values);
+
+            // Should return Luji.
+            List<String> lastElement = redis.getArrRange(key, 2, 2);
+            // Should return Manta, Luji.
+            List<String> partialArray = redis.getArrRange(key, 1, 2);
+
+            assertEquals(lastElement.size(), 1);
+            assertEquals(partialArray.size(), 2);
+
+            assertEquals(lastElement.get(0), "Luji");
+            assertEquals(partialArray.get(0), "Manta");
+            assertEquals(partialArray.get(1), "Luji");
+        } catch (TimeLimitExceededException e) {
+            fail();
+            e.printStackTrace();
+        }
+
+        deleteKey(key);
+    }
+
     @AfterClass
     public static void tearDown() {
 
