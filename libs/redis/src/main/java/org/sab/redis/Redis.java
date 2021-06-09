@@ -65,15 +65,18 @@ public class Redis {
         asyncCommands = connection.async();
     }
     
-    public void setKeyVal(String key, String value) throws TimeLimitExceededException {
+    public String setKeyVal(String key, String value) throws TimeLimitExceededException {
 
         RedisFuture<String> future = asyncCommands.set(key, value);
-        
+
+        String status = "";
         try{
-            future.await(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+            status = future.get(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
         } catch(Exception e){
             throw new TimeLimitExceededException(TIMEOUT_ERROR_MESSAGE);
         }
+
+        return status;
     }
 
     public String getKeyVal(String key) throws TimeLimitExceededException {
@@ -91,15 +94,18 @@ public class Redis {
         return value;
     }
 
-    public void deleteKey(String... keys) throws TimeLimitExceededException {
+    public long deleteKey(String... keys) throws TimeLimitExceededException {
 
         RedisFuture<Long> future = asyncCommands.del(keys);
+        long num;
         
         try{
-            future.await(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
+            num = future.get(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
         } catch(Exception e){
             throw new TimeLimitExceededException(TIMEOUT_ERROR_MESSAGE);
         }
+
+        return num;
     }
     
     public long existsKey(String... keys) throws TimeLimitExceededException {
