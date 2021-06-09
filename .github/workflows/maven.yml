@@ -75,11 +75,10 @@ jobs:
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
           couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
-      - name: Set Redis password
-        uses: shogo82148/actions-setup-redis@v1
+      - uses: shogo82148/actions-setup-redis@v1
         with:
-          redis-version: '6.x'
-        run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-version: '6.x' 
+      - run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
