@@ -20,9 +20,6 @@ public class RedisTest {
     public static Redis redis;
     public static RedisCommands<String, String> syncCommand;
 
-    final static String key1 = "test1Key";
-    final static String key2 = "test2Key";
-
     /**
      * Rigorous Test :-)
      */
@@ -49,23 +46,28 @@ public class RedisTest {
     @Test
     public void putKeyValue() {
 
-        final String key = key1;
+        final String key = "key1";
         final String value = "This is a test value :)";
 
+        String status = "";
+
         try {
-            redis.setKeyVal(key, value);
+           status = redis.setKeyVal(key, value);
         } catch (TimeLimitExceededException e) {
             fail(e.getMessage());
         }
 
         String valInRedis = getValue(key);
 
+        deleteKey(key);
+
+        assertEquals("OK", status);
         assertEquals(value, valInRedis);
     }
 
     @Test
     public void getValueFromKey() {
-        final String key = key2;
+        final String key = "key2";
         final String value = "Were you able to get me?";
         String valueRetrieved = "";
 
@@ -77,7 +79,153 @@ public class RedisTest {
             fail(e.getMessage());
         }
 
+        deleteKey(key);
+
         assertEquals(value, valueRetrieved);
+    }
+
+    @Test
+    public void checkKeyExists() {
+        final String key = "key3";
+        final String value = "testVal";
+
+        putValue(key, value);
+
+        long numKeysExist = -1;
+
+        try {
+            numKeysExist = redis.existsKey(key);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        deleteKey(key);
+
+        assertEquals(1, numKeysExist);
+    }
+
+    @Test
+    public void checkMultipleKeyExists() {
+        final String key1 = "key4";
+        final String key2 = "key5";
+        final String key3 = "key6";
+
+        final String value = "testVal";
+
+        putValue(key1, value);
+        putValue(key2, value);
+        putValue(key3, value);
+
+        long numKeysExist = -1;
+
+        try {
+            numKeysExist = redis.existsKey(key1, key2, key3);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        deleteKey(key1);
+        deleteKey(key2);
+        deleteKey(key3);
+
+        assertEquals(3, numKeysExist);
+    }
+
+    @Test
+    public void checkKeyDoesNotExist() {
+
+        final String key = "notAKey";
+
+        long numKeysExist = -1;
+
+        try {
+            numKeysExist = redis.existsKey(key);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        assertEquals(0, numKeysExist);
+    }
+
+    @Test
+    public void deleteKeyValue() {
+
+        final String key = "key7";
+        final String value = "value";
+
+        putValue(key, value);
+        String inRedis = getValue(key);
+        assertEquals(value, inRedis);
+
+        long numKeysDeleted = -1;
+
+        try {
+            numKeysDeleted = redis.deleteKey(key);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        String deletedVal = getValue(key);
+
+        assertEquals(1, numKeysDeleted);
+        assertNull(deletedVal);
+
+    }
+
+    @Test
+    public void deleteMultipleKeyValue() {
+        final String key1 = "key8";
+        final String key2 = "key9";
+        final String key3 = "key10";
+
+        final String value = "value";
+
+        putValue(key1, value + "1");
+        String inRedis = getValue(key1);
+        assertEquals(value + "1", inRedis);
+
+        putValue(key2, value + "2");
+        inRedis = getValue(key2);
+        assertEquals(value + "2", inRedis);
+
+        putValue(key3, value + "3");
+        inRedis = getValue(key3);
+        assertEquals(value + "3", inRedis);
+
+        long numKeysDeleted = -1;
+
+        try {
+            numKeysDeleted = redis.deleteKey(key1, key2, key3);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        assertEquals(3, numKeysDeleted);
+
+        String deletedVal1 = getValue(key1);
+        String deletedVal2 = getValue(key2);
+        String deletedVal3 = getValue(key3);
+
+        assertNull(deletedVal1);
+        assertNull(deletedVal2);
+        assertNull(deletedVal3);
+
+    }
+
+    @Test
+    public void deleteKeyDoesNotExist() {
+
+        final String key = "notAKey";
+
+        long numKeysDeleted = -1;
+
+        try {
+            numKeysDeleted = redis.deleteKey(key);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        assertEquals(0, numKeysDeleted);
     }
 
     @Test
@@ -187,9 +335,6 @@ public class RedisTest {
 
     @AfterClass
     public static void tearDown() {
-
-        deleteKey(key1);
-        deleteKey(key2);
 
         RedisTest.redis.closeConnection();
         RedisTest.redis.shutdown();
