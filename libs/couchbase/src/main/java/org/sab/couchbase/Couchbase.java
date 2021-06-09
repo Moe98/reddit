@@ -6,6 +6,8 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
+import com.couchbase.client.java.manager.bucket.BucketType;
+import com.couchbase.client.java.manager.bucket.EvictionPolicyType;
 import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
 import com.couchbase.client.java.manager.query.DropPrimaryQueryIndexOptions;
 import com.couchbase.client.java.query.QueryResult;
@@ -55,8 +57,7 @@ public class Couchbase {
     }
 
     public void createBucket(String bucketName, int ramQuotaMB) {
-        cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB));
-        cluster.queryIndexes().createPrimaryIndex(bucketName);
+        cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB).bucketType(BucketType.EPHEMERAL).evictionPolicy(EvictionPolicyType.NOT_RECENTLY_USED));
     }
 
     public void dropBucket(String bucketName) {
@@ -71,8 +72,6 @@ public class Couchbase {
     public void createBucketIfNotExists(String bucketName, int ramQuotaMB) {
         if (!bucketExists(bucketName))
             createBucket(bucketName, ramQuotaMB);
-        else
-            cluster.queryIndexes().createPrimaryIndex(bucketName, CreatePrimaryQueryIndexOptions.createPrimaryQueryIndexOptions().ignoreIfExists(true));
     }
 
     public MutationResult upsertDocument(String bucketName, String documentKey, JsonObject object) {
@@ -94,13 +93,5 @@ public class Couchbase {
 
     public MutationResult deleteDocument(String bucketName, String documentKey) {
         return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
-    }
-
-    public QueryResult query(String queryText) {
-        return query(queryText, false);
-    }
-
-    public QueryResult query(String queryText, boolean consistent) {
-        return cluster.query(queryText, queryOptions().scanConsistency(consistent ? QueryScanConsistency.REQUEST_PLUS : QueryScanConsistency.NOT_BOUNDED));
     }
 }
