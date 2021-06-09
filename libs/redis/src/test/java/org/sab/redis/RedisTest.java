@@ -100,6 +100,31 @@ public class RedisTest {
         deleteKey(key);
     }
 
+    @Test
+    public void appendToArr() {
+        String key = "key";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        try {
+            // Set the initial array.
+            long initialValuesCount = redis.setArr(key, values);
+
+            // Append to the same array.
+            long updatedValuesCount = redis.appendToArr(key, "Epsilon");
+
+            List<String> returnedValues = redis.getArrRange(key, 0, -1);
+
+            assertEquals(initialValuesCount + 1, updatedValuesCount);
+            assertEquals(returnedValues.size(), values.length + 1);
+            assertEquals(returnedValues.get((int) updatedValuesCount - 1), "Epsilon");
+        } catch (TimeLimitExceededException e) {
+            fail();
+            e.printStackTrace();
+        }
+
+        deleteKey(key);
+    }
+
     @AfterClass
     public static void tearDown() {
 
