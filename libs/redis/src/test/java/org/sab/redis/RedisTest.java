@@ -125,6 +125,39 @@ public class RedisTest {
         deleteKey(key);
     }
 
+    @Test
+    public void getArrLength() {
+        String key = "key";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        try {
+            redis.setArr(key, values);
+
+            long length = redis.getArrLength(key);
+
+            assertEquals((int) length, values.length);
+        } catch (TimeLimitExceededException e) {
+            fail();
+            e.printStackTrace();
+        }
+
+        deleteKey(key);
+    }
+
+    @Test
+    public void getLengthForArrDoesNotExist() {
+        String key = "key";
+
+        try {
+            long length = redis.getArrLength(key);
+
+            assertEquals((int) length, 0);
+        } catch (TimeLimitExceededException e) {
+            fail();
+            e.printStackTrace();
+        }
+    }
+
     @AfterClass
     public static void tearDown() {
 
