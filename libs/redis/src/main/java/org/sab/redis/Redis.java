@@ -56,6 +56,9 @@ public class Redis {
         connection = redisClient.connect();
     }
 
+    public StatefulRedisConnection<String, String> getConnection() {
+        return connection;
+    }
 
     // TODO should we also have a sync option??
     public void setCommand() {
