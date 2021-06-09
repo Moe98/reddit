@@ -75,6 +75,12 @@ jobs:
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
           couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
+      - name: Set Redis password
+      - uses: actions/checkout@v2
+      - uses: shogo82148/actions-setup-redis@v1
+        with:
+          redis-version: '6.x'
+      - run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
@@ -92,6 +98,9 @@ jobs:
           ARANGO_USER: ${{ secrets.ARANGO_USER }}
           ARANGO_PASSWORD: ${{ secrets.ARANGO_PASSWORD }}
           ARANGO_DB: 'Reddit'
+          # redis
+          REDIS_HOST: '127.0.0.1'
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           # ENV_TYPE
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
           # JWT
