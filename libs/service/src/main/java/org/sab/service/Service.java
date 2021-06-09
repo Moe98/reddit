@@ -50,6 +50,26 @@ public abstract class Service {
         }
     }
 
+    private void freeze() {
+        throw new UnsupportedOperationException();
+    }
+
+    private void resume() {
+        throw new UnsupportedOperationException();
+    }
+
+    private void reloadThreadPool() {
+        throw new UnsupportedOperationException();
+    }
+
+    private void reloadCommandMap() {
+        throw new UnsupportedOperationException();
+    }
+
+    private void reloadDbPool() {
+        throw new UnsupportedOperationException();
+    }
+
     public void listenOnQueue() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
@@ -62,6 +82,19 @@ public abstract class Service {
         // call the method in RPC server
         server.listenOnQueue(queueName, invokeCallback);
 
+    }
+
+    private void listenToController() {
+        throw new UnsupportedOperationException();
+    }
+
+    // Object is a placeholder.
+    private void receiveFile(Object file) {
+        throw new UnsupportedOperationException();
+    }
+
+    private void reloadClass(String className) {
+        throw new UnsupportedOperationException();
     }
 
     // function to invoke the required command using command pattern design
