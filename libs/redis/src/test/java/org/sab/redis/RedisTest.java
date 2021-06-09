@@ -148,6 +148,21 @@ public class RedisTest {
     }
 
     @Test
+    public void checkArrExists() {
+
+    }
+
+    @Test
+    public void checkMultipleArrExists() {
+
+    }
+
+    @Test
+    public void checkMultipleKeyValueArrExists() {
+
+    }
+
+    @Test
     public void deleteKeyValue() {
 
         final String key = "key7";
@@ -226,6 +241,32 @@ public class RedisTest {
         }
 
         assertEquals(0, numKeysDeleted);
+    }
+
+    @Test
+    public void deleteArr() {
+
+    }
+
+    @Test
+    public void deleteMultipleArr() {
+
+    }
+
+    @Test
+    public void deleteMultipleKeyValueAndArr() {
+
+    }
+
+    @Test
+    public void keyExpiresAfter1Min() {
+        // get value after 10 seconds --> should exist
+        // get value after 60 seconds --> should not exist
+    }
+
+    @Test
+    public void setMultipleKeyValues() {
+
     }
 
     @Test
