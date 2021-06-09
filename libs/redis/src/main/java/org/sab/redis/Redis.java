@@ -151,10 +151,9 @@ public class Redis {
     }
 
     public long setArr(String arrName, String... values) throws TimeLimitExceededException {
-        
         long newLen;
 
-        RedisFuture<Long> future = asyncCommands.rpushx(arrName, values);
+        RedisFuture<Long> future = asyncCommands.rpush(arrName, values);
         try{
             newLen = future.get(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
         } catch(Exception e) {
@@ -165,11 +164,10 @@ public class Redis {
     }
 
     public long appendToArr(String arrName, String... items) throws TimeLimitExceededException {
-
         long newLen;
 
         try{
-            RedisFuture<Long> future = asyncCommands.rpush(arrName, items);   
+            RedisFuture<Long> future = asyncCommands.rpushx(arrName, items);
             newLen = future.get(OPERATION_TIMEOUT_MINUTES, TimeUnit.MINUTES);
         } catch(Exception e) {
             throw new TimeLimitExceededException(TIMEOUT_ERROR_MESSAGE);
