@@ -6,7 +6,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.naming.TimeLimitExceededException;
-
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -43,6 +42,21 @@ public class RedisTest {
         syncCommand.del(key);
     }
 
+    public static long setArr(String arrName, String... values) {
+        return syncCommand.rpush(arrName, values);
+    }
+
+    public static List<String> getArrRange(String arrName, int start, int stop) {
+        return syncCommand.lrange(arrName, start, stop);
+    }
+
+    @AfterClass
+    public static void tearDown() {
+
+        RedisTest.redis.closeConnection();
+        RedisTest.redis.shutdown();
+    }
+
     @Test
     public void putKeyValue() {
 
@@ -52,7 +66,7 @@ public class RedisTest {
         String status = "";
 
         try {
-           status = redis.setKeyVal(key, value);
+            status = redis.setKeyVal(key, value);
         } catch (TimeLimitExceededException e) {
             fail(e.getMessage());
         }
@@ -74,7 +88,7 @@ public class RedisTest {
         putValue(key, value);
 
         try {
-             valueRetrieved = redis.getKeyVal(key);
+            valueRetrieved = redis.getKeyVal(key);
         } catch (TimeLimitExceededException e) {
             fail(e.getMessage());
         }
@@ -276,7 +290,7 @@ public class RedisTest {
 
         try {
             redis.setArr(key, values);
-            List<String> returnedValues = redis.getArrRange(key, 0, -1);
+            List<String> returnedValues = getArrRange(key, 0, -1);
 
             assertEquals(returnedValues.size(), values.length);
             IntStream.range(0, returnedValues.size()).
@@ -296,12 +310,12 @@ public class RedisTest {
 
         try {
             // Set the initial array.
-            long initialValuesCount = redis.setArr(key, values);
+            long initialValuesCount = setArr(key, values);
 
             // Append to the same array.
             long updatedValuesCount = redis.appendToArr(key, "Epsilon");
 
-            List<String> returnedValues = redis.getArrRange(key, 0, -1);
+            List<String> returnedValues = getArrRange(key, 0, -1);
 
             assertEquals(initialValuesCount + 1, updatedValuesCount);
             assertEquals(returnedValues.size(), values.length + 1);
@@ -320,7 +334,7 @@ public class RedisTest {
         String[] values = new String[]{"Moe", "Manta", "Luji"};
 
         try {
-            redis.setArr(key, values);
+            setArr(key, values);
 
             long length = redis.getArrLength(key);
 
@@ -353,7 +367,7 @@ public class RedisTest {
         String[] values = new String[]{"Moe", "Manta", "Luji"};
 
         try {
-            redis.setArr(key, values);
+            setArr(key, values);
 
             // Should return Luji.
             List<String> lastElement = redis.getArrRange(key, 2, 2);
@@ -372,12 +386,5 @@ public class RedisTest {
         }
 
         deleteKey(key);
-    }
-
-    @AfterClass
-    public static void tearDown() {
-
-        RedisTest.redis.closeConnection();
-        RedisTest.redis.shutdown();
     }
 }
