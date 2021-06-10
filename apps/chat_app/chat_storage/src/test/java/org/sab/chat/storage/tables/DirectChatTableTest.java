@@ -2,6 +2,7 @@ package org.sab.chat.storage.tables;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
+import junit.framework.AssertionFailedError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -92,7 +93,7 @@ public class DirectChatTableTest {
             directChats.createDirectChat(firstMember, secondMember);
             fail("Creating group chat with same members (duplicate)");
         } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(),"Chat already exist between Users" );
+            assertEquals(ignored.getMessage(), "Chat already exist between Users");
         }
 
         directChats.getMapper().delete(chatId);
@@ -127,18 +128,44 @@ public class DirectChatTableTest {
 
         assertEquals(chatNumber, directChatsList.size());
         ArrayList<UUID> listOfRetrievedChatIds = new ArrayList<>();
-        for(int i=0;i<listOfChatIds.size();i++){
+        for (int i = 0; i < listOfChatIds.size(); i++) {
             listOfRetrievedChatIds.add(directChatsList.get(i).getChat_id());
         }
 
         Collections.sort(listOfRetrievedChatIds);
         Collections.sort(listOfChatIds);
 
-        for (int i=0;i<listOfChatIds.size();i++){
-            assertEquals(listOfChatIds.get(i),listOfRetrievedChatIds.get(i));
+        for (int i = 0; i < listOfChatIds.size(); i++) {
+            assertEquals(listOfChatIds.get(i), listOfRetrievedChatIds.get(i));
             directChats.getMapper().delete(listOfChatIds.get(i));
         }
 
+    }
+
+    @Test
+    public void whenDeletingDirectChatAlreadyExisting_thenDeletesSuccessfully() {
+        UUID firstMember = UUID.randomUUID();
+        UUID secondMember = UUID.randomUUID();
+
+        UUID chatId = null;
+        try {
+            chatId = directChats.createDirectChat(firstMember, secondMember).getChat_id();
+        } catch (InvalidInputException e) {
+            fail("Failed to create direct chat: " + e.getMessage());
+        }
+        directChats.getMapper().delete(chatId);
+        List<DirectChat> membersDirectChats = null;
+        try {
+            membersDirectChats = directChats.getDirectChats(firstMember);
+            membersDirectChats.addAll(directChats.getDirectChats(secondMember));
+
+        } catch (InvalidInputException e) {
+            fail("Failed to retrieve user direct chats: " + e.getMessage());
+        }
+        for (DirectChat chat : membersDirectChats) {
+
+            assertEquals(chat.getChat_id().equals(chatId), false);
+        }
     }
 
 
