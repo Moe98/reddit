@@ -11,6 +11,7 @@ import org.sab.chat.storage.models.DirectChat;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -125,9 +126,18 @@ public class DirectChatTableTest {
 
 
         assertEquals(chatNumber, directChatsList.size());
+        ArrayList<UUID> listOfRetrievedChatIds = new ArrayList<>();
+        for(int i=0;i<listOfChatIds.size();i++){
+            listOfRetrievedChatIds.add(directChatsList.get(i).getChat_id());
+        }
 
-        for (UUID chatId : listOfChatIds)
-            directChats.getMapper().delete(chatId);
+        Collections.sort(listOfRetrievedChatIds);
+        Collections.sort(listOfChatIds);
+
+        for (int i=0;i<listOfChatIds.size();i++){
+            assertEquals(listOfChatIds.get(i),listOfRetrievedChatIds.get(i));
+            directChats.getMapper().delete(listOfChatIds.get(i));
+        }
 
     }
 
