@@ -109,8 +109,8 @@ public class DirectMessageTableTest {
         try {
             directMessages.createDirectMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember failed to send a message");
-        } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(),"Not a chat member");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(),"Not a chat member");
         }
         directChats.getMapper().delete(chatId);
     }
@@ -134,8 +134,12 @@ public class DirectMessageTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to create direct message: " + e.getMessage());
         }
-
-        DirectMessage createdMessage = directMessages.getMapper().get(chatId, messageId);
+        DirectMessage createdMessage = null;
+        try{
+            createdMessage = directMessages.getDirectMessages(chatId,firstMember).get(0);
+        }catch (InvalidInputException e) {
+            fail(e.getMessage());
+        }
 
         assertEquals(messageId, createdMessage.getMessage_id());
         assertEquals(firstMember, createdMessage.getSender_id());
@@ -160,19 +164,21 @@ public class DirectMessageTableTest {
             fail("Failed to create direct chat: " + e.getMessage());
         }
         String content = "content";
+        UUID messageId = null;
         try {
-            directMessages.createDirectMessage(chatId, firstMember, content);
+            messageId= directMessages.createDirectMessage(chatId, firstMember, content).getMessage_id();
         } catch (InvalidInputException e) {
             fail("A nonmember failed to send a message");
         }
         try {
             directMessages.getDirectMessages(chatId, UUID.randomUUID());
             fail("A nonmember failed to get a message");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+           assertEquals(e.getMessage(),"Not a chat member");
         }
 
         directChat.getMapper().delete(chatId);
+        directMessages.getMapper().delete(chatId, messageId);
     }
 
 }

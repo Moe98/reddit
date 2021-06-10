@@ -108,8 +108,8 @@ public class GroupMessageTableTest {
         try {
             groupMessages.createGroupMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember was able to send a message.");
-        } catch (InvalidInputException ignored) {
-          assertEquals(ignored.getMessage(),"Not a chat member");
+        } catch (InvalidInputException e) {
+          assertEquals(e.getMessage(),"Not a chat member");
         }
         groupChats.getMapper().delete(chatId);
     }
@@ -174,8 +174,8 @@ public class GroupMessageTableTest {
         try {
             groupMessages.getGroupMessages(chatId, UUID.randomUUID());
             fail("A nonmember was able to get a message.");
-        } catch (InvalidInputException ignored) {
-             assertEquals(ignored.getMessage(),"Not a chat member");
+        } catch (InvalidInputException e) {
+             assertEquals(e.getMessage(),"Not a chat member");
         }
 
         groupChats.getMapper().delete(chatId);

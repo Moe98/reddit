@@ -87,8 +87,8 @@ public class GroupChatTableTest {
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
                 fail("Created group chat with invalid data.");
-            } catch (InvalidInputException ignored) {
-                assertEquals(ignored.getMessage(), i == 0 ? "Description cannot be null." : "Group name cannot be empty or null.");
+            } catch (InvalidInputException e) {
+                assertEquals(e.getMessage(), i == 0 ? "Description cannot be null." : "Group name cannot be empty or null.");
             }
         }
     }
@@ -140,8 +140,8 @@ public class GroupChatTableTest {
         try {
             groupChats.addGroupMember(chatId, adminId, memberId);
             fail("Added an already existing member to the group chat.");
-        } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(), "Member already there");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member already there");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -193,8 +193,8 @@ public class GroupChatTableTest {
         try {
             groupChats.removeGroupMember(chatId, adminId, UUID.randomUUID());
             fail("Failed to remove a non existing member from the group chat");
-        } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(), "Member not in group");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member not in group");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -276,8 +276,8 @@ public class GroupChatTableTest {
         try {
             groupChats.leavesChat(chatId, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
-        } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(), "Member not in group");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member not in group");
         }
         groupChats.getMapper().delete(chatId);
     }

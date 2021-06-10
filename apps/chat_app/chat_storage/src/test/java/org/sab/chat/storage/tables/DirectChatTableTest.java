@@ -91,8 +91,8 @@ public class DirectChatTableTest {
         try {
             directChats.createDirectChat(firstMember, secondMember);
             fail("Creating group chat with same members (duplicate)");
-        } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(), "Chat already exist between Users");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Chat already exist between Users");
         }
 
         directChats.getMapper().delete(chatId);
