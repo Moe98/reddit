@@ -109,7 +109,7 @@ public class GroupMessageTableTest {
             groupMessages.createGroupMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember was able to send a message.");
         } catch (InvalidInputException ignored) {
-
+          assertEquals(ignored.getMessage(),"Not a chat member");
         }
         groupChats.getMapper().delete(chatId);
     }
