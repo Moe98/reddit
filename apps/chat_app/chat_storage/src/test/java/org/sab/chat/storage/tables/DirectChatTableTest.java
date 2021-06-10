@@ -40,7 +40,7 @@ public class DirectChatTableTest {
     }
 
     @Test
-    public void checkChatTableExists() {
+    public void checkDirectChatTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + DirectChatTable.TABLE_NAME + ";");
 

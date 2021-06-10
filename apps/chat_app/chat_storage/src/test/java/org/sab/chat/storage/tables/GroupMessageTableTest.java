@@ -38,7 +38,7 @@ public class GroupMessageTableTest {
     }
 
     @Test
-    public void whenCreatingMessageTable_thenCreatedCorrectly() {
+    public void checkGroupMessageTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + GroupMessageTable.TABLE_NAME + ";");
 
@@ -74,8 +74,12 @@ public class GroupMessageTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to create group message: " + e.getMessage());
         }
-
-        GroupMessage createdMessage = groupMessages.getMapper().get(chatId, messageId);
+        GroupMessage createdMessage = null;
+        try{
+            createdMessage = groupMessages.getGroupMessages(chatId, adminId).get(0);
+        }catch (InvalidInputException e) {
+            fail(e.getMessage());
+        }
 
         assertEquals(messageId, createdMessage.getMessage_id());
         assertEquals(adminId, createdMessage.getSender_id());

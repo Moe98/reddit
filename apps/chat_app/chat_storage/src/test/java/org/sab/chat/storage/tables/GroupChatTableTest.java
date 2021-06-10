@@ -40,7 +40,7 @@ public class GroupChatTableTest {
     }
 
     @Test
-    public void whenCreatingChatTable_thenCreatedCorrectly() {
+    public void checkGroupChatTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + GroupChatTable.TABLE_NAME + ";");
 
@@ -327,5 +327,5 @@ public class GroupChatTableTest {
 
     }
 
-   
+
 }

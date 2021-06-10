@@ -39,7 +39,7 @@ public class DirectMessageTableTest {
     }
 
     @Test
-    public void whenCreatingMessageTable_thenCreatedCorrectly() {
+    public void checkDirectMessageTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + DirectMessageTable.TABLE_NAME + ";");
 
