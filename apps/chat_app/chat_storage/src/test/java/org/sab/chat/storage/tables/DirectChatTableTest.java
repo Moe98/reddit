@@ -2,7 +2,6 @@ package org.sab.chat.storage.tables;
 
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
-import junit.framework.AssertionFailedError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,10 +161,9 @@ public class DirectChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to retrieve user direct chats: " + e.getMessage());
         }
-        for (DirectChat chat : membersDirectChats) {
-
+        for (DirectChat chat : membersDirectChats)
             assertEquals(chat.getChat_id().equals(chatId), false);
-        }
+
     }
 
 

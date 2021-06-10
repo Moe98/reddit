@@ -54,7 +54,7 @@ public class GroupChatTable {
         if (name == null || name.length() == 0)
             throw new InvalidInputException("Group name cannot be empty or null.");
         if (description == null)
-            throw new InvalidInputException("Group name cannot be null.");
+            throw new InvalidInputException("Description cannot be null.");
 
         try {
             UUID.fromString(creator.toString());

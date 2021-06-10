@@ -86,8 +86,8 @@ public class GroupChatTableTest {
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
                 fail("Created group chat with invalid data.");
-            } catch (InvalidInputException ignored) {
-
+            } catch (InvalidInputException ignored){
+                assertEquals(ignored.getMessage(),i==0?"Description cannot be null.":"Group name cannot be empty or null.");
             }
         }
     }
@@ -120,7 +120,7 @@ public class GroupChatTableTest {
     }
 
     @Test
-    public void whenAddingExsitingGroupMember_thenAddingFailed() {
+    public void whenAddingExistingGroupMember_thenAddingFailed() {
         String name = "name";
         String description = "description";
         UUID adminId = UUID.randomUUID();
