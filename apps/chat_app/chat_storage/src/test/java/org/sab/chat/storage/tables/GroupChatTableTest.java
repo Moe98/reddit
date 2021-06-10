@@ -276,7 +276,7 @@ public class GroupChatTableTest {
             groupChats.leavesChat(chatId, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
         } catch (InvalidInputException ignored) {
-           //assertEquals(ignored.getMessage(),);
+           assertEquals(ignored.getMessage(),"Member not in group");
         }
         groupChats.getMapper().delete(chatId);
     }
