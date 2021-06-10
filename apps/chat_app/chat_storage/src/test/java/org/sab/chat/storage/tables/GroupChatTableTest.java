@@ -11,6 +11,7 @@ import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -86,8 +87,8 @@ public class GroupChatTableTest {
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
                 fail("Created group chat with invalid data.");
-            } catch (InvalidInputException ignored){
-                assertEquals(ignored.getMessage(),i==0?"Description cannot be null.":"Group name cannot be empty or null.");
+            } catch (InvalidInputException ignored) {
+                assertEquals(ignored.getMessage(), i == 0 ? "Description cannot be null." : "Group name cannot be empty or null.");
             }
         }
     }
@@ -140,7 +141,7 @@ public class GroupChatTableTest {
             groupChats.addGroupMember(chatId, adminId, memberId);
             fail("Added an already existing member to the group chat.");
         } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(),"Member already there");
+            assertEquals(ignored.getMessage(), "Member already there");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -193,7 +194,7 @@ public class GroupChatTableTest {
             groupChats.removeGroupMember(chatId, adminId, UUID.randomUUID());
             fail("Failed to remove a non existing member from the group chat");
         } catch (InvalidInputException ignored) {
-            assertEquals(ignored.getMessage(),"Member not in group");
+            assertEquals(ignored.getMessage(), "Member not in group");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -216,11 +217,11 @@ public class GroupChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to leave chat");
         }
-        try{
+        try {
             groupChats.getGroupChat(chatId);
 
-        }catch (InvalidInputException e) {
-            assertEquals(e.getMessage(),"This chat does not exist");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "This chat does not exist");
         }
 
     }
@@ -248,15 +249,15 @@ public class GroupChatTableTest {
             fail("Failed to leave chat");
         }
         GroupChat createdGroupChat = null;
-        try{
+        try {
             createdGroupChat = groupChats.getGroupChat(chatId);
-        }catch (InvalidInputException e){
+        } catch (InvalidInputException e) {
             System.out.println(e.getMessage());
             fail(e.getMessage());
         }
         List<UUID> members = createdGroupChat.getMembers();
 
-        assertEquals(members.contains(memberId),false);
+        assertEquals(members.contains(memberId), false);
 
         groupChats.getMapper().delete(chatId);
     }
@@ -276,7 +277,7 @@ public class GroupChatTableTest {
             groupChats.leavesChat(chatId, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
         } catch (InvalidInputException ignored) {
-           assertEquals(ignored.getMessage(),"Member not in group");
+            assertEquals(ignored.getMessage(), "Member not in group");
         }
         groupChats.getMapper().delete(chatId);
     }
@@ -301,20 +302,30 @@ public class GroupChatTableTest {
 
         }
 
-        List<GroupChat> directChatsList = null;
+        List<GroupChat> groupChatsList = null;
         try {
-            directChatsList = groupChats.getGroupChats(adminId);
+            groupChatsList = groupChats.getGroupChats(adminId);
         } catch (InvalidInputException e) {
             fail("Failed to retrieve user direct chats: " + e.getMessage());
         }
 
 
-        assertEquals(chatNumber, directChatsList.size());
+        assertEquals(chatNumber, groupChatsList.size());
 
-        for (UUID chatId : listOfChatIds)
-            groupChats.getMapper().delete(chatId);
+        ArrayList<UUID> listOfRetrievedChatIds = new ArrayList<>();
+        for (int i = 0; i < listOfChatIds.size(); i++) {
+            listOfRetrievedChatIds.add(groupChatsList.get(i).getChat_id());
+        }
+
+        Collections.sort(listOfRetrievedChatIds);
+        Collections.sort(listOfChatIds);
+
+        for (int i = 0; i < listOfChatIds.size(); i++) {
+            assertEquals(listOfChatIds.get(i), listOfRetrievedChatIds.get(i));
+            groupChats.getMapper().delete(listOfChatIds.get(i));
+        }
 
     }
 
-
+   
 }
