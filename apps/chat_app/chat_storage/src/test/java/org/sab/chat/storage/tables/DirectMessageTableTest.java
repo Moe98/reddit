@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectMessage;
+import org.sab.chat.storage.models.GroupMessage;
 
 import java.util.List;
 import java.util.UUID;
@@ -76,7 +77,12 @@ public class DirectMessageTableTest {
             fail("Failed to create direct message: " + e.getMessage());
         }
 
-        DirectMessage createdMessage = directMessages.getMapper().get(chatId, messageId);
+        DirectMessage createdMessage = null;
+        try{
+            createdMessage = directMessages.getDirectMessages(chatId,firstMember).get(0);
+        }catch (InvalidInputException e) {
+            fail(e.getMessage());
+        }
 
         assertEquals(messageId, createdMessage.getMessage_id());
         assertEquals(firstMember, createdMessage.getSender_id());
@@ -104,7 +110,7 @@ public class DirectMessageTableTest {
             directMessages.createDirectMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember failed to send a message");
         } catch (InvalidInputException ignored) {
-
+            assertEquals(ignored.getMessage(),"Not a chat member");
         }
         directChats.getMapper().delete(chatId);
     }
