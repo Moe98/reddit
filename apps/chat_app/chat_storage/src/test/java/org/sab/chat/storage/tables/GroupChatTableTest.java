@@ -247,10 +247,16 @@ public class GroupChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to leave chat");
         }
-        GroupChat createdGroupChat = groupChats.getMapper().get(chatId);
+        GroupChat createdGroupChat = null;
+        try{
+            createdGroupChat = groupChats.getGroupChat(chatId);
+        }catch (InvalidInputException e){
+            System.out.println(e.getMessage());
+            fail(e.getMessage());
+        }
         List<UUID> members = createdGroupChat.getMembers();
-        if (members.contains(memberId))
-            fail("Failed to leave group chat");
+
+        assertEquals(members.contains(memberId),false);
 
         groupChats.getMapper().delete(chatId);
     }
@@ -270,7 +276,7 @@ public class GroupChatTableTest {
             groupChats.leavesChat(chatId, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
         } catch (InvalidInputException ignored) {
-
+           //assertEquals(ignored.getMessage(),);
         }
         groupChats.getMapper().delete(chatId);
     }
