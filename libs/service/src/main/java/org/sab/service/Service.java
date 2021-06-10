@@ -3,6 +3,7 @@ package org.sab.service;
 import org.json.JSONObject;
 import org.sab.functions.TriFunction;
 import org.sab.rabbitmq.RPCServer;
+import org.sab.service.controllerbackdoor.Server;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,6 +67,8 @@ public abstract class Service {
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
+        listenToController();
+
     }
 
     private void freeze() {
@@ -103,7 +106,13 @@ public abstract class Service {
     }
 
     private void listenToController() {
-        throw new UnsupportedOperationException();
+        new Thread(() -> {
+            try {
+                new Server(8080, this).start();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     // Object is a placeholder.
