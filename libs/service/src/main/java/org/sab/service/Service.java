@@ -1,12 +1,13 @@
 package org.sab.service;
 
 import org.json.JSONObject;
-import org.sab.rabbitmq.RPCServer;
 import org.sab.functions.TriFunction;
+import org.sab.rabbitmq.RPCServer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Properties;
 import java.util.concurrent.*;
 
 /**
@@ -17,11 +18,13 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     public static final String DEFAULT_PROPERTIES_FILENAME = "configmap.properties";
-    private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ"; 
+    private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
+    private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount";
+    private static int DEFAULT_THREADS_COUNT = 10;
     private ExecutorService threadPool;
 
     // Singleton Design Pattern
-    public void getThreadPool(int threads) {
+    private void getThreadPool(int threads) {
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(threads);
         }
@@ -29,7 +32,22 @@ public abstract class Service {
 
     public abstract String getAppUriName();
 
-    public abstract int getThreadCount();
+    public int getThreadCount() {
+        final Properties properties = new Properties();
+        final InputStream threadsCountStream = getClass().getClassLoader().getResourceAsStream(THREADS_COUNT_PROPERTY_NAME.toLowerCase() + ".properties");
+
+        if (threadsCountStream == null)
+            return DEFAULT_THREADS_COUNT;
+        else {
+            try {
+                properties.load(threadsCountStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return DEFAULT_THREADS_COUNT;
+            }
+            return Integer.parseInt(properties.getProperty(THREADS_COUNT_PROPERTY_NAME));
+        }
+    }
 
     public abstract String getConfigMapPath();
 
@@ -58,7 +76,7 @@ public abstract class Service {
         RPCServer server = RPCServer.getInstance(queueName);
 
         TriFunction<String, JSONObject, String> invokeCallback = this::invokeCommand;
-                
+
         // call the method in RPC server
         server.listenOnQueue(queueName, invokeCallback);
 
@@ -94,7 +112,7 @@ public abstract class Service {
             // callback responsible for invoking the required method of the command class
             return (String) commandClass.getMethod("execute", req.getClass()).invoke(commandInstance, req);
         } catch (ClassNotFoundException e) {
-            return "{\"statusCode\": 404, \"msg\": \"Function-Name class: ("+ commandName + ") not found\"}";
+            return "{\"statusCode\": 404, \"msg\": \"Function-Name class: (" + commandName + ") not found\"}";
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             return "{\"statusCode\": 504, \"msg\": \"Function-Name class: not operational\"}";
         } catch (InvocationTargetException e) {

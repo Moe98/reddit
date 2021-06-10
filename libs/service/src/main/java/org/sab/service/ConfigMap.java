@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class ConfigMap {
-    // TODO change this to config file.
 
     private static ConfigMap instance = new ConfigMap();
 
