@@ -140,7 +140,7 @@ public class GroupChatTableTest {
             groupChats.addGroupMember(chatId, adminId, memberId);
             fail("Added an already existing member to the group chat.");
         } catch (InvalidInputException ignored) {
-
+            assertEquals(ignored.getMessage(),"Member already there");
         }
 
         groupChats.getMapper().delete(chatId);
