@@ -193,7 +193,7 @@ public class GroupChatTableTest {
             groupChats.removeGroupMember(chatId, adminId, UUID.randomUUID());
             fail("Failed to remove a non existing member from the group chat");
         } catch (InvalidInputException ignored) {
-
+            assertEquals(ignored.getMessage(),"Member not in group");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -216,16 +216,17 @@ public class GroupChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to leave chat");
         }
-        GroupChat createdGroupChat = groupChats.getMapper().get(chatId);
+        try{
+            groupChats.getGroupChat(chatId);
 
-        if (createdGroupChat != null) {
-            fail("Admin failed to leave chat");
+        }catch (InvalidInputException e) {
+            assertEquals(e.getMessage(),"This chat does not exist");
         }
 
     }
 
     @Test
-    public void whenMemberLeavesAGroup_thenLeavesSuccessfuly() {
+    public void whenMemberLeavesAGroup_thenLeavesSuccessfully() {
         String name = "name";
         String description = "description";
         UUID admin = UUID.randomUUID();

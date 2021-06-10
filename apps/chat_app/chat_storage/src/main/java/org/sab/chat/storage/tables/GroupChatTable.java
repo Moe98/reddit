@@ -80,6 +80,9 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
 
         ResultSet groupChats = cassandra.runQuery(query);
+        if(groupChats.all().isEmpty()){
+            throw new InvalidInputException("This chat does not exist");
+        }
         return mapper.map(groupChats).all().get(0);
     }
 
