@@ -39,7 +39,7 @@ public class DirectChatTableTest {
     }
 
     @Test
-    public void whenCreatingChatTable_thenCreatedCorrectly() {
+    public void checkChatTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + DirectChatTable.TABLE_NAME + ";");
 
@@ -89,9 +89,9 @@ public class DirectChatTableTest {
 
         try {
             directChats.createDirectChat(firstMember, secondMember);
-            fail("Created group chat with invalid data");
+            fail("Creating group chat with same members (duplicate)");
         } catch (InvalidInputException ignored) {
-
+            assertEquals(ignored.getMessage(),"Chat already exist between Users" );
         }
 
         directChats.getMapper().delete(chatId);
