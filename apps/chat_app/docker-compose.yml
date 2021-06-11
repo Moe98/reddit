@@ -1,16 +1,27 @@
 version: "3.9"
 services:
+    rabbitmq:
+        image: "rabbitmq"
+        ports:
+            - "5672:5672"
+    cassandra:
+        image: "cassandra"
+        ports:
+            - "9042:9042"
     chat_server:
         build: 
-            - context: ../../
-            - dockerfile: apps/chat_app/chat_server/Dockerfile
+            context: "../../"
+            dockerfile: "apps/chat_app/chat_server/Dockerfile"
         ports:
-            - 5000:5000
-    rabbitmq:
-        image: rabbitmq
+            - "5000:5000"
+        depends_on:
+            - "rabbitmq"
+    chat_storage:
+        build: 
+            context: "../../"
+            dockerfile: "apps/chat_app/chat_storage/Dockerfile"
         ports:
-            - 5672:5672
-    cassandra:
-        image: cassandra
-        ports:
-            - 9042:9042
+            - "15672:15672"
+        depends_on:
+            - "cassandra"
+            - "rabbitmq"
