@@ -57,6 +57,14 @@ public abstract class RPCBase {
                         .build();
     }
 
+    private BasicProperties createSenderProps_withoutReplyTo(String corrId) {
+
+        // adding the corrID of the request
+        return new BasicProperties.Builder()
+                .correlationId(corrId)
+                .build();
+    }
+
     protected void sendRequest(String corrId, String message, String targetQueue, String replyToQueue)
             throws IOException {
         
@@ -65,5 +73,13 @@ public abstract class RPCBase {
         // sending the request message in the request queue with it's properties
         channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
     }
-    
+
+    protected void sendRequest_withoutReplyTo(String corrId, String message, String targetQueue)
+            throws IOException {
+
+        final BasicProperties senderProps = createSenderProps_withoutReplyTo(corrId);
+        final String exchange = "";
+        // sending the request message in the request queue with it's properties
+        channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
+    }
 }
