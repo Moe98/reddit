@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.naming.TimeLimitExceededException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -162,16 +163,75 @@ public class RedisTest {
     @Test
     public void checkArrExists() {
 
+        String key = "key7";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+        setArr(key, values);
+
+        long numExists = -1;
+        try {
+            numExists = redis.existsKey(key);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(1, numExists);
+
+        deleteKeys(key);
     }
 
     @Test
     public void checkMultipleArrExists() {
+        String key1 = "key8";
+        String key2 = "key9";
+        String key3 = "key10";
 
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+        setArr(key1, values);
+        setArr(key2, values);
+        setArr(key3, values);
+
+        long numExists = -1;
+        try {
+            numExists = redis.existsKey(key1, key2, key3);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(3, numExists);
+
+        deleteKeys(key1, key2, key3);
     }
 
     @Test
     public void checkMultipleKeyValueArrExists() {
+        String key1 = "key11";
+        String key2 = "key12";
+        String key3 = "key13";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
 
+        String key4 = "key14";
+        String key5 = "key15";
+        String key6 = "key16";
+        String value = "val";
+
+        setArr(key1, values);
+        setArr(key2, values);
+        setArr(key3, values);
+
+        putValue(key4, value);
+        putValue(key5, value);
+        putValue(key6, value);
+
+        long numExists = -1;
+        try {
+            numExists = redis.existsKey(key1, key2, key3, key4, key5, key6);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(6, numExists);
+
+        deleteKeys(key1, key2, key3, key4, key5, key6);
     }
 
     @Test
@@ -208,16 +268,8 @@ public class RedisTest {
         final String value = "value";
 
         putValue(key1, value + "1");
-        String inRedis = getValue(key1);
-        assertEquals(value + "1", inRedis);
-
         putValue(key2, value + "2");
-        inRedis = getValue(key2);
-        assertEquals(value + "2", inRedis);
-
         putValue(key3, value + "3");
-        inRedis = getValue(key3);
-        assertEquals(value + "3", inRedis);
 
         long numKeysDeleted = -1;
 
@@ -257,16 +309,102 @@ public class RedisTest {
 
     @Test
     public void deleteArr() {
+        String key = "key11";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+        setArr(key, values);
 
+        long numDeleted = -1;
+        try {
+            numDeleted = redis.deleteKey(key);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        List<String> arr = getArrRange(key, 0, -1);
+
+        ArrayList<?> empty = new ArrayList<>();
+        assertEquals(1, numDeleted);
+        assertEquals(empty, arr);
     }
 
     @Test
     public void deleteMultipleArr() {
+        String key1 = "key12";
+        String key2 = "key13";
+        String key3 = "key14";
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        setArr(key1, values);
+        setArr(key2, values);
+        setArr(key3, values);
+
+        long numDeleted = -1;
+        try {
+            numDeleted = redis.deleteKey(key1, key2, key3);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        List<String> arr1 = getArrRange(key1, 0, -1);
+        List<String> arr2 = getArrRange(key2, 0, -1);
+        List<String> arr3 = getArrRange(key3, 0, -1);
+
+        assertEquals(3, numDeleted);
+
+        ArrayList<?> empty = new ArrayList<>();
+        assertEquals(empty, arr1);
+        assertEquals(empty, arr2);
+        assertEquals(empty, arr3);
 
     }
 
     @Test
     public void deleteMultipleKeyValueAndArr() {
+        final String key1 = "key15";
+        final String key2 = "key16";
+        final String key3 = "key17";
+
+        final String key4 = "key18";
+        final String key5 = "key19";
+        final String key6 = "key20";
+
+        final String value = "value";
+
+        String[] values = new String[]{"Moe", "Manta", "Luji"};
+
+        setArr(key1, values);
+        setArr(key2, values);
+        setArr(key3, values);
+
+        putValue(key4, value);
+        putValue(key5, value);
+        putValue(key6, value);
+
+        long numDeleted = -1;
+        try {
+            numDeleted = redis.deleteKey(key1, key2, key3, key4, key5, key6);
+        } catch (TimeLimitExceededException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(6, numDeleted);
+
+        List<String> arr1 = getArrRange(key1, 0, -1);
+        List<String> arr2 = getArrRange(key2, 0, -1);
+        List<String> arr3 = getArrRange(key3, 0, -1);
+
+        ArrayList<?> empty = new ArrayList<>();
+        assertEquals(empty, arr1);
+        assertEquals(empty, arr2);
+        assertEquals(empty, arr3);
+
+        String deletedVal1 = getValue(key4);
+        String deletedVal2 = getValue(key6);
+        String deletedVal3 = getValue(key3);
+
+        assertNull(deletedVal1);
+        assertNull(deletedVal2);
+        assertNull(deletedVal3);
 
     }
 
