@@ -9,6 +9,10 @@ import javax.naming.TimeLimitExceededException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -415,10 +419,48 @@ public class RedisTest {
 
     }
 
-    @Test
+    @Test(timeout = 15000)
     public void keyExpiresAfter1Min() {
-        // get value after 10 seconds --> should exist
-        // get value after 60 seconds --> should not exist
+        String key = "key";
+        String value = "value";
+
+        long seconds = 10;
+
+        final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+
+        Runnable assertExists = () -> {
+            try {
+                String valRetrieved = redis.getKeyVal(key);
+                assertEquals(value, valRetrieved);
+            } catch (TimeLimitExceededException e) {
+                fail(e.getMessage());
+            }
+        };
+
+        Runnable assertDoesNotExist = () -> {
+            try {
+                String valRetrieved = redis.getKeyVal(key);
+                assertNull(value, valRetrieved);
+            } catch (TimeLimitExceededException e) {
+                fail(e.getMessage());
+            }
+        };
+
+        try{
+            redis.setKeyVal(key, value);
+            redis.expireKey(key, seconds);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+            e.printStackTrace();
+        }
+
+        // get value after half of delay --> should exist
+        final ScheduledFuture<?> existsHandle = ses.schedule(assertExists, seconds/2, TimeUnit.SECONDS);
+
+        // get value after delay --> should not exist
+        final ScheduledFuture<?> doesNotExistHandle = ses.schedule(assertDoesNotExist, seconds, TimeUnit.SECONDS);
+
+        while(!(existsHandle.isDone() && doesNotExistHandle.isDone()));
     }
 
     @Test
