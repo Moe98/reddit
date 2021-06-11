@@ -62,7 +62,7 @@ public class RedisTest {
     @Test
     public void putKeyValue() {
 
-        final String key = "key1";
+        final String key = "key";
         final String value = "This is a test value :)";
 
         String status = "";
@@ -83,7 +83,7 @@ public class RedisTest {
 
     @Test
     public void getValueFromKey() {
-        final String key = "key2";
+        final String key = "key";
         final String value = "Were you able to get me?";
         String valueRetrieved = "";
 
@@ -102,7 +102,7 @@ public class RedisTest {
 
     @Test
     public void checkKeyExists() {
-        final String key = "key3";
+        final String key = "key";
         final String value = "testVal";
 
         putValue(key, value);
@@ -122,9 +122,9 @@ public class RedisTest {
 
     @Test
     public void checkMultipleKeyExists() {
-        final String key1 = "key4";
-        final String key2 = "key5";
-        final String key3 = "key6";
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String key3 = "key3";
 
         final String value = "testVal";
 
@@ -164,7 +164,7 @@ public class RedisTest {
     @Test
     public void checkArrExists() {
 
-        String key = "key7";
+        String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
         setArr(key, values);
 
@@ -172,6 +172,7 @@ public class RedisTest {
         try {
             numExists = redis.existsKey(key);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -182,9 +183,9 @@ public class RedisTest {
 
     @Test
     public void checkMultipleArrExists() {
-        String key1 = "key8";
-        String key2 = "key9";
-        String key3 = "key10";
+        String key1 = "key1";
+        String key2 = "key2";
+        String key3 = "key3";
 
         String[] values = new String[]{"Moe", "Manta", "Luji"};
         setArr(key1, values);
@@ -195,6 +196,7 @@ public class RedisTest {
         try {
             numExists = redis.existsKey(key1, key2, key3);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -205,14 +207,14 @@ public class RedisTest {
 
     @Test
     public void checkMultipleKeyValueArrExists() {
-        String key1 = "key11";
-        String key2 = "key12";
-        String key3 = "key13";
+        String key1 = "key1";
+        String key2 = "key2";
+        String key3 = "key3";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
 
-        String key4 = "key14";
-        String key5 = "key15";
-        String key6 = "key16";
+        String key4 = "key4";
+        String key5 = "key5";
+        String key6 = "key6";
         String value = "val";
 
         setArr(key1, values);
@@ -227,6 +229,7 @@ public class RedisTest {
         try {
             numExists = redis.existsKey(key1, key2, key3, key4, key5, key6);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -238,7 +241,7 @@ public class RedisTest {
     @Test
     public void deleteKeyValue() {
 
-        final String key = "key7";
+        final String key = "key";
         final String value = "value";
 
         putValue(key, value);
@@ -262,9 +265,9 @@ public class RedisTest {
 
     @Test
     public void deleteMultipleKeyValue() {
-        final String key1 = "key8";
-        final String key2 = "key9";
-        final String key3 = "key10";
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String key3 = "key3";
 
         final String value = "value";
 
@@ -310,7 +313,7 @@ public class RedisTest {
 
     @Test
     public void deleteArr() {
-        String key = "key11";
+        String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
         setArr(key, values);
 
@@ -318,6 +321,7 @@ public class RedisTest {
         try {
             numDeleted = redis.deleteKey(key);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -330,9 +334,9 @@ public class RedisTest {
 
     @Test
     public void deleteMultipleArr() {
-        String key1 = "key12";
-        String key2 = "key13";
-        String key3 = "key14";
+        String key1 = "key1";
+        String key2 = "key2";
+        String key3 = "key3";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
 
         setArr(key1, values);
@@ -343,6 +347,7 @@ public class RedisTest {
         try {
             numDeleted = redis.deleteKey(key1, key2, key3);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -361,13 +366,13 @@ public class RedisTest {
 
     @Test
     public void deleteMultipleKeyValueAndArr() {
-        final String key1 = "key15";
-        final String key2 = "key16";
-        final String key3 = "key17";
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String key3 = "key3";
 
-        final String key4 = "key18";
-        final String key5 = "key19";
-        final String key6 = "key20";
+        final String key4 = "key4";
+        final String key5 = "key5";
+        final String key6 = "key6";
 
         final String value = "value";
 
@@ -385,6 +390,7 @@ public class RedisTest {
         try {
             numDeleted = redis.deleteKey(key1, key2, key3, key4, key5, key6);
         } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -456,7 +462,7 @@ public class RedisTest {
             IntStream.range(0, returnedValues.size()).
                     forEach(index -> assertEquals(returnedValues.get(index), values[index]));
         } catch (TimeLimitExceededException e) {
-            fail();
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -481,7 +487,7 @@ public class RedisTest {
             assertEquals(returnedValues.size(), values.length + 1);
             assertEquals(returnedValues.get((int) updatedValuesCount - 1), "Epsilon");
         } catch (TimeLimitExceededException e) {
-            fail();
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -500,7 +506,7 @@ public class RedisTest {
 
             assertEquals((int) length, values.length);
         } catch (TimeLimitExceededException e) {
-            fail();
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
@@ -516,7 +522,7 @@ public class RedisTest {
 
             assertEquals((int) length, 0);
         } catch (TimeLimitExceededException e) {
-            fail();
+            fail(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -541,7 +547,7 @@ public class RedisTest {
             assertEquals(partialArray.get(0), "Manta");
             assertEquals(partialArray.get(1), "Luji");
         } catch (TimeLimitExceededException e) {
-            fail();
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
