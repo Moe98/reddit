@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import javax.naming.TimeLimitExceededException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -416,7 +417,30 @@ public class RedisTest {
 
     @Test
     public void setMultipleKeyValues() {
+        String key1 = "key1";
+        String key2 = "key2";
+        String key3 = "key3";
 
+        String value = "value";
+
+        ArrayList<String> keys = new ArrayList<>(Arrays.asList(key1, key2, key3));
+        ArrayList<String> values = new ArrayList<>(Arrays.asList(value, value, value));
+
+        try {
+            redis.setAllKeyVal(keys, values);
+        } catch (TimeLimitExceededException e) {
+            fail(e.getMessage());
+        }
+
+        String value1 = getValue(key1);
+        String value2 = getValue(key2);
+        String value3 = getValue(key3);
+
+        assertEquals(value, value1);
+        assertEquals(value, value2);
+        assertEquals(value, value3);
+
+        deleteKeys(key1, key2, key3);
     }
 
     @Test
