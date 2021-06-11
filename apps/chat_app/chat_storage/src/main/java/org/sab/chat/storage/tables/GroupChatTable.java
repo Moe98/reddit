@@ -11,6 +11,7 @@ import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class GroupChatTable {
         if (name == null || name.length() == 0)
             throw new InvalidInputException("Group name cannot be empty or null.");
         if (description == null)
-            throw new InvalidInputException("Group name cannot be null.");
+            throw new InvalidInputException("Description cannot be null.");
 
         try {
             UUID.fromString(creator.toString());
@@ -80,7 +81,18 @@ public class GroupChatTable {
                 " WHERE chat_id = " + chatId + " ALLOW FILTERING;";
 
         ResultSet groupChats = cassandra.runQuery(query);
-        return mapper.map(groupChats).all().get(0);
+        List<Row> query2Rows = groupChats.all();
+        if (TableUtils.isEmpty(query2Rows)) {
+            throw new InvalidInputException("This chat does not exist");
+        }
+        String name = query2Rows.get(0).get(5, String.class);
+        String description = query2Rows.get(0).get(3, String.class);
+        List<UUID> members = query2Rows.get(0).getList(4, UUID.class);
+        Date dateCreated = query2Rows.get(0).getTimestamp(2);
+        UUID admin = query2Rows.get(0).get(1, UUID.class);
+
+        GroupChat gc = new GroupChat(chatId,name, description, members,admin,dateCreated);
+        return gc;
     }
 
     public List<GroupChat> getGroupChats(UUID userId) throws InvalidInputException {
