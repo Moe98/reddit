@@ -38,8 +38,8 @@ public class RedisTest {
         syncCommand.set(key, value);
     }
 
-    public static void deleteKey(String key) {
-        syncCommand.del(key);
+    public static void deleteKeys(String... keys) {
+        syncCommand.del(keys);
     }
 
     public static long setArr(String arrName, String... values) {
@@ -73,7 +73,7 @@ public class RedisTest {
 
         String valInRedis = getValue(key);
 
-        deleteKey(key);
+        deleteKeys(key);
 
         assertEquals("OK", status);
         assertEquals(value, valInRedis);
@@ -93,7 +93,7 @@ public class RedisTest {
             fail(e.getMessage());
         }
 
-        deleteKey(key);
+        deleteKeys(key);
 
         assertEquals(value, valueRetrieved);
     }
@@ -113,7 +113,7 @@ public class RedisTest {
             fail(e.getMessage());
         }
 
-        deleteKey(key);
+        deleteKeys(key);
 
         assertEquals(1, numKeysExist);
     }
@@ -138,9 +138,7 @@ public class RedisTest {
             fail(e.getMessage());
         }
 
-        deleteKey(key1);
-        deleteKey(key2);
-        deleteKey(key3);
+        deleteKeys(key1, key2, key3);
 
         assertEquals(3, numKeysExist);
     }
@@ -300,7 +298,7 @@ public class RedisTest {
             e.printStackTrace();
         }
 
-        deleteKey(key);
+        deleteKeys(key);
     }
 
     @Test
@@ -325,7 +323,7 @@ public class RedisTest {
             e.printStackTrace();
         }
 
-        deleteKey(key);
+        deleteKeys(key);
     }
 
     @Test
@@ -344,7 +342,7 @@ public class RedisTest {
             e.printStackTrace();
         }
 
-        deleteKey(key);
+        deleteKeys(key);
     }
 
     @Test
@@ -385,6 +383,6 @@ public class RedisTest {
             e.printStackTrace();
         }
 
-        deleteKey(key);
+        deleteKeys(key);
     }
 }
