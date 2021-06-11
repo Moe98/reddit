@@ -125,7 +125,7 @@ public abstract class CommentCommand extends CommandWithVerification {
                 String user = word.substring(1);
                 JSONObject request = new JSONObject();
 //                request.put("userId", user);
-//                request.put("contentId", "POST");
+//                request.put("contentId", contentId);
                 try (RPCClient rpcClient = RPCClient.getInstance()) {
                     rpcClient.call_withoutResponse(request.toString(), Notification_Queue_Name);
                 }
