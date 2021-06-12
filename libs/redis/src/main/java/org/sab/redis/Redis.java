@@ -1,8 +1,11 @@
 package org.sab.redis;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.naming.TimeLimitExceededException;
 
@@ -27,13 +30,13 @@ public class Redis {
     private GenericObjectPool<StatefulRedisClusterConnection<String, String>> connectionPool;
 
     // TODO get from config file
-    private final String HOST_URI = "127.0.0.1";
+    private final String HOST_URI = System.getenv("REDIS_HOST_URI");
     private final ArrayList<Integer> ports = new ArrayList<>(Arrays.asList(7000, 7001, 7002, 7003, 7004, 7005));
     // Very top secret password.
     private final String PASSWORD = System.getenv("REDIS_PASSWORD");
-    private final int OPERATION_TIMEOUT_MINUTES = 1;
-    private final int DATABASE_NUMBER = 0;
-    private final int NUMBER_OF_CONNECTIONS = 10;
+    private final int OPERATION_TIMEOUT_MINUTES;
+    private final int DATABASE_NUMBER;
+    private final int NUMBER_OF_CONNECTIONS;
 
     final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
 
@@ -46,6 +49,18 @@ public class Redis {
                 [? [timeout=timeout[d|h|m|s|ms|us|ns]]
                 [&_database=database_]]
         */
+
+        final Properties properties = new Properties();
+
+        try {
+            properties.load(new FileInputStream("src/main/resources/config.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        OPERATION_TIMEOUT_MINUTES = (int) properties.get("OPERATION_TIMEOUT_MINUTES");
+        DATABASE_NUMBER = (int) properties.get("DATABASE_NUMBER");
+        NUMBER_OF_CONNECTIONS = (int) properties.get("NUMBER_OF_CONNECTIONS");
 
         ArrayList<RedisURI> redisURIs = new ArrayList<>();
         for (int port : this.ports) {
