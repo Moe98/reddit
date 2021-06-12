@@ -1,11 +1,12 @@
 package org.sab.redis;
 
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.naming.TimeLimitExceededException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +23,9 @@ import static org.junit.Assert.*;
  */
 public class RedisTest {
 
-    public static Redis redis;
-    public static RedisCommands<String, String> syncCommand;
+    private static Redis redis;
+    private static RedisAdvancedClusterCommands<String, String> syncCommand;
+    private static StatefulRedisClusterConnection<String, String> connection;
 
     /**
      * Rigorous Test :-)
@@ -32,8 +34,12 @@ public class RedisTest {
     @BeforeClass
     public static void setUp() {
         RedisTest.redis = new Redis();
-        RedisTest.redis.setCommand();
-        RedisTest.syncCommand = redis.getConnection().sync();
+        try {
+            connection = redis.getConnection();
+            RedisTest.syncCommand = redis.getSyncCommand(connection);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterClass
@@ -89,7 +95,7 @@ public class RedisTest {
 
         try {
             status = redis.setKeyVal(key, value);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -111,12 +117,11 @@ public class RedisTest {
 
         try {
             valueRetrieved = redis.getKeyVal(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
         deleteKeys(key);
-
         assertEquals(value, valueRetrieved);
     }
 
@@ -131,7 +136,7 @@ public class RedisTest {
 
         try {
             numKeysExist = redis.existsKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -156,7 +161,7 @@ public class RedisTest {
 
         try {
             numKeysExist = redis.existsKey(key1, key2, key3);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -174,7 +179,7 @@ public class RedisTest {
 
         try {
             numKeysExist = redis.existsKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -191,7 +196,7 @@ public class RedisTest {
         long numExists = -1;
         try {
             numExists = redis.existsKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -215,7 +220,7 @@ public class RedisTest {
         long numExists = -1;
         try {
             numExists = redis.existsKey(key1, key2, key3);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -248,7 +253,7 @@ public class RedisTest {
         long numExists = -1;
         try {
             numExists = redis.existsKey(key1, key2, key3, key4, key5, key6);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -272,7 +277,7 @@ public class RedisTest {
 
         try {
             numKeysDeleted = redis.deleteKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -299,7 +304,7 @@ public class RedisTest {
 
         try {
             numKeysDeleted = redis.deleteKey(key1, key2, key3);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -324,7 +329,7 @@ public class RedisTest {
 
         try {
             numKeysDeleted = redis.deleteKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -340,7 +345,7 @@ public class RedisTest {
         long numDeleted = -1;
         try {
             numDeleted = redis.deleteKey(key);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -366,7 +371,7 @@ public class RedisTest {
         long numDeleted = -1;
         try {
             numDeleted = redis.deleteKey(key1, key2, key3);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -409,7 +414,7 @@ public class RedisTest {
         long numDeleted = -1;
         try {
             numDeleted = redis.deleteKey(key1, key2, key3, key4, key5, key6);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -448,7 +453,7 @@ public class RedisTest {
             try {
                 String valRetrieved = redis.getKeyVal(key);
                 assertEquals(value, valRetrieved);
-            } catch (TimeLimitExceededException e) {
+            } catch (Exception e) {
                 fail(e.getMessage());
             }
         };
@@ -457,7 +462,7 @@ public class RedisTest {
             try {
                 String valRetrieved = redis.getKeyVal(key);
                 assertNull(value, valRetrieved);
-            } catch (TimeLimitExceededException e) {
+            } catch (Exception e) {
                 fail(e.getMessage());
             }
         };
@@ -465,7 +470,7 @@ public class RedisTest {
         try{
             redis.setKeyVal(key, value);
             redis.expireKey(key, seconds);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -492,7 +497,7 @@ public class RedisTest {
 
         try {
             redis.setAllKeyVal(keys, values);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
         }
 
@@ -519,7 +524,7 @@ public class RedisTest {
             assertEquals(returnedValues.size(), values.length);
             IntStream.range(0, returnedValues.size()).
                     forEach(index -> assertEquals(returnedValues.get(index), values[index]));
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -544,7 +549,7 @@ public class RedisTest {
             assertEquals(initialValuesCount + 1, updatedValuesCount);
             assertEquals(returnedValues.size(), values.length + 1);
             assertEquals(returnedValues.get((int) updatedValuesCount - 1), "Epsilon");
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -563,7 +568,7 @@ public class RedisTest {
             long length = redis.getArrLength(key);
 
             assertEquals((int) length, values.length);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -579,7 +584,7 @@ public class RedisTest {
             long length = redis.getArrLength(key);
 
             assertEquals((int) length, 0);
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
@@ -604,7 +609,7 @@ public class RedisTest {
             assertEquals(lastElement.get(0), "Luji");
             assertEquals(partialArray.get(0), "Manta");
             assertEquals(partialArray.get(1), "Luji");
-        } catch (TimeLimitExceededException e) {
+        } catch (Exception e) {
             fail(e.getMessage());
             e.printStackTrace();
         }
