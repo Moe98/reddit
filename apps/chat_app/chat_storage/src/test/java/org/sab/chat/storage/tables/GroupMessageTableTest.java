@@ -38,7 +38,7 @@ public class GroupMessageTableTest {
     }
 
     @Test
-    public void whenCreatingMessageTable_thenCreatedCorrectly() {
+    public void checkGroupMessageTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + GroupMessageTable.TABLE_NAME + ";");
 
@@ -74,8 +74,12 @@ public class GroupMessageTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to create group message: " + e.getMessage());
         }
-
-        GroupMessage createdMessage = groupMessages.getMapper().get(chatId, messageId);
+        GroupMessage createdMessage = null;
+        try{
+            createdMessage = groupMessages.getGroupMessages(chatId, adminId).get(0);
+        }catch (InvalidInputException e) {
+            fail(e.getMessage());
+        }
 
         assertEquals(messageId, createdMessage.getMessage_id());
         assertEquals(adminId, createdMessage.getSender_id());
@@ -104,14 +108,14 @@ public class GroupMessageTableTest {
         try {
             groupMessages.createGroupMessage(chatId, UUID.randomUUID(), content);
             fail("A nonmember was able to send a message.");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+          assertEquals(e.getMessage(),"Not a chat member");
         }
         groupChats.getMapper().delete(chatId);
     }
 
     @Test
-    public void whenGetDirectMessage_thenReturnedCorrectly() {
+    public void whenGetGroupMessage_thenReturnedCorrectly() {
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
         UUID adminId = UUID.randomUUID();
@@ -130,8 +134,12 @@ public class GroupMessageTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to create group message: " + e.getMessage());
         }
-
-        GroupMessage createdMessage = groupMessages.getMapper().get(chatId, messageId);
+        GroupMessage createdMessage = null;
+        try{
+            createdMessage = groupMessages.getGroupMessages(chatId, adminId).get(0);
+        }catch (InvalidInputException e) {
+            fail(e.getMessage());
+        }
 
         assertEquals(messageId, createdMessage.getMessage_id());
         assertEquals(adminId, createdMessage.getSender_id());
@@ -143,7 +151,7 @@ public class GroupMessageTableTest {
     }
 
     @Test
-    public void whenGetDirectMessageWithANonMember_thenFailedCorrectly() {
+    public void whenGetGroupMessageWithANonMember_thenFailedCorrectly() {
 
         GroupChatTable groupChats = new GroupChatTable(cassandra);
         groupChats.createTable();
@@ -157,18 +165,20 @@ public class GroupMessageTableTest {
             fail("Failed to create group chat: " + e.getMessage());
         }
         String content = "content";
+        UUID messageId =null;
         try {
-            groupMessages.createGroupMessage(chatId, adminId, content);
+            messageId =groupMessages.createGroupMessage(chatId, adminId, content).getMessage_id();
         } catch (InvalidInputException e) {
             fail("A member failed to send a message.");
         }
         try {
             groupMessages.getGroupMessages(chatId, UUID.randomUUID());
             fail("A nonmember was able to get a message.");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+             assertEquals(e.getMessage(),"Not a chat member");
         }
 
         groupChats.getMapper().delete(chatId);
+        groupMessages.getMapper().delete(chatId, messageId);
     }
 }
