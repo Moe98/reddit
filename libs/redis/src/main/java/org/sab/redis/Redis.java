@@ -1,5 +1,18 @@
 package org.sab.redis;
 
+import io.lettuce.core.RedisFuture;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
+import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
+import io.lettuce.core.support.ConnectionPoolSupport;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
+import javax.naming.TimeLimitExceededException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,28 +20,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import javax.naming.TimeLimitExceededException;
-
-import io.lettuce.core.cluster.ClusterClientOptions;
-import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
-import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
-import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import io.lettuce.core.RedisFuture;
-import io.lettuce.core.RedisURI;
-import io.lettuce.core.cluster.RedisClusterClient;
-import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.support.ConnectionPoolSupport;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import static io.lettuce.core.LettuceFutures.awaitAll;
 import static io.lettuce.core.cluster.ClusterTopologyRefreshOptions.DEFAULT_REFRESH_PERIOD_DURATION;
 
 public class Redis {
 
+    final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
     private final RedisClusterClient redisClient;
-    private GenericObjectPool<StatefulRedisClusterConnection<String, String>> connectionPool;
-
     // TODO get from config file
     private final String HOST_URI = System.getenv("REDIS_HOST_URI");
     private final ArrayList<Integer> ports = new ArrayList<>(Arrays.asList(7000, 7001, 7002, 7003, 7004, 7005));
@@ -37,8 +36,7 @@ public class Redis {
     private final int OPERATION_TIMEOUT_MINUTES;
     private final int DATABASE_NUMBER;
     private final int NUMBER_OF_CONNECTIONS;
-
-    final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
+    private GenericObjectPool<StatefulRedisClusterConnection<String, String>> connectionPool;
 
     // TODO singleton?
     //  check if we can pool the connection

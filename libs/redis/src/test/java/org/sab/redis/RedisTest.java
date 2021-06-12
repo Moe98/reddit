@@ -49,17 +49,6 @@ public class RedisTest {
         RedisTest.redis.shutdown();
     }
 
-    @After
-    public void deleteAllKeys() {
-        System.out.println("After");
-        final String key = "key";
-        final String key1 = "key1";
-        final String key2 = "key2";
-        final String key3 = "key3";
-
-        deleteKeys(key, key1, key2, key3);
-    }
-
     /*
      * auxiliary methods
      */
@@ -84,6 +73,16 @@ public class RedisTest {
         return syncCommand.lrange(arrName, start, stop);
     }
 
+    @After
+    public void deleteAllKeys() {
+        System.out.println("After");
+        final String key = "key";
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String key3 = "key3";
+
+        deleteKeys(key, key1, key2, key3);
+    }
 
     @Test(timeout = 10000)
     public void putKeyValue() {
@@ -469,7 +468,7 @@ public class RedisTest {
             }
         };
 
-        try{
+        try {
             redis.setKeyVal(key, value);
             redis.expireKey(key, seconds);
         } catch (Exception e) {
@@ -478,12 +477,12 @@ public class RedisTest {
         }
 
         // get value after half of delay --> should exist
-        final ScheduledFuture<?> existsHandle = ses.schedule(assertExists, seconds/2, TimeUnit.SECONDS);
+        final ScheduledFuture<?> existsHandle = ses.schedule(assertExists, seconds / 2, TimeUnit.SECONDS);
 
         // get value after delay --> should not exist
         final ScheduledFuture<?> doesNotExistHandle = ses.schedule(assertDoesNotExist, seconds, TimeUnit.SECONDS);
 
-        while(!(existsHandle.isDone() && doesNotExistHandle.isDone()));
+        while (!(existsHandle.isDone() && doesNotExistHandle.isDone())) ;
     }
 
     @Test(timeout = 10000)
@@ -552,7 +551,7 @@ public class RedisTest {
             assertEquals(returnedValues.size(), values.length + 1);
             assertEquals(returnedValues.get((int) updatedValuesCount - 1), "Epsilon");
         } catch (Exception e) {
-            fail(e.getMessage()); 
+            fail(e.getMessage());
             e.printStackTrace();
         }
 
