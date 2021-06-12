@@ -79,7 +79,7 @@ jobs:
       #   with:
       #     redis-version: '6.x' 
       # - run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-      - name: Test redis cluster
+      - name: Create redis cluster
         uses: vishnudxb/redis-cluster@1.0.5
         with:
           master1-port: 7000
@@ -90,12 +90,15 @@ jobs:
           slave3-port: 7005
       - name: Set auth in redis cluster
         run: |
+          sudo apt-get install -y redis-tools
+          docker ps -a
           redis-cli -p 7000 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7001 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7002 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7003 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7004 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7005 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -h 127.0.0.1 -p 5000 cluster nodes
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
