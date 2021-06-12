@@ -9,14 +9,14 @@ const TextInput = importJsx('./text-input')
 const { useState } = React
 
 const CreateGroupChat = ({ onBack }) => {
-	const { userId } = useContext(AppContext)
+	const { authToken } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [chatName, setChatName] = useState('')
 
 	const onCreate = (chatName) => {
 		chatContext.sendToChat({
 			type: 'CREATE_GROUP_CHAT',
-			creator: userId,
+			authToken,
 			name: chatName,
 			description: ''
 		})
