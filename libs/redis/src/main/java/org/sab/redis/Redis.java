@@ -28,8 +28,7 @@ public class Redis {
     final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
     private final RedisClusterClient redisClient;
     // TODO get from config file
-//     private final String HOST_URI = System.getenv("REDIS_HOST_URI");
-    private final String HOST_URI = "127.0.0.1";
+    private final String HOST_URI = System.getenv("REDIS_HOST_URI");
     private final ArrayList<Integer> ports = new ArrayList<>(Arrays.asList(7000, 7001, 7002, 7003, 7004, 7005));
     // Very top secret password.
     private final String PASSWORD = System.getenv("REDIS_PASSWORD");
@@ -59,9 +58,6 @@ public class Redis {
         OPERATION_TIMEOUT_MINUTES = Integer.parseInt(properties.getProperty("OPERATION_TIMEOUT_MINUTES"));
         DATABASE_NUMBER = Integer.parseInt(properties.getProperty("DATABASE_NUMBER"));
         NUMBER_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
-//         OPERATION_TIMEOUT_MINUTES = 1;
-//         DATABASE_NUMBER = 0;
-//         NUMBER_OF_CONNECTIONS = 10;
 
         ArrayList<RedisURI> redisURIs = new ArrayList<>();
         for (int port : this.ports) {
