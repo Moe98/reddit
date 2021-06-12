@@ -82,23 +82,23 @@ jobs:
       - name: Create redis cluster
         uses: vishnudxb/redis-cluster@1.0.5
         with:
-          master1-port: 7000
-          master2-port: 7001
-          master3-port: 7002
-          slave1-port: 7003
-          slave2-port: 7004
-          slave3-port: 7005
+          master1-port: ${{ secrets.REDIS_PORTS.0 }}
+          master2-port: ${{ secrets.REDIS_PORTS.1 }}
+          master3-port: ${{ secrets.REDIS_PORTS.2 }}
+          slave1-port: ${{ secrets.REDIS_PORTS.3 }}
+          slave2-port: ${{ secrets.REDIS_PORTS.4 }}
+          slave3-port: ${{ secrets.REDIS_PORTS.5 }}
       - name: Set auth in redis cluster
         run: |
           sudo apt-get install -y redis-tools
           docker ps -a
-          redis-cli -p 7000 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -p 7001 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -p 7002 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -p 7003 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -p 7004 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -p 7005 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -h ${{ secrets.REDIS_HOST_URI }} -p 7000 cluster nodes
+          redis-cli -p ${{ secrets.REDIS_PORTS.0 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p ${{ secrets.REDIS_PORTS.1 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p ${{ secrets.REDIS_PORTS.2 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p ${{ secrets.REDIS_PORTS.3 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p ${{ secrets.REDIS_PORTS.4 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p ${{ secrets.REDIS_PORTS.5 }} CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -h ${{ secrets.REDIS_HOST_URI }} -p ${{ secrets.REDIS_PORTS.0 }} cluster nodes
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
@@ -119,6 +119,7 @@ jobs:
           # redis
           REDIS_HOST_URI: ${{ secrets.REDIS_HOST_URI }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORTS: ${{ secrets.REDIS_PORTS }}
           # ENV_TYPE
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
           # JWT
