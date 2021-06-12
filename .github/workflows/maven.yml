@@ -98,7 +98,7 @@ jobs:
           redis-cli -p 7003 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7004 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
           redis-cli -p 7005 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
-          redis-cli -h 127.0.0.1 -p 7000 cluster nodes
+          redis-cli -h ${{ secrets.REDIS_HOST_URI }} -p 7000 cluster nodes
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
