@@ -1,15 +1,14 @@
 package org.sab.subthread.commands;
 
 import org.json.JSONObject;
-import org.sab.models.CollectionNames;
-import org.sab.models.CommentAttributes;
-import org.sab.models.SubThreadAttributes;
-import org.sab.models.ThreadAttributes;
+import org.sab.models.*;
 import org.sab.models.user.UserAttributes;
 import org.sab.rabbitmq.RPCClient;
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 
@@ -115,24 +114,44 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
 
 
+
+    protected static final String NOTIFICATION_TITLE = NotificationAttributes.TITLE.getHTTP();
+    protected static final String NOTIFICATION_USERS_LIST = NotificationAttributes.USERS_LIST.getHTTP();
+    protected static final String NOTIFICATION_BODY = NotificationAttributes.NOTIFICATION_BODY.getHTTP();
+
     // TODO get queueName from somewhere instead of hardcoding it
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
 
-    public static void tag(String content, String contentId){
+    public static void tag(String title, String contentId, String content){
         String[] words = content.split(" ");
+        ArrayList<String> usersList = new ArrayList<String>();
         for(String word:words){
             if(word.startsWith("@")){
-                String user = word.substring(1);
-                JSONObject request = new JSONObject();
-//                request.put("userId", user);
-//                request.put("contentId", contentId);
-                try (RPCClient rpcClient = RPCClient.getInstance()) {
-                    rpcClient.call_withoutResponse(request.toString(), Notification_Queue_Name);
-                }
-                catch (IOException | TimeoutException | InterruptedException | NullPointerException e) {
-                    e.printStackTrace();
-                }
+                usersList.add(word.substring(1));
             }
+        }
+        putMessageInNotificationQueue(title, (String[]) usersList.toArray(), contentId);
+    }
+
+    public static void putMessageInNotificationQueue(String title, String[] usersList, String notificationBody){
+        JSONObject body = new JSONObject();
+        body.put(NotificationAttributes.TITLE.getHTTP(), title);
+        body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
+        body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), notificationBody);
+
+        JSONObject uriParams = new JSONObject();
+
+        JSONObject request = new JSONObject();
+        request.put(RequestAttributes.BODY.getHTTP(), body);
+        request.put(RequestAttributes.METHOD_TYPE.getHTTP(), HTTPMethod.PUT);
+        request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
+
+
+        try (RPCClient rpcClient = RPCClient.getInstance()) {
+            rpcClient.call_withoutResponse(request.toString(), Notification_Queue_Name);
+        }
+        catch (IOException | TimeoutException | InterruptedException | NullPointerException e) {
+            e.printStackTrace();
         }
     }
 }

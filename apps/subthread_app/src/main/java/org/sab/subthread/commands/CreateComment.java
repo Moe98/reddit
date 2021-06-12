@@ -6,6 +6,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -111,6 +112,9 @@ public class CreateComment extends CommentCommand {
             // Add the edge documents.
             arango.createEdgeDocument(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
             arango.createEdgeDocument(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
+
+            //TODO: tag a person if tagged
+            tag( NotificationMessages.COMMENT_TAG_MSG.getMSG() ,commentId, content );
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

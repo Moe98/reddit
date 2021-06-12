@@ -81,5 +81,6 @@ public abstract class RPCBase {
         final String exchange = "";
         // sending the request message in the request queue with it's properties
         channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
+        System.out.println("done");
     }
 }
