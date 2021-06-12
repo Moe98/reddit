@@ -41,18 +41,18 @@ jobs:
         image: fclairamb/minio-github-actions
         ports:
           - 9000:9000
-      redis:
-        # Docker Hub image
-        image: redis
-        # Set health checks to wait until redis has started
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps port 6379 on service container to the host
-          - 6379:6379
+      # redis:
+      #   # Docker Hub image
+      #   image: redis
+      #   # Set health checks to wait until redis has started
+      #   options: >-
+      #     --health-cmd "redis-cli ping"
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
+      #   ports:
+      #     # Maps port 6379 on service container to the host
+      #     - 6379:6379
 
     steps:
       - uses: actions/checkout@v2
@@ -75,10 +75,27 @@ jobs:
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
           couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
-      - uses: shogo82148/actions-setup-redis@v1
+      # - uses: shogo82148/actions-setup-redis@v1
+      #   with:
+      #     redis-version: '6.x' 
+      # - run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+      - name: Test redis cluster
+        uses: vishnudxb/redis-cluster@1.0.5
         with:
-          redis-version: '6.x' 
-      - run: redis-cli CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          master1-port: 7000
+          master2-port: 7001
+          master3-port: 7002
+          slave1-port: 7003
+          slave2-port: 7004
+          slave3-port: 7005
+      - name: Set auth in redis cluster
+        run: |
+          redis-cli -p 7000 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p 7001 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p 7002 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p 7003 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p 7004 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
+          redis-cli -p 7005 CONFIG SET requirepass ${{ secrets.REDIS_PASSWORD }}
       - name: Build with Maven
         env:
           # The hostname used to communicate with the PostgreSQL service container
