@@ -119,6 +119,7 @@ jobs:
           # redis
           REDIS_HOST_URI: ${{ secrets.REDIS_HOST_URI }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORTS: ${{ secrets.REDIS_PORTS }}
           # ENV_TYPE
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
           # JWT
