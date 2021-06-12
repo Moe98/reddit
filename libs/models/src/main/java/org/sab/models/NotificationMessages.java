@@ -1,7 +1,6 @@
 package org.sab.models;
 
 public enum NotificationMessages {
-    // TODO: have a separate enum for the notification messages
     COMMENT_TAG_MSG("You have been tagged in a comment"),
     COMMENT_LIKE_MSG("Someone liked your comment"),
     COMMENT_DISLIKE_MSG( "Someone Disliked your comment"),

@@ -13,7 +13,7 @@ public class Comm {
     // TODO get queueName from somewhere instead of hardcoding it
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
 
-    public static void tag(String title, String contentId, String content){
+    public static void tag(String queueName, String title, String contentId, String content){
         String[] words = content.split(" ");
         ArrayList<String> usersList = new ArrayList<String>();
         for(String word:words){
@@ -21,10 +21,10 @@ public class Comm {
                 usersList.add(word.substring(1));
             }
         }
-        putMessageInNotificationQueue(title, (String[]) usersList.toArray(), contentId);
+        putMessageInQueue(queueName, title, (String[]) usersList.toArray(), contentId);
     }
 
-    public static void putMessageInNotificationQueue(String title, String[] usersList, String notificationBody){
+    public static void putMessageInQueue(String queueName, String title, String[] usersList, String notificationBody){
         JSONObject body = new JSONObject();
         body.put(NotificationAttributes.TITLE.getHTTP(), title);
         body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
@@ -39,17 +39,11 @@ public class Comm {
 
 
         try (RPCClient rpcClient = RPCClient.getInstance()) {
-            rpcClient.call_withoutResponse(request.toString(), Notification_Queue_Name);
+            rpcClient.call_withoutResponse(request.toString(), queueName);
             System.out.println("finished");
         }
         catch (IOException | TimeoutException | InterruptedException | NullPointerException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        String[] arr = new String[0];
-        putMessageInNotificationQueue("hohoh",arr, "comment\423132");
-        System.out.println("dodododd");
     }
 }

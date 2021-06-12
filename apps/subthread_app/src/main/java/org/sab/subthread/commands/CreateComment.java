@@ -114,7 +114,7 @@ public class CreateComment extends CommentCommand {
             arango.createEdgeDocument(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
 
             //TODO: tag a person if tagged
-            tag( NotificationMessages.COMMENT_TAG_MSG.getMSG() ,commentId, content );
+            org.sab.innerAppComm.Comm.tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content);
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
