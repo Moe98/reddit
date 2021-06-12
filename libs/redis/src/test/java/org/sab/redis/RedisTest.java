@@ -85,7 +85,7 @@ public class RedisTest {
     }
 
 
-    @Test
+    @Test(timeout = 10000)
     public void putKeyValue() {
 
         final String key = "key";
@@ -107,7 +107,8 @@ public class RedisTest {
         assertEquals(value, valInRedis);
     }
 
-    @Test
+
+    @Test(timeout = 10000)
     public void getValueFromKey() {
         final String key = "key";
         final String value = "Were you able to get me?";
@@ -125,7 +126,8 @@ public class RedisTest {
         assertEquals(value, valueRetrieved);
     }
 
-    @Test
+
+    @Test(timeout = 10000)
     public void checkKeyExists() {
         final String key = "key";
         final String value = "testVal";
@@ -145,7 +147,7 @@ public class RedisTest {
         assertEquals(1, numKeysExist);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void checkMultipleKeyExists() {
         final String key1 = "key1";
         final String key2 = "key2";
@@ -170,7 +172,7 @@ public class RedisTest {
         assertEquals(3, numKeysExist);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void checkKeyDoesNotExist() {
 
         final String key = "notAKey";
@@ -186,7 +188,7 @@ public class RedisTest {
         assertEquals(0, numKeysExist);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void checkArrExists() {
 
         String key = "key";
@@ -206,7 +208,7 @@ public class RedisTest {
         deleteKeys(key);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void checkMultipleArrExists() {
         String key1 = "key1";
         String key2 = "key2";
@@ -230,7 +232,7 @@ public class RedisTest {
         deleteKeys(key1, key2, key3);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void checkMultipleKeyValueArrExists() {
         String key1 = "key1";
         String key2 = "key2";
@@ -263,7 +265,7 @@ public class RedisTest {
         deleteKeys(key1, key2, key3, key4, key5, key6);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteKeyValue() {
 
         final String key = "key";
@@ -288,7 +290,7 @@ public class RedisTest {
 
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteMultipleKeyValue() {
         final String key1 = "key1";
         final String key2 = "key2";
@@ -320,7 +322,7 @@ public class RedisTest {
 
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteKeyDoesNotExist() {
 
         final String key = "notAKey";
@@ -336,7 +338,7 @@ public class RedisTest {
         assertEquals(0, numKeysDeleted);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteArr() {
         String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
@@ -357,7 +359,7 @@ public class RedisTest {
         assertEquals(empty, arr);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteMultipleArr() {
         String key1 = "key1";
         String key2 = "key2";
@@ -389,7 +391,7 @@ public class RedisTest {
 
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void deleteMultipleKeyValueAndArr() {
         final String key1 = "key1";
         final String key2 = "key2";
@@ -484,7 +486,7 @@ public class RedisTest {
         while(!(existsHandle.isDone() && doesNotExistHandle.isDone()));
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void setMultipleKeyValues() {
         String key1 = "key1";
         String key2 = "key2";
@@ -512,7 +514,7 @@ public class RedisTest {
         deleteKeys(key1, key2, key3);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void setArrWithValues() {
         String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
@@ -532,7 +534,7 @@ public class RedisTest {
         deleteKeys(key);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void appendToArr() {
         String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
@@ -550,14 +552,14 @@ public class RedisTest {
             assertEquals(returnedValues.size(), values.length + 1);
             assertEquals(returnedValues.get((int) updatedValuesCount - 1), "Epsilon");
         } catch (Exception e) {
-            fail(e.getMessage());
+            fail(e.getMessage()); 
             e.printStackTrace();
         }
 
         deleteKeys(key);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void getArrLength() {
         String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
@@ -576,7 +578,7 @@ public class RedisTest {
         deleteKeys(key);
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void getLengthForArrDoesNotExist() {
         String key = "key";
 
@@ -590,7 +592,7 @@ public class RedisTest {
         }
     }
 
-    @Test
+    @Test(timeout = 10000)
     public void getArrRange() {
         String key = "key";
         String[] values = new String[]{"Moe", "Manta", "Luji"};
