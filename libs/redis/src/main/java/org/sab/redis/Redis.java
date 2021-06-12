@@ -30,7 +30,7 @@ public class Redis {
     private final String HOST_URI = "127.0.0.1";
     private final ArrayList<Integer> ports = new ArrayList<>(Arrays.asList(7000, 7001, 7002, 7003, 7004, 7005));
     // Very top secret password.
-    private final String PASSWORD = "mypass";
+    private final String PASSWORD = System.getenv("REDIS_PASSWORD");
     private final int OPERATION_TIMEOUT_MINUTES = 1;
     private final int DATABASE_NUMBER = 0;
     private final int NUMBER_OF_CONNECTIONS = 10;
