@@ -117,7 +117,7 @@ jobs:
           ARANGO_PASSWORD: ${{ secrets.ARANGO_PASSWORD }}
           ARANGO_DB: 'Reddit'
           # redis
-          REDIS_HOST: ${{ secrets.REDIS_HOST_URI }}
+          REDIS_HOST_URI: ${{ secrets.REDIS_HOST_URI }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           # ENV_TYPE
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
