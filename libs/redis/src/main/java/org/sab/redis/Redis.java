@@ -55,9 +55,12 @@ public class Redis {
             e.printStackTrace();
         }
 
-        OPERATION_TIMEOUT_MINUTES = Integer.parseInt(properties.getProperty("OPERATION_TIMEOUT_MINUTES"));
-        DATABASE_NUMBER = Integer.parseInt(properties.getProperty("DATABASE_NUMBER"));
-        NUMBER_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
+//         OPERATION_TIMEOUT_MINUTES = Integer.parseInt(properties.getProperty("OPERATION_TIMEOUT_MINUTES"));
+//         DATABASE_NUMBER = Integer.parseInt(properties.getProperty("DATABASE_NUMBER"));
+//         NUMBER_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
+        OPERATION_TIMEOUT_MINUTES = 1;
+        DATABASE_NUMBER = 0;
+        NUMBER_OF_CONNECTIONS = 10;
 
         ArrayList<RedisURI> redisURIs = new ArrayList<>();
         for (int port : this.ports) {
