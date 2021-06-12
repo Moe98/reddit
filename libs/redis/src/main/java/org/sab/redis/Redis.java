@@ -220,20 +220,4 @@ public class Redis {
         redisClient.shutdown();
     }
 
-    public static void main(String[] args) {
-
-        Redis redis = new Redis();
-        redis.setCommand();
-        try {
-            redis.setKeyVal("test", "val1");
-            String s = redis.getKeyVal("lala");
-            redis.deleteKey("test", "lala");
-
-        } catch (TimeLimitExceededException e) {
-            System.out.println("ERROR!!!");
-            e.printStackTrace();
-        }
-
-    }
-    
 }
