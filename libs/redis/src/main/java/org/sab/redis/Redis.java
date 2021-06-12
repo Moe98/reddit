@@ -29,7 +29,14 @@ public class Redis {
     private final RedisClusterClient redisClient;
     // TODO get from config file
     private final String HOST_URI = System.getenv("REDIS_HOST_URI");
-    private final ArrayList<Integer> ports = new ArrayList<>(Arrays.asList(7000, 7001, 7002, 7003, 7004, 7005));
+    private final ArrayList<String> ports = new ArrayList(
+            Arrays.asList(
+                    System.getenv("REDIS_PORTS")
+                            .replaceAll("\\s","")
+                            .replace("[", "")
+                            .replace("]", "")
+                            .split(",")
+            ));
     // Very top secret password.
     private final String PASSWORD = System.getenv("REDIS_PASSWORD");
     private final int OPERATION_TIMEOUT_MINUTES;
@@ -60,8 +67,8 @@ public class Redis {
         NUMBER_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
 
         ArrayList<RedisURI> redisURIs = new ArrayList<>();
-        for (int port : this.ports) {
-            RedisURI uri = RedisURI.Builder.redis(HOST_URI, port)
+        for (String port : this.ports) {
+            RedisURI uri = RedisURI.Builder.redis(HOST_URI, Integer.parseInt(port))
                     .withPassword(PASSWORD)
                     .withDatabase(DATABASE_NUMBER)
                     .build();
