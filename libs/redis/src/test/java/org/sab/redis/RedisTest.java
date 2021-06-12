@@ -1,6 +1,6 @@
 package org.sab.redis;
 
-import io.lettuce.core.api.sync.RedisCommands;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,8 +36,30 @@ public class RedisTest {
         RedisTest.syncCommand = redis.getConnection().sync();
     }
 
+    @AfterClass
+    public static void tearDown() {
+        connection.close();
+        RedisTest.redis.closeConnection();
+        RedisTest.redis.shutdown();
+    }
+
+    @After
+    public void deleteAllKeys() {
+        System.out.println("After");
+        final String key = "key";
+        final String key1 = "key1";
+        final String key2 = "key2";
+        final String key3 = "key3";
+
+        deleteKeys(key, key1, key2, key3);
+    }
+
+    /*
+     * auxiliary methods
+     */
     public static String getValue(String key) {
         return syncCommand.get(key);
+
     }
 
     public static void putValue(String key, String value) {
@@ -56,12 +78,6 @@ public class RedisTest {
         return syncCommand.lrange(arrName, start, stop);
     }
 
-    @AfterClass
-    public static void tearDown() {
-
-        RedisTest.redis.closeConnection();
-        RedisTest.redis.shutdown();
-    }
 
     @Test
     public void putKeyValue() {
