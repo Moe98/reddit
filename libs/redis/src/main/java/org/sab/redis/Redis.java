@@ -13,7 +13,6 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
 import javax.naming.TimeLimitExceededException;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,14 +50,14 @@ public class Redis {
         final Properties properties = new Properties();
 
         try {
-            properties.load(new FileInputStream("libs/redis/src/main/resources/config.properties"));
+            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        OPERATION_TIMEOUT_MINUTES = (int) properties.get("OPERATION_TIMEOUT_MINUTES");
-        DATABASE_NUMBER = (int) properties.get("DATABASE_NUMBER");
-        NUMBER_OF_CONNECTIONS = (int) properties.get("NUMBER_OF_CONNECTIONS");
+        OPERATION_TIMEOUT_MINUTES = Integer.parseInt(properties.getProperty("OPERATION_TIMEOUT_MINUTES"));
+        DATABASE_NUMBER = Integer.parseInt(properties.getProperty("DATABASE_NUMBER"));
+        NUMBER_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
 
         ArrayList<RedisURI> redisURIs = new ArrayList<>();
         for (int port : this.ports) {
