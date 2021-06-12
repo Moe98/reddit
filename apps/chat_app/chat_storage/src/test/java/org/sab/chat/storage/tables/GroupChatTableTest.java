@@ -11,6 +11,7 @@ import org.sab.chat.storage.models.DirectChat;
 import org.sab.chat.storage.models.GroupChat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class GroupChatTableTest {
     }
 
     @Test
-    public void whenCreatingChatTable_thenCreatedCorrectly() {
+    public void checkGroupChatTableExists() {
         ResultSet result = cassandra.runQuery(
                 "SELECT * FROM " + GroupChatTable.TABLE_NAME + ";");
 
@@ -86,8 +87,8 @@ public class GroupChatTableTest {
             try {
                 groupChats.createGroupChat(admin, groupNames[i], groupDescs[i]);
                 fail("Created group chat with invalid data.");
-            } catch (InvalidInputException ignored) {
-
+            } catch (InvalidInputException e) {
+                assertEquals(e.getMessage(), i == 0 ? "Description cannot be null." : "Group name cannot be empty or null.");
             }
         }
     }
@@ -120,7 +121,7 @@ public class GroupChatTableTest {
     }
 
     @Test
-    public void whenAddingExsitingGroupMember_thenAddingFailed() {
+    public void whenAddingExistingGroupMember_thenAddingFailed() {
         String name = "name";
         String description = "description";
         UUID adminId = UUID.randomUUID();
@@ -139,8 +140,8 @@ public class GroupChatTableTest {
         try {
             groupChats.addGroupMember(chatId, adminId, memberId);
             fail("Added an already existing member to the group chat.");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member already there");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -192,8 +193,8 @@ public class GroupChatTableTest {
         try {
             groupChats.removeGroupMember(chatId, adminId, UUID.randomUUID());
             fail("Failed to remove a non existing member from the group chat");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member not in group");
         }
 
         groupChats.getMapper().delete(chatId);
@@ -216,16 +217,17 @@ public class GroupChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to leave chat");
         }
-        GroupChat createdGroupChat = groupChats.getMapper().get(chatId);
+        try {
+            groupChats.getGroupChat(chatId);
 
-        if (createdGroupChat != null) {
-            fail("Admin failed to leave chat");
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "This chat does not exist");
         }
 
     }
 
     @Test
-    public void whenMemberLeavesAGroup_thenLeavesSuccessfuly() {
+    public void whenMemberLeavesAGroup_thenLeavesSuccessfully() {
         String name = "name";
         String description = "description";
         UUID admin = UUID.randomUUID();
@@ -246,10 +248,16 @@ public class GroupChatTableTest {
         } catch (InvalidInputException e) {
             fail("Failed to leave chat");
         }
-        GroupChat createdGroupChat = groupChats.getMapper().get(chatId);
+        GroupChat createdGroupChat = null;
+        try {
+            createdGroupChat = groupChats.getGroupChat(chatId);
+        } catch (InvalidInputException e) {
+            System.out.println(e.getMessage());
+            fail(e.getMessage());
+        }
         List<UUID> members = createdGroupChat.getMembers();
-        if (members.contains(memberId))
-            fail("Failed to leave group chat");
+
+        assertEquals(members.contains(memberId), false);
 
         groupChats.getMapper().delete(chatId);
     }
@@ -268,8 +276,8 @@ public class GroupChatTableTest {
         try {
             groupChats.leavesChat(chatId, UUID.randomUUID());
             fail("Non existing member failed to leave chat");
-        } catch (InvalidInputException ignored) {
-
+        } catch (InvalidInputException e) {
+            assertEquals(e.getMessage(), "Member not in group");
         }
         groupChats.getMapper().delete(chatId);
     }
@@ -294,18 +302,28 @@ public class GroupChatTableTest {
 
         }
 
-        List<GroupChat> directChatsList = null;
+        List<GroupChat> groupChatsList = null;
         try {
-            directChatsList = groupChats.getGroupChats(adminId);
+            groupChatsList = groupChats.getGroupChats(adminId);
         } catch (InvalidInputException e) {
             fail("Failed to retrieve user direct chats: " + e.getMessage());
         }
 
 
-        assertEquals(chatNumber, directChatsList.size());
+        assertEquals(chatNumber, groupChatsList.size());
 
-        for (UUID chatId : listOfChatIds)
-            groupChats.getMapper().delete(chatId);
+        ArrayList<UUID> listOfRetrievedChatIds = new ArrayList<>();
+        for (int i = 0; i < listOfChatIds.size(); i++) {
+            listOfRetrievedChatIds.add(groupChatsList.get(i).getChat_id());
+        }
+
+        Collections.sort(listOfRetrievedChatIds);
+        Collections.sort(listOfChatIds);
+
+        for (int i = 0; i < listOfChatIds.size(); i++) {
+            assertEquals(listOfChatIds.get(i), listOfRetrievedChatIds.get(i));
+            groupChats.getMapper().delete(listOfChatIds.get(i));
+        }
 
     }
 
