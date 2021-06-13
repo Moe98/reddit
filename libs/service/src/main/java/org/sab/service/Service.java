@@ -1,6 +1,7 @@
 package org.sab.service;
 
 import org.json.JSONObject;
+import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
 import org.sab.rabbitmq.RPCServer;
 import org.sab.service.controllerbackdoor.Server;
@@ -108,7 +109,7 @@ public abstract class Service {
     private void listenToController() {
         new Thread(() -> {
             try {
-                new Server(8080, this).start();
+                new Server(getControllerPort(), this).start();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
