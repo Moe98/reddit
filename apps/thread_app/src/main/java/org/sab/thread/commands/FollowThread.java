@@ -12,6 +12,8 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
+import static org.sab.innerAppComm.Comm.updateRecommendation;
+
 public class FollowThread extends ThreadCommand {
     @Override
     protected boolean isAuthNeeded() {
@@ -69,6 +71,11 @@ public class FollowThread extends ThreadCommand {
             threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
 
             arango.updateDocument(DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
+
+            // send message to the notification app to update the recommendation list
+            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME);
+            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

@@ -4,6 +4,7 @@ public enum RequestAttributes {
     BODY("body", null),
     METHOD_TYPE("methodType",null),
     AUTHENTICATION_PARAMS("authenticationParams",null),
+    FUNCTION_NAME("functionName", null),
     URI_PARAMS("uriParams", null);
 
     private final String http;

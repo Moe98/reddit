@@ -69,6 +69,12 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
     protected static final String COMMENT_COLLECTION_NAME = CollectionNames.COMMENT.get();
 
+    // TODO: remove hardcoded strings about the recomendation app
+    protected static final String RECOMENDATION_REQUEST_QUEUE = "RECOMMENDATION_REQ";
+    protected static final String UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_THREADS";
+    protected static final String UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_SUBTHREADS";
+
+
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;
         final String to = THREAD_COLLECTION_NAME + "/" + threadName;

@@ -78,7 +78,7 @@ public abstract class CommentCommand extends CommandWithVerification {
 
     protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getArangoDb();
     protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
-    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
+    protected static final String USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
     protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     // Thread attributes
@@ -114,44 +114,10 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
 
 
-
-    protected static final String NOTIFICATION_TITLE = NotificationAttributes.TITLE.getHTTP();
-    protected static final String NOTIFICATION_USERS_LIST = NotificationAttributes.USERS_LIST.getHTTP();
-    protected static final String NOTIFICATION_BODY = NotificationAttributes.NOTIFICATION_BODY.getHTTP();
-
     // TODO get queueName from somewhere instead of hardcoding it
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
-
-    public static void tag(String title, String contentId, String content){
-        String[] words = content.split(" ");
-        ArrayList<String> usersList = new ArrayList<String>();
-        for(String word:words){
-            if(word.startsWith("@")){
-                usersList.add(word.substring(1));
-            }
-        }
-        putMessageInNotificationQueue(title, (String[]) usersList.toArray(), contentId);
-    }
-
-    public static void putMessageInNotificationQueue(String title, String[] usersList, String notificationBody){
-        JSONObject body = new JSONObject();
-        body.put(NotificationAttributes.TITLE.getHTTP(), title);
-        body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
-        body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), notificationBody);
-
-        JSONObject uriParams = new JSONObject();
-
-        JSONObject request = new JSONObject();
-        request.put(RequestAttributes.BODY.getHTTP(), body);
-        request.put(RequestAttributes.METHOD_TYPE.getHTTP(), HTTPMethod.PUT);
-        request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 
 
-        try (RPCClient rpcClient = RPCClient.getInstance()) {
-            rpcClient.call_withoutResponse(request.toString(), Notification_Queue_Name);
-        }
-        catch (IOException | TimeoutException | InterruptedException | NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
 }

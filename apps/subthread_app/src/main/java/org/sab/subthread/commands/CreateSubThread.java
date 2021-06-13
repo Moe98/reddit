@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.tag;
 
 public class CreateSubThread extends SubThreadCommand {
     final long INITIAL_LIKES = 0;
@@ -105,6 +108,10 @@ public class CreateSubThread extends SubThreadCommand {
             subThread.setDateCreated(date);
             subThread.setLikes(likes);
             subThread.setDislikes(dislikes);
+
+            // tag a person if someone was tagged in the content of the comment
+            tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subThreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

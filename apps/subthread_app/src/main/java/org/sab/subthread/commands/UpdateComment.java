@@ -3,6 +3,7 @@ package org.sab.subthread.commands;
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateComment extends CommentCommand {
 
@@ -73,6 +76,10 @@ public class UpdateComment extends CommentCommand {
             comment.setLikes(likes);
             comment.setDislikes(dislikes);
             comment.setDateCreated(dateCreated);
+
+            // tag a person if someone was tagged in the content of the comment
+            tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

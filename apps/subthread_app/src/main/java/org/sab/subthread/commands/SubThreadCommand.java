@@ -134,4 +134,10 @@ public abstract class SubThreadCommand extends CommandWithVerification {
 
     // image attributes
     protected static final String BUCKETNAME = "subthread-picture-scaleabull";
+
+
+    // TODO get queueName from somewhere instead of hardcoding it
+    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 }

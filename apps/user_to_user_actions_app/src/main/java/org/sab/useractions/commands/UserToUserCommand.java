@@ -34,6 +34,11 @@ public abstract class UserToUserCommand extends CommandWithVerification {
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requesting does not exist.";
 
+    // TODO: remove hardcoded strings about the recomendation app
+    protected static final String RECOMENDATION_REQUEST_QUEUE = "RECOMMENDATION_REQ";
+    protected static final String UPDATE_RECOMMENDED_USERS_FUNCTION_NAME = "UPDATE_RECOMMENDED_USERS";
+
+
     protected final BaseEdgeDocument addEdgeFromUserToUser(String actionMakerId, String userId) {
         final String from = USER_COLLECTION_NAME + "/" + actionMakerId;
         final String to = USER_COLLECTION_NAME + "/" + userId;

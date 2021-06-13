@@ -12,8 +12,10 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+import static org.sab.innerAppComm.Comm.tag;
 
 import java.util.List;
+
 
 public class CreateComment extends CommentCommand {
 
@@ -113,8 +115,9 @@ public class CreateComment extends CommentCommand {
             arango.createEdgeDocument(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
             arango.createEdgeDocument(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
 
-            //TODO: tag a person if tagged
-            org.sab.innerAppComm.Comm.tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content);
+            // tag a person if someone was tagged in the content of the comment
+            tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
