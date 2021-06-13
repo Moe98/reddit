@@ -1,15 +1,13 @@
 package org.sab.models;
 
-public enum RequestAttributes {
-    BODY("body", null),
-    METHOD_TYPE("methodType",null),
+public enum AuthenticationAttributes {
     AUTHENTICATION_PARAMS("authenticationParams",null),
-    URI_PARAMS("uriParams", null);
-
+    IS_AUTHENTICATED("isAuthenticated", null);
+;
     private final String http;
     private final String db;
 
-    RequestAttributes(String http, String db) {
+    AuthenticationAttributes(String http, String db) {
         this.http = http;
         this.db = db;
     }

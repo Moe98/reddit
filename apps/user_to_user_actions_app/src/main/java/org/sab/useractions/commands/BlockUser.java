@@ -73,6 +73,9 @@ public class BlockUser extends UserToUserCommand {
                 final BaseEdgeDocument userBlockUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
             }
+
+            //TODO: if a user was following a user then he blocked set user he should be removed form the follow collection
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
