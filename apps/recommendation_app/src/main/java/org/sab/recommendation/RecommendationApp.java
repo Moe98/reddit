@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
+import org.sab.models.CollectionNames;
 import org.sab.models.SubThread;
 import org.sab.models.Thread;
 import org.sab.recommendation.commands.UpdatePopularSubThreads;
@@ -51,6 +52,7 @@ public class RecommendationApp extends Service {
     final public static String USERNAMES_DATA_KEY = "listOfUsernames";
     final public static String AUTHENTICATION_PARAMS = "authenticationParams";
     final public static String AUTHENTICATED = "isAuthenticated";
+    final public static String USER_BLOCK_USER_COLLECTION_NAME = CollectionNames.USER_BLOCK_USER.get();
 
     @Override
     public String getAppUriName() {
