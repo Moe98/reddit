@@ -164,4 +164,17 @@ public abstract class Service {
         }
     }
 
+
+    public int getControllerPort() {
+        final InputStream stream = Controller.class.getClassLoader().getResourceAsStream("apps-ports.properties");
+        final Properties properties = new Properties();
+        try {
+            properties.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String propertyName = getAppUriName().toLowerCase();
+        return Integer.parseInt(properties.getProperty(propertyName));
+
+    }
 }
