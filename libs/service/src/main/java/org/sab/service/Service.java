@@ -63,13 +63,12 @@ public abstract class Service {
         }
 
         getThreadPool(getThreadCount());
-
+        listenToController();
         try {
             listenOnQueue();
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
-        listenToController();
 
     }
 
