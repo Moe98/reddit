@@ -12,28 +12,28 @@ import java.net.InetSocketAddress;
 
 
 public class ControllerClient {
-    private final String host;
+    private final String ip;
     private final int port;
-    private final String cmd;
+    private final String message;
 
-    public ControllerClient(String host, int port, String cmd) {
-        this.host = host;
+    public ControllerClient(String ip, int port, String message) {
+        this.ip = ip;
         this.port = port;
-        this.cmd = cmd;
+        this.message = message;
     }
 
 
     public void start() throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            Bootstrap b = new Bootstrap(); // Bootstrap Client
+            Bootstrap b = new Bootstrap();
             b.group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(new InetSocketAddress(host, port))
+                    .remoteAddress(new InetSocketAddress(ip, port))
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(new ControllerClientHandler(cmd));
+                            ch.pipeline().addLast(new ControllerClientHandler(message));
                         }
                     });
 
