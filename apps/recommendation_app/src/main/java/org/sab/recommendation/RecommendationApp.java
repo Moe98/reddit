@@ -91,6 +91,7 @@ public class RecommendationApp extends Service {
             arango.createCollectionIfNotExists(DB_NAME, THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_NAME, USER_FOLLOW_USER_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_NAME, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_NAME, USER_BLOCK_USER_COLLECTION_NAME, true);
             arango.createViewIfNotExists(DB_NAME, getViewName(THREADS_COLLECTION_NAME), THREADS_COLLECTION_NAME, new String[]{THREAD_NAME, THREAD_DESCRIPTION});
             arango.createViewIfNotExists(DB_NAME, getViewName(SUB_THREADS_COLLECTION_NAME), SUB_THREADS_COLLECTION_NAME, new String[]{SUB_THREAD_TITLE, SUB_THREAD_CONTENT});
         } catch (ArangoDBException | CouchbaseException e) {
