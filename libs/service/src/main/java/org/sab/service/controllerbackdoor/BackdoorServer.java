@@ -11,11 +11,11 @@ import org.sab.service.Service;
 
 import java.net.InetSocketAddress;
 
-public class Server {
+public class BackdoorServer {
     private final int port;
     private Service service;
 
-    public Server(int port, Service service) {
+    public BackdoorServer(int port, Service service) {
         this.port = port;
         this.service = service;
     }
@@ -30,13 +30,13 @@ public class Server {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // Specifies channel handler to call when connection is accepted
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new ServerHandler(service)); // Adds channel handler to pipeline
+                            ch.pipeline().addLast(new BackdoorServerHandler(service)); // Adds channel handler to pipeline
                         }
                     });
 
             ChannelFuture f = b.bind().sync(); // Bind server to address, and block (sync method) until it does so
 
-            System.out.println(Server.class.getName() + " started and listen on " + f.channel().localAddress());
+            System.out.println(BackdoorServer.class.getSimpleName() + " started and listen on " + f.channel().localAddress());
             f.channel().closeFuture().sync(); // Returns a future channel that will be notified when shutdown
 
         } finally {

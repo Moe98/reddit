@@ -5,7 +5,7 @@ import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
 import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
-import org.sab.service.controllerbackdoor.Server;
+import org.sab.service.controllerbackdoor.BackdoorServer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,7 +110,7 @@ public abstract class Service {
     private void listenToController() {
         new Thread(() -> {
             try {
-                new Server(getControllerPort(), this).start();
+                new BackdoorServer(getControllerPort(), this).start();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -179,7 +179,7 @@ public abstract class Service {
     }
 
     public void handleControllerMessage(JSONObject message) {
-        //TODO
-        System.out.printf("%s has received a message from the controller!\n%s", getAppUriName(), message.toString());
+        // TODO
+        System.out.printf("%s has received a message from the controller!\n%s\n", getAppUriName(), message.toString());
     }
 }

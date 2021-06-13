@@ -10,11 +10,11 @@ import org.json.JSONObject;
 import org.sab.service.Service;
 
 
-@ChannelHandler.Sharable  
-public class ServerHandler extends ChannelInboundHandlerAdapter {
+@ChannelHandler.Sharable
+public class BackdoorServerHandler extends ChannelInboundHandlerAdapter {
     private Service service;
 
-    public ServerHandler(Service service) {
+    public BackdoorServerHandler(Service service) {
         this.service = service;
     }
 
