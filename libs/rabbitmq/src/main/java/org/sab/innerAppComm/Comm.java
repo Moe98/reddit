@@ -48,6 +48,7 @@ public class Comm {
         authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
 
         JSONObject request = new JSONObject();
+        request.put("functionName", "UPDATE_RECOMMENDED_USERS");
         request.put(RequestAttributes.BODY.getHTTP(), body);
         request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.POST);
         request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
