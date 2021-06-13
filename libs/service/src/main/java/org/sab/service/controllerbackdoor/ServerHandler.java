@@ -6,10 +6,11 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.json.JSONObject;
 import org.sab.service.Service;
 
 
-@ChannelHandler.Sharable  // Ensures that the code is shareable between channels
+@ChannelHandler.Sharable  
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     private Service service;
 
@@ -28,16 +29,14 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) { // Reads input stream and fire the ChannelHandlerContext on Channel
+    public void channelRead(ChannelHandlerContext ctx, Object msg) { //
         String controllerCmd = toString(msg);
-        System.out.printf("%s received %s from Controller\n", service.getAppUriName(), controllerCmd);
+        service.handleControllerMessage(new JSONObject(controllerCmd));
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        // Empty the buffer and flush the buffer then close the channel
         ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-
     }
 
     @Override

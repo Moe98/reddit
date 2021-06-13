@@ -3,6 +3,7 @@ package org.sab.service;
 import org.json.JSONObject;
 import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
+import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
 import org.sab.service.controllerbackdoor.Server;
 
@@ -116,9 +117,8 @@ public abstract class Service {
         }).start();
     }
 
-    // Object is a placeholder.
-    private void receiveFile(Object file) {
-        throw new UnsupportedOperationException();
+    private InputStream receiveFile(JSONObject message) {
+        return IoUtils.decodeFile(message.getString("encodedFile"));
     }
 
     private void reloadClass(String className) {
@@ -176,5 +176,10 @@ public abstract class Service {
         String propertyName = getAppUriName().toLowerCase();
         return Integer.parseInt(properties.getProperty(propertyName));
 
+    }
+
+    public void handleControllerMessage(JSONObject message) {
+        //TODO
+        System.out.printf("%s has received a message from the controller!\n%s", getAppUriName(), message.toString());
     }
 }
