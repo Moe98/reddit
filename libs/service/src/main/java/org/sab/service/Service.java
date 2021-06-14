@@ -72,7 +72,9 @@ public abstract class Service {
     }
 
     private void freeze() {
-        throw new UnsupportedOperationException();
+        stopAcceptingNewRequests();
+        releaseThreadPool();
+        releaseDbPool();
     }
 
     private void resume() {
