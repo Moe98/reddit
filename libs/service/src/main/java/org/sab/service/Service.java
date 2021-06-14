@@ -101,7 +101,11 @@ public abstract class Service {
     }
 
     private void stopAcceptingNewRequests() {
-        throw new UnsupportedOperationException();
+        try {
+            messagingServer.pauseListening();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void startAcceptingNewRequests() {
