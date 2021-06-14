@@ -95,13 +95,7 @@ public class Controller {
         for (String ip : ips)
             sendMessage(ip, port, message);
     }
-
-    private void pushFile(List<String> targetIps, int targetPort, String fileName) throws Exception {
-        sendMessage(targetIps, targetPort, new JSONObject().put(ENCODED_FILE, fileNameToString(fileName)).toString());
-
-    }
-
-
+    
     private String fileNameToString(String fileName) throws IOException {
         return IoUtils.encodeFile(new FileInputStream(fileName));
     }
