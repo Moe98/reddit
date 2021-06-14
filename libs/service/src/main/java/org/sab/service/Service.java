@@ -91,6 +91,10 @@ public abstract class Service {
         throw new UnsupportedOperationException();
     }
 
+    private void stopAcceptingNewRequests() {
+        throw new UnsupportedOperationException();
+    }
+
     public void listenOnQueue() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
