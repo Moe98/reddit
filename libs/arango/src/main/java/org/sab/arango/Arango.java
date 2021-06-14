@@ -14,9 +14,12 @@ import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @SuppressWarnings("unused")
 public class Arango {
@@ -25,11 +28,21 @@ public class Arango {
     private ArangoDB arangoDB;
 
     private Arango() {
+
+        final Properties properties = new Properties();
+        int NUM_OF_CONNECTIONS = 10;
+        try {
+            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
+            NUM_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         builder = new ArangoDB.Builder()
-//                .user("root")
-//                .password("root")
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
+                .maxConnections(NUM_OF_CONNECTIONS)
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
