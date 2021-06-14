@@ -59,16 +59,7 @@ public abstract class Service {
 
     public void start() {
         loadCommandMap();
-        initThreadPool();
-        beginAcceptingNewRequests();
-    }
-
-    private void beginAcceptingNewRequests() {
-        try {
-            listenOnQueue();
-        } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
-        }
+        resume();
     }
 
     private void freeze() {
@@ -78,7 +69,8 @@ public abstract class Service {
     }
 
     private void resume() {
-        throw new UnsupportedOperationException();
+        initThreadPool();
+        beginAcceptingNewRequests();
     }
 
     private void reloadThreadPool() {
@@ -96,6 +88,14 @@ public abstract class Service {
 
     private void reloadDbPool() {
         throw new UnsupportedOperationException();
+    }
+
+    private void beginAcceptingNewRequests() {
+        try {
+            listenOnQueue();
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
     }
 
     private void stopAcceptingNewRequests() {
