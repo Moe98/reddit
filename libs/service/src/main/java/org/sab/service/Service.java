@@ -51,13 +51,17 @@ public abstract class Service {
 
     public abstract String getConfigMapPath();
 
-    public void start() {
+    private void loadCommandMap() {
         final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
         try {
             ConfigMap.getInstance().instantiate(configMapStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void start() {
+        loadCommandMap();
 
         getThreadPool(getThreadCount());
 
