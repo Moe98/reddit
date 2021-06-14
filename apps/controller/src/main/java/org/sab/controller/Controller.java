@@ -3,7 +3,10 @@ package org.sab.controller;
 import org.json.JSONObject;
 import org.sab.io.IoUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -95,15 +98,16 @@ public class Controller {
         for (String ip : ips)
             sendMessage(ip, port, message);
     }
-    
-    private String fileNameToString(String fileName) throws IOException {
-        return IoUtils.encodeFile(new FileInputStream(fileName));
+
+    private String fileNameToEncodedString(String fileName) throws IOException {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream(fileName);
+        return IoUtils.encodeFile(stream);
     }
 
 
     private void addOrUpdateClass(JSONObject request) throws Exception {
         String fileName = request.getString("fileName");
-        request.put(ENCODED_FILE, fileNameToString(fileName));
+        request.put(ENCODED_FILE, fileNameToEncodedString(fileName));
         sendMessage(request);
     }
 
