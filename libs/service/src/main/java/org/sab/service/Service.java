@@ -1,8 +1,11 @@
 package org.sab.service;
 
 import org.json.JSONObject;
+import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
+import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
+import org.sab.service.controllerbackdoor.BackdoorServer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,12 +63,13 @@ public abstract class Service {
         }
 
         getThreadPool(getThreadCount());
-
+        listenToController();
         try {
             listenOnQueue();
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
+
     }
 
     private void freeze() {
@@ -103,12 +107,17 @@ public abstract class Service {
     }
 
     private void listenToController() {
-        throw new UnsupportedOperationException();
+        new Thread(() -> {
+            try {
+                new BackdoorServer(getControllerPort(), this).start();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    // Object is a placeholder.
-    private void receiveFile(Object file) {
-        throw new UnsupportedOperationException();
+    private InputStream receiveFile(JSONObject message) {
+        return IoUtils.decodeFile(message.getString("encodedFile"));
     }
 
     private void reloadClass(String className) {
@@ -154,4 +163,22 @@ public abstract class Service {
         }
     }
 
+
+    public int getControllerPort() {
+        final InputStream stream = Controller.class.getClassLoader().getResourceAsStream("apps-ports.properties");
+        final Properties properties = new Properties();
+        try {
+            properties.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String propertyName = getAppUriName().toLowerCase();
+        return Integer.parseInt(properties.getProperty(propertyName));
+
+    }
+
+    public void handleControllerMessage(JSONObject message) {
+        // TODO
+        System.out.printf("%s has received a message from the controller!\n%s\n", getAppUriName(), message.toString());
+    }
 }
