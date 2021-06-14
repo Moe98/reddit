@@ -8,14 +8,8 @@ import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.manager.bucket.BucketType;
 import com.couchbase.client.java.manager.bucket.EvictionPolicyType;
-import com.couchbase.client.java.manager.query.CreatePrimaryQueryIndexOptions;
-import com.couchbase.client.java.manager.query.DropPrimaryQueryIndexOptions;
-import com.couchbase.client.java.query.QueryResult;
-import com.couchbase.client.java.query.QueryScanConsistency;
 
 import java.time.Duration;
-
-import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
 @SuppressWarnings("unused")
 public class Couchbase {
@@ -34,7 +28,9 @@ public class Couchbase {
     private void connect() {
         if (cluster != null)
             disconnect();
-        cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"), System.getenv("COUCHBASE_USERNAME"), System.getenv("COUCHBASE_PASSWORD"));
+        cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"),
+                System.getenv("COUCHBASE_USERNAME"),
+                System.getenv("COUCHBASE_PASSWORD"));
         cluster.waitUntilReady(Duration.ofSeconds(3));
     }
 
@@ -57,11 +53,13 @@ public class Couchbase {
     }
 
     public void createBucket(String bucketName, int ramQuotaMB) {
-        cluster.buckets().createBucket(BucketSettings.create(bucketName).ramQuotaMB(ramQuotaMB).bucketType(BucketType.EPHEMERAL).evictionPolicy(EvictionPolicyType.NOT_RECENTLY_USED));
+        cluster.buckets().createBucket(BucketSettings.create(bucketName)
+                .ramQuotaMB(ramQuotaMB)
+                .bucketType(BucketType.EPHEMERAL)
+                .evictionPolicy(EvictionPolicyType.NOT_RECENTLY_USED));
     }
 
     public void dropBucket(String bucketName) {
-        cluster.queryIndexes().dropPrimaryIndex(bucketName, DropPrimaryQueryIndexOptions.dropPrimaryQueryIndexOptions().ignoreIfNotExists(true));
         cluster.buckets().dropBucket(bucketName);
     }
 
