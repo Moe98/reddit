@@ -82,7 +82,10 @@ public abstract class Service {
     }
 
     private void reloadThreadPool() {
-        throw new UnsupportedOperationException();
+        stopAcceptingNewRequests();
+        releaseThreadPool();
+        initThreadPool();
+        beginAcceptingNewRequests();
     }
 
     private void reloadCommandMap() {
