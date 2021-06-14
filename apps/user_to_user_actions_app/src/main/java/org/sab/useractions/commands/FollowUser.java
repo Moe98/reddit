@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -12,6 +13,7 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
+import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.updateRecommendation;
 
 public class FollowUser extends UserToUserCommand {
@@ -72,12 +74,24 @@ public class FollowUser extends UserToUserCommand {
                 arango.deleteDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
                 --followerCount;
 
+                // notify the follower about the follow
+                notifyApp(Notification_Queue_Name, NotificationMessages.USER_UNFOLLOW_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
+                // notify the user about the follow
+                notifyApp(Notification_Queue_Name, NotificationMessages.USER_GOT_UNFOLLOWED_MSG.getMSG(), "", userId, SEND_NOTIFICATION_FUNCTION_NAME);
+
+
             } else {
                 responseMessage = SUCCESSFULLY_FOLLOWED_USER;
 
                 final BaseEdgeDocument userFollowsUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, userFollowsUserEdge);
                 ++followerCount;
+
+                // notify the follower about the follow
+                notifyApp(Notification_Queue_Name, NotificationMessages.USER_FOLLOW_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
+                // notify the user about the follow
+                notifyApp(Notification_Queue_Name, NotificationMessages.USER_GOT_FOLLOWED_MSG.getMSG(), "", userId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             }
 
             userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);

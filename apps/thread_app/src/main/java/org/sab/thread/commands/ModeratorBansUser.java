@@ -3,6 +3,7 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class ModeratorBansUser extends ThreadCommand {
     @Override
@@ -78,6 +81,12 @@ public class ModeratorBansUser extends ThreadCommand {
             final BaseEdgeDocument userBannedFromThreadEdge = addEdgeFromUserToThread(bannedUserId, threadName);
             arango.createEdgeDocument(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, userBannedFromThreadEdge);
             messageResponse = USER_BANNED_SUCCESSFULLY;
+
+            // notify the user that he got banned
+            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_USER_BANNED_MSG.getMSG(), threadName, bannedUserId, SEND_NOTIFICATION_FUNCTION_NAME);
+            // notify the mod that they banned someone
+            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_MOD_BANS_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

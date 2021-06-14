@@ -1,16 +1,22 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DislikeComment extends CommentCommand {
 
@@ -52,6 +58,8 @@ public class DislikeComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
 
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 msg = "Comment does not exist";
@@ -99,6 +107,16 @@ public class DislikeComment extends CommentCommand {
                 originalComment.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
+
+                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, COMMENT_COLLECTION_NAME + "/" + commentId);
+                ArrayList<String> arr = new ArrayList<>();
+                arr.add(USER_IS_DELETED_DB);
+                arr.add(USER_NUM_OF_FOLLOWERS_DB);
+                JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
+                String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
+
+                // notify the owner of the comment about the dislike
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_DISLIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
             }
         } catch (Exception e) {
             // System.out.println(e.getStackTrace());

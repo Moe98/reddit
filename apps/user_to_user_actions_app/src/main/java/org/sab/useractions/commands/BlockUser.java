@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -11,6 +12,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class BlockUser extends UserToUserCommand {
     @Override
@@ -70,6 +73,9 @@ public class BlockUser extends UserToUserCommand {
                 responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
                 arango.deleteDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
 
+                // notify the user about the block
+                notifyApp(Notification_Queue_Name, NotificationMessages.USER_UNBLOCKED_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             } else {
                 responseMessage = USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
 
@@ -85,7 +91,12 @@ public class BlockUser extends UserToUserCommand {
                     --followerCount;
                     userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
                     arango.updateDocument(DB_Name, USER_COLLECTION_NAME, userDocument, userId);
+
+                    // notify the user about the block
+                    notifyApp(Notification_Queue_Name, NotificationMessages.USER_BLOCKED_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
                 }
+
+
             }
 
         } catch (Exception e) {

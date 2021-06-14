@@ -3,6 +3,7 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class BookmarkThread extends ThreadCommand {
     @Override
@@ -54,10 +57,14 @@ public class BookmarkThread extends ThreadCommand {
             if (!bookmarkEdgeId.equals("")) {
                 responseMessage = UNBOOKMARKED_THREAD_SUCCESSFULLY;
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, bookmarkEdgeId);
+                // notify the user who is bookmarking with the unbookmarking
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_REMOVE_BOOKMARK_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
             } else {
                 responseMessage = BOOKMARKED_THREAD_SUCCESSFULLY;
                 final BaseEdgeDocument userBookmarkThreadEdge = addEdgeFromUserToThread(userId, threadName);
                 arango.createEdgeDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, userBookmarkThreadEdge);
+                // notify the user who is bookmarking with the bookmarking
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_BOOKMARK_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

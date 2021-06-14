@@ -12,6 +12,8 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
 import java.util.List;
@@ -117,6 +119,9 @@ public class CreateComment extends CommentCommand {
 
             // tag a person if someone was tagged in the content of the comment
             tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+            // notify the owner of the comment about the creation
+            notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_MSG.getMSG(), commentId, creatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -38,6 +38,11 @@ public abstract class UserToUserCommand extends CommandWithVerification {
     protected static final String RECOMENDATION_REQUEST_QUEUE = "RECOMMENDATION_REQ";
     protected static final String UPDATE_RECOMMENDED_USERS_FUNCTION_NAME = "UPDATE_RECOMMENDED_USERS";
 
+    // TODO get queueName from somewhere instead of hardcoding it
+    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
+
 
     protected final BaseEdgeDocument addEdgeFromUserToUser(String actionMakerId, String userId) {
         final String from = USER_COLLECTION_NAME + "/" + actionMakerId;

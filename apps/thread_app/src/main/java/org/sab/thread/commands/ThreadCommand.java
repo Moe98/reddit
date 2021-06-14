@@ -74,6 +74,10 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_THREADS";
     protected static final String UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_SUBTHREADS";
 
+    // TODO get queueName from somewhere instead of hardcoding it
+    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
         final String from = USER_COLLECTION_NAME + "/" + userId;

@@ -8,6 +8,7 @@ public enum CollectionNames {
     COMMENT("Comment"),
     USER("User"),
     // # Subthread collections
+    USER_CREATE_SUBTHREAD("UserCreateSubthread"),
     USER_BOOKMARK_SUBTHREAD("UserBookmarkSubthread"),
     USER_LIKE_SUBTHREAD("UserLikeSubthread"),
     USER_DISLIKE_SUBTHREAD("UserDislikeSubthread"),

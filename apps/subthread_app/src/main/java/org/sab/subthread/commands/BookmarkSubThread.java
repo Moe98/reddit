@@ -3,6 +3,7 @@ package org.sab.subthread.commands;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class BookmarkSubThread extends SubThreadCommand {
 
@@ -45,14 +48,8 @@ public class BookmarkSubThread extends SubThreadCommand {
             arango.connectIfNotConnected();
 
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                // TODO if this doesn't exist something is wrong!
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
 
             // check subthread exist
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
@@ -70,6 +67,9 @@ public class BookmarkSubThread extends SubThreadCommand {
                 // unbookmark
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, userBookmarkEdgeId);
 
+                // notify the user who is bookmarking with the unbookmarking
+                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_REMOVE_BOOKMARK_MSG.getMSG(), subthreadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             } else {
                 // bookmark
                 msg = "Bookmarked Subthread";
@@ -77,7 +77,8 @@ public class BookmarkSubThread extends SubThreadCommand {
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
                 edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
                 arango.createEdgeDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, edgeDocument);
-
+                // notify the user who is bookmarking with the bookmarking
+                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_BOOKMARK_MSG.getMSG(), subthreadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
 
 

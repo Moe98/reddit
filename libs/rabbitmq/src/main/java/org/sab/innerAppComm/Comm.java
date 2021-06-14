@@ -45,7 +45,7 @@ public class Comm {
         }
     }
 
-    public static void notify(String queueName, String title, String contentId, String userName, String functionName){
+    public static void notifyApp(String queueName, String title, String contentId, String userName, String functionName){
         String[] usersList = new String[1];
         usersList[0] = userName;
         JSONObject body = new JSONObject();

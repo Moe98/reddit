@@ -1,16 +1,22 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DislikeSubThread extends SubThreadCommand {
     @Override
@@ -43,16 +49,10 @@ public class DislikeSubThread extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
-            }
-            if (!arango.collectionExists(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
 
             // TODO check if subthread exists
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
@@ -97,6 +97,17 @@ public class DislikeSubThread extends SubThreadCommand {
                 originalSubthread.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
+
+                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
+                ArrayList<String> arr = new ArrayList<>();
+                arr.add(USER_IS_DELETED_DB);
+                arr.add(USER_NUM_OF_FOLLOWERS_DB);
+                JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
+                String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
+
+                // notify the owner of the subthread about the dislike
+                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DISLIKE_MSG.getMSG(), subthreadId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+
             }
         } catch (Exception e) {
             System.err.println(e);

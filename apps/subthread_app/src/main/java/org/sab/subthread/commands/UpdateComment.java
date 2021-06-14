@@ -12,6 +12,7 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
+import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateComment extends CommentCommand {
@@ -79,6 +80,8 @@ public class UpdateComment extends CommentCommand {
 
             // tag a person if someone was tagged in the content of the comment
             tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+            // notify the user who is updating
+            notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_UPDATE_MSG.getMSG(), commentId, creatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

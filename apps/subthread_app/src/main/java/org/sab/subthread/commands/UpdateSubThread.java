@@ -12,6 +12,7 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
+import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateSubThread extends SubThreadCommand {
@@ -53,9 +54,7 @@ public class UpdateSubThread extends SubThreadCommand {
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
             final String subthreadId = uriParams.getString(SUBTHREAD_ID);
 
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
@@ -97,8 +96,10 @@ public class UpdateSubThread extends SubThreadCommand {
             subthread.setHasImage(hasImage);
             subthread.setParentThreadId(parentId);
 
-            // tag a person if someone was tagged in the content of the comment
+            // tag a person if someone was tagged in the content of the subthread
             tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+            // notify the user who is updating
+            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_UPDATE_MSG.getMSG(), subthreadId, creatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

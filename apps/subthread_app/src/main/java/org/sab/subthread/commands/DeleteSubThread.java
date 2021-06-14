@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -13,6 +14,8 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteSubThread extends SubThreadCommand {
 
@@ -49,16 +52,11 @@ public class DeleteSubThread extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, false);
 
             // check if subthread exists
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
@@ -77,7 +75,6 @@ public class DeleteSubThread extends SubThreadCommand {
             // get all children comments at level 1
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, SubThreadCommand.PARENT_SUBTHREAD_ID_DB, subthreadId);
 
-//            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
             commentJsonArr = arango.parseOutput(cursor, SubThreadCommand.COMMENT_ID_DB, attribs);
@@ -111,6 +108,9 @@ public class DeleteSubThread extends SubThreadCommand {
             }
 
             msg = "Deleted subthread: " + subthreadId + " with it's " + numOfComments + " comments.";
+
+            // notify the owner of the subthread about the deletion
+            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DELETE_MSG.getMSG(), subthreadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();

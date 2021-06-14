@@ -13,7 +13,7 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import static org.sab.innerAppComm.Comm.notify;
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +58,8 @@ public class LikeComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
 
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
 
             String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
 
@@ -110,9 +112,9 @@ public class LikeComment extends CommentCommand {
                 arr.add(USER_NUM_OF_FOLLOWERS_DB);
                 JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
                 String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
-                
-                // tag a person if someone was tagged in the content of the comment
-                notify(Notification_Queue_Name, NotificationMessages.COMMENT_LIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+
+                // notify the owner of the comment about the like
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_LIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
             }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
