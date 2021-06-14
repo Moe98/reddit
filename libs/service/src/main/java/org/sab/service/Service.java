@@ -59,9 +59,11 @@ public abstract class Service {
 
     public void start() {
         loadCommandMap();
+        initThreadPool();
+        beginAcceptingNewRequests();
+    }
 
-        getThreadPool(getThreadCount());
-
+    private void beginAcceptingNewRequests() {
         try {
             listenOnQueue();
         } catch (IOException | TimeoutException e) {
