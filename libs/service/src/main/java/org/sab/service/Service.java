@@ -72,20 +72,20 @@ public abstract class Service {
 
     private void resume() {
         initThreadPool();
-        beginAcceptingNewRequests();
+        startAcceptingNewRequests();
     }
 
     private void reloadThreadPool() {
         stopAcceptingNewRequests();
         releaseThreadPool();
         initThreadPool();
-        beginAcceptingNewRequests();
+        startAcceptingNewRequests();
     }
 
     private void reloadCommandMap() {
         stopAcceptingNewRequests();
         loadCommandMap();
-        beginAcceptingNewRequests();
+        startAcceptingNewRequests();
     }
 
     private void reloadDbPool() {
@@ -102,6 +102,14 @@ public abstract class Service {
 
     private void stopAcceptingNewRequests() {
         throw new UnsupportedOperationException();
+    }
+
+    private void startAcceptingNewRequests() {
+        try {
+            messagingServer.startListening();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void releaseThreadPool() {
