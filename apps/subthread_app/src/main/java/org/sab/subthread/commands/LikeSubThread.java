@@ -103,11 +103,12 @@ public class LikeSubThread extends SubThreadCommand {
                 ArrayList<String> arr = new ArrayList<>();
                 arr.add(USER_IS_DELETED_DB);
                 arr.add(USER_NUM_OF_FOLLOWERS_DB);
-                JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
-                String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
-
-                // notify the owner of the subthread about the like
-                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_LIKE_MSG.getMSG(), subthreadId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+                JSONArray subthreadCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
+                if(subthreadCreatorArr.length()>0){
+                    String subthreadCreator = ((JSONObject)subthreadCreatorArr.get(0)).getString(USER_ID_DB);
+                    // notify the owner of the subthread about the like
+                    notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_LIKE_MSG.getMSG(), subthreadId, subthreadCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+                }
 
             }
         } catch (Exception e) {

@@ -111,11 +111,12 @@ public class LikeComment extends CommentCommand {
                 arr.add(USER_IS_DELETED_DB);
                 arr.add(USER_NUM_OF_FOLLOWERS_DB);
                 JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
-                String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
-
-                // notify the owner of the comment about the like
-                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_LIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
-            }
+                if(commentCreatorArr.length()>0){
+                    String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
+                    // notify the owner of the comment about the like
+                    notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_LIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+                }
+               }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

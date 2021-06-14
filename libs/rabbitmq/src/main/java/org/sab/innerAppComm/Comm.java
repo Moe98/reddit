@@ -16,32 +16,34 @@ public class Comm {
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
 
     public static void tag(String queueName, String title, String contentId, String content, String functionName){
-        String[] words = content.split(" ");
-        ArrayList<String> usersList = new ArrayList<String>();
-        for(String word:words){
-            if(word.startsWith("@")){
-                usersList.add(word.substring(1));
+        if(content!=null && content.length()>0){
+            String[] words = content.split(" ");
+            ArrayList<String> usersList = new ArrayList<String>();
+            for(String word:words){
+                if(word.startsWith("@")){
+                    usersList.add(word.substring(1));
+                }
             }
-        }
-        if(usersList.size()>0){
-            JSONObject body = new JSONObject();
-            body.put(NotificationAttributes.TITLE.getHTTP(), title);
-            body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
-            body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), contentId);
+            if(usersList.size()>0){
+                JSONObject body = new JSONObject();
+                body.put(NotificationAttributes.TITLE.getHTTP(), title);
+                body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
+                body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), contentId);
 
-            JSONObject uriParams = new JSONObject();
+                JSONObject uriParams = new JSONObject();
 
-            JSONObject authenticationParams = new JSONObject();
-            authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
+                JSONObject authenticationParams = new JSONObject();
+                authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
 
-            JSONObject request = new JSONObject();
-            request.put(RequestAttributes.FUNCTION_NAME.getHTTP(), functionName);
-            request.put(RequestAttributes.BODY.getHTTP(), body);
-            request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.PUT);
-            request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
-            request.put(RequestAttributes.AUTHENTICATION_PARAMS.getHTTP(), authenticationParams);
+                JSONObject request = new JSONObject();
+                request.put(RequestAttributes.FUNCTION_NAME.getHTTP(), functionName);
+                request.put(RequestAttributes.BODY.getHTTP(), body);
+                request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.PUT);
+                request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
+                request.put(RequestAttributes.AUTHENTICATION_PARAMS.getHTTP(), authenticationParams);
 
-            putMessageInQueue(request, queueName);
+                putMessageInQueue(request, queueName);
+            }
         }
     }
 
