@@ -89,7 +89,9 @@ public abstract class Service {
     }
 
     private void reloadCommandMap() {
-        throw new UnsupportedOperationException();
+        stopAcceptingNewRequests();
+        loadCommandMap();
+        beginAcceptingNewRequests();
     }
 
     private void reloadDbPool() {
