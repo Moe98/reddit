@@ -12,6 +12,7 @@ public enum CollectionNames {
     USER_LIKE_SUBTHREAD("UserLikeSubthread"),
     USER_DISLIKE_SUBTHREAD("UserDislikeSubthread"),
     SUBTHREAD_REPORTS("SubthreadReports"),
+    USER_FOLLOW_USER("UserFollowUser"),
     USER_MOD_THREAD("UserModThread"),
     // Comments collections
     USER_CREATE_COMMENT("UserCreateComment"),
@@ -20,7 +21,9 @@ public enum CollectionNames {
     USER_DISLIKE_COMMENT("UserDislikeComment"),
     // Thread Collection
     USER_FOLLOW_THREAD("UserFollowThread"),
+    USER_FOLLOW_THREAD_DATE("Date"),
     USER_BOOKMARK_THREAD("UserBookmarkThread"),
+    THREAD_CONTAIN_SUBTHREAD("ThreadContainSubThread"),
     USER_BANNED_FROM_THREAD("UserBannedFromThread");
 
     private final String collectionName;
