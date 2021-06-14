@@ -2,28 +2,31 @@ package org.sab.search;
 
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
-import org.sab.models.SubThread;
-import org.sab.models.Thread;
+import org.sab.models.CollectionNames;
+//import org.sab.models.SubThread;
+import org.sab.models.SubThreadAttributes;
+//import org.sab.models.Thread;
+import org.sab.models.ThreadAttributes;
 import org.sab.service.Service;
 
 public class SearchApp extends Service {
     final public static String DB_NAME = System.getenv("ARANGO_DB");
-    final public static String THREADS_COLLECTION_NAME = Thread.getCollectionName();
-    final public static String THREAD_NAME = Thread.getNameAttributeName();
-    final public static String THREAD_DESCRIPTION = Thread.getDescriptionAttributeName();
-    final public static String THREAD_CREATOR = Thread.getCreatorAttributeName();
-    final public static String THREAD_FOLLOWERS = Thread.getNumOfFollowersAttributeName();
-    final public static String THREAD_DATE = Thread.getDateCreatedAttributeName();
-    final public static String SUB_THREADS_COLLECTION_NAME = SubThread.getCollectionName();
-    final public static String SUB_THREAD_ID = SubThread.getIdAttributeName();
-    final public static String SUB_THREAD_PARENT_THREAD = SubThread.getParentThreadAttributeName();
-    final public static String SUB_THREAD_TITLE = SubThread.getTitleAttributeName();
-    final public static String SUB_THREAD_CREATOR = SubThread.getCreatorAttributeName();
-    final public static String SUB_THREAD_LIKES = SubThread.getLikesAttributeName();
-    final public static String SUB_THREAD_DISLIKES = SubThread.getDislikesAttributeName();
-    final public static String SUB_THREAD_CONTENT = SubThread.getContentAttributeName();
-    final public static String SUB_THREAD_HAS_IMAGE = SubThread.getHasImageAttributeName();
-    final public static String SUB_THREAD_DATE = SubThread.getDateAttributeName();
+    final public static String THREADS_COLLECTION_NAME = CollectionNames.THREAD.get();
+    final public static String THREAD_NAME = ThreadAttributes.THREAD_NAME.toString();
+    final public static String THREAD_DESCRIPTION = ThreadAttributes.DESCRIPTION.toString();
+    final public static String THREAD_CREATOR = ThreadAttributes.CREATOR_ID.toString();
+    final public static String THREAD_FOLLOWERS = ThreadAttributes.NUM_OF_FOLLOWERS.toString();
+    final public static String THREAD_DATE = ThreadAttributes.DATE_CREATED.toString();
+    final public static String SUB_THREADS_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
+    final public static String SUB_THREAD_ID = SubThreadAttributes.SUBTHREAD_ID.toString();
+    final public static String SUB_THREAD_PARENT_THREAD = SubThreadAttributes.PARENT_THREAD_ID.toString();
+    final public static String SUB_THREAD_TITLE = SubThreadAttributes.TITLE.toString();
+    final public static String SUB_THREAD_CREATOR = SubThreadAttributes.CREATOR_ID.toString();
+    final public static String SUB_THREAD_LIKES = SubThreadAttributes.LIKES.toString();
+    final public static String SUB_THREAD_DISLIKES = SubThreadAttributes.DISLIKES.toString();
+    final public static String SUB_THREAD_CONTENT = SubThreadAttributes.CONTENT.toString();
+    final public static String SUB_THREAD_HAS_IMAGE = SubThreadAttributes.HAS_IMAGE.toString();
+    final public static String SUB_THREAD_DATE = SubThreadAttributes.DATE_CREATED.toString();
 
     @Override
     public String getAppUriName() {
