@@ -10,10 +10,6 @@ public class HelloWorld extends Command {
 
     @Override
     public String execute(JSONObject request) {
-//        String[] arr = new String[0];
-//        putMessageInQueue("hohoh",arr, "comment\423132");
-
-        updateRecommendation("RECOMMENDATION_REQ", "samy", "UPDATE_RECOMMENDED_USERS");
         // Return SUCCESS
         return "{\"msg\":\"Hello World\", \"statusCode\": 200}";
         // Return ERROR Ex: 400 for bad request
