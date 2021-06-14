@@ -23,11 +23,8 @@ public abstract class Service {
     private static int DEFAULT_THREADS_COUNT = 10;
     private ExecutorService threadPool;
 
-    // Singleton Design Pattern
-    private void getThreadPool(int threads) {
-        if (threadPool == null) {
-            threadPool = Executors.newFixedThreadPool(threads);
-        }
+    private void initThreadPool() {
+        threadPool = Executors.newFixedThreadPool(getThreadCount());
     }
 
     public abstract String getAppUriName();
