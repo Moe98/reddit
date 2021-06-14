@@ -22,6 +22,7 @@ public abstract class Service {
     private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount";
     private static int DEFAULT_THREADS_COUNT = 10;
     private ExecutorService threadPool;
+    private RPCServer messagingServer;
 
     private void initThreadPool() {
         threadPool = Executors.newFixedThreadPool(getThreadCount());
@@ -59,6 +60,7 @@ public abstract class Service {
 
     public void start() {
         loadCommandMap();
+        initAcceptingNewRequests();
         resume();
     }
 
@@ -90,9 +92,9 @@ public abstract class Service {
         throw new UnsupportedOperationException();
     }
 
-    private void beginAcceptingNewRequests() {
+    private void initAcceptingNewRequests() {
         try {
-            listenOnQueue();
+            initRPCServer();
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
         }
@@ -113,19 +115,14 @@ public abstract class Service {
     private void releaseDbPool() {
         throw new UnsupportedOperationException();
     }
-
-    public void listenOnQueue() throws IOException, TimeoutException {
+    
+    public void initRPCServer() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
         final String queueName = getAppUriName().toUpperCase() + REQUEST_QUEUE_NAME_SUFFIX;
 
-        RPCServer server = RPCServer.getInstance(queueName);
-
         TriFunction<String, JSONObject, String> invokeCallback = this::invokeCommand;
-
-        // call the method in RPC server
-        server.listenOnQueue(queueName, invokeCallback);
-
+        messagingServer = RPCServer.getInstance(queueName, invokeCallback);
     }
 
     private void listenToController() {
