@@ -27,6 +27,7 @@ public enum CollectionNames {
     USER_BANNED_FROM_THREAD("UserBannedFromThread");
 
     private final String collectionName;
+
     CollectionNames(String collectionName) {
         this.collectionName = collectionName;
     }

@@ -6,8 +6,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-//import org.sab.models.SubThread;
-//import org.sab.models.Thread;
 import org.sab.models.CollectionNames;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;

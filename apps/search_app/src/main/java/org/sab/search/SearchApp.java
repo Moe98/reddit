@@ -3,9 +3,7 @@ package org.sab.search;
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
 import org.sab.models.CollectionNames;
-//import org.sab.models.SubThread;
 import org.sab.models.SubThreadAttributes;
-//import org.sab.models.Thread;
 import org.sab.models.ThreadAttributes;
 import org.sab.service.Service;
 
