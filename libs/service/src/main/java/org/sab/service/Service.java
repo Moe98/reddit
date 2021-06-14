@@ -95,6 +95,18 @@ public abstract class Service {
         throw new UnsupportedOperationException();
     }
 
+    private void releaseThreadPool() {
+        try {
+            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void releaseDbPool() {
+        throw new UnsupportedOperationException();
+    }
+
     public void listenOnQueue() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
