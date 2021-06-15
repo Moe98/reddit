@@ -19,7 +19,7 @@ const ADDING_GROUP_MEMBER = 3
 const REMOVING_GROUP_MEMBER = 4
 
 const ChatsList = ({ onChatSelect }) => {
-	const { userId } = useContext(AppContext)
+	const { authToken, userId } = useContext(AppContext)
 	const [chatContext, setChatContext] = useContext(ChatContext)
 	const [status, setStatus] = useState(CHAT_LIST)
 
@@ -73,7 +73,7 @@ const ChatsList = ({ onChatSelect }) => {
 			chatContext.sendToChat({
 				type: 'LEAVE_GROUP',
 				chatId: highlightedChat.chatId,
-				userId
+				authToken
 			})
 			setHighlightedChat(!isChatListEmpty() ? items[0].value : null)
 		}
