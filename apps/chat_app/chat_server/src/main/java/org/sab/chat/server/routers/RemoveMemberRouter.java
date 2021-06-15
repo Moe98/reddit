@@ -10,6 +10,11 @@ public class RemoveMemberRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
+        boolean isAuthenticated = authenticate(request, "adminId");
+        if (!isAuthenticated) {
+            rejectUnAuthenticatedRequest(ctx);
+            return;
+        }
         String[] attributes = {"chatId", "adminId", "memberId"};
         packAndForwardRequest(ctx, request, attributes);
     }

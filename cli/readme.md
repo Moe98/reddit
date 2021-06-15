@@ -26,5 +26,5 @@ $ reddit-cli --help
 	Examples
 	  $ reddit-cli chat -u ee55dcf8-ee7b-429a-939e-12c2f7b7ddee
 	  $ reddit-cli chat -u abu
-    $ reddit-cli welcome -r
+      $ reddit-cli welcome -r
 ```

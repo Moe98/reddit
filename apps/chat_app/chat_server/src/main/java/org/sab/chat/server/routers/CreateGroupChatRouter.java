@@ -12,6 +12,11 @@ public class CreateGroupChatRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
+        boolean isAuthenticated = authenticate(request, "creator");
+        if (!isAuthenticated) {
+            rejectUnAuthenticatedRequest(ctx);
+            return;
+        }
         String[] attributes = {"creator", "name", "description"};
         packAndForwardRequest(ctx, request, attributes);
     }
