@@ -12,16 +12,16 @@ const ChatContext = require('../contexts/chat-context')
 const { mapIdToSpecialId } = require('../utils/id-mapper')
 
 const ChatView = ({ chat, onChatExit }) => {
-	const { userId } = useContext(AppContext)
+	const { userId, authToken } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [newMessage, setNewMessage] = useState('')
 
 	const onNewMessageSent = (messageText) => {
 		if (messageText.length == 0) return
 		const isAbleToSend = chatContext.sendToChat({
+			authToken,
 			type: chat.name ? 'CREATE_GROUP_MESSAGE' : 'CREATE_DIRECT_MESSAGE',
 			chatId: chat.chatId,
-			senderId: userId,
 			content: messageText
 		})
 		if (isAbleToSend) setNewMessage('')
@@ -32,7 +32,7 @@ const ChatView = ({ chat, onChatExit }) => {
 		chatContext.sendToChat({
 			type: chat.name ? 'GET_GROUP_MESSAGES' : 'GET_DIRECT_MESSAGES',
 			chatId: chat.chatId,
-			userId
+			authToken
 		})
 	}, [])
 

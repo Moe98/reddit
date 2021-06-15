@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/apps/chat_app/chat_storage/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/chat_app/chat_storage/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/controller/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apps/controller/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apps/example_app/src/main/resources" charset="UTF-8" />
@@ -37,6 +38,7 @@
     <file url="file://$PROJECT_DIR$/libs/postgres/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/rabbitmq/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/redis/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/libs/redis/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/utilities/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/libs/utilities/src/main/resources" charset="UTF-8" />
