@@ -5,11 +5,13 @@ import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
 import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
+import org.sab.reflection.ReflectionUtils;
 import org.sab.service.controllerbackdoor.BackdoorServer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -68,13 +70,13 @@ public abstract class Service {
         resume();
     }
 
-    private void freeze() {
+    public void freeze() {
         stopAcceptingNewRequests();
         releaseThreadPool();
         releaseDbPool();
     }
 
-    private void resume() {
+    public void resume() {
         initThreadPool();
         startAcceptingNewRequests();
     }
@@ -131,7 +133,7 @@ public abstract class Service {
     private void releaseDbPool() {
         throw new UnsupportedOperationException();
     }
-    
+
     public void initRPCServer() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
@@ -215,5 +217,45 @@ public abstract class Service {
     public void handleControllerMessage(JSONObject message) {
         // TODO
         System.out.printf("%s has received a message from the controller!\n%s\n", getAppUriName(), message.toString());
+        Method method = ReflectionUtils.getMethod(Service.class, message.getString("command"));
+        try {
+            boolean hasArgs = message.has(Controller.ARGS);
+            method.invoke(this, hasArgs ? message.optJSONArray(Controller.ARGS).toList().toArray() : null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void setMaxThreadsCount(int maxThreadsCount) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    public void setMaxDbConnectionsCount(int maxDbConnectionsCount) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    public void addCommand(String commandName, String encodedFile) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    public void deleteCommand(String commandName) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    public void updateCommand(String commandName, String encodedFile) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    public void updateClass(String className, String encodedFile) {
+        // TODO
+        throw new UnsupportedOperationException();
+
+    }
+
+
 }
