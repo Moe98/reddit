@@ -26,7 +26,7 @@ public final class Server {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL ? "8443" : "8080"));
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
     public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
-    public static final ArrayList<String> apps = new ArrayList<>(Arrays.asList("example_app", "thread", "subthread", "recommendation", "notification", "chat", "search", "user", "authentication", "useraction"));
+    public static final ArrayList<String> apps = new ArrayList<>(Arrays.asList("example", "thread", "subthread", "recommendation", "notification", "chat", "search", "user", "authentication", "useraction"));
 
     public static EventLoopGroup bossGroup;
     public static EventLoopGroup workerGroup;

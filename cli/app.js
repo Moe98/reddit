@@ -3,7 +3,7 @@ const React = require('react')
 const importJsx = require('import-jsx')
 const ChatContext = require('./contexts/chat-context')
 const { useState } = require('react')
-const { mapSpecialIdToId } = require('./utils/id-mapper')
+const { getAuthToken, mapSpecialIdToId } = require('./utils/id-mapper')
 const WelcomeFlow = importJsx('./flows/welcome-flow')
 const ChatFlow = importJsx('./flows/chat-flow')
 
@@ -23,10 +23,10 @@ const defaultChatContext = {
 const App = ({ command = 'welcome', flags }) => {
 	const [chatContext, setChatContext] = useState(defaultChatContext)
 
-	const { rainbow, user = 'ee55dcf8-ee7b-429a-939e-12c2f7b7ddee' } = flags
+	const { rainbow, user = '6b57562b-3667-426c-ae6a-372c8ea6ff91' } = flags
 
 	const defaultAppContext = {
-		authToken: null,
+		authToken: getAuthToken(user),
 		userId: mapSpecialIdToId(user)
 	}
 

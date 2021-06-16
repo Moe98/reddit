@@ -10,14 +10,14 @@ const TextInput = importJsx('./text-input')
 const { useState } = React
 
 const CreateDirectChat = ({ onBack }) => {
-	const { userId } = useContext(AppContext)
+	const { authToken } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [otherUserId, setOtherUserId] = useState('')
 
 	const onCreate = (targetUserId) => {
 		chatContext.sendToChat({
 			type: 'CREATE_DIRECT_CHAT',
-			firstMember: userId,
+			authToken,
 			secondMember: mapSpecialIdToId(targetUserId)
 		})
 		onBack()
