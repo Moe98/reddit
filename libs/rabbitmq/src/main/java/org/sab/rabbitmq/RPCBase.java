@@ -24,21 +24,6 @@ public abstract class RPCBase {
         this.connection = initConnection();
     }
 
-    private static Connection initConnectionTillSuccess(ConnectionFactory factory) throws IOException, InterruptedException, TimeoutException {
-        while (true) {
-            try {
-                Connection conn = factory.newConnection();
-                System.out.println("Connected to RabbitMQ.");
-                return conn;
-            } catch (ConnectException e) {
-                e.printStackTrace();
-                final long WAIT_ON_RETRY_TIME = 1000;
-                System.out.printf("Retrying connection with RabbitMQ in %.2f second(s).\n", WAIT_ON_RETRY_TIME / 1000.0);
-                Thread.sleep(WAIT_ON_RETRY_TIME);
-            }
-        }
-    }
-
     private static Connection initConnection() throws TimeoutException, IOException {
         ConnectionFactory factory = new ConnectionFactory();
 
@@ -48,12 +33,7 @@ public abstract class RPCBase {
 
         factory.setHost(rabbitHost);
 
-        try {
-            return initConnectionTillSuccess(factory);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            throw new ConnectException("Failed to connect with RabbitMQ host: " + rabbitHost);
-        }
+        return factory.newConnection();
     }
 
     // adding a channel to the connection
