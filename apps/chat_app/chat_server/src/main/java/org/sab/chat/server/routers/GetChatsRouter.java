@@ -10,6 +10,11 @@ public class GetChatsRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
+        boolean isAuthenticated = authenticate(request, "userId");
+        if (!isAuthenticated) {
+            rejectUnAuthenticatedRequest(ctx);
+            return;
+        }
         String[] attributes = {"userId"};
         packAndForwardRequest(ctx, request, attributes);
     }

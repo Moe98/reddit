@@ -16,6 +16,7 @@
     <module>thread_app</module>
     <module>subthread_app</module>
     <module>user_to_user_actions_app</module>
+    <module>controller</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -83,15 +84,5 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>14</source>
-          <target>14</target>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 </project>
