@@ -68,6 +68,7 @@ public abstract class Service {
             listenOnQueue();
         } catch (IOException | TimeoutException e) {
             e.printStackTrace();
+            System.exit(-1);
         }
 
     }
