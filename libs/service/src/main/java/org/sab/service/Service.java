@@ -250,12 +250,5 @@ public abstract class Service {
         // TODO
         throw new UnsupportedOperationException();
     }
-
-    public void updateClass(String className, String encodedFile) {
-        // TODO
-        throw new UnsupportedOperationException();
-
-    }
-
-
+    
 }

@@ -137,11 +137,6 @@ public class Controller {
         addOrUpdateClass(request);
     }
 
-    private void updateClass(JSONObject request) throws Exception {
-        addOrUpdateClass(request);
-
-    }
-
     private void freeze(JSONObject request) throws Exception {
         sendMessage(request);
     }
