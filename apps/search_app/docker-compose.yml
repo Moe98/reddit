@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"
+  arangodb:
+    image: "arangodb"
+  recommendation_app:
+    build:
+      context: "../../"
+      dockerfile: "apps/search_app/Dockerfile"
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - ARANGO_USER=root
+      - ARANGO_PASSWORD=koko
+      - ARANGO_DB=Reddit
+    depends_on:
+      - "rabbitmq"
+      - "arangodb"
+
+networks:
+  default:
+    name: search_nw
