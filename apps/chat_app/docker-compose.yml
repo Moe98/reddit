@@ -1,17 +1,17 @@
 version: "3.9"
 services:
     rabbitmq:
-        image: "rabbitmq"
+        image: "rabbitmq:management"
         ports:
-            - "5672:5672"
+            - "15672:15672"
     cassandra:
         image: "cassandra"
-        ports:
-            - "9042:9042"
     chat_server:
         build: 
             context: "../../"
             dockerfile: "apps/chat_app/chat_server/Dockerfile"
+        environment:
+            - RABBIT_HOST=rabbitmq
         ports:
             - "5000:5000"
         depends_on:
@@ -20,8 +20,17 @@ services:
         build: 
             context: "../../"
             dockerfile: "apps/chat_app/chat_storage/Dockerfile"
-        ports:
-            - "15672:15672"
+        environment:
+            - RABBIT_HOST=rabbitmq
+            - CASSANDRA_NODE=cassandra
+            - CASSANDRA_PORT=9042
+            - KEYSPACE_NAME=chat_app
+            - REPLICATION_STRATEGY=SimpleStrategy
+            - REPLICATION_FACTOR=2
         depends_on:
             - "cassandra"
             - "rabbitmq"
+
+networks: 
+    default: 
+        name: chat_nw

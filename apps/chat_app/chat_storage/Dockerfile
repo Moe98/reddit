@@ -17,6 +17,5 @@ FROM openjdk:15-alpine
 ENV APP_NAME=chat_storage
 
 COPY --from=build /reddit/apps/chat_app/${APP_NAME}/target/${APP_NAME}-1.0-SNAPSHOT.jar /usr/local/lib/${APP_NAME}.jar
-EXPOSE 15672
 
 ENTRYPOINT ["java", "-jar", "/usr/local/lib/chat_storage.jar"]
