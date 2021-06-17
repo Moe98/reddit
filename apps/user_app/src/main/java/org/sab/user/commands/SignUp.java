@@ -3,6 +3,7 @@ package org.sab.user.commands;
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
 import org.sab.auth.Auth;
+import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
@@ -78,7 +79,7 @@ public class SignUp extends UserCommand {
     private void InsertUserInArango(String username) {
         Map<String, Object> properties = Map.of(UserAttributes.IS_DELETED.getArangoDb(), false, UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
         try {
-            Arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), properties, username);
+            Arango.createDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), properties, username);
         } finally {
             Arango.getInstance().disconnect();
         }

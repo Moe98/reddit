@@ -2,6 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
+import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
@@ -45,7 +46,7 @@ public class UserApp extends Service {
         try {
             arango.connectIfNotConnected();
             arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
-            arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
+            arango.createCollectionIfNotExists(ARANGO_DB_NAME, CollectionNames.USER.get(), false);
         } finally {
             arango.disconnect();
         }
