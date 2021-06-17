@@ -26,6 +26,7 @@ services:
       dockerfile: "apps/search_app/Dockerfile"
     environment:
       - RABBIT_HOST=rabbitmq
+      - ARANGO_DB=Reddit
     depends_on:
       - "rabbitmq"
       - "arangodb"
