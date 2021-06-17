@@ -71,7 +71,7 @@ public class SearchAppTest {
                 toBeDeleted.get(subThreadsCollectionName).add(created.getKey());
                 subThreadsKeys[i] = created.getKey();
             }
-            TimeUnit.SECONDS.sleep(5);
+            TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
             fail(e.getMessage());
         }
