@@ -142,7 +142,7 @@ public abstract class Service {
     }
 
     private void releaseDbPool() {
-        throw new UnsupportedOperationException();
+        // TODO
     }
 
     public void initRPCServer() throws IOException, TimeoutException {
