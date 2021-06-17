@@ -21,7 +21,6 @@ public enum CollectionNames {
     USER_DISLIKE_COMMENT("UserDislikeComment"),
     // Thread Collection
     USER_FOLLOW_THREAD("UserFollowThread"),
-    USER_FOLLOW_THREAD_DATE("Date"),
     USER_BOOKMARK_THREAD("UserBookmarkThread"),
     THREAD_CONTAIN_SUBTHREAD("ThreadContainSubThread"),
     USER_BANNED_FROM_THREAD("UserBannedFromThread");

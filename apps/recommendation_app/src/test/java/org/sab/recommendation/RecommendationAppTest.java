@@ -24,11 +24,13 @@ import static org.junit.Assert.*;
 public class RecommendationAppTest {
     static String dbName = RecommendationApp.DB_NAME;
     static String threadsCollectionName = RecommendationApp.THREADS_COLLECTION_NAME;
+    static String threadName = RecommendationApp.THREAD_NAME;
     static String threadDescription = RecommendationApp.THREAD_DESCRIPTION;
     static String threadCreator = RecommendationApp.THREAD_CREATOR;
     static String threadFollowers = RecommendationApp.THREAD_FOLLOWERS;
     static String threadDate = RecommendationApp.THREAD_DATE;
     static String subThreadsCollectionName = RecommendationApp.SUB_THREADS_COLLECTION_NAME;
+    static String subThreadId = RecommendationApp.SUB_THREAD_ID;
     static String subThreadParentThread = RecommendationApp.SUB_THREAD_PARENT_THREAD;
     static String subThreadTitle = RecommendationApp.SUB_THREAD_TITLE;
     static String subThreadCreator = RecommendationApp.SUB_THREAD_CREATOR;
@@ -197,7 +199,7 @@ public class RecommendationAppTest {
         new UpdatePopularSubThreads().execute(new JSONObject());
         JSONObject responseJson = new JSONObject(new GetPopularSubThreads().execute(new JSONObject()));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[subThreads.length - 1]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[subThreads.length - 1]));
     }
 
     @Test
@@ -205,7 +207,7 @@ public class RecommendationAppTest {
         new UpdatePopularThreads().execute(new JSONObject());
         JSONObject responseJson = new JSONObject(new GetPopularThreads().execute(new JSONObject()));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(threads[threads.length - 1]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(threadName).equals(threads[threads.length - 1]));
     }
 
     @Test
@@ -213,7 +215,7 @@ public class RecommendationAppTest {
         new UpdateRecommendedSubThreads().execute(request);
         JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[4]));
     }
 
     @Test
@@ -236,21 +238,21 @@ public class RecommendationAppTest {
     public void UpdatePopularSubThreads() {
         JSONObject responseJson = new JSONObject(new UpdatePopularSubThreads().execute(new JSONObject()));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[subThreads.length - 1]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[subThreads.length - 1]));
     }
 
     @Test
     public void UpdatePopularThreads() {
         JSONObject responseJson = new JSONObject(new UpdatePopularThreads().execute(new JSONObject()));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(threads[threads.length - 1]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(threadName).equals(threads[threads.length - 1]));
     }
 
     @Test
     public void UpdateRecommendedSubThreads() {
         JSONObject responseJson = new JSONObject(new UpdateRecommendedSubThreads().execute(request));
         assertEquals(200, responseJson.getInt("statusCode"));
-        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreads[4]));
+        assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[4]));
     }
 
     @Test

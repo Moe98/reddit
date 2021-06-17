@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.CollectionNames;
+import org.sab.models.EdgeCollectionsAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.recommendation.commands.UpdatePopularSubThreads;
@@ -39,7 +40,7 @@ public class RecommendationApp extends Service {
     final public static String THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME = CollectionNames.THREAD_CONTAIN_SUBTHREAD.get();
     final public static String USER_FOLLOW_USER_COLLECTION_NAME = CollectionNames.USER_FOLLOW_USER.get();
     final public static String USER_FOLLOW_THREAD_COLLECTION_NAME = CollectionNames.USER_FOLLOW_THREAD.get();
-    final public static String USER_FOLLOW_THREAD_DATE = CollectionNames.USER_FOLLOW_THREAD_DATE.get();
+    final public static String USER_FOLLOW_THREAD_DATE = EdgeCollectionsAttributes.USER_FOLLOW_THREAD_DATE.getDb();
     final public static int DEFAULT_RAM_QUOTA = 100;
     final public static String LISTINGS_BUCKET_NAME = "Listings";
     final public static String LISTINGS_POPULAR_THREADS_KEY = "popThreads";
