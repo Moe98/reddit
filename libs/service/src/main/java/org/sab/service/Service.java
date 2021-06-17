@@ -22,7 +22,7 @@ import java.util.concurrent.*;
  */
 
 public abstract class Service {
-    public static final String DEFAULT_PROPERTIES_FILENAME = "configmap.properties";
+    public static final String DEFAULT_PROPERTIES_FILENAME = "commandmap.properties";
     private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
     private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount";
     private static int DEFAULT_THREADS_COUNT = 10;
