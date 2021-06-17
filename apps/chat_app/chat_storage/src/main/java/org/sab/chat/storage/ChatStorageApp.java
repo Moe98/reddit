@@ -10,11 +10,6 @@ public class ChatStorageApp extends Service {
     }
 
     @Override
-    public int getThreadCount() {
-        return 8;
-    }
-
-    @Override
     public String getConfigMapPath() {
         return DEFAULT_PROPERTIES_FILENAME;
     }

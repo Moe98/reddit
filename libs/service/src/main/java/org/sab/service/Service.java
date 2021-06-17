@@ -24,8 +24,9 @@ import java.util.concurrent.*;
 public abstract class Service {
     public static final String DEFAULT_PROPERTIES_FILENAME = "commandmap.properties";
     private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
-    private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount";
-    private static int DEFAULT_THREADS_COUNT = 10;
+    private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount", DB_CONNECTIONS_COUNT_PROPERTY_NAME = "dbConnectionsCount";
+    private static final int DEFAULT_THREADS_COUNT = 10, DEFAULT_DB_CONNECTIONS_COUNT = 10;
+    private final Properties configProperties = new Properties();
     private ExecutorService threadPool;
     private RPCServer messagingServer;
 
@@ -35,21 +36,18 @@ public abstract class Service {
 
     public abstract String getAppUriName();
 
-    public int getThreadCount() {
-        final Properties properties = new Properties();
-        final InputStream threadsCountStream = getClass().getClassLoader().getResourceAsStream(THREADS_COUNT_PROPERTY_NAME.toLowerCase() + ".properties");
+    public int readProperty(String propertyName, int defaultPropertyValue) {
+        if (!configProperties.containsKey(propertyName))
+            return defaultPropertyValue;
+        return Integer.parseInt(configProperties.getProperty(propertyName));
+    }
 
-        if (threadsCountStream == null)
-            return DEFAULT_THREADS_COUNT;
-        else {
-            try {
-                properties.load(threadsCountStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return DEFAULT_THREADS_COUNT;
-            }
-            return Integer.parseInt(properties.getProperty(THREADS_COUNT_PROPERTY_NAME));
-        }
+    private final int getThreadCount() {
+        return readProperty(THREADS_COUNT_PROPERTY_NAME, DEFAULT_THREADS_COUNT);
+    }
+
+    public final int getDbConnectionsCount() {
+        return readProperty(DB_CONNECTIONS_COUNT_PROPERTY_NAME, DEFAULT_DB_CONNECTIONS_COUNT);
     }
 
     public abstract String getConfigMapPath();
@@ -65,9 +63,23 @@ public abstract class Service {
 
     public void start() {
         listenToController();
-        loadCommandMap();
+        loadProperties();
         initAcceptingNewRequests();
         resume();
+    }
+
+    private void loadProperties() {
+        loadCommandMap();
+        loadConfigProperties();
+    }
+
+    private void loadConfigProperties() {
+        final InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties");
+        try {
+            configProperties.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void freeze() {

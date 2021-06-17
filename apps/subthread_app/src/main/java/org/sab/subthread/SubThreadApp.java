@@ -69,11 +69,6 @@ public class SubThreadApp extends Service {
     }
 
     @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
     public String getConfigMapPath() {
         return DEFAULT_PROPERTIES_FILENAME;
     }
