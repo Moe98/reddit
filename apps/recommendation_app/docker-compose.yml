@@ -6,18 +6,33 @@ services:
       - "15672:15672"
   arangodb:
     image: "arangodb"
+    ports:
+      - 8529:8529
+    environment:
+      - ARANGO_NO_AUTH=1
+      - DB_LINK_PORT_8529_TCP=tcp://172.17.0.17:8529
+      - DB_LINK_PORT_8529_TCP_ADDR=172.17.0.17
+      - DB_LINK_PORT_8529_TCP_PORT=8529
+      - DB_LINK_PORT_8529_TCP_PROTO=tcp
+      - DB_LINK_NAME=/naughty_ardinghelli/db-link
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://arangodb:8529" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  couchbase:
+    image: "couchbase"
   recommendation_app:
     build:
       context: "../../"
       dockerfile: "apps/recommendation_app/Dockerfile"
     environment:
       - RABBIT_HOST=rabbitmq
-      - ARANGO_USER=root
-      - ARANGO_PASSWORD=koko
       - ARANGO_DB=Reddit
     depends_on:
       - "rabbitmq"
       - "arangodb"
+      - "couchbase"
 
 networks:
   default:
