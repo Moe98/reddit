@@ -24,6 +24,7 @@ import java.util.concurrent.*;
 public abstract class Service {
     public static final String DEFAULT_PROPERTIES_FILENAME = "commandmap.properties";
     private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
+    private static final int MAX_THREAD_TIMEOUT = 4;
     private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount", DB_CONNECTIONS_COUNT_PROPERTY_NAME = "dbConnectionsCount";
     private static final int DEFAULT_THREADS_COUNT = 10, DEFAULT_DB_CONNECTIONS_COUNT = 10;
     private final Properties configProperties = new Properties();
@@ -131,9 +132,12 @@ public abstract class Service {
 
     private void releaseThreadPool() {
         try {
-            threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            threadPool.shutdown();
+            if (!threadPool.awaitTermination(MAX_THREAD_TIMEOUT, TimeUnit.MINUTES)) {
+                threadPool.shutdownNow();
+            }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            threadPool.shutdownNow();
         }
     }
 
@@ -222,7 +226,6 @@ public abstract class Service {
     }
 
     public void handleControllerMessage(JSONObject message) {
-        // TODO
         System.out.printf("%s has received a message from the controller!\n%s\n", getAppUriName(), message.toString());
         Method method = ReflectionUtils.getMethod(Service.class, message.getString("command"));
         try {
@@ -234,13 +237,18 @@ public abstract class Service {
     }
 
     public void setMaxThreadsCount(int maxThreadsCount) {
-        // TODO
-        throw new UnsupportedOperationException();
+        updateProperty(THREADS_COUNT_PROPERTY_NAME, String.valueOf(maxThreadsCount));
+        reloadThreadPool();
+
     }
 
     public void setMaxDbConnectionsCount(int maxDbConnectionsCount) {
-        // TODO
-        throw new UnsupportedOperationException();
+        updateProperty(DB_CONNECTIONS_COUNT_PROPERTY_NAME, String.valueOf(maxDbConnectionsCount));
+        reloadDbPool();
+    }
+
+    private void updateProperty(String propertyName, String newValue) {
+        configProperties.replace(propertyName, newValue);
     }
 
     public void addCommand(String commandName, String encodedFile) {
