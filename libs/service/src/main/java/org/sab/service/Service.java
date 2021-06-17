@@ -249,18 +249,18 @@ public abstract class Service {
     }
 
     public void addCommand(String commandName, String encodedFile) {
-        // TODO
+        ConfigMap.getInstance().addCommand(commandName);
+        // TODO ADD to JVM
         throw new UnsupportedOperationException();
     }
 
-    public void deleteCommand(String commandName) {
-        // TODO
-        throw new UnsupportedOperationException();
+    public void deleteCommand(String functionName) {
+        ConfigMap.getInstance().deleteCommand(functionName);
     }
 
     public void updateCommand(String commandName, String encodedFile) {
         // TODO
         throw new UnsupportedOperationException();
     }
-    
+
 }

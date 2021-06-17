@@ -21,6 +21,10 @@ public class StringManipulation {
 
     }
 
+    public static String pascalToScreamingCase(String pascalCase) {
+        return camelToSnakeCase((pascalCase.charAt(0) + "").toLowerCase() + pascalCase.substring(1));
+    }
+
     public static boolean isCapital(char c) {
         return c >= 'A' && c <= 'Z';
     }
