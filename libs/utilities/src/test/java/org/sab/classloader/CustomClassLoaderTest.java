@@ -36,4 +36,30 @@ public class CustomClassLoaderTest {
         }
     }
 
+    @Test
+    public void loadClassFromResourcesByTwoDifferentLoaders() {
+        final CustomClassLoader customClassLoader = new CustomClassLoader();
+        final String className = "org.sab.classloader.Alice";
+        final String methodName = "run";
+        final String expectedResult = "Running";
+
+        try {
+            final Class<?> clazz = Class.forName(className, true, customClassLoader);
+            assertEquals(expectedResult, invokeClassMethod(clazz, methodName));
+        } catch (ClassNotFoundException e) {
+            fail("Class not loaded from disk.");
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            final Class<?> clazz = Class.forName(className);
+            assertEquals(expectedResult, invokeClassMethod(clazz, methodName));
+        } catch (ClassNotFoundException e) {
+            fail("Class could not be loaded by the current loader.");
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            fail(e.getMessage());
+        }
+    }
+
 }
