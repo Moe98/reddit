@@ -16,6 +16,6 @@ RUN mvn clean package -pl :${APP_NAME} -am -DskipTests
 FROM openjdk:15-alpine
 ENV APP_NAME=recommendation_app
 
-COPY --from=build /reddit/apps/recommendation_app/${APP_NAME}/target/${APP_NAME}-1.0-SNAPSHOT.jar /usr/local/lib/${APP_NAME}.jar
+COPY --from=build /reddit/apps/${APP_NAME}/target/${APP_NAME}-1.0-SNAPSHOT.jar /usr/local/lib/${APP_NAME}.jar
 
 ENTRYPOINT ["java", "-jar", "/usr/local/lib/recommendation_app.jar"]
