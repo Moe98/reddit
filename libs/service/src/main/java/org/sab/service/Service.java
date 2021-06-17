@@ -160,8 +160,8 @@ public abstract class Service {
         }).start();
     }
 
-    private InputStream receiveFile(JSONObject message) {
-        return IoUtils.decodeFile(message.getString("encodedFile"));
+    private InputStream decodedFileToInputStream(String encodedFile) {
+        return IoUtils.decodeFile(encodedFile);
     }
 
     private void reloadClass(String className) {
