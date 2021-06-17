@@ -273,7 +273,6 @@ public class RecommendationAppTest {
     @Test
     public void UpdateRecommendedUsers() {
         JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(makeRequest("PUT")));
-        assertEquals("", responseJson.getString("msg"));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
