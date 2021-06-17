@@ -37,4 +37,9 @@ public class ExampleAppTest {
         assertEquals(11, new ExampleApp().getThreadCount());
     }
 
+    @Test
+    public void readControllerFromPort() {
+        int port = new ExampleApp().getControllerPort();
+        assertTrue(port >= 4000 && port < 5000);
+    }
 }

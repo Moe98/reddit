@@ -122,30 +122,4 @@ public class CouchbaseTest {
         }
     }
 
-    @Test
-    public void query() {
-        try {
-            JsonObject document1 = JsonObject.create(1);
-            JsonObject document2 = JsonObject.create(1);
-            JsonObject document3 = JsonObject.create(1);
-
-            document1.put("flag", true);
-            document2.put("flag", true);
-            document3.put("flag", false);
-
-            couchbase.upsertDocument(bucketName, "query1", document1);
-            couchbase.upsertDocument(bucketName, "query2", document2);
-            couchbase.upsertDocument(bucketName, "query3", document3);
-
-            QueryResult result = couchbase.query("SELECT * FROM `" + bucketName + "` WHERE `flag` = TRUE;", true);
-
-            ArrayList<JsonObject> resultList = new ArrayList<>(result.rowsAsObject());
-
-            assertEquals(resultList.size(), 2);
-            assertTrue(resultList.get(0).getObject(bucketName).getBoolean("flag"));
-            assertTrue(resultList.get(1).getObject(bucketName).getBoolean("flag"));
-        } catch (CouchbaseException e) {
-            fail(e.getMessage());
-        }
-    }
 }

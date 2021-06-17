@@ -1,7 +1,0 @@
-{
-  "CASSANDRA_NODE": "127.0.0.1",
-  "CASSANDRA_PORT": 9042,
-  "KEYSPACE_NAME": "chat_app",
-  "REPLICATION_STRATEGY": "SimpleStrategy",
-  "REPLICATION_FACTOR": 2
-}
