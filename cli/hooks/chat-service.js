@@ -5,7 +5,7 @@ const ChatContext = require('../contexts/chat-context')
 
 const useChatService = () => {
 	const ws = useRef(null)
-	const { userId } = useContext(AppContext)
+	const { authToken, userId } = useContext(AppContext)
 	const [chatContext, setChatContext] = useContext(ChatContext)
 
 	const onNewFrameReceived = (frame) => {
@@ -183,7 +183,7 @@ const useChatService = () => {
 			ws.current.send(
 				JSON.stringify({
 					type: 'INIT_CONNECTION',
-					userId
+					authToken
 				})
 			)
 		}

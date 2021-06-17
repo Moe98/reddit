@@ -21,7 +21,8 @@ public enum CollectionNames {
     // Thread Collection
     USER_FOLLOW_THREAD("UserFollowThread"),
     USER_BOOKMARK_THREAD("UserBookmarkThread"),
-    USER_BANNED_FROM_THREAD("UserBannedFromThread");
+    USER_BANNED_FROM_THREAD("UserBannedFromThread"),
+    USER_BLOCK_USER("UserBlockUser");
 
     private final String collectionName;
     CollectionNames(String collectionName) {

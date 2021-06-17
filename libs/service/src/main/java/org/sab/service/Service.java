@@ -80,6 +80,7 @@ public abstract class Service {
             configProperties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 
