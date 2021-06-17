@@ -1,0 +1,54 @@
+version: "3.7"
+services:
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"
+  arangodb:
+    image: "arangodb"
+    ports:
+      - 1234:8529
+    environment:
+      - ARANGO_NO_AUTH=1
+      - DB_LINK_PORT_8529_TCP=tcp://172.17.0.17:8529
+      - DB_LINK_PORT_8529_TCP_ADDR=172.17.0.17
+      - DB_LINK_PORT_8529_TCP_PORT=8529
+      - DB_LINK_PORT_8529_TCP_PROTO=tcp
+      - DB_LINK_NAME=/naughty_ardinghelli/db-link
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://arangodb:8529"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - ../../libs/postgres/src/main/resources/sql/CreateUsersTable.sql:/docker-entrypoint-initdb.d/1_CreateTables.sql
+      - ../../libs/postgres/src/main/resources/sql/CreateUserProcedures.sql:/docker-entrypoint-initdb.d/2_CreateProcedures.sql
+  user_app:
+    build:
+      context: "../../"
+      dockerfile: "apps/user_app/Dockerfile"
+    restart: on-failure
+    env_file:
+      - "../../.env"
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - ARANGO_DB=Reddit
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=scaleabull
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_PORT=5432
+      - ENV_TYPE=Staging
+    depends_on:
+      - "rabbitmq"
+      - "arangodb"
+      - "postgres"
+
+networks:
+  default:
+    name: user_nw

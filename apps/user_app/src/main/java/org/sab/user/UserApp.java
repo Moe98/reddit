@@ -2,6 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
+import org.sab.functions.Utilities;
 import org.sab.models.user.User;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
@@ -34,7 +35,8 @@ public class UserApp extends Service {
     }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        PostgresConnection.dbInit();
+        if(!Utilities.inContainerizationMode())
+            PostgresConnection.dbInit();
         arangoDbInit();
     }
 
