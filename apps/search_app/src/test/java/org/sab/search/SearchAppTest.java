@@ -23,7 +23,9 @@ import static org.junit.Assert.*;
 public class SearchAppTest {
     static String dbName = SearchApp.DB_NAME;
     static String threadsCollectionName = SearchApp.THREADS_COLLECTION_NAME;
+    static String threadName = SearchApp.THREAD_NAME;
     static String subThreadsCollectionName = SearchApp.SUB_THREADS_COLLECTION_NAME;
+    static String subThreadId = SearchApp.SUB_THREAD_ID;
     static Arango arango;
     static HashMap<String, ArrayList<String>> toBeDeleted;
     static String[] threads;
@@ -90,12 +92,20 @@ public class SearchAppTest {
         }
     }
 
+    private static JSONObject makeRequest(String input) {
+        JSONObject request = new JSONObject();
+        request.put("methodType", "POST");
+        request.put("body", new JSONObject().put(SearchApp.SEARCH_KEYWORDS, input));
+        request.put("uriParams", new JSONObject());
+        return request;
+    }
+
     @Test
     public void SearchThread() {
         try {
-            JSONObject responseJson = new JSONObject(new SearchThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeyword", "ThreadForTestSearch"))));
+            JSONObject responseJson = new JSONObject(new SearchThread().execute(makeRequest("ThreadForTestSearch")));
             assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(threads[0]));
+            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(threadName).equals(threads[0]));
         } catch (JSONException e) {
             fail(e.getMessage());
         }
@@ -104,9 +114,9 @@ public class SearchAppTest {
     @Test
     public void SearchSubThread() {
         try {
-            JSONObject responseJson = new JSONObject(new SearchSubThread().execute(new JSONObject().put("body", new JSONObject().put("searchKeywords", "ice cream"))));
+            JSONObject responseJson = new JSONObject(new SearchSubThread().execute(makeRequest("ice cream")));
             assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString("_key").equals(subThreadsKeys[1]));
+            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreadsKeys[1]));
         } catch (JSONException e) {
             fail(e.getMessage());
         }

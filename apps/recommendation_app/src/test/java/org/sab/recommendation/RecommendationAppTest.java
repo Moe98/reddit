@@ -22,33 +22,35 @@ import java.util.Properties;
 import static org.junit.Assert.*;
 
 public class RecommendationAppTest {
-    static String dbName = RecommendationApp.DB_NAME;
-    static String threadsCollectionName = RecommendationApp.THREADS_COLLECTION_NAME;
-    static String threadName = RecommendationApp.THREAD_NAME;
-    static String threadDescription = RecommendationApp.THREAD_DESCRIPTION;
-    static String threadCreator = RecommendationApp.THREAD_CREATOR;
-    static String threadFollowers = RecommendationApp.THREAD_FOLLOWERS;
-    static String threadDate = RecommendationApp.THREAD_DATE;
-    static String subThreadsCollectionName = RecommendationApp.SUB_THREADS_COLLECTION_NAME;
-    static String subThreadId = RecommendationApp.SUB_THREAD_ID;
-    static String subThreadParentThread = RecommendationApp.SUB_THREAD_PARENT_THREAD;
-    static String subThreadTitle = RecommendationApp.SUB_THREAD_TITLE;
-    static String subThreadCreator = RecommendationApp.SUB_THREAD_CREATOR;
-    static String subThreadLikes = RecommendationApp.SUB_THREAD_LIKES;
-    static String subThreadDislikes = RecommendationApp.SUB_THREAD_DISLIKES;
-    static String subThreadContent = RecommendationApp.SUB_THREAD_CONTENT;
-    static String subThreadHasImage = RecommendationApp.SUB_THREAD_HAS_IMAGE;
-    static String subThreadDate = RecommendationApp.SUB_THREAD_DATE;
-    static String usersCollectionName = RecommendationApp.USERS_COLLECTION_NAME;
-    static String threadContainSubThreadCollectionName = RecommendationApp.THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME;
-    static String userFollowUserCollectionName = RecommendationApp.USER_FOLLOW_USER_COLLECTION_NAME;
-    static String userFollowThreadCollectionName = RecommendationApp.USER_FOLLOW_THREAD_COLLECTION_NAME;
-    static String listingsBucketName = RecommendationApp.LISTINGS_BUCKET_NAME;
-    static String listingsPopularThreadsKey = RecommendationApp.LISTINGS_POPULAR_THREADS_KEY;
-    static String listingsPopularSubThreadsKey = RecommendationApp.LISTINGS_POPULAR_SUB_THREADS_KEY;
-    static String recommendedSubThreadsBucketName = RecommendationApp.RECOMMENDED_SUB_THREADS_BUCKET_NAME;
-    static String recommendedThreadsBucketName = RecommendationApp.RECOMMENDED_THREADS_BUCKET_NAME;
-    static String recommendedUsersBucketName = RecommendationApp.RECOMMENDED_USERS_BUCKET_NAME;
+    final private static String AUTHENTICATION_PARAMS = "authenticationParams";
+    final private static String AUTHENTICATED = "isAuthenticated";
+    static String dbName = RecommendationCommand.DB_NAME;
+    static String threadsCollectionName = RecommendationCommand.THREADS_COLLECTION_NAME;
+    static String threadName = RecommendationCommand.THREAD_NAME;
+    static String threadDescription = RecommendationCommand.THREAD_DESCRIPTION;
+    static String threadCreator = RecommendationCommand.THREAD_CREATOR;
+    static String threadFollowers = RecommendationCommand.THREAD_FOLLOWERS;
+    static String threadDate = RecommendationCommand.THREAD_DATE;
+    static String subThreadsCollectionName = RecommendationCommand.SUB_THREADS_COLLECTION_NAME;
+    static String subThreadId = RecommendationCommand.SUB_THREAD_ID;
+    static String subThreadParentThread = RecommendationCommand.SUB_THREAD_PARENT_THREAD;
+    static String subThreadTitle = RecommendationCommand.SUB_THREAD_TITLE;
+    static String subThreadCreator = RecommendationCommand.SUB_THREAD_CREATOR;
+    static String subThreadLikes = RecommendationCommand.SUB_THREAD_LIKES;
+    static String subThreadDislikes = RecommendationCommand.SUB_THREAD_DISLIKES;
+    static String subThreadContent = RecommendationCommand.SUB_THREAD_CONTENT;
+    static String subThreadHasImage = RecommendationCommand.SUB_THREAD_HAS_IMAGE;
+    static String subThreadDate = RecommendationCommand.SUB_THREAD_DATE;
+    static String usersCollectionName = RecommendationCommand.USERS_COLLECTION_NAME;
+    static String threadContainSubThreadCollectionName = RecommendationCommand.THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME;
+    static String userFollowUserCollectionName = RecommendationCommand.USER_FOLLOW_USER_COLLECTION_NAME;
+    static String userFollowThreadCollectionName = RecommendationCommand.USER_FOLLOW_THREAD_COLLECTION_NAME;
+    static String listingsBucketName = RecommendationCommand.LISTINGS_BUCKET_NAME;
+    static String listingsPopularThreadsKey = RecommendationCommand.LISTINGS_POPULAR_THREADS_KEY;
+    static String listingsPopularSubThreadsKey = RecommendationCommand.LISTINGS_POPULAR_SUB_THREADS_KEY;
+    static String recommendedSubThreadsBucketName = RecommendationCommand.RECOMMENDED_SUB_THREADS_BUCKET_NAME;
+    static String recommendedThreadsBucketName = RecommendationCommand.RECOMMENDED_THREADS_BUCKET_NAME;
+    static String recommendedUsersBucketName = RecommendationCommand.RECOMMENDED_USERS_BUCKET_NAME;
     static Arango arango;
     static Couchbase couchbase;
     static HashMap<String, ArrayList<String>> toBeDeleted;
@@ -56,7 +58,6 @@ public class RecommendationAppTest {
     static String[] threads;
     static String[] users;
     static JSONObject authentication;
-    static JSONObject request = new JSONObject();
 
     @BeforeClass
     public static void setUp() {
@@ -164,10 +165,6 @@ public class RecommendationAppTest {
             edgeDocument.setTo(usersCollectionName + "/" + users[users.length - 1]);
             created = arango.createEdgeDocument(dbName, userFollowUserCollectionName, edgeDocument);
             toBeDeleted.get(userFollowUserCollectionName).add(created.getKey());
-
-            authentication = new JSONObject().put(RecommendationApp.AUTHENTICATED, true);
-            request.put("body", new JSONObject().put("username", users[0]));
-            request.put(RecommendationApp.AUTHENTICATION_PARAMS, authentication);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -181,9 +178,9 @@ public class RecommendationAppTest {
                     arango.deleteDocument(dbName, key, _key);
                 }
             });
-            couchbase.deleteDocument(recommendedThreadsBucketName, users[0]);
-            couchbase.deleteDocument(listingsBucketName, listingsPopularThreadsKey);
             couchbase.deleteDocument(listingsBucketName, listingsPopularSubThreadsKey);
+            couchbase.deleteDocument(listingsBucketName, listingsPopularThreadsKey);
+            couchbase.deleteDocument(recommendedThreadsBucketName, users[0]);
             couchbase.deleteDocument(recommendedSubThreadsBucketName, users[0]);
             couchbase.deleteDocument(recommendedUsersBucketName, users[0]);
         } catch (Exception e) {
@@ -194,77 +191,88 @@ public class RecommendationAppTest {
         }
     }
 
+    private static JSONObject makeRequest(String methodType) {
+        JSONObject request = new JSONObject();
+        authentication = new JSONObject();
+        authentication.put(AUTHENTICATED, true);
+        authentication.put(RecommendationCommand.USERNAME, users[0]);
+        request.put(AUTHENTICATION_PARAMS, authentication);
+        request.put("methodType", methodType);
+        request.put("uriParams", new JSONObject());
+        return request;
+    }
+
     @Test
     public void GetPopularSubThreads() {
-        new UpdatePopularSubThreads().execute(new JSONObject());
-        JSONObject responseJson = new JSONObject(new GetPopularSubThreads().execute(new JSONObject()));
+        new UpdatePopularSubThreads().execute();
+        JSONObject responseJson = new JSONObject(new GetPopularSubThreads().execute());
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[subThreads.length - 1]));
     }
 
     @Test
     public void GetPopularThreads() {
-        new UpdatePopularThreads().execute(new JSONObject());
-        JSONObject responseJson = new JSONObject(new GetPopularThreads().execute(new JSONObject()));
+        new UpdatePopularThreads().execute();
+        JSONObject responseJson = new JSONObject(new GetPopularThreads().execute());
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(threadName).equals(threads[threads.length - 1]));
     }
 
     @Test
     public void GetRecommendedSubThreads() {
-        new UpdateRecommendedSubThreads().execute(request);
-        JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(request));
+        new UpdateRecommendedSubThreads().execute(makeRequest("PUT"));
+        JSONObject responseJson = new JSONObject(new GetRecommendedSubThreads().execute(makeRequest("GET")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[4]));
     }
 
     @Test
     public void GetRecommendedThreads() {
-        new UpdateRecommendedThreads().execute(request);
-        JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(request));
+        new UpdateRecommendedThreads().execute(makeRequest("PUT"));
+        JSONObject responseJson = new JSONObject(new GetRecommendedThreads().execute(makeRequest("GET")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
 
     @Test
     public void GetRecommendedUsers() {
-        new UpdateRecommendedUsers().execute(request);
-        JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(request));
+        new UpdateRecommendedUsers().execute(makeRequest("PUT"));
+        JSONObject responseJson = new JSONObject(new GetRecommendedUsers().execute(makeRequest("GET")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
 
     @Test
     public void UpdatePopularSubThreads() {
-        JSONObject responseJson = new JSONObject(new UpdatePopularSubThreads().execute(new JSONObject()));
+        JSONObject responseJson = new JSONObject(new UpdatePopularSubThreads().execute());
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[subThreads.length - 1]));
     }
 
     @Test
     public void UpdatePopularThreads() {
-        JSONObject responseJson = new JSONObject(new UpdatePopularThreads().execute(new JSONObject()));
+        JSONObject responseJson = new JSONObject(new UpdatePopularThreads().execute());
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(threadName).equals(threads[threads.length - 1]));
     }
 
     @Test
     public void UpdateRecommendedSubThreads() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedSubThreads().execute(request));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedSubThreads().execute(makeRequest("PUT")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(subThreadId).equals(subThreads[4]));
     }
 
     @Test
     public void UpdateRecommendedThreads() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedThreads().execute(request));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedThreads().execute(makeRequest("PUT")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").length() != 0);
     }
 
     @Test
     public void UpdateRecommendedUsers() {
-        JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(request));
+        JSONObject responseJson = new JSONObject(new UpdateRecommendedUsers().execute(makeRequest("PUT")));
         assertEquals(200, responseJson.getInt("statusCode"));
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }

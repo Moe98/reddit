@@ -25,21 +25,7 @@ public class SearchApp extends Service {
     final public static String SUB_THREAD_CONTENT = SubThreadAttributes.CONTENT.getDb();
     final public static String SUB_THREAD_HAS_IMAGE = SubThreadAttributes.HAS_IMAGE.getDb();
     final public static String SUB_THREAD_DATE = SubThreadAttributes.DATE_CREATED.getDb();
-
-    @Override
-    public String getAppUriName() {
-        return "SEARCH";
-    }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
+    final public static String SEARCH_KEYWORDS = "searchKeywords";
 
     public static String getViewName(String collectionName) {
         return collectionName + "View";
@@ -62,5 +48,20 @@ public class SearchApp extends Service {
     public static void main(String[] args) {
         dbInit();
         new SearchApp().start();
+    }
+
+    @Override
+    public String getAppUriName() {
+        return "SEARCH";
+    }
+
+    @Override
+    public int getThreadCount() {
+        return 10;
+    }
+
+    @Override
+    public String getConfigMapPath() {
+        return DEFAULT_PROPERTIES_FILENAME;
     }
 }
