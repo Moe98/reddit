@@ -27,7 +27,7 @@ public class GetRecommendedSubThreads extends RecommendationCommand {
                 return Responder.makeErrorResponse("Failed to create data JSONArray from Couchbase results.", 500);
             }
         } catch (DocumentNotFoundException e) {
-            return new UpdateRecommendedSubThreads().execute();
+            return new UpdateRecommendedSubThreads().execute(origRequest.put("methodType", "PUT"));
         } catch (TimeoutException e) {
             return Responder.makeErrorResponse("Request to Couchbase timed out.", 408);
         } catch (CouchbaseException e) {
