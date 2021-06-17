@@ -23,7 +23,9 @@ public enum CollectionNames {
     USER_FOLLOW_THREAD("UserFollowThread"),
     USER_BOOKMARK_THREAD("UserBookmarkThread"),
     THREAD_CONTAIN_SUBTHREAD("ThreadContainSubThread"),
-    USER_BANNED_FROM_THREAD("UserBannedFromThread");
+    USER_BANNED_FROM_THREAD("UserBannedFromThread"),
+    USER_BLOCK_USER("UserBlockUser");
+
 
     private final String collectionName;
 

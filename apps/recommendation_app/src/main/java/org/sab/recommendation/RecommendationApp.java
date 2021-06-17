@@ -13,7 +13,6 @@ import org.sab.models.ThreadAttributes;
 import org.sab.recommendation.commands.UpdatePopularSubThreads;
 import org.sab.recommendation.commands.UpdatePopularThreads;
 import org.sab.service.Service;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +52,7 @@ public class RecommendationApp extends Service {
     final public static String USERNAMES_DATA_KEY = "listOfUsernames";
     final public static String AUTHENTICATION_PARAMS = "authenticationParams";
     final public static String AUTHENTICATED = "isAuthenticated";
+    final public static String USER_BLOCK_USER_COLLECTION_NAME = CollectionNames.USER_BLOCK_USER.get();
 
     @Override
     public String getAppUriName() {
@@ -91,6 +91,7 @@ public class RecommendationApp extends Service {
             arango.createCollectionIfNotExists(DB_NAME, THREAD_CONTAIN_SUB_THREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_NAME, USER_FOLLOW_USER_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_NAME, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_NAME, USER_BLOCK_USER_COLLECTION_NAME, true);
             arango.createViewIfNotExists(DB_NAME, getViewName(THREADS_COLLECTION_NAME), THREADS_COLLECTION_NAME, new String[]{THREAD_NAME, THREAD_DESCRIPTION});
             arango.createViewIfNotExists(DB_NAME, getViewName(SUB_THREADS_COLLECTION_NAME), SUB_THREADS_COLLECTION_NAME, new String[]{SUB_THREAD_TITLE, SUB_THREAD_CONTENT});
         } catch (ArangoDBException | CouchbaseException e) {
