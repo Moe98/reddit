@@ -10,7 +10,7 @@ const TextInput = importJsx('./text-input')
 const { useState } = React
 
 const AddGroupMember = ({ onBack }) => {
-	const { userId } = useContext(AppContext)
+	const { authToken } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [memberId, setMemberId] = useState('')
 
@@ -18,9 +18,9 @@ const AddGroupMember = ({ onBack }) => {
 
 	const onAction = (memberId) => {
 		chatContext.sendToChat({
+			authToken,
 			type: 'ADD_GROUP_MEMBER',
 			chatId: chat.chatId,
-			adminId: userId,
 			memberId: mapSpecialIdToId(memberId)
 		})
 		onBack()

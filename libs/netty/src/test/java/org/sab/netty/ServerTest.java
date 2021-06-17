@@ -146,7 +146,7 @@ public class ServerTest {
         runExampleApp();
         String response = null;
         try {
-            response = get("http://localhost:8080/api/example_app", "HELLO_WORLD");
+            response = get("http://localhost:8080/api/example", "HELLO_WORLD");
         } catch (IOException | InterruptedException e) {
             fail(e.getMessage());
         }
