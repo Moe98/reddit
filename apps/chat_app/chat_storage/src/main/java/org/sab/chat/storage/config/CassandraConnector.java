@@ -31,19 +31,12 @@ public class CassandraConnector {
     }
 
     private void init() {
-        JSONObject configJSON = null;
-        try {
-            configJSON = loadConfigFile();
-        } catch (Exception e) {
-            System.err.println("failed to load configuration file");
-            e.printStackTrace();
-        }
-        node = (String) configJSON.get("CASSANDRA_NODE");
-        port = ((Long) configJSON.get("CASSANDRA_PORT")).intValue();
+        node = System.getenv("CASSANDRA_NODE");
+        port = Integer.parseInt(System.getenv("CASSANDRA_PORT"));
 
-        keyspaceName = (String) configJSON.get("KEYSPACE_NAME");
-        replicationStrategy = (String) configJSON.get("REPLICATION_STRATEGY");
-        replicationFactor = ((Long) configJSON.get("REPLICATION_FACTOR")).intValue();
+        keyspaceName = System.getenv("KEYSPACE_NAME");
+        replicationStrategy = System.getenv("REPLICATION_STRATEGY");
+        replicationFactor = Integer.parseInt(System.getenv("REPLICATION_FACTOR"));
     }
 
     public void connect() {
