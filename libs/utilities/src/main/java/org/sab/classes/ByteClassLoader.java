@@ -1,4 +1,4 @@
-package org.sab.classloader;
+package org.sab.classes;
 
 import java.io.File;
 import java.io.IOException;

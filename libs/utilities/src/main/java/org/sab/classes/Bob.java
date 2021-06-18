@@ -1,4 +1,4 @@
-package org.sab.classloader;
+package org.sab.classes;
 
 @SuppressWarnings("unused")
 public class Bob {

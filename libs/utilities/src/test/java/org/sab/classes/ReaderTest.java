@@ -1,4 +1,4 @@
-package org.sab.classloader;
+package org.sab.classes;
 
 import org.junit.Test;
 
@@ -67,7 +67,7 @@ public class ReaderTest {
 
         // Expected output for each version
         final List<String> expected = List.of("Flying", "Hopping");
-        
+
         final int loadCount = 4;
 
         // Alternate between versions
