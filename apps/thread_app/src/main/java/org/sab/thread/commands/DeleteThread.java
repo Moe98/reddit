@@ -122,7 +122,7 @@ public class DeleteThread extends ThreadCommand {
                     arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 } catch (Exception e) {
                     System.err.println("subthread: " + i);
-                    System.err.println(e.getStackTrace());
+                    e.printStackTrace();
                     System.err.println(e.getMessage());
                     return Responder.makeErrorResponse(e.getMessage(), 333);
                 }
@@ -136,7 +136,7 @@ public class DeleteThread extends ThreadCommand {
                     arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 } catch (Exception e) {
                     System.err.printf("comment: %d out of: %d with id: %s\n", i, commentJsonArr.length(), commentId);
-                    System.err.println(e.getStackTrace());
+                    e.printStackTrace();
                     System.err.println(e.getMessage());
                     return Responder.makeErrorResponse(e.getMessage(), 777);
                 }
@@ -145,7 +145,7 @@ public class DeleteThread extends ThreadCommand {
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
         } catch (ArangoDBException e) {
-            System.err.println(e.getStackTrace());
+            e.printStackTrace();
             System.err.println(e.getMessage());
             return Responder.makeErrorResponse(e.getMessage(), 666);
         } catch (Exception e) {
