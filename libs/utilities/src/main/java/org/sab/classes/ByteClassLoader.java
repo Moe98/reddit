@@ -13,6 +13,7 @@ class ByteClassLoader extends ClassLoader {
 
 
     public static Class<?> loadClassFromBytes(String name, byte[] b) {
+        // Convert the entire array of bytes (0 offset) into a Class
         return new ByteClassLoader().defineClass(name, b, 0, b.length);
     }
 
