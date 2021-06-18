@@ -42,7 +42,7 @@ public class ReaderTest {
 
     @Test
     public void readUpdateRemoveClass() {
-        final String className = "org.sab.classloader.Charlie";
+        final String className = "org.sab.classes.Charlie";
         final String methodName = "jump";
 
         // Assert that class is not found by the current class loader
@@ -104,7 +104,7 @@ public class ReaderTest {
 
     @Test
     public void loadClassByName() {
-        final String className = "org.sab.classloader.Bob";
+        final String className = "org.sab.classes.Bob";
         final String methodName = "talk";
         final String expectedResult = "Hi";
 
@@ -122,7 +122,7 @@ public class ReaderTest {
 
     @Test
     public void loadClassFromResourcesByName() {
-        final String className = "org.sab.classloader.Alice";
+        final String className = "org.sab.classes.Alice";
         final String methodName = "run";
         final String expectedResult = "Running";
 
