@@ -193,4 +193,20 @@ public class ExampleAppTest {
             fail(e.getMessage());
         }
     }
+
+    @Test(timeout = 3000)
+    public void resumeThenFreezeThenGetRequest() {
+        ExampleApp app = mockApp();
+        app.start();
+        app.resume();
+        app.freeze();
+
+        try {
+            HttpClient.get("api/example", "HELLO_WORLD");
+            // assert no exception occured
+        } catch (IOException | InterruptedException e) {
+            fail(e.getMessage());
+        }
+
+    }
 }
