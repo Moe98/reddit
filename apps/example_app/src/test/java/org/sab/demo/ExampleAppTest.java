@@ -184,9 +184,7 @@ public class ExampleAppTest {
         Future<String> future = null;
         try {
             future = getThreadPool(app).submit(trivialCallable);
-        } catch (NoSuchFieldException e) {
-            fail(e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             fail(e.getMessage());
         }
         try {
