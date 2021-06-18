@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -84,7 +85,6 @@ public class SearchAppTest {
                 toBeDeleted.get(SUB_THREADS_COLLECTION_NAME).add(created.getKey());
                 subThreadsKeys[i] = created.getKey();
             }
-            TimeUnit.SECONDS.sleep(5);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -115,25 +115,29 @@ public class SearchAppTest {
 
     @Test
     public void SearchThread() {
-        try {
-            JSONObject responseJson = new JSONObject(new SearchThread().execute(makeRequest("ThreadForTestSearchApp")));
-            assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(arango.viewExists(SearchApp.DB_NAME, SearchApp.getViewName(THREADS_COLLECTION_NAME)));
-            assertTrue(arango.documentExists(SearchApp.DB_NAME, THREADS_COLLECTION_NAME, threads[0]));
-            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(THREAD_NAME).equals(threads[0]));
-        } catch (JSONException e) {
-            fail(e.getMessage());
-        }
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            try {
+                JSONObject responseJson = new JSONObject(new SearchThread().execute(makeRequest("ThreadForTestSearch")));
+                assertEquals(200, responseJson.getInt("statusCode"));
+                assertTrue(arango.viewExists(SearchApp.DB_NAME, SearchApp.getViewName(THREADS_COLLECTION_NAME)));
+                assertTrue(arango.documentExists(SearchApp.DB_NAME, THREADS_COLLECTION_NAME, threads[0]));
+                assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(THREAD_NAME).equals(threads[0]));
+            } catch (JSONException e) {
+                fail(e.getMessage());
+            }
+        }, 5, TimeUnit.SECONDS);
     }
 
     @Test
     public void SearchSubThread() {
-        try {
-            JSONObject responseJson = new JSONObject(new SearchSubThread().execute(makeRequest("ice cream")));
-            assertEquals(200, responseJson.getInt("statusCode"));
-            assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(SUB_THREAD_ID).equals(subThreadsKeys[1]));
-        } catch (JSONException e) {
-            fail(e.getMessage());
-        }
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            try {
+                JSONObject responseJson = new JSONObject(new SearchSubThread().execute(makeRequest("ice cream")));
+                assertEquals(200, responseJson.getInt("statusCode"));
+                assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(SUB_THREAD_ID).equals(subThreadsKeys[1]));
+            } catch (JSONException e) {
+                fail(e.getMessage());
+            }
+        }, 5, TimeUnit.SECONDS);
     }
 }
