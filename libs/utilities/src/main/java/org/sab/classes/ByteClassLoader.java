@@ -19,14 +19,14 @@ class ByteClassLoader extends ClassLoader {
 
     public static Class<?> loadClassByName(String name) throws ClassNotFoundException {
         try {
-            final byte[] b = loadClassBytes(name);
+            final byte[] b = readClassFileAsBytes(name);
             return loadClassFromBytes(name, b);
         } catch (IOException e) {
             throw new ClassNotFoundException("Class not found.", e);
         }
     }
 
-    private static byte[] loadClassBytes(String className) throws IOException {
+    private static byte[] readClassFileAsBytes(String className) throws IOException {
         byte[] buffer;
 
         try (final InputStream inputStream = getClassInputStream(className)) {
