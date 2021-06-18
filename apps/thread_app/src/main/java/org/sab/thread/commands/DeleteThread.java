@@ -129,12 +129,13 @@ public class DeleteThread extends ThreadCommand {
             }
 
             // delete comments
+            System.err.println(commentJsonArr.length());
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 try {
                     arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 } catch (Exception e) {
-                    System.err.println("comment: " + i);
+                    System.err.printf("comment: %d out of: %d with id: %s\n", i, commentJsonArr.length(), commentId);
                     System.err.println(e.getStackTrace());
                     System.err.println(e.getMessage());
                     return Responder.makeErrorResponse(e.getMessage(), 777);
