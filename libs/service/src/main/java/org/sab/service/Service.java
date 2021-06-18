@@ -23,10 +23,6 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     public static final String DEFAULT_PROPERTIES_FILENAME = "commandmap.properties";
-    private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
-    private static final int MAX_THREAD_TIMEOUT = 4;
-    private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount", DB_CONNECTIONS_COUNT_PROPERTY_NAME = "dbConnectionsCount";
-    private static final int DEFAULT_THREADS_COUNT = 10, DEFAULT_DB_CONNECTIONS_COUNT = 10;
     private final Properties configProperties = new Properties();
     private ExecutorService threadPool;
     private RPCServer messagingServer;
@@ -44,11 +40,11 @@ public abstract class Service {
     }
 
     private final int getThreadCount() {
-        return readProperty(THREADS_COUNT_PROPERTY_NAME, DEFAULT_THREADS_COUNT);
+        return readProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_THREADS_COUNT);
     }
 
     public final int getDbConnectionsCount() {
-        return readProperty(DB_CONNECTIONS_COUNT_PROPERTY_NAME, DEFAULT_DB_CONNECTIONS_COUNT);
+        return readProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_DB_CONNECTIONS_COUNT);
     }
 
     public abstract String getConfigMapPath();
