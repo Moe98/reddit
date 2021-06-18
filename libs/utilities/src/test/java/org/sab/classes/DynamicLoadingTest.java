@@ -15,7 +15,7 @@ import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ReaderTest {
+public class DynamicLoadingTest {
 
     // Uses no-args constructor
     private static Object invokeClassMethod(Class<?> clazz, String methodName) throws NoSuchMethodException,
@@ -26,7 +26,7 @@ public class ReaderTest {
     }
 
     private static Path getResourcePath(String resource) {
-        final URL url = ReaderTest.class.getClassLoader().getResource(resource);
+        final URL url = DynamicLoadingTest.class.getClassLoader().getResource(resource);
 
         if (url == null) {
             return null;
