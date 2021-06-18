@@ -57,13 +57,14 @@ public class ReaderTest {
         final Path flyingPath = getResourcePath("CharlieFlying");
         final Path hoppingPath = getResourcePath("CharlieHopping");
 
-        final List<Path> paths = List.of(flyingPath, hoppingPath);
-
         try {
-            paths.forEach(Objects::requireNonNull);
+            Objects.requireNonNull(flyingPath);
+            Objects.requireNonNull(hoppingPath);
         } catch (NullPointerException e) {
             fail(e.getMessage());
         }
+
+        final List<Path> paths = List.of(flyingPath, hoppingPath);
 
         // Expected output for each version
         final List<String> expected = List.of("Flying", "Hopping");
