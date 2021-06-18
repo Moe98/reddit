@@ -32,7 +32,6 @@ public class UpdateComment extends CommentCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             final String content = body.getString(CONTENT);
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
@@ -75,10 +74,6 @@ public class UpdateComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(comment.toJSON()).toString();

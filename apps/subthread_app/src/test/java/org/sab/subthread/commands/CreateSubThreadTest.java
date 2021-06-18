@@ -39,8 +39,7 @@ public class CreateSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
             arango.createDatabase(SubThreadCommand.DB_Name);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);

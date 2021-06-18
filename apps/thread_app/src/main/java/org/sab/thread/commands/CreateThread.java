@@ -51,7 +51,6 @@ public class CreateThread extends ThreadCommand {
             String creatorId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
@@ -92,7 +91,7 @@ public class CreateThread extends ThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {
-                arango.disconnect();
+
             }
         }
         return Responder.makeDataResponse(thread.toJSON()).toString();

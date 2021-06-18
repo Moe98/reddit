@@ -22,7 +22,7 @@ public class UpdatePopularSubThreads extends Command {
         JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             String query = """
                     FOR subThread IN %s
                         SORT subThread.%s DESC
@@ -53,8 +53,6 @@ public class UpdatePopularSubThreads extends Command {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            arango.disconnect();
         }
 
         if (data.length() != 0) {

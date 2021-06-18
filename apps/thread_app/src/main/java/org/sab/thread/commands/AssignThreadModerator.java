@@ -45,7 +45,6 @@ public class AssignThreadModerator extends ThreadCommand {
             String assignerId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 // TODO if this doesn't exist something is wrong!
@@ -100,9 +99,9 @@ public class AssignThreadModerator extends ThreadCommand {
 
         } finally {
             if (arango != null) {
-                arango.disconnect();
+
             }
-            arango.disconnect();
+
             response.put("msg", msg);
         }
 

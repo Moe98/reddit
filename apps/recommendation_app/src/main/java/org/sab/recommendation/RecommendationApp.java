@@ -76,7 +76,7 @@ public class RecommendationApp extends Service {
     public static void dbInit() {
         try {
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             Couchbase couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 

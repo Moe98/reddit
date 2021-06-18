@@ -24,7 +24,6 @@ public class SearchSubThread extends Command {
                 return Responder.makeErrorResponse("searchKeywords must not be blank", 400).toString();
 
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // Search SubThread by using an English text analyzer to search for keywords appearing in SubThreads' Titles
             // & Contents.

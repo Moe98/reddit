@@ -32,7 +32,6 @@ public class BlockUser extends UserToUserCommand {
         String responseMessage = "";
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
             String userId = body.getString(USER_ID);
@@ -76,9 +75,6 @@ public class BlockUser extends UserToUserCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", responseMessage);
         }
 

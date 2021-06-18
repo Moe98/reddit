@@ -41,7 +41,6 @@ public class DislikeSubThread extends SubThreadCommand {
             String subthreadId = body.getString(SUBTHREAD_ID);
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
@@ -102,9 +101,6 @@ public class DislikeSubThread extends SubThreadCommand {
             System.err.println(e);
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

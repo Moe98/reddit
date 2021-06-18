@@ -47,7 +47,7 @@ public class SearchApp extends Service {
     public static void dbInit() {
         try {
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(DB_NAME);
             arango.createCollectionIfNotExists(DB_NAME, THREADS_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_NAME, SUB_THREADS_COLLECTION_NAME, false);

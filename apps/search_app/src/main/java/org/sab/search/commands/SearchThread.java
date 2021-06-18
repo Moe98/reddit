@@ -24,7 +24,6 @@ public class SearchThread extends Command {
                 return Responder.makeErrorResponse("searchKeyword must not be blank", 400).toString();
 
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // Search Threads using an English text analyzer to search for the keyword appearing in a prefix of Threads'
             // names.

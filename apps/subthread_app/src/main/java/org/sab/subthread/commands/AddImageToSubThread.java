@@ -46,7 +46,6 @@ public class AddImageToSubThread extends SubThreadCommand {
             String output;
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // check subthread exist
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
@@ -74,10 +73,6 @@ public class AddImageToSubThread extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeMsgResponse("Profile Picture uploaded successfully");

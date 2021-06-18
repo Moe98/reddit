@@ -27,8 +27,7 @@ public class LikeCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertComments(commentId1, parentThreadId1, "content", mantaId, "SubThread");
@@ -68,7 +67,6 @@ public class LikeCommentTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
     }
 
@@ -140,14 +138,14 @@ public class LikeCommentTest {
     @Test
     public void T01_UserLikeCommentForTheFirstTime() {
         String commentId = commentId1;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, true);
 
         BaseDocument commentBeforeLike = arango.readDocument(CommentCommand.DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, commentId);
         int oldNumOfLikes = Integer.parseInt(String.valueOf(commentBeforeLike.getAttribute(CommentCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(commentBeforeLike.getAttribute(CommentCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeComment(mantaId, commentId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -157,7 +155,7 @@ public class LikeCommentTest {
         assertEquals("added your like on the comment", data.get("msg"));
 
         // checking the db for the addition of the like edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> commentAtt = new ArrayList<>();
         commentAtt.add(CommentCommand.CREATOR_ID_DB);
@@ -182,7 +180,7 @@ public class LikeCommentTest {
     @Test
     public void T02_UserLikeCommentForTheSecondTime() {
         String commentId = commentId2;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, true);
 
         // like the comment first time
@@ -192,7 +190,7 @@ public class LikeCommentTest {
         int oldNumOfLikes = Integer.parseInt(String.valueOf(commentBefore2ndLike.getAttribute(CommentCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(commentBefore2ndLike.getAttribute(CommentCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeComment(mantaId, commentId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -202,7 +200,7 @@ public class LikeCommentTest {
         assertEquals("removed your like on the comment", data.get("msg"));
 
         // checking the db for the removal of the like edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> commentAtt = new ArrayList<>();
         commentAtt.add(CommentCommand.CREATOR_ID_DB);
@@ -227,7 +225,7 @@ public class LikeCommentTest {
     @Test
     public void T03_UserLikeCommentAfterDislikingIt() {
         String commentId = commentId3;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, true);
         arango.createCollectionIfNotExists(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
 
@@ -237,7 +235,7 @@ public class LikeCommentTest {
         int oldNumOfLikes = Integer.parseInt(String.valueOf(commentBeforeLike.getAttribute(CommentCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(commentBeforeLike.getAttribute(CommentCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeComment(mantaId, commentId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -247,7 +245,7 @@ public class LikeCommentTest {
         assertEquals("added your like on the comment & removed your dislike", data.get("msg"));
 
         // checking the db for the adition of the like edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> commentAtt = new ArrayList<>();
         commentAtt.add(CommentCommand.CREATOR_ID_DB);
@@ -268,7 +266,7 @@ public class LikeCommentTest {
         assertEquals(newNumOfDislikes, oldNumOfDislikes - 1);
 
         // checking the db for the removal of the dislike edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         JSONArray commentArr2 = arango.parseOutput(cursor2, CommentCommand.COMMENT_ID, commentAtt);
         assertEquals(0, commentArr2.length());
