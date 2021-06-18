@@ -50,7 +50,6 @@ public class DeleteThreadTest {
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
             manta = TestUtils.setUpUser(mantaId, false, 0);
-            ;
             TestUtils.addObjectToCollection(arango, manta, USER_COLLECTION_NAME);
 
             lujine = TestUtils.setUpUser(lujineId, false, 0);
@@ -161,7 +160,7 @@ public class DeleteThreadTest {
     @Test
     public void T03_CreatorDeleteThread() {
         JSONObject response = deleteThread(fishName, mantaId);
-        System.out.println(response.toString());
+        System.err.println(response.toString());
         assertEquals(200, response.getInt("statusCode"));
 
         assertFalse(arango.documentExists(DB_NAME, THREAD_COLLECTION_NAME, fishName));

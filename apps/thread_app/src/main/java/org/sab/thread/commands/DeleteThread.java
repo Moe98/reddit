@@ -1,6 +1,7 @@
 package org.sab.thread.commands;
 
 import com.arangodb.ArangoCursor;
+import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -64,7 +65,7 @@ public class DeleteThread extends ThreadCommand {
             // TODO check thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 444).toString();
+                return Responder.makeErrorResponse(msg, 444);
             }
 
             // TODO check person deleting is creator
@@ -72,7 +73,7 @@ public class DeleteThread extends ThreadCommand {
             String creatorID = (String) threadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this thread!";
-                return Responder.makeErrorResponse(msg, 401).toString();
+                return Responder.makeErrorResponse(msg, 401);
             }
 
             // get all children subthreads
@@ -130,15 +131,19 @@ public class DeleteThread extends ThreadCommand {
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
+        } catch (ArangoDBException e) {
+            System.err.println(e.getMessage());
+            return Responder.makeErrorResponse(e.getMessage(), 666);
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 555).toString();
+            System.err.println(e.getMessage());
+            return Responder.makeErrorResponse(e.getMessage(), 555);
         } finally {
             if (arango != null) {
                 arango.disconnect();
             }
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 }
 
