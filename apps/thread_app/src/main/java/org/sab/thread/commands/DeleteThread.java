@@ -129,7 +129,6 @@ public class DeleteThread extends ThreadCommand {
             }
 
             // delete comments
-            System.err.println(commentJsonArr.length());
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 try {
