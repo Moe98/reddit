@@ -44,14 +44,20 @@ public class UpdateRecommendedUsers extends Command {
                         FOR user IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
                             RETURN user
                     )
+                    LET blocked = (
+                        FOR user IN 1..1 OUTBOUND CONCAT('%s/', @username) %s
+                            RETURN user
+                    )
                     FOR user IN 2..2 OUTBOUND CONCAT('%s/', @username) %s
-                         Filter user._id != CONCAT('%s/', @username) AND user NOT IN followed
+                         Filter user._id != CONCAT('%s/', @username) AND user NOT IN followed AND user NOT IN blocked
                          COLLECT friend = user._key WITH COUNT INTO mutual_number
                          SORT mutual_number DESC
                          LIMIT 25
                          RETURN {username:friend}"""
                     .formatted(RecommendationApp.USERS_COLLECTION_NAME,
                             RecommendationApp.USER_FOLLOW_USER_COLLECTION_NAME,
+                            RecommendationApp.USERS_COLLECTION_NAME,
+                            RecommendationApp.USER_BLOCK_USER_COLLECTION_NAME,
                             RecommendationApp.USERS_COLLECTION_NAME,
                             RecommendationApp.USER_FOLLOW_USER_COLLECTION_NAME,
                             RecommendationApp.USERS_COLLECTION_NAME);
