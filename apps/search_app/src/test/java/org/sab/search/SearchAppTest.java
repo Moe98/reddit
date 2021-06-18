@@ -116,8 +116,10 @@ public class SearchAppTest {
     @Test
     public void SearchThread() {
         try {
-            JSONObject responseJson = new JSONObject(new SearchThread().execute(makeRequest("ThreadForTestSearch")));
+            JSONObject responseJson = new JSONObject(new SearchThread().execute(makeRequest("ThreadForTestSearchApp")));
             assertEquals(200, responseJson.getInt("statusCode"));
+            assertTrue(arango.viewExists(SearchApp.DB_NAME, SearchApp.getViewName(THREADS_COLLECTION_NAME)));
+            assertTrue(arango.documentExists(SearchApp.DB_NAME, THREADS_COLLECTION_NAME, threads[0]));
             assertTrue(responseJson.getJSONArray("data").getJSONObject(0).getString(THREAD_NAME).equals(threads[0]));
         } catch (JSONException e) {
             fail(e.getMessage());
