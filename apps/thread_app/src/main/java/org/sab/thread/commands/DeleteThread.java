@@ -64,7 +64,7 @@ public class DeleteThread extends ThreadCommand {
             // TODO check thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 444).toString();
             }
 
             // TODO check person deleting is creator
@@ -131,7 +131,7 @@ public class DeleteThread extends ThreadCommand {
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 555).toString();
         } finally {
             if (arango != null) {
                 arango.disconnect();

@@ -161,6 +161,7 @@ public class DeleteThreadTest {
     @Test
     public void T03_CreatorDeleteThread() {
         JSONObject response = deleteThread(fishName, mantaId);
+        System.out.println(response.toString());
         assertEquals(200, response.getInt("statusCode"));
 
         assertFalse(arango.documentExists(DB_NAME, THREAD_COLLECTION_NAME, fishName));
