@@ -138,6 +138,7 @@ public class DeleteThread extends ThreadCommand {
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
         } catch (ArangoDBException e) {
+            System.err.println(e.getStackTrace());
             System.err.println(e.getMessage());
             return Responder.makeErrorResponse(e.getMessage(), 666);
         } catch (Exception e) {
