@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sab.HttpServerUtilities.HttpClient;
 import org.sab.demo.commands.GoodByeWorld;
 import org.sab.demo.commands.HelloWorld;
@@ -22,6 +23,7 @@ import static org.junit.Assert.*;
  * Unit test for Example App.
  */
 public class ExampleAppTest {
+    public static int availablePort = 4000;
 
 
     @BeforeClass
@@ -46,6 +48,21 @@ public class ExampleAppTest {
         field.setAccessible(true);
         return (ExecutorService) field.get(service);
 
+    }
+
+    /**
+     * Creates a mocked app that uses the controller port specified by {@link #obtainPort}.
+     * @return the mocked app.
+     */
+    private static ExampleApp mockApp() {
+        final int controllerPort = obtainPort();
+        ExampleApp app = Mockito.spy(new ExampleApp());
+        Mockito.when(app.getControllerPort()).thenReturn(controllerPort);
+        return app;
+    }
+
+    public static synchronized int obtainPort() {
+        return availablePort++;
     }
 
 
@@ -83,7 +100,7 @@ public class ExampleAppTest {
     @Test
     public void freeze() {
         ExecutorService threadPool = Executors.newScheduledThreadPool(3);
-        ExampleApp app = new ExampleApp();
+        ExampleApp app = mockApp();
         app.start();
         app.freeze();
         final Callable<String> getRequest = () -> HttpClient.get("api/example", "HELLO_WORLD");
@@ -105,7 +122,7 @@ public class ExampleAppTest {
 
     @Test
     public void callingExampleAppAPI() {
-        ExampleApp app = new ExampleApp();
+        ExampleApp app = mockApp();
         app.start();
         String response = null;
         try {
@@ -119,7 +136,7 @@ public class ExampleAppTest {
 
     @Test
     public void deleteCommandWorksAsExpected() {
-        ExampleApp app = new ExampleApp();
+        ExampleApp app = mockApp();
         app.start();
         app.deleteCommand("HELLO_WORLD");
         String response = null;
@@ -134,7 +151,7 @@ public class ExampleAppTest {
 
     @Test
     public void setMaxThreadsCountWaitsForActiveThreadsToTerminate() {
-        ExampleApp app = new ExampleApp();
+        ExampleApp app = mockApp();
         app.start();
         final String testString = "Hello";
         Callable<String> callable = () -> {
@@ -160,7 +177,7 @@ public class ExampleAppTest {
     @Test
     public void threadPoolReloadsProperlyAfterSettingMaxThreadsCount() {
 
-        ExampleApp app = new ExampleApp();
+        ExampleApp app = mockApp();
         app.start();
 
         app.setMaxThreadsCount(4);
