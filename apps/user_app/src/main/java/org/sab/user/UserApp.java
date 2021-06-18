@@ -42,12 +42,7 @@ public class UserApp extends Service {
         if (ARANGO_DB_NAME == null)
             throw new EnvironmentVariableNotLoaded("ARANGO_DB");
         Arango arango = Arango.getInstance();
-        try {
-            arango.connectIfNotConnected();
-            arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
-            arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
-        } finally {
-            arango.disconnect();
-        }
+        arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
+        arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
     }
 }

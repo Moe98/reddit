@@ -39,8 +39,7 @@ public class UpdateSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
 
@@ -156,7 +155,6 @@ public class UpdateSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.disconnect();
         arango.dropDatabase(DB_NAME);
     }
 

@@ -47,7 +47,6 @@ public class DeleteSubThread extends SubThreadCommand {
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
@@ -115,9 +114,6 @@ public class DeleteSubThread extends SubThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

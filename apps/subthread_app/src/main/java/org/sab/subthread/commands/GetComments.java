@@ -34,7 +34,6 @@ public class GetComments extends CommentCommand {
         String msg;
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO not a uri param
             final String parentId = body.getString(PARENT_SUBTHREAD_ID);
@@ -96,10 +95,6 @@ public class GetComments extends CommentCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

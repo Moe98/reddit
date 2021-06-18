@@ -31,7 +31,6 @@ public class FollowThread extends ThreadCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             final String threadName = body.getString(THREAD_NAME);
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
@@ -72,9 +71,6 @@ public class FollowThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", responseMessage);
         }
 

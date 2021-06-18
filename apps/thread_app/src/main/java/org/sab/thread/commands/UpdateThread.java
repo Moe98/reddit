@@ -34,7 +34,6 @@ public class UpdateThread extends ThreadCommand {
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
                 arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
@@ -66,10 +65,6 @@ public class UpdateThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(thread.toJSON()).toString();

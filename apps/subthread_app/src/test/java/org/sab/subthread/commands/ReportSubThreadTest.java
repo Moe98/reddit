@@ -28,7 +28,7 @@ public class ReportSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
@@ -63,7 +63,7 @@ public class ReportSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
+
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -138,7 +138,7 @@ public class ReportSubThreadTest {
 
     @Test
     public void T01_UserReportingRealSubThread() {
-        arango.connectIfNotConnected();
+
         String typeOfReport = "SCAM";
         String reportedSubthreadId = subthreadId1;
         String threadId = parentThreadId1;
@@ -150,7 +150,7 @@ public class ReportSubThreadTest {
         JSONObject data = (JSONObject) (responseJson.get("data"));
         assertEquals("Created Subthread Report", data.get("msg"));
 
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterCollection(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_REPORTS_COLLECTION_NAME, SubThreadCommand.REPORTER_ID_DB, mantaId);
         ArrayList<String> reportAtt = new ArrayList<>();
         reportAtt.add(SubThreadCommand.REPORTER_ID_DB);
@@ -171,7 +171,7 @@ public class ReportSubThreadTest {
 
     @Test
     public void T02_UserReportingSubThreadFromNonExistingThread() {
-        arango.connectIfNotConnected();
+
         String typeOfReport = "SCAM";
         String reportedSubthreadId = subthreadId1;
         String threadId = parentThreadId2;
@@ -185,7 +185,7 @@ public class ReportSubThreadTest {
 
     @Test
     public void T03_UserReportingNonExistingSubThread() {
-        arango.connectIfNotConnected();
+
         String typeOfReport = "SCAM";
         String reportedSubthreadId = subthreadId2;
         String threadId = parentThreadId1;

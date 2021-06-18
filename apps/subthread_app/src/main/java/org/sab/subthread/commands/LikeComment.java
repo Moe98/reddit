@@ -43,7 +43,6 @@ public class LikeComment extends CommentCommand {
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
@@ -99,9 +98,6 @@ public class LikeComment extends CommentCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

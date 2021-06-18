@@ -25,7 +25,7 @@ public class GetThread extends ThreadCommand {
             final String threadId = uriParams.getString(THREAD_NAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
@@ -49,10 +49,6 @@ public class GetThread extends ThreadCommand {
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(thread.toJSON()).toString();
