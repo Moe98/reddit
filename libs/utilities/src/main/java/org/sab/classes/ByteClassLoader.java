@@ -40,7 +40,7 @@ class ByteClassLoader extends ClassLoader {
 
     private static InputStream getClassInputStream(String className) {
         final String path = className.replace(PACKAGE_SEPARATOR, File.separatorChar) + CLASS_EXT;
-        return CustomClassLoader.class.getClassLoader().getResourceAsStream(path);
+        return ByteClassLoader.class.getClassLoader().getResourceAsStream(path);
     }
 
 }
