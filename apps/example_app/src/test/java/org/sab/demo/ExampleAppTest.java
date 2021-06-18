@@ -43,10 +43,9 @@ public class ExampleAppTest {
      * A function to get the {@code threadPool} from the app even though it's private
      */
     private static ExecutorService getThreadPool(ExampleApp app) throws NoSuchFieldException, IllegalAccessException {
-        Service service = app;
         Field field = Service.class.getDeclaredField("threadPool");
         field.setAccessible(true);
-        return (ExecutorService) field.get(service);
+        return (ExecutorService) field.get(app);
 
     }
 
