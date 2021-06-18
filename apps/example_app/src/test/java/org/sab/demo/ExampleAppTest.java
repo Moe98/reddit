@@ -86,7 +86,7 @@ public class ExampleAppTest {
         GoodByeWorld h = new GoodByeWorld();
         String result = h.execute(new JSONObject());
 
-        assertTrue(result.equals("{\"msg\":\"GoodBye World\"}"));
+        assertEquals("{\"msg\":\"GoodBye World\"}", result);
     }
 
     @Test
