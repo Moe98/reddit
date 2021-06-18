@@ -5,8 +5,9 @@ public enum NotificationMessages {
     COMMENT_LIKE_MSG("Someone liked your comment"),
     COMMENT_DISLIKE_MSG( "Someone Disliked your comment"),
     COMMENT_DELETE_MSG("You deleted your comment"),
-    COMMENT_CREATE_MSG("Somebody commented on your content"),
     COMMENT_UPDATE_MSG("You have updated your comment"),
+    COMMENT_CREATE_ON_COMMENT_MSG("Somebody commented on your comment"),
+    COMMENT_CREATE_ON_SUBTHREAD_MSG("Somebody commented on your subthread"),
 
     SUBTHREAD_TAG_MSG("You have been tagged in a subthread"),
     SUBTHREAD_LIKE_MSG("Someone liked your subthread"),

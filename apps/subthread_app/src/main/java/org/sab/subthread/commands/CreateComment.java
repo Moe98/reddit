@@ -122,27 +122,17 @@ public class CreateComment extends CommentCommand {
 
             // tag a person if someone was tagged in the content of the comment
             tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
-            // getting the person who made the parent comment/subthread
-            JSONArray contentCreatorArr = new JSONArray();
+
+            // getting/notifying the person who made the parent comment/subthread
             if(parentContentType.toLowerCase().equals("comment")){
-                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, COMMENT_COLLECTION_NAME + "/" + parentSubThreadId);
-                ArrayList<String> arr = new ArrayList<>();
-                arr.add(USER_IS_DELETED_DB);
-                arr.add(USER_NUM_OF_FOLLOWERS_DB);
-                contentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
+                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, parentSubThreadId);
+                String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_COMMENT_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
             else{
-                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, SUBTHREAD_COLLECTION_NAME + "/" + parentSubThreadId);
-                ArrayList<String> arr = new ArrayList<>();
-                arr.add(USER_IS_DELETED_DB);
-                arr.add(USER_NUM_OF_FOLLOWERS_DB);
-                contentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
-            }
-
-            if(contentCreatorArr.length()>0){
-                String contentCreator = ((JSONObject)contentCreatorArr.get(0)).getString(USER_ID_DB);
-                // notify the owner of the comment about the dislike
-                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_MSG.getMSG(), commentId, contentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
+                BaseDocument subthreadDoc = arango.readDocument(DB_Name,  SUBTHREAD_COLLECTION_NAME, parentSubThreadId);
+                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_SUBTHREAD_MSG.getMSG(), commentId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
 
         } catch (Exception e) {
