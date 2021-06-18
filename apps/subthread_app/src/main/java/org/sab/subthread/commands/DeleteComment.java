@@ -106,9 +106,6 @@ public class DeleteComment extends CommentCommand {
 
             msg = "Deleted comment: with it's " + numOfComments + " nested comments.";
 
-            // notify the owner of the comment about the deletion
-            notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_DELETE_MSG.getMSG(), commentId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
-
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {

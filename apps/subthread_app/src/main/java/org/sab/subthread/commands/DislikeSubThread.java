@@ -98,16 +98,10 @@ public class DislikeSubThread extends SubThreadCommand {
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
-                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
-                ArrayList<String> arr = new ArrayList<>();
-                arr.add(USER_IS_DELETED_DB);
-                arr.add(USER_NUM_OF_FOLLOWERS_DB);
-                JSONArray subthreadCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
-                if(subthreadCreatorArr.length()>0){
-                    String subthreadCreator = ((JSONObject)subthreadCreatorArr.get(0)).getString(USER_ID_DB);
-                    // notify the owner of the subthread about the dislike
-                    notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DISLIKE_MSG.getMSG(), subthreadId, subthreadCreator, SEND_NOTIFICATION_FUNCTION_NAME);
-                }
+                BaseDocument subthreadDoc = arango.readDocument(DB_Name,  SUBTHREAD_COLLECTION_NAME, subthreadId);
+                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DISLIKE_MSG.getMSG(), subthreadId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
 
             }
         } catch (Exception e) {

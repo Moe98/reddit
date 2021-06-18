@@ -109,8 +109,6 @@ public class DeleteSubThread extends SubThreadCommand {
 
             msg = "Deleted subthread: " + subthreadId + " with it's " + numOfComments + " comments.";
 
-            // notify the owner of the subthread about the deletion
-            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DELETE_MSG.getMSG(), subthreadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();

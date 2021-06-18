@@ -3,7 +3,6 @@ package org.sab.demo.commands;
 import org.json.JSONObject;
 import org.sab.service.Command;
 
-import static org.sab.innerAppComm.Comm.updateRecommendation;
 
 
 public class HelloWorld extends Command {

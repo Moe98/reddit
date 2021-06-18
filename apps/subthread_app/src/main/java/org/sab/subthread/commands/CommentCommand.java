@@ -112,7 +112,7 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = CollectionNames.USER_DISLIKE_COMMENT.get();
     protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
     protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
-
+    protected static final String USER_CREATE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_CREATE_SUBTHREAD.get();
 
     // TODO get queueName from somewhere instead of hardcoding it
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";

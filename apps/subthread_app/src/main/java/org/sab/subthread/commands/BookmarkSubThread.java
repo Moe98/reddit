@@ -67,9 +67,6 @@ public class BookmarkSubThread extends SubThreadCommand {
                 // unbookmark
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, userBookmarkEdgeId);
 
-                // notify the user who is bookmarking with the unbookmarking
-                notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_REMOVE_BOOKMARK_MSG.getMSG(), subthreadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
-
             } else {
                 // bookmark
                 msg = "Bookmarked Subthread";

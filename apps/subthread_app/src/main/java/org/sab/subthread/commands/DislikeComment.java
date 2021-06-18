@@ -108,17 +108,11 @@ public class DislikeComment extends CommentCommand {
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
 
-                ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, COMMENT_COLLECTION_NAME + "/" + commentId);
-                ArrayList<String> arr = new ArrayList<>();
-                arr.add(USER_IS_DELETED_DB);
-                arr.add(USER_NUM_OF_FOLLOWERS_DB);
-                JSONArray commentCreatorArr = arango.parseOutput(cursor, USER_ID_DB, arr);
 
-                if(commentCreatorArr.length()>0){
-                    String commentCreator = ((JSONObject)commentCreatorArr.get(0)).getString(USER_ID_DB);
-                    // notify the owner of the comment about the dislike
-                    notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_DISLIKE_MSG.getMSG(), commentId, commentCreator, SEND_NOTIFICATION_FUNCTION_NAME);
-                }
+                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, commentId);
+                String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_DISLIKE_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
 
             }
         } catch (Exception e) {
