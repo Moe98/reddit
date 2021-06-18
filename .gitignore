@@ -230,5 +230,8 @@ package-lock.json
 config.json
 .idea/dataSources.xml
 
+# Firebase Config
+firebase-config.json
+
 # MacOS
 .DS_Store
