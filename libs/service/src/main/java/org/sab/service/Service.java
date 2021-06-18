@@ -38,7 +38,7 @@ public abstract class Service {
         return Integer.parseInt(configProperties.getProperty(propertyName));
     }
 
-    private final int getThreadCount() {
+    private int getThreadCount() {
         return readProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_THREADS_COUNT);
     }
 
@@ -131,7 +131,7 @@ public abstract class Service {
     private void releaseThreadPool() {
         try {
             threadPool.shutdown();
-            if (!threadPool.awaitTermination(MAX_THREAD_TIMEOUT, TimeUnit.MINUTES)) {
+            if (!threadPool.awaitTermination(ServiceConstants.MAX_THREAD_TIMEOUT, TimeUnit.MINUTES)) {
                 threadPool.shutdownNow();
             }
         } catch (InterruptedException e) {
@@ -146,7 +146,7 @@ public abstract class Service {
     public void initRPCServer() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
-        final String queueName = getAppUriName().toUpperCase() + REQUEST_QUEUE_NAME_SUFFIX;
+        final String queueName = getAppUriName().toUpperCase() + ServiceConstants.REQUEST_QUEUE_NAME_SUFFIX;
 
         TriFunction<String, JSONObject, String> invokeCallback = this::invokeCommand;
         messagingServer = RPCServer.getInstance(queueName, invokeCallback);
