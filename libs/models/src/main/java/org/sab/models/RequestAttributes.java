@@ -1,25 +1,20 @@
 package org.sab.models;
 
 public enum RequestAttributes {
-    BODY("body", null),
-    METHOD_TYPE("methodType",null),
-    AUTHENTICATION_PARAMS("authenticationParams",null),
-    FUNCTION_NAME("functionName", null),
-    URI_PARAMS("uriParams", null);
+    BODY("body"),
+    METHOD_TYPE("methodType"),
+    AUTHENTICATION_PARAMS("authenticationParams"),
+    FUNCTION_NAME("functionName"),
+    URI_PARAMS("uriParams");
 
-    private final String http;
-    private final String db;
+    private final String value;
 
-    RequestAttributes(String http, String db) {
-        this.http = http;
-        this.db = db;
+    RequestAttributes(String value) {
+        this.value = value;
     }
 
-    public String getHTTP() {
-        return http;
+    public String getValue() {
+        return value;
     }
 
-    public String getDb() {
-        return db;
-    }
 }

@@ -26,21 +26,21 @@ public class Comm {
             }
             if(usersList.size()>0){
                 JSONObject body = new JSONObject();
-                body.put(NotificationAttributes.TITLE.getHTTP(), title);
-                body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
-                body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), contentId);
+                body.put(NotificationAttributes.TITLE.getValue(), title);
+                body.put(NotificationAttributes.USERS_LIST.getValue(), usersList);
+                body.put(NotificationAttributes.NOTIFICATION_BODY.getValue(), contentId);
 
                 JSONObject uriParams = new JSONObject();
 
                 JSONObject authenticationParams = new JSONObject();
-                authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
+                authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getValue(), true);
 
                 JSONObject request = new JSONObject();
-                request.put(RequestAttributes.FUNCTION_NAME.getHTTP(), functionName);
-                request.put(RequestAttributes.BODY.getHTTP(), body);
-                request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.PUT);
-                request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
-                request.put(RequestAttributes.AUTHENTICATION_PARAMS.getHTTP(), authenticationParams);
+                request.put(RequestAttributes.FUNCTION_NAME.getValue(), functionName);
+                request.put(RequestAttributes.BODY.getValue(), body);
+                request.put(RequestAttributes.METHOD_TYPE.getValue(), RequestType.PUT);
+                request.put(RequestAttributes.URI_PARAMS.getValue(), uriParams);
+                request.put(RequestAttributes.AUTHENTICATION_PARAMS.getValue(), authenticationParams);
 
                 putMessageInQueue(request, queueName);
             }
@@ -51,21 +51,21 @@ public class Comm {
         String[] usersList = new String[1];
         usersList[0] = userName;
         JSONObject body = new JSONObject();
-        body.put(NotificationAttributes.TITLE.getHTTP(), title);
-        body.put(NotificationAttributes.USERS_LIST.getHTTP(), usersList);
-        body.put(NotificationAttributes.NOTIFICATION_BODY.getHTTP(), contentId);
+        body.put(NotificationAttributes.TITLE.getValue(), title);
+        body.put(NotificationAttributes.USERS_LIST.getValue(), usersList);
+        body.put(NotificationAttributes.NOTIFICATION_BODY.getValue(), contentId);
 
         JSONObject uriParams = new JSONObject();
 
         JSONObject authenticationParams = new JSONObject();
-        authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
+        authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getValue(), true);
 
         JSONObject request = new JSONObject();
-        request.put(RequestAttributes.FUNCTION_NAME.getHTTP(), functionName);
-        request.put(RequestAttributes.BODY.getHTTP(), body);
-        request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.PUT);
-        request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
-        request.put(RequestAttributes.AUTHENTICATION_PARAMS.getHTTP(), authenticationParams);
+        request.put(RequestAttributes.FUNCTION_NAME.getValue(), functionName);
+        request.put(RequestAttributes.BODY.getValue(), body);
+        request.put(RequestAttributes.METHOD_TYPE.getValue(), RequestType.PUT);
+        request.put(RequestAttributes.URI_PARAMS.getValue(), uriParams);
+        request.put(RequestAttributes.AUTHENTICATION_PARAMS.getValue(), authenticationParams);
 
         putMessageInQueue(request, queueName);
     }
@@ -77,14 +77,14 @@ public class Comm {
         JSONObject uriParams = new JSONObject();
 
         JSONObject authenticationParams = new JSONObject();
-        authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getHTTP(), true);
+        authenticationParams.put(AuthenticationAttributes.IS_AUTHENTICATED.getValue(), true);
 
         JSONObject request = new JSONObject();
-        request.put(RequestAttributes.FUNCTION_NAME.getHTTP(), functionName);
-        request.put(RequestAttributes.BODY.getHTTP(), body);
-        request.put(RequestAttributes.METHOD_TYPE.getHTTP(), RequestType.POST);
-        request.put(RequestAttributes.URI_PARAMS.getHTTP(), uriParams);
-        request.put(RequestAttributes.AUTHENTICATION_PARAMS.getHTTP(), authenticationParams);
+        request.put(RequestAttributes.FUNCTION_NAME.getValue(), functionName);
+        request.put(RequestAttributes.BODY.getValue(), body);
+        request.put(RequestAttributes.METHOD_TYPE.getValue(), RequestType.POST);
+        request.put(RequestAttributes.URI_PARAMS.getValue(), uriParams);
+        request.put(RequestAttributes.AUTHENTICATION_PARAMS.getValue(), authenticationParams);
 
         putMessageInQueue(request, queueName);
     }

@@ -1,22 +1,17 @@
 package org.sab.models;
 
 public enum AuthenticationAttributes {
-    AUTHENTICATION_PARAMS("authenticationParams",null),
-    IS_AUTHENTICATED("isAuthenticated", null);
+    AUTHENTICATION_PARAMS("authenticationParams"),
+    IS_AUTHENTICATED("isAuthenticated");
 ;
-    private final String http;
-    private final String db;
+    private final String value;
 
-    AuthenticationAttributes(String http, String db) {
-        this.http = http;
-        this.db = db;
+    AuthenticationAttributes(String value) {
+        this.value = value;
     }
 
-    public String getHTTP() {
-        return http;
+    public String getValue() {
+        return value;
     }
 
-    public String getDb() {
-        return db;
-    }
 }

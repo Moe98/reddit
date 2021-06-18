@@ -2,24 +2,19 @@ package org.sab.models;
 
 public enum NotificationAttributes {
     // TODO: change its name to userList instead of registrationToken here and in the sendNotification command
-    USERS_LIST("registrationTokens", null),
-    TITLE("title",null),
-    NOTIFICATION_BODY("notificationBody", null);
+    USERS_LIST("registrationTokens"),
+    TITLE("title"),
+    NOTIFICATION_BODY("notificationBody");
 
 
-    private final String http;
-    private final String db;
+    private final String value;
 
-    NotificationAttributes(String http, String db) {
-        this.http = http;
-        this.db = db;
+    NotificationAttributes(String value) {
+        this.value = value;
     }
 
-    public String getHTTP() {
-        return http;
+    public String getValue() {
+        return value;
     }
 
-    public String getDb() {
-        return db;
-    }
 }
