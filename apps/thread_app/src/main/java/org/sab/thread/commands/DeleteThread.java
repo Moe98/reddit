@@ -47,12 +47,12 @@ public class DeleteThread extends ThreadCommand {
         try {
             try {
                 arango = Arango.getInstance();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 return Responder.makeErrorResponse(e.getMessage(), 111);
             }
             try {
                 arango.connectIfNotConnected();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 return Responder.makeErrorResponse(e.getMessage(), 222);
             }
             String threadName = body.getString(THREAD_NAME);
@@ -126,13 +126,25 @@ public class DeleteThread extends ThreadCommand {
             // delete thread
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
-                arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                try {
+                    arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                } catch (Exception e) {
+                    System.err.println(e.getStackTrace());
+                    System.err.println(e.getMessage());
+                    return Responder.makeErrorResponse(e.getMessage(), 333);
+                }
             }
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
-                arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                try {
+                    arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                } catch (Exception e) {
+                    System.err.println(e.getStackTrace());
+                    System.err.println(e.getMessage());
+                    return Responder.makeErrorResponse(e.getMessage(), 333);
+                }
             }
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
