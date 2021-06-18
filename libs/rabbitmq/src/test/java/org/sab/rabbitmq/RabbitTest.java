@@ -67,14 +67,11 @@ public class RabbitTest {
 
 
         while (!executorCallable1.isDone() || !executorCallable2.isDone()) ;
-        System.out.println("Done with callables");
 
         String callbackReply = executorCallable1.get();
-        System.out.println("Callback Reply: " + callbackReply);
         assertEquals(callbackReply, expectedReplyMessage);
 
         String callbackSentMessage = this.receivedMessage;
-        System.out.println("Callback 2 Reply: " + callbackSentMessage);
         assertEquals(callbackSentMessage, message);
     }
 }

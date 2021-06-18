@@ -42,7 +42,6 @@ public class UserToUserActionsTest {
 
             addObjectToCollection(lujine, UserToUserCommand.USER_COLLECTION_NAME);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

@@ -116,7 +116,6 @@ public class ServerTest {
 
         while (!shutdownServerFuture.isDone()) ;
 
-        System.out.println("Done with callables");
         assertEquals(expectedReplyMessage, response);
     }
 

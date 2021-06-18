@@ -37,7 +37,6 @@ public class DislikeCommentTest {
              *         subthread2 -> comment(20201) -> comment(20202)
              */
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

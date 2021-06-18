@@ -100,7 +100,6 @@ public class DislikeComment extends CommentCommand {
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
             }
         } catch (Exception e) {
-            // System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);

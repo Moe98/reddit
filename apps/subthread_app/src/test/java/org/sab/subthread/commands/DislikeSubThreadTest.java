@@ -34,7 +34,6 @@ public class DislikeSubThreadTest {
             createSubThread(subthreadId2, parentThreadId1, content1, moeId, title1, hasImage1);
             createSubThread(subthreadId3, parentThreadId2, content2, moeId, title2, hasImage2);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

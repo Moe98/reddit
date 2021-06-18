@@ -34,7 +34,6 @@ public class ReportSubThreadTest {
             createThreads();
             createSubThread(subthreadId1, parentThreadId1, content1, mantaId, title1, hasImage1);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

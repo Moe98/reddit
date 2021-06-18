@@ -98,7 +98,6 @@ public class DislikeSubThread extends SubThreadCommand {
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
             }
         } catch (Exception e) {
-            System.err.println(e);
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);

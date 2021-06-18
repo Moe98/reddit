@@ -68,8 +68,6 @@ public class RPCServer extends RPCBase {
                 System.out.println("-H- " + commandName);
 
                 response += action.apply((String) commandName, new JSONObject(req));
-
-                System.out.println("Sending: " + response);
             } catch (ParseException e) {
                 e.printStackTrace();
             } finally {
