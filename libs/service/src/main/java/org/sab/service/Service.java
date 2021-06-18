@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     private final Properties configProperties = new Properties();
-    private final boolean isFrozen = false;
+    private boolean isFrozen = false;
     private ExecutorService threadPool;
     private RPCServer messagingServer;
 
@@ -90,6 +90,8 @@ public abstract class Service {
         stopAcceptingNewRequests();
         releaseThreadPool();
         releaseDbPool();
+
+        isFrozen = true;
     }
 
     public void resume() {
@@ -99,6 +101,8 @@ public abstract class Service {
 
         initThreadPool();
         startAcceptingNewRequests();
+
+        isFrozen = false;
     }
 
     private void reloadThreadPool() {
