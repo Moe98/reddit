@@ -121,6 +121,7 @@ public class DeleteThread extends ThreadCommand {
                 try {
                     arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 } catch (Exception e) {
+                    System.err.println("subthread: " + i);
                     System.err.println(e.getStackTrace());
                     System.err.println(e.getMessage());
                     return Responder.makeErrorResponse(e.getMessage(), 333);
@@ -133,9 +134,10 @@ public class DeleteThread extends ThreadCommand {
                 try {
                     arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 } catch (Exception e) {
+                    System.err.println("comment: " + i);
                     System.err.println(e.getStackTrace());
                     System.err.println(e.getMessage());
-                    return Responder.makeErrorResponse(e.getMessage(), 333);
+                    return Responder.makeErrorResponse(e.getMessage(), 777);
                 }
             }
 
