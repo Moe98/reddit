@@ -12,9 +12,5 @@ public class UserToUserActionsApp extends Service {
     public String getAppUriName() {
         return "useraction";
     }
-    
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
+
 }

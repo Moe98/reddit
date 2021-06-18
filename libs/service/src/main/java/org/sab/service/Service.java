@@ -22,7 +22,6 @@ import java.util.concurrent.*;
  */
 
 public abstract class Service {
-    public static final String DEFAULT_PROPERTIES_FILENAME = "commandmap.properties";
     private final Properties configProperties = new Properties();
     private ExecutorService threadPool;
     private RPCServer messagingServer;
@@ -47,7 +46,9 @@ public abstract class Service {
         return readProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_DB_CONNECTIONS_COUNT);
     }
 
-    public abstract String getConfigMapPath();
+    public final String getConfigMapPath() {
+        return ServiceConstants.DEFAULT_PROPERTIES_FILENAME;
+    }
 
     private void loadCommandMap() {
         final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
@@ -234,13 +235,13 @@ public abstract class Service {
     }
 
     public void setMaxThreadsCount(int maxThreadsCount) {
-        updateProperty(THREADS_COUNT_PROPERTY_NAME, String.valueOf(maxThreadsCount));
+        updateProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, String.valueOf(maxThreadsCount));
         reloadThreadPool();
 
     }
 
     public void setMaxDbConnectionsCount(int maxDbConnectionsCount) {
-        updateProperty(DB_CONNECTIONS_COUNT_PROPERTY_NAME, String.valueOf(maxDbConnectionsCount));
+        updateProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, String.valueOf(maxDbConnectionsCount));
         reloadDbPool();
     }
 

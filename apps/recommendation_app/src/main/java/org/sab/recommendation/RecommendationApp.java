@@ -59,10 +59,6 @@ public class RecommendationApp extends Service {
         return "RECOMMENDATION";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 
     public static String getViewName(String collectionName) {
         return collectionName + "View";

@@ -68,9 +68,6 @@ public class SubThreadApp extends Service {
         return "subThread";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
+
 
 }

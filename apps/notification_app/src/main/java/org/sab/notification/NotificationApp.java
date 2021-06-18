@@ -12,8 +12,4 @@ public class NotificationApp extends Service {
         return "notification";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 }

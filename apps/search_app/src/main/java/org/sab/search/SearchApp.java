@@ -30,10 +30,6 @@ public class SearchApp extends Service {
         return "SEARCH";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 
     public static String getViewName(String collectionName) {
         return collectionName + "View";

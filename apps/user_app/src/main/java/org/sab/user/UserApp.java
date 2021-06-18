@@ -23,10 +23,6 @@ public class UserApp extends Service {
         return "user";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
         PostgresConnection.dbInit();

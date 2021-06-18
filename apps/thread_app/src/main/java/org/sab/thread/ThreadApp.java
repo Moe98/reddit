@@ -16,8 +16,4 @@ public class ThreadApp extends Service {
         return "thread";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 }
