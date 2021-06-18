@@ -153,7 +153,7 @@ public class DeleteThreadTest {
     @Test
     public void T02_DeleteNonexistentThread() {
         JSONObject response = deleteThread("lala", moeId);
-        assertEquals(400, response.getInt("statusCode"));
+        assertEquals(444, response.getInt("statusCode"));
         assertEquals("Thread does not exist", response.getString("msg"));
 
     }
