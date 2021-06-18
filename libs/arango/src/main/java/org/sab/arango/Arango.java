@@ -40,6 +40,7 @@ public class Arango {
 
 
         builder = new ArangoDB.Builder()
+                .host(System.getenv("ARANGO_HOST"), 8529)
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
                 .maxConnections(NUM_OF_CONNECTIONS)

@@ -8,8 +8,8 @@ services:
     image: "arangodb"
     environment:
       - ARANGO_ROOT_PASSWORD=root
-    volumes:
-      - ../../libs/arango/src/main/resources/shell/bash.sh:/docker-entrypoint-initdb.d/arango.sh
+    ports:
+      - "1234:8529"
   postgres:
     image: postgres
     restart: always
@@ -27,11 +27,12 @@ services:
       - "../../.env"
     environment:
       - RABBIT_HOST=rabbitmq
+      - ARANGO_HOST=arangodb
       - ARANGO_DB=Reddit
       - ARANGO_USER=root
       - ARANGO_PASSWORD=root
       - POSTGRES_HOST=postgres
-      - POSTGRES_DB=scaleabull
+      - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root
       - POSTGRES_PORT=5432
