@@ -194,8 +194,8 @@ public class ExampleAppTest {
         }
     }
 
-    @Test(timeout = 3000)
-    public void resumeThenFreezeThenGetRequest() {
+    @Test
+    public void startThenResumeThenFreeze() {
         ExampleApp app = mockApp();
         app.start();
         app.resume();

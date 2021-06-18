@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     private final Properties configProperties = new Properties();
-    private boolean isFrozen = false;
+    private boolean isFrozen = true;
     private ExecutorService threadPool;
     private RPCServer messagingServer;
 
