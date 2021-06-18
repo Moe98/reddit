@@ -104,8 +104,7 @@ public class ExampleAppTest {
         app.freeze();
         final Callable<String> getRequest = () -> HttpClient.get("api/example", "HELLO_WORLD");
         final int sleepSeconds = 4;
-        Runnable resumeAfterXSeconds = () ->
-                app.resume();
+        Runnable resumeAfterXSeconds = app::resume;
         Executors.newSingleThreadScheduledExecutor().schedule(resumeAfterXSeconds, sleepSeconds, TimeUnit.SECONDS);
 
         Future<String> getRequestFuture = threadPool.submit(getRequest);
