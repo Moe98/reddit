@@ -45,9 +45,16 @@ public class DeleteThread extends ThreadCommand {
 
         // TODO add authentication
         try {
-            arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-
+            try {
+                arango = Arango.getInstance();
+            } catch(Exception e) {
+                return Responder.makeErrorResponse(e.getMessage(), 111);
+            }
+            try {
+                arango.connectIfNotConnected();
+            } catch(Exception e) {
+                return Responder.makeErrorResponse(e.getMessage(), 222);
+            }
             String threadName = body.getString(THREAD_NAME);
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
@@ -79,7 +86,6 @@ public class DeleteThread extends ThreadCommand {
             // get all children subthreads
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, PARENT_THREAD_ID_DB, threadName);
 
-//            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
             subThreadJsonArr = arango.parseOutput(cursor, SUBTHREAD_ID_DB, attribs);

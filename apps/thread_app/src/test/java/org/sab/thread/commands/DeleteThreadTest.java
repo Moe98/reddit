@@ -132,7 +132,8 @@ public class DeleteThreadTest {
         DeleteThread deleteThread = new DeleteThread();
         JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, userId);
         AuthParamsHandler.putAuthorizedParams(request, claims);
-        return new JSONObject(deleteThread.execute(request));
+        String object = deleteThread.execute(request);
+        return new JSONObject(object);
     }
 
     @AfterClass
