@@ -200,13 +200,5 @@ public class ExampleAppTest {
         app.start();
         app.resume();
         app.freeze();
-
-        try {
-            HttpClient.get("api/example", "HELLO_WORLD");
-            // assert no exception occured
-        } catch (IOException | InterruptedException e) {
-            fail(e.getMessage());
-        }
-
     }
 }
