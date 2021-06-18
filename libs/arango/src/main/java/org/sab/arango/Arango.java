@@ -166,6 +166,7 @@ public class Arango {
     public ViewEntity createView(String dbName, String viewName, String collectionName, String[] fields) {
 
         ArangoSearchCreateOptions options = new ArangoSearchCreateOptions();
+        options.consolidationIntervalMsec(500L).commitIntervalMsec(500L);
 
         FieldLink[] fieldLinks = new FieldLink[fields.length];
         for (int i = 0; i < fields.length; i++) {
