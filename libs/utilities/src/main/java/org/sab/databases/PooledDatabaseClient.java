@@ -4,8 +4,8 @@ public interface PooledDatabaseClient {
 
     // Note: a decorator pattern would be a better design strategy
     void createPool(int maxConnections);
-    void destroyPool();
-    void setMaxConnections(int maxConnections);
+    void destroyPool() throws PoolDoesNotExistException;
+    void setMaxConnections(int maxConnections) throws PoolDoesNotExistException;
 
     /**
      * Compulsory method!
