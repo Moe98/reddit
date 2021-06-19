@@ -53,7 +53,7 @@ public class UpdatePopularSubThreads extends RecommendationCommand {
         } catch (ArangoDBException e) {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500);
         } catch (Exception e) {
-            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
         }
 
         if (data.length() != 0) {
