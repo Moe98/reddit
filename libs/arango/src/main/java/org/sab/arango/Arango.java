@@ -14,6 +14,8 @@ import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.sab.databases.PoolDoesNotExistException;
+import org.sab.databases.PooledDatabaseClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,9 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-@SuppressWarnings("unused")
-public class Arango {
-    final private static Arango instance = new Arango();
+public class Arango implements PooledDatabaseClient {
+    private static Arango instance = getInstance();
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
 
@@ -38,18 +39,51 @@ public class Arango {
             e.printStackTrace();
         }
 
+        createPool(NUM_OF_CONNECTIONS);
+    }
 
+    @Override
+    public void createPool(int maxConnections) {
         builder = new ArangoDB.Builder()
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
-                .maxConnections(NUM_OF_CONNECTIONS)
+                .maxConnections(maxConnections)
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
+        arangoDB = builder.build();
     }
 
+    // Mandatory public static ConcreteClass getClient() method
+    // TODO change method name (once everything else is merged)
     public static Arango getInstance() {
+        if(instance == null) {
+            instance = new Arango();
+        }
+
         return instance;
+    }
+
+    @Override
+    public void destroyPool() throws PoolDoesNotExistException {
+        if (arangoDB != null) {
+            arangoDB.shutdown();
+        } else {
+            throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
+        }
+
+        // TODO useless method
+        disconnect();
+        builder = null;
+    }
+
+    @Override
+    public void setMaxConnections(int maxConnections) throws PoolDoesNotExistException {
+        if(builder != null) {
+            builder.maxConnections(maxConnections);
+        } else {
+            throw new PoolDoesNotExistException("Can't set the number of connections if pool does not exist");
+        }
     }
 
     private void connect() {
