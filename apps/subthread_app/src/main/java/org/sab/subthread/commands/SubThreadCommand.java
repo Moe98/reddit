@@ -173,4 +173,8 @@ public abstract class SubThreadCommand extends CommandWithVerification {
         return Arango.getInstance().documentExists(DB_Name, collectionName, key);
     }
 
+    protected final void deleteDocumentFromCouchbase(String bucketName, String key) {
+        Couchbase.getInstance().deleteDocumentIfExists(bucketName, key);
+    }
+
 }

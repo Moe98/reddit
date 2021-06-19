@@ -111,6 +111,12 @@ public class Couchbase {
         return cluster.bucket(bucketName).defaultCollection().replace(documentKey, object);
     }
 
+    public void deleteDocumentIfExists(String bucketName, String documentKey) {
+        if (documentExists(bucketName, documentKey))
+            deleteDocument(bucketName, documentKey);
+    }
+
+    @Deprecated
     public MutationResult deleteDocument(String bucketName, String documentKey) {
         return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
     }
