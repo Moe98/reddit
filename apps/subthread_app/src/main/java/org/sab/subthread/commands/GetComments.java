@@ -34,7 +34,6 @@ public class GetComments extends CommentCommand {
         String msg;
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO not a uri param
             final String parentId = body.getString(PARENT_SUBTHREAD_ID);
@@ -47,9 +46,8 @@ public class GetComments extends CommentCommand {
                 parentCollection = COMMENT_COLLECTION_NAME;
             }
 
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+
 
             // check if comment exists
             if (!arango.documentExists(DB_Name, parentCollection, parentId)) {
@@ -96,10 +94,6 @@ public class GetComments extends CommentCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

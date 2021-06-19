@@ -1,15 +1,21 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class ReportSubThread extends SubThreadCommand {
 
@@ -49,13 +55,9 @@ public class ReportSubThread extends SubThreadCommand {
             String reportMsg = body.getString(REPORT_MSG);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
-            }
-
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             // check if thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
@@ -82,12 +84,20 @@ public class ReportSubThread extends SubThreadCommand {
             BaseDocument res = arango.createDocument(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, myObject);
             msg = "Created Subthread Report";
 
+            //notify the user who is reporting
+            JSONArray contentCreatorArr = new JSONArray();
+            ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollectionInbound(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, THREAD_COLLECTION_NAME + "/" + threadId);
+            ArrayList<String> arr = new ArrayList<>();
+            JSONArray modsArr = arango.parseOutput(cursor, USER_ID_DB, arr);
+            ArrayList<String> userNames = new ArrayList<String>();
+            for(Object obj:modsArr){
+                userNames.add(((JSONObject)obj).getString(USER_ID_DB));
+            };
+            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_REPORT_MSG.getMSG(), subthreadId, userNames, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

@@ -3,7 +3,7 @@ package org.sab.user;
 
 import org.sab.arango.Arango;
 import org.sab.functions.Utilities;
-import org.sab.models.user.User;
+import org.sab.models.CollectionNames;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
@@ -19,23 +19,8 @@ public class UserApp extends Service {
         new UserApp().start();
     }
 
-    @Override
-    public String getAppUriName() {
-        return "user";
-    }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
-
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        if(!Utilities.inContainerizationMode())
+        if (!Utilities.inContainerizationMode())
             PostgresConnection.dbInit();
         arangoDbInit();
     }
@@ -44,12 +29,12 @@ public class UserApp extends Service {
         if (ARANGO_DB_NAME == null)
             throw new EnvironmentVariableNotLoaded("ARANGO_DB");
         Arango arango = Arango.getInstance();
-        try {
-            arango.connectIfNotConnected();
-            arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
-            arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
-        } finally {
-            arango.disconnect();
-        }
+        arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
+        arango.createCollectionIfNotExists(ARANGO_DB_NAME, CollectionNames.USER.get(), false);
+    }
+
+    @Override
+    public String getAppUriName() {
+        return "user";
     }
 }

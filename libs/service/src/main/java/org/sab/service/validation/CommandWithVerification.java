@@ -15,10 +15,11 @@ public abstract class CommandWithVerification extends Command {
     protected JSONObject body, uriParams, authenticationParams, files;
     protected Schema schema;
     protected static final String IS_AUTHENTICATED = "isAuthenticated";
+    protected JSONObject origRequest;
 
     @Override
     public final String execute(JSONObject request) {
-
+        origRequest = request;
         schema = getSchema();
         uriParams = request.getJSONObject("uriParams");
         HTTPMethod methodType = getMethodType();

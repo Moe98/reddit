@@ -40,8 +40,7 @@ public class DeleteSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
 
@@ -143,7 +142,6 @@ public class DeleteSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.disconnect();
         arango.dropDatabase(DB_NAME);
     }
 

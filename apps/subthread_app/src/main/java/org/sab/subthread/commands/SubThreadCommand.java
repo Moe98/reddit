@@ -103,7 +103,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
     protected static final String NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
-    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
+    protected static final String USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
 
     // Comment attributes
     // db
@@ -131,7 +131,14 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String USER_DISLIKE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_DISLIKE_SUBTHREAD.get();
     protected static final String SUBTHREAD_REPORTS_COLLECTION_NAME = CollectionNames.SUBTHREAD_REPORTS.get();
     protected static final String USER_MOD_THREAD_COLLECTION_NAME = CollectionNames.USER_MOD_THREAD.get();
+    protected static final String USER_CREATE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_CREATE_SUBTHREAD.get();
 
     // image attributes
     protected static final String BUCKETNAME = "subthread-picture-scaleabull";
+
+
+    // TODO get queueName from somewhere instead of hardcoding it
+    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 }

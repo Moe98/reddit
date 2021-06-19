@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -10,6 +11,9 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
+import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateSubThread extends SubThreadCommand {
 
@@ -39,7 +43,6 @@ public class UpdateSubThread extends SubThreadCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String content = null, title = null;
             if (body.has(CONTENT))
@@ -50,9 +53,7 @@ public class UpdateSubThread extends SubThreadCommand {
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
             final String subthreadId = uriParams.getString(SUBTHREAD_ID);
 
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
@@ -94,12 +95,11 @@ public class UpdateSubThread extends SubThreadCommand {
             subthread.setHasImage(hasImage);
             subthread.setParentThreadId(parentId);
 
+            // tag a person if someone was tagged in the content of the subthread
+            tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(subthread.toJSON()).toString();

@@ -23,7 +23,6 @@ public class GetSubThread extends SubThreadCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             final String subThreadId = uriParams.getString(SUBTHREAD_ID);
 
@@ -51,10 +50,6 @@ public class GetSubThread extends SubThreadCommand {
             subThread.setDislikes(dislikes);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(subThread.toJSON()).toString();

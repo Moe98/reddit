@@ -18,6 +18,7 @@ public class SendNotification extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
+        // TODO: use attributes from the libs.models.notificationAttributes file rather than hardcoding strings here
         final Attribute title = new Attribute("title", DataType.STRING, true);
         final Attribute body = new Attribute("notificationBody", DataType.STRING, true);
         final Attribute registrationTokens = new Attribute("registrationTokens", DataType.ARRAY_OF_STRING, true);
@@ -26,6 +27,7 @@ public class SendNotification extends CommandWithVerification {
 
     @Override
     protected String execute() {
+        // TODO: use attributes from the libs.models.notificationAttributes file rather than hardcoding strings here
         final List<String> registrationTokens = List.of((String[]) body.get("registrationTokens"));
         final String title = body.getString("title");
         final String notificationBody = body.getString("notificationBody");

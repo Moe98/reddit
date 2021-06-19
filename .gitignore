@@ -235,3 +235,6 @@ firebase-config.json
 
 # MacOS
 .DS_Store
+
+# Exception for class files as resources
+!**/resources/**/*.class

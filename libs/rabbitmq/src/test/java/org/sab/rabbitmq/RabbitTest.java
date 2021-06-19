@@ -33,8 +33,8 @@ public class RabbitTest {
         ExecutorService threadPool = Executors.newFixedThreadPool(threads);
 
         Callable<String> runRabbitClient = () -> {
-            RPCClient client = RPCClient.getInstance();
-            return client.call(message, queueName, replyQueueName);
+            final SingleClientChannel channelExecutor = RPCClient.getSingleChannelExecutor();
+            return channelExecutor.call(message, queueName, replyQueueName);
         };
 
         Callable<String> respondToClient = () -> {

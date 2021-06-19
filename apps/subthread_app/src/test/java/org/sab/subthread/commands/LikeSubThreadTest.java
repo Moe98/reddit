@@ -18,9 +18,9 @@ import static org.junit.Assert.fail;
 
 public class LikeSubThreadTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String parentThreadId1 = "asmakElRayes7amido", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
+    final private static String parentThreadId1 = "asmakIbn7amedo", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
     final private static String parentThreadId2 = "GelatiAzza", title2 = "fish is better", content2 = "fish is better", hasImage2 = "false";
-    final private static String subthreadId1 = "20001", subthreadId2 = "20002", subthreadId3 = "20003";
+    final private static String subthreadId1 = "214124", subthreadId2 = "218447", subthreadId3 = "218470";
     private static Arango arango;
     private static BaseDocument moe, manta, lujine;
 
@@ -28,7 +28,7 @@ public class LikeSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createSubThread(subthreadId1, parentThreadId1, content1, mantaId, title1, hasImage1);
@@ -64,7 +64,6 @@ public class LikeSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -138,14 +137,14 @@ public class LikeSubThreadTest {
     @Test
     public void T01_UserLikeSubthreadForTheFirstTime() {
         String subthreadId = subthreadId1;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
 
         BaseDocument subthreadBeforeLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int oldNumOfLikes = Integer.parseInt(String.valueOf(subthreadBeforeLike.getAttribute(SubThreadCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(subthreadBeforeLike.getAttribute(SubThreadCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeSubthread(mantaId, subthreadId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -155,7 +154,7 @@ public class LikeSubThreadTest {
         assertEquals("added your like on the subthread", data.get("msg"));
 
         // checking the db for the addition of the like edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, SubThreadCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> subthreadAtt = new ArrayList<>();
         subthreadAtt.add(SubThreadCommand.PARENT_THREAD_ID_DB);
@@ -164,9 +163,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(subthreadId, ((JSONObject) commentArr.get(0)).get(SubThreadCommand.SUBTHREAD_ID_DB));
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument subthreadAfterLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfterLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -174,13 +178,13 @@ public class LikeSubThreadTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes + 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
     }
 
     @Test
     public void T02_UserLikeSubthreadForTheSecondTime() {
         String subthreadId = subthreadId2;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
 
         // like the subthread the first time
@@ -190,7 +194,7 @@ public class LikeSubThreadTest {
         int oldNumOfLikes = Integer.parseInt(String.valueOf(subthreadBefore2ndLike.getAttribute(SubThreadCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(subthreadBefore2ndLike.getAttribute(SubThreadCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeSubthread(mantaId, subthreadId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -200,7 +204,7 @@ public class LikeSubThreadTest {
         assertEquals("removed your like on the subthread", data.get("msg"));
 
         // checking the db for the removal of the like edge between the user and subthread
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, SubThreadCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> subthreadAtt = new ArrayList<>();
         subthreadAtt.add(SubThreadCommand.PARENT_THREAD_ID_DB);
@@ -209,8 +213,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(0, commentArr.length());
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(0, tmpArr.size());
 
         BaseDocument subthreadAfter2ndLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfter2ndLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -218,14 +228,14 @@ public class LikeSubThreadTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes - 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
     }
 
 
     @Test
     public void T03_UserLikeSubthreadAfterDislikingIt() {
         String subthreadId = subthreadId3;
-        arango.connectIfNotConnected();
+
         arango.createCollectionIfNotExists(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
         arango.createCollectionIfNotExists(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
 
@@ -235,7 +245,7 @@ public class LikeSubThreadTest {
         int oldNumOfLikes = Integer.parseInt(String.valueOf(subthreadBeforeLike.getAttribute(SubThreadCommand.LIKES_DB)));
         int oldNumOfDislikes = Integer.parseInt(String.valueOf(subthreadBeforeLike.getAttribute(SubThreadCommand.DISLIKES_DB)));
 
-        arango.connectIfNotConnected();
+
         String response = likeSubthread(mantaId, subthreadId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -245,7 +255,7 @@ public class LikeSubThreadTest {
         assertEquals("added your like on the subthread & removed your dislike", data.get("msg"));
 
         // checking the db for the removal of the like edge between the user and subthread
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME, SubThreadCommand.USER_COLLECTION_NAME + "/" + mantaId);
         ArrayList<String> subthreadAtt = new ArrayList<>();
         subthreadAtt.add(SubThreadCommand.PARENT_THREAD_ID_DB);
@@ -254,9 +264,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(subthreadId, ((JSONObject) commentArr.get(0)).get(SubThreadCommand.SUBTHREAD_ID_DB));
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument subthreadAfterLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfterLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -266,12 +281,12 @@ public class LikeSubThreadTest {
         assertEquals(newNumOfDislikes, oldNumOfDislikes - 1);
 
         // checking the db for the removal of the dislike edge between the user and comment
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         JSONArray subthreadArr2 = arango.parseOutput(cursor2, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
         assertEquals(0, subthreadArr2.length());
 
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME);
     }
 }

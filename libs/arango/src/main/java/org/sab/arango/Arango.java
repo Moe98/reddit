@@ -47,6 +47,8 @@ public class Arango {
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
+
+        arangoDB = builder.build();
     }
 
     public static Arango getInstance() {
@@ -57,17 +59,17 @@ public class Arango {
         arangoDB = builder.build();
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         return arangoDB != null && arangoDB.db().exists();
     }
 
-    public void connectIfNotConnected() {
+    private void connectIfNotConnected() {
         if (!isConnected()){
             connect();
         }
     }
 
-    public void disconnect() {
+    private void disconnect() {
         if (arangoDB != null) {
             arangoDB.shutdown();
         }
@@ -116,7 +118,7 @@ public class Arango {
         BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
         newDocument.setKey(key);
         Arango arango = getInstance();
-        arango.connectIfNotConnected();
+
         return arango.createDocument(dbName, collectionName, newDocument);
     }
 
@@ -142,7 +144,7 @@ public class Arango {
         BaseDocument updatedDocument = new BaseDocument(new HashMap<>(updatedProperties));
         updatedDocument.setKey(documentKey);
         Arango arango = Arango.getInstance();
-        arango.connectIfNotConnected();
+
         return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
     }
 
