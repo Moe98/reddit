@@ -91,8 +91,6 @@ public class CreateThread extends ThreadCommand {
             edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + name);
             arango.createEdgeDocument(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
-            // notify the user about the creation of the thread
-            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_CREATE_MSG.getMSG(), name, creatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

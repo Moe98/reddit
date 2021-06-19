@@ -138,7 +138,7 @@ public class CreateThreadTest {
 
     @Test
     public void T01_UserCreateThread() {
-        String threadName = "asmakIbn7amedoooooo";
+        String threadName = "asmakIbn7amedo";
         String description = "agmad thread fl wogoog";
         arango.connectIfNotConnected();
         String response = createThread(mantaId, threadName, description);

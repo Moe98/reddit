@@ -98,8 +98,6 @@ public class UpdateSubThread extends SubThreadCommand {
 
             // tag a person if someone was tagged in the content of the subthread
             tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
-            // notify the user who is updating
-            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_UPDATE_MSG.getMSG(), subthreadId, creatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

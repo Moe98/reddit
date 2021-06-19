@@ -84,8 +84,6 @@ public class ModeratorBansUser extends ThreadCommand {
 
             // notify the user that he got banned
             notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_USER_BANNED_MSG.getMSG(), threadName, bannedUserId, SEND_NOTIFICATION_FUNCTION_NAME);
-            // notify the mod that they banned someone
-            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_MOD_BANS_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

@@ -63,7 +63,9 @@ public class FollowThread extends ThreadCommand {
                 --followerCount;
 
                 // notify the user about the unfollow
-                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_UNFOLLOW_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
+                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
+                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_UNFOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
             } else {
                 responseMessage = FOLLOWED_THREAD_SUCCESSFULLY;
@@ -74,7 +76,10 @@ public class FollowThread extends ThreadCommand {
                 ++followerCount;
 
                 // notify the user about the follow
-                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_FOLLOW_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
+                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
+                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_FOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             }
 
             threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);

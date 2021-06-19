@@ -57,14 +57,10 @@ public class BookmarkThread extends ThreadCommand {
             if (!bookmarkEdgeId.equals("")) {
                 responseMessage = UNBOOKMARKED_THREAD_SUCCESSFULLY;
                 arango.deleteDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, bookmarkEdgeId);
-                // notify the user who is bookmarking with the unbookmarking
-                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_REMOVE_BOOKMARK_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
             } else {
                 responseMessage = BOOKMARKED_THREAD_SUCCESSFULLY;
                 final BaseEdgeDocument userBookmarkThreadEdge = addEdgeFromUserToThread(userId, threadName);
                 arango.createEdgeDocument(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, userBookmarkThreadEdge);
-                // notify the user who is bookmarking with the bookmarking
-                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_BOOKMARK_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

@@ -74,8 +74,6 @@ public class FollowUser extends UserToUserCommand {
                 arango.deleteDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
                 --followerCount;
 
-                // notify the follower about the follow
-                notifyApp(Notification_Queue_Name, NotificationMessages.USER_UNFOLLOW_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
                 // notify the user about the follow
                 notifyApp(Notification_Queue_Name, NotificationMessages.USER_GOT_UNFOLLOWED_MSG.getMSG(), "", userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
@@ -87,8 +85,6 @@ public class FollowUser extends UserToUserCommand {
                 arango.createEdgeDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, userFollowsUserEdge);
                 ++followerCount;
 
-                // notify the follower about the follow
-                notifyApp(Notification_Queue_Name, NotificationMessages.USER_FOLLOW_USER_MSG.getMSG(), "", actionMakerId, SEND_NOTIFICATION_FUNCTION_NAME);
                 // notify the user about the follow
                 notifyApp(Notification_Queue_Name, NotificationMessages.USER_GOT_FOLLOWED_MSG.getMSG(), "", userId, SEND_NOTIFICATION_FUNCTION_NAME);
 

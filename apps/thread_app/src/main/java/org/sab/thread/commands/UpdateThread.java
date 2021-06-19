@@ -66,8 +66,6 @@ public class UpdateThread extends ThreadCommand {
             thread.setDateCreated(dateCreated);
             thread.setNumOfFollowers(numOfFollowers);
 
-            // notify the user about the update of the thread
-            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_UPDATE_MSG.getMSG(), threadId, userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

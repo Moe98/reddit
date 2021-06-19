@@ -126,8 +126,6 @@ public class DeleteThread extends ThreadCommand {
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
-            // notify the user about the deletion of the thread
-            notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_DELETE_MSG.getMSG(), threadName, userId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
