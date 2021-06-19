@@ -30,7 +30,6 @@ public class CreateThreadTest {
             createUsers();
 
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

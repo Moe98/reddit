@@ -46,7 +46,6 @@ public class GetMyCommentsTest {
              *                                                        |-> comment(20204) -> comment(20206)
              */
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

@@ -252,7 +252,6 @@ public class GroupChatTableTest {
         try {
             createdGroupChat = groupChats.getGroupChat(chatId);
         } catch (InvalidInputException e) {
-            System.out.println(e.getMessage());
             fail(e.getMessage());
         }
         List<UUID> members = createdGroupChat.getMembers();

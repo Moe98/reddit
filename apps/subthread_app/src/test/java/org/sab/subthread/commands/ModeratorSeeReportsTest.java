@@ -38,7 +38,6 @@ public class ModeratorSeeReportsTest {
             insertReports("40002", moeId, "SCAM", parentThreadId1, "help", subthreadId1);
             insertReports("40003", lujineId, "SCAM", parentThreadId1, "help", subthreadId1);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

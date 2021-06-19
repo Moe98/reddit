@@ -95,7 +95,6 @@ public class AssignThreadModerator extends ThreadCommand {
 
             }
         } catch (Exception e) {
-//            System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {

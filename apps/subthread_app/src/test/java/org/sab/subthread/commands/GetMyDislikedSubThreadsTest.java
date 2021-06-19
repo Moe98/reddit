@@ -40,7 +40,6 @@ public class GetMyDislikedSubThreadsTest {
             dislikeSubthread(mantaId, "20204");
             dislikeSubthread(mantaId, "20205");
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
