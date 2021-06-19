@@ -52,7 +52,25 @@ public class RPCClient extends RPCBase implements AutoCloseable {
 
         return awaitResponse(corrId, declaredReplyToQueue);
     }
-    
+
+    // Send |message| to |requestQueue|
+    public void call_withoutResponse(String message, String requestQueue)
+            throws IOException, InterruptedException {
+        // Create a unique identifier for the request being placed in
+        // |requestQueue|.
+        final String corrId = UUID.randomUUID().toString();
+
+        final boolean durable = false;
+        final boolean exclusive = false;
+        final boolean autoDelete = false;
+        final Map<String, Object> arguments = null;
+
+        // Initialize the request queue.
+        String declaredRequestQueue = declareQueue(requestQueue, durable, exclusive, autoDelete, arguments);
+
+        sendRequest_withoutReplyTo(corrId, message, declaredRequestQueue);
+    }
+
     private String awaitResponse(String corrId, String targetQueue) throws IOException, InterruptedException {
         // Create a blocking queue to put the expected response in.
         final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);

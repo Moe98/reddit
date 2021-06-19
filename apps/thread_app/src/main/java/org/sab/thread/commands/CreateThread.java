@@ -3,6 +3,7 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -11,6 +12,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class CreateThread extends ThreadCommand {
     private final long INITIAL_NUM_FOLLOWERS = 0;
@@ -87,6 +90,7 @@ public class CreateThread extends ThreadCommand {
             edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + creatorId);
             edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + name);
             arango.createEdgeDocument(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
+
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -11,6 +12,9 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
+import static org.sab.innerAppComm.Comm.updateRecommendation;
 
 public class FollowThread extends ThreadCommand {
     @Override
@@ -57,6 +61,12 @@ public class FollowThread extends ThreadCommand {
                 arango.deleteDocument(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, followEdgeId);
 
                 --followerCount;
+
+                // notify the user about the unfollow
+                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
+                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_UNFOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             } else {
                 responseMessage = FOLLOWED_THREAD_SUCCESSFULLY;
 
@@ -64,11 +74,23 @@ public class FollowThread extends ThreadCommand {
                 arango.createEdgeDocument(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, userFollowsThreadEdge);
 
                 ++followerCount;
+
+                // notify the user about the follow
+                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
+                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_FOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
             }
 
             threadDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
 
             arango.updateDocument(DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
+
+            // send message to the notification app to update the recommendation list
+            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME);
+            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
+
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

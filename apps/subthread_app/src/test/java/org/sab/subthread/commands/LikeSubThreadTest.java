@@ -18,9 +18,9 @@ import static org.junit.Assert.fail;
 
 public class LikeSubThreadTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String parentThreadId1 = "asmakElRayes7amido", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
+    final private static String parentThreadId1 = "asmakIbn7amedo", title1 = "gelaty azza is better", content1 = "fish is ya3", hasImage1 = "false";
     final private static String parentThreadId2 = "GelatiAzza", title2 = "fish is better", content2 = "fish is better", hasImage2 = "false";
-    final private static String subthreadId1 = "20001", subthreadId2 = "20002", subthreadId3 = "20003";
+    final private static String subthreadId1 = "214124", subthreadId2 = "218447", subthreadId3 = "218470";
     private static Arango arango;
     private static BaseDocument moe, manta, lujine;
 
@@ -164,9 +164,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(subthreadId, ((JSONObject) commentArr.get(0)).get(SubThreadCommand.SUBTHREAD_ID_DB));
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument subthreadAfterLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfterLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -174,7 +179,7 @@ public class LikeSubThreadTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes + 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
     }
 
     @Test
@@ -209,8 +214,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(0, commentArr.length());
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(0, tmpArr.size());
 
         BaseDocument subthreadAfter2ndLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfter2ndLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -218,7 +229,7 @@ public class LikeSubThreadTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes - 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
     }
 
 
@@ -254,9 +265,14 @@ public class LikeSubThreadTest {
         subthreadAtt.add(SubThreadCommand.CONTENT_DB);
         subthreadAtt.add(SubThreadCommand.LIKES_DB);
         subthreadAtt.add(SubThreadCommand.DISLIKES_DB);
-        JSONArray commentArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(subthreadId, ((JSONObject) commentArr.get(0)).get(SubThreadCommand.SUBTHREAD_ID_DB));
+        JSONArray subthreadArr = arango.parseOutput(cursor, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: subthreadArr){
+            if(((JSONObject) c).get(SubThreadCommand.SUBTHREAD_ID_DB).equals(subthreadId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument subthreadAfterLike = arango.readDocument(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_COLLECTION_NAME, subthreadId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(subthreadAfterLike.getAttribute(SubThreadCommand.LIKES_DB)));
@@ -271,7 +287,7 @@ public class LikeSubThreadTest {
         JSONArray subthreadArr2 = arango.parseOutput(cursor2, SubThreadCommand.SUBTHREAD_ID_DB, subthreadAtt);
         assertEquals(0, subthreadArr2.length());
 
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
-        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_LIKE_SUBTHREAD_COLLECTION_NAME);
+//        arango.dropCollection(SubThreadCommand.DB_Name, SubThreadCommand.USER_DISLIKE_SUBTHREAD_COLLECTION_NAME);
     }
 }

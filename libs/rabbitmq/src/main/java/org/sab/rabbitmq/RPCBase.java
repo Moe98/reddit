@@ -72,4 +72,13 @@ public abstract class RPCBase {
         channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
     }
 
+
+    protected void sendRequest_withoutReplyTo(String corrId, String message, String targetQueue)
+            throws IOException {
+
+        final BasicProperties senderProps = createSenderProps(corrId, "");
+        final String exchange = "";
+        // sending the request message in the request queue with it's properties
+        channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
+    }
 }
