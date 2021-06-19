@@ -40,7 +40,7 @@ public class CreateSubThreadTest {
         try {
             arango = Arango.getInstance();
 
-            arango.createDatabase(SubThreadCommand.DB_Name);
+            arango.createDatabaseIfNotExists(SubThreadCommand.DB_Name);
 
             arango.createCollectionIfNotExists(DB_NAME, USER_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_NAME, THREAD_COLLECTION_NAME, false);
