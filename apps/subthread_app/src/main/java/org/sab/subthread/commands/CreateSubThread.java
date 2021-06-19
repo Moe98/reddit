@@ -1,7 +1,12 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
+import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.sab.arango.Arango;
+import org.sab.models.Comment;
+import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -9,7 +14,11 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
+import static org.sab.innerAppComm.Comm.tag;
 
 public class CreateSubThread extends SubThreadCommand {
     final long INITIAL_LIKES = 0;
@@ -54,10 +63,9 @@ public class CreateSubThread extends SubThreadCommand {
             arango = Arango.getInstance();
             arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
             // TODO check thread exists
             String msg;
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, parentThreadId)) {
@@ -106,6 +114,20 @@ public class CreateSubThread extends SubThreadCommand {
             subThread.setLikes(likes);
             subThread.setDislikes(dislikes);
 
+            // Create an edge between user and subthread.
+            final BaseEdgeDocument edgeDocumentFromUserToComment = addEdgeFromUserToSubthread(subThread);
+
+            arango.createEdgeDocument(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, edgeDocumentFromUserToComment);
+
+            // tag a person if someone was tagged in the content of the subthread
+            tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subThreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
+            BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, parentThreadId);
+            String threadCreatorId = threadDoc.getAttribute(THREAD_CREATOR_ID_DB).toString();
+
+            // notify the owner of the subthread about the creation
+            notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_CREATE_MSG.getMSG(), subThreadId, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
@@ -115,5 +137,22 @@ public class CreateSubThread extends SubThreadCommand {
         }
         return Responder.makeDataResponse(subThread.toJSON()).toString();
 
+    }
+
+    private BaseEdgeDocument addEdgeFromUserToSubthread(SubThread subthread) {
+        final String creatorId = subthread.getCreatorId();
+        final String subthreadId = subthread.getId();
+        final String from = USER_COLLECTION_NAME + "/" + creatorId;
+        final String to = SUBTHREAD_COLLECTION_NAME + "/" + subthreadId;
+
+        return addEdgeFromTo(from, to);
+    }
+
+    private BaseEdgeDocument addEdgeFromTo(String from, String to) {
+        BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
+        edgeDocument.setFrom(from);
+        edgeDocument.setTo(to);
+
+        return edgeDocument;
     }
 }
