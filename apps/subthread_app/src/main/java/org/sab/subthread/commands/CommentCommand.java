@@ -1,11 +1,15 @@
 package org.sab.subthread.commands;
 
-import org.sab.models.CollectionNames;
-import org.sab.models.CommentAttributes;
-import org.sab.models.SubThreadAttributes;
-import org.sab.models.ThreadAttributes;
+import org.json.JSONObject;
+import org.sab.models.*;
 import org.sab.models.user.UserAttributes;
+import org.sab.rabbitmq.RPCClient;
 import org.sab.service.validation.CommandWithVerification;
+import org.sab.service.validation.HTTPMethod;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 
 public abstract class CommentCommand extends CommandWithVerification {
@@ -74,7 +78,7 @@ public abstract class CommentCommand extends CommandWithVerification {
 
     protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getArangoDb();
     protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
-    protected static final String USER_USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
+    protected static final String USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
     protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     // Thread attributes
@@ -108,4 +112,12 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String USER_DISLIKE_COMMENT_COLLECTION_NAME = CollectionNames.USER_DISLIKE_COMMENT.get();
     protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
     protected static final String THREAD_COLLECTION_NAME = CollectionNames.THREAD.get();
+    protected static final String USER_CREATE_SUBTHREAD_COLLECTION_NAME = CollectionNames.USER_CREATE_SUBTHREAD.get();
+
+    // TODO get queueName from somewhere instead of hardcoding it
+    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    // TODO get function name from somewhere consitant
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
+
+
 }
