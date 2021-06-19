@@ -48,7 +48,6 @@ public class DislikeComment extends CommentCommand {
             String commentId = body.getString(COMMENT_ID);
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO: System.getenv("ARANGO_DB") instead of writing the DB
 
@@ -119,9 +118,6 @@ public class DislikeComment extends CommentCommand {
             // System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

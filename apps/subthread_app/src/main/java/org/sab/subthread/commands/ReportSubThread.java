@@ -55,7 +55,6 @@ public class ReportSubThread extends SubThreadCommand {
             String reportMsg = body.getString(REPORT_MSG);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
@@ -99,9 +98,6 @@ public class ReportSubThread extends SubThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

@@ -28,7 +28,6 @@ public class UpdateRecommendedUsers extends RecommendationCommand {
         try {
             username = authenticationParams.getString(USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
 //          First, we acquire the followed users. Based on the acquired results, we acquire the
 //          users which followed users follow, Then, these users are filtered and sorted according to
@@ -64,9 +63,7 @@ public class UpdateRecommendedUsers extends RecommendationCommand {
         } catch (JSONException e) {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400);
         } catch (Exception e) {
-            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
-        } finally {
-            arango.disconnect();
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         }
 
         if (data.length() != 0) {

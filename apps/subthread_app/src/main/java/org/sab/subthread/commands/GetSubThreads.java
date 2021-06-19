@@ -24,7 +24,6 @@ public class GetSubThreads extends SubThreadCommand {
         JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO not a uri param
             final String threadId = uriParams.getString(THREAD_ID);
@@ -48,10 +47,6 @@ public class GetSubThreads extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

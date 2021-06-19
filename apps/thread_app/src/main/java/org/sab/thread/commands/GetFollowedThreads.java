@@ -28,7 +28,6 @@ public class GetFollowedThreads extends ThreadCommand {
         JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
@@ -50,7 +49,7 @@ public class GetFollowedThreads extends ThreadCommand {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {
-                arango.disconnect();
+
             }
         }
         return Responder.makeDataResponse(response).toString();

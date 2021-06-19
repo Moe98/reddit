@@ -35,7 +35,6 @@ public class ModeratorSeeReports extends SubThreadCommand {
             String threadId = uriParams.getString(THREAD_ID);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
@@ -55,10 +54,6 @@ public class ModeratorSeeReports extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }
