@@ -5,7 +5,9 @@ import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.service.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 public class SubThreadApp extends Service {
     // TODO get from environment variables
@@ -45,8 +47,19 @@ public class SubThreadApp extends Service {
     private static void startCouchbaseConnection() {
         couchbase = Couchbase.getInstance();
 
-        couchbase.createBucketIfNotExists(CouchbaseBuckets.COMMENTS.get(), 100);
-        couchbase.createBucketIfNotExists(CouchbaseBuckets.SUBTHREADS.get(), 100);
+        final Properties properties = new Properties();
+
+        try {
+            properties.load(SubThreadApp.class.getClassLoader().getResourceAsStream("configurations.properties"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        final int commentRamQuota = Integer.parseInt(properties.getProperty("COMMENT_RAM_QUOTA"));
+        final int subthreadRamQuota = Integer.parseInt(properties.getProperty("SUBTHREAD_RAM_QUOTA"));
+
+        couchbase.createBucketIfNotExists(CouchbaseBuckets.COMMENTS.get(), commentRamQuota);
+        couchbase.createBucketIfNotExists(CouchbaseBuckets.SUBTHREADS.get(), subthreadRamQuota);
     }
 
     public static void shutdownGracefully() {
