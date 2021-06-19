@@ -47,7 +47,6 @@ public class DeleteComment extends CommentCommand {
             String commentId = body.getString(COMMENT_ID);
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
 
@@ -109,9 +108,6 @@ public class DeleteComment extends CommentCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

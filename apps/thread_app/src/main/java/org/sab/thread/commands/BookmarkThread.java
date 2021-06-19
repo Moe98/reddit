@@ -38,7 +38,6 @@ public class BookmarkThread extends ThreadCommand {
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
@@ -65,9 +64,6 @@ public class BookmarkThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", responseMessage);
         }
 

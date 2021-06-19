@@ -20,7 +20,7 @@ public class RecommendationApp extends Service {
     public static void dbInit() {
         try {
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             Couchbase couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 
@@ -58,15 +58,5 @@ public class RecommendationApp extends Service {
     @Override
     public String getAppUriName() {
         return "RECOMMENDATION";
-    }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
     }
 }

@@ -23,7 +23,7 @@ public class UpdatePopularSubThreads extends RecommendationCommand {
         JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             String query = """
                     FOR subThread IN %s
                         SORT subThread.%s DESC
@@ -53,9 +53,7 @@ public class UpdatePopularSubThreads extends RecommendationCommand {
         } catch (ArangoDBException e) {
             return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500);
         } catch (Exception e) {
-            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
-        } finally {
-            arango.disconnect();
+            return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
         }
 
         if (data.length() != 0) {

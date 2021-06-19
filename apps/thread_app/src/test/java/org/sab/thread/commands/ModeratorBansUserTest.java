@@ -22,7 +22,7 @@ public class ModeratorBansUserTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(DB_NAME);
 
             arango.createCollection(DB_NAME, ThreadCommand.THREAD_COLLECTION_NAME, false);

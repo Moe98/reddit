@@ -22,8 +22,7 @@ public class ArangoTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
 
             dbName = "TestDB";
             collectionName = "TestCollection";
@@ -48,7 +47,6 @@ public class ArangoTest {
     public static void tearDown() {
         try {
             assertTrue(arango.dropDatabase(dbName));
-            arango.disconnect();
         } catch (ArangoDBException e) {
             fail(e.getMessage());
         }

@@ -25,7 +25,6 @@ public class FollowUser extends UserToUserCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             final String userId = body.getString(USER_ID);
             final String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
@@ -99,9 +98,6 @@ public class FollowUser extends UserToUserCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", responseMessage);
         }
         return Responder.makeDataResponse(response).toString();

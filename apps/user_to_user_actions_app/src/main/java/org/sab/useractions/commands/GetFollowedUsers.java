@@ -29,7 +29,6 @@ public class GetFollowedUsers extends UserToUserCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             final String userId = uriParams.getString(USER_ID);
 
@@ -55,10 +54,6 @@ public class GetFollowedUsers extends UserToUserCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

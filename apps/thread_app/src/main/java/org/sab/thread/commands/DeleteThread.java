@@ -48,7 +48,6 @@ public class DeleteThread extends ThreadCommand {
         // TODO add authentication
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String threadName = body.getString(THREAD_NAME);
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
@@ -130,9 +129,6 @@ public class DeleteThread extends ThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

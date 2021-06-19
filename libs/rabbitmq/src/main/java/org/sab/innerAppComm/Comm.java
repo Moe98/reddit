@@ -1,12 +1,12 @@
 package org.sab.innerAppComm;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.models.AuthenticationAttributes;
 import org.sab.models.NotificationAttributes;
 import org.sab.models.RequestAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.rabbitmq.RPCClient;
+import org.sab.rabbitmq.SingleClientChannel;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -119,10 +119,10 @@ public class Comm {
     }
 
     public static void putMessageInQueue(JSONObject request, String queueName){
-        try (RPCClient rpcClient = RPCClient.getInstance()) {
-            rpcClient.call_withoutResponse(request.toString(), queueName);
+        try (final SingleClientChannel singleClientChannel = RPCClient.getSingleChannelExecutor()) {
+            singleClientChannel.call_withoutResponse(request.toString(), queueName);
         }
-        catch (IOException | TimeoutException | InterruptedException | NullPointerException e) {
+        catch (IOException | TimeoutException | NullPointerException e) {
             e.printStackTrace();
         }
     }

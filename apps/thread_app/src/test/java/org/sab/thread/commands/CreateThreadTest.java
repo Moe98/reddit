@@ -23,8 +23,7 @@ public class CreateThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
 
             arango.createDatabaseIfNotExists(ThreadCommand.TEST_DB_Name);
 
@@ -51,7 +50,6 @@ public class CreateThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(ThreadCommand.TEST_DB_Name);
     }
 
@@ -140,7 +138,7 @@ public class CreateThreadTest {
     public void T01_UserCreateThread() {
         String threadName = "asmakIbn7amedo";
         String description = "agmad thread fl wogoog";
-        arango.connectIfNotConnected();
+
         String response = createThread(mantaId, threadName, description);
         JSONObject responseJson = new JSONObject(response);
 
@@ -153,7 +151,7 @@ public class CreateThreadTest {
         assertEquals(threadName, data.get(ThreadCommand.THREAD_NAME));
 
         // checking the thread created in DB
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor = arango.filterCollection(ThreadCommand.DB_Name, ThreadCommand.THREAD_COLLECTION_NAME, ThreadCommand.CREATOR_ID_DB, mantaId);
         ArrayList<String> threadAtt = new ArrayList<>();
         threadAtt.add(ThreadCommand.NUM_OF_FOLLOWERS_DB);
@@ -168,7 +166,7 @@ public class CreateThreadTest {
         assertEquals(threadName, ((JSONObject) threadArr.get(0)).get(ThreadCommand.THREAD_NAME));
 
         // checking the creator is a mod
-        arango.connectIfNotConnected();
+
         ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(ThreadCommand.DB_Name, ThreadCommand.USER_MOD_THREAD_COLLECTION_NAME, ThreadCommand.USER_COLLECTION_NAME + "/" + mantaId);
         JSONArray threadArr2 = arango.parseOutput(cursor2, ThreadCommand.THREAD_NAME, threadAtt);
         assertEquals(1, threadArr2.length());
@@ -180,7 +178,7 @@ public class CreateThreadTest {
 
     @Test
     public void T02_UserCreateThreadWithoutNameAndDesc() {
-        arango.connectIfNotConnected();
+
         String response = createThreadWithoutNameAndDesc(mantaId);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(400, responseJson.getInt("statusCode"));
@@ -190,7 +188,7 @@ public class CreateThreadTest {
     @Test
     public void T02_UserCreateThreadWithoutName() {
         String description = "description";
-        arango.connectIfNotConnected();
+
         String response = createThreadWithoutName(mantaId, description);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(400, responseJson.getInt("statusCode"));
@@ -200,7 +198,7 @@ public class CreateThreadTest {
     @Test
     public void T02_UserCreateThreadWithoutDesc() {
         String name = "name";
-        arango.connectIfNotConnected();
+
         String response = createThreadWithoutDesc(mantaId, name);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(400, responseJson.getInt("statusCode"));

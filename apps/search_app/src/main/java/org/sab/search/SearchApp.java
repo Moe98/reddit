@@ -34,7 +34,7 @@ public class SearchApp extends Service {
     public static void dbInit() {
         try {
             Arango arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(DB_NAME);
             arango.createCollectionIfNotExists(DB_NAME, THREADS_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_NAME, SUB_THREADS_COLLECTION_NAME, false);
@@ -53,15 +53,5 @@ public class SearchApp extends Service {
     @Override
     public String getAppUriName() {
         return "SEARCH";
-    }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
     }
 }

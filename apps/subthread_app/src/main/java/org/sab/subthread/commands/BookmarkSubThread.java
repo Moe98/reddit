@@ -45,8 +45,6 @@ public class BookmarkSubThread extends SubThreadCommand {
             String userId = authenticationParams.getString(USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
@@ -82,11 +80,6 @@ public class BookmarkSubThread extends SubThreadCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
-            response.put("msg", msg);
         }
 
         return Responder.makeDataResponse(response).toString();

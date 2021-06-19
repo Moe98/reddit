@@ -49,7 +49,6 @@ public class SearchAppTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             SearchApp.dbInit();
 
@@ -100,8 +99,6 @@ public class SearchAppTest {
             });
         } catch (Exception e) {
             fail(e.getMessage());
-        } finally {
-            arango.disconnect();
         }
     }
 

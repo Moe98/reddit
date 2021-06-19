@@ -24,7 +24,7 @@ public class GetMyDislikedSubThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertSubthread("20301", parentThreadId1, mantaId, "title", "content");
@@ -69,7 +69,6 @@ public class GetMyDislikedSubThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -136,7 +135,6 @@ public class GetMyDislikedSubThreadsTest {
 
     @Test
     public void T01_GetMyLikedSubthreads() {
-        arango.connectIfNotConnected();
         String response = getMyDislikedSubThreads(mantaId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -147,7 +145,6 @@ public class GetMyDislikedSubThreadsTest {
 
     @Test
     public void T02_GetMyLikedSubthreads() {
-        arango.connectIfNotConnected();
         String response = getMyDislikedSubThreads(moeId);
         JSONObject responseJson = new JSONObject(response);
 

@@ -24,7 +24,7 @@ public class GetMyLikedCommentsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertComments("20301", parentThreadId1, "content", mantaId, "SubThread");
@@ -75,7 +75,6 @@ public class GetMyLikedCommentsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
     }
 
@@ -141,7 +140,6 @@ public class GetMyLikedCommentsTest {
 
     @Test
     public void T01_GetMyLikedComments() {
-        arango.connectIfNotConnected();
         String response = getMyLikedComments(mantaId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -152,7 +150,6 @@ public class GetMyLikedCommentsTest {
 
     @Test
     public void T02_GetMyLikedComments() {
-        arango.connectIfNotConnected();
         String response = getMyLikedComments(moeId);
         JSONObject responseJson = new JSONObject(response);
 

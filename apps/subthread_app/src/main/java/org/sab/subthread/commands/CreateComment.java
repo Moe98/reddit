@@ -68,7 +68,6 @@ public class CreateComment extends CommentCommand {
             final String userId = authenticationParams.getString(CommentCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
@@ -138,10 +137,6 @@ public class CreateComment extends CommentCommand {
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(comment.toJSON()).toString();
     }
