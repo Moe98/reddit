@@ -24,6 +24,13 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>3.5.10</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.sab</groupId>
       <artifactId>example_util</artifactId>
@@ -41,6 +48,12 @@
       <artifactId>service</artifactId>
       <version>1.0-SNAPSHOT</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sab.netty</groupId>
+      <artifactId>netty</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

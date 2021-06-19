@@ -36,8 +36,7 @@ public class DeleteCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
@@ -134,7 +133,6 @@ public class DeleteCommentTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.disconnect();
         arango.dropDatabase(DB_NAME);
     }
 

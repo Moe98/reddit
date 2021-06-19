@@ -24,17 +24,12 @@ public class GetSubThreads extends SubThreadCommand {
         JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // TODO not a uri param
             final String threadId = uriParams.getString(THREAD_ID);
 
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
@@ -52,10 +47,6 @@ public class GetSubThreads extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

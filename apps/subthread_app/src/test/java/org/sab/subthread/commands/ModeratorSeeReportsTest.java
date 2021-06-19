@@ -25,7 +25,7 @@ public class ModeratorSeeReportsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
@@ -67,7 +67,7 @@ public class ModeratorSeeReportsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
+
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -168,7 +168,7 @@ public class ModeratorSeeReportsTest {
 
     @Test
     public void T01_ModeratorSeeReports() {
-        arango.connectIfNotConnected();
+
         String response = moderatorSeeReports(parentThreadId1);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(200, responseJson.getInt("statusCode"));
@@ -178,7 +178,7 @@ public class ModeratorSeeReportsTest {
 
     @Test
     public void T02_ModeratorSeeReports() {
-        arango.connectIfNotConnected();
+
         String response = moderatorSeeReports(parentThreadId2);
         JSONObject responseJson = new JSONObject(response);
         assertEquals(200, responseJson.getInt("statusCode"));

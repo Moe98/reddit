@@ -25,7 +25,7 @@ public class GetFollowedThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(ThreadCommand.TEST_DB_Name);
 
             createUsers();
@@ -64,7 +64,7 @@ public class GetFollowedThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
+
         arango.dropDatabase(ThreadCommand.TEST_DB_Name);
     }
 
@@ -142,7 +142,7 @@ public class GetFollowedThreadsTest {
 
     @Test
     public void T01_GetFollowedThreads() {
-        arango.connectIfNotConnected();
+
         String response = getFollowedThreads(mantaId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -155,7 +155,7 @@ public class GetFollowedThreadsTest {
 
     @Test
     public void T02_GetFollowedThreads() {
-        arango.connectIfNotConnected();
+
         String response = getFollowedThreads(lujineId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -167,7 +167,7 @@ public class GetFollowedThreadsTest {
 
     @Test
     public void T03_GetFollowedThreads() {
-        arango.connectIfNotConnected();
+
         String response = getFollowedThreads(moeId);
         JSONObject responseJson = new JSONObject(response);
 

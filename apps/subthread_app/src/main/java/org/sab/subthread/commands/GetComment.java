@@ -25,7 +25,6 @@ public class GetComment extends CommentCommand {
             final String commentId = uriParams.getString(COMMENT_ID);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
@@ -54,10 +53,6 @@ public class GetComment extends CommentCommand {
             comment.setDateCreated(dateCreated);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(comment.toJSON()).toString();

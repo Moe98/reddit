@@ -21,7 +21,7 @@ public class BackdoorServer {
     }
 
     public void start() throws InterruptedException {
-        EventLoopGroup group = new NioEventLoopGroup(); //Creates an EventLoop that is shareable across clients
+        EventLoopGroup group = new NioEventLoopGroup(1); //Creates an EventLoop that is shareable across clients
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(group) // Bootstrap the server to a specific group

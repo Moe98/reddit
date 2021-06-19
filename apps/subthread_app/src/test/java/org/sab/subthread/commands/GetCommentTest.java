@@ -24,7 +24,7 @@ public class GetCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            assertTrue(arango.isConnected());
+
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
 
