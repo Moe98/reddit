@@ -85,6 +85,8 @@ public class SearchAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+
+        arango.dropDatabase(dbName);
     }
 
     @Test

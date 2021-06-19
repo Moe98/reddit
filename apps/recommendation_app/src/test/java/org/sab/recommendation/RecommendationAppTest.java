@@ -190,6 +190,8 @@ public class RecommendationAppTest {
 
             couchbase.disconnect();
         }
+
+        arango.dropDatabase(dbName);
     }
 
     @Test
