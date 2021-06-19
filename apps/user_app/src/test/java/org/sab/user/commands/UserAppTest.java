@@ -237,12 +237,12 @@ public class UserAppTest {
     @AfterClass
     public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
-        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
-        Map<String, Object> props = user.getProperties();
-        boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
-        assertTrue(isDeleted);
-        int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
-        assertEquals(0, numberOfFollowers);
-        arango.deleteDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
+            BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
+            Map<String, Object> props = user.getProperties();
+            boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
+            assertTrue(isDeleted);
+            int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
+            assertEquals(0, numberOfFollowers);
+            arango.deleteDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
     }
 }
