@@ -1,9 +1,8 @@
 package org.sab.subthread.commands;
 
-import org.sab.models.CollectionNames;
-import org.sab.models.CommentAttributes;
-import org.sab.models.SubThreadAttributes;
-import org.sab.models.ThreadAttributes;
+import com.arangodb.entity.BaseDocument;
+import org.json.JSONObject;
+import org.sab.models.*;
 import org.sab.models.report.SubThreadReportAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
@@ -141,4 +140,27 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
     // TODO get function name from somewhere consitant
     protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
+
+    protected final JSONObject baseDocumentToJson(BaseDocument document) {
+        SubThread subThread;
+
+        final String subThreadId = document.getKey();
+        final String parentThreadId = (String) document.getAttribute(PARENT_THREAD_ID_DB);
+        final String creatorId = (String) document.getAttribute(CREATOR_ID_DB);
+        final String title = (String) document.getAttribute(TITLE_DB);
+        final String content = (String) document.getAttribute(CONTENT_DB);
+        final String date = (String) document.getAttribute(DATE_CREATED_DB);
+        final Boolean hasImage = (Boolean) document.getAttribute(HASIMAGE_DB);
+        final int likes = Integer.parseInt(String.valueOf(document.getAttribute(LIKES_DB)));
+        final int dislikes = Integer.parseInt(String.valueOf(document.getAttribute(DISLIKES_DB)));
+        // TODO add tagged users in image attribute
+        subThread = SubThread.createNewSubThread(parentThreadId, creatorId, title, content, hasImage);
+        subThread.setId(subThreadId);
+        subThread.setDateCreated(date);
+        subThread.setLikes(likes);
+        subThread.setDislikes(dislikes);
+
+        return subThread.toJSON();
+    }
+
 }
