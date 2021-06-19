@@ -1,12 +1,10 @@
 package org.sab.thread.commands;
 
 import com.arangodb.ArangoCursor;
-import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -15,8 +13,6 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteThread extends ThreadCommand {
 
