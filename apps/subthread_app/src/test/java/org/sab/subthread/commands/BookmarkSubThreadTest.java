@@ -48,7 +48,7 @@ public class BookmarkSubThreadTest {
             arango = Arango.getInstance();
 
 //            arango.dropDatabase(DB_NAME);
-            arango.createDatabase(DB_NAME);
+            arango.createDatabaseIfNotExists(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
             arango.createCollection(DB_NAME, THREAD_COLLECTION_NAME, false);

@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -11,6 +12,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class BlockUser extends UserToUserCommand {
     @Override
@@ -36,10 +39,11 @@ public class BlockUser extends UserToUserCommand {
             String actionMakerId = uriParams.getString(ACTION_MAKER_ID);
             String userId = body.getString(USER_ID);
 
-//            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
 
             arango.createCollectionIfNotExists(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, true);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 responseMessage = USER_DOES_NOT_EXIST_RESPONSE_MESSAGE;
@@ -63,15 +67,32 @@ public class BlockUser extends UserToUserCommand {
 
             String blockEdgeId = arango.getSingleEdgeId(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
 
-            if (blockEdgeId.length() != 0) {
+
+            if (blockEdgeId.length() != 0) {// the user already blocks said user
                 responseMessage = USER_UNBLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
                 arango.deleteDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, blockEdgeId);
+
+
             } else {
                 responseMessage = USER_BLOCKED_SUCCESSFULLY_RESPONSE_MESSAGE;
 
                 final BaseEdgeDocument userBlockUserEdge = addEdgeFromUserToUser(actionMakerId, userId);
                 arango.createEdgeDocument(DB_Name, USER_BLOCK_USER_COLLECTION_NAME, userBlockUserEdge);
+
+                // TODO: make sure this is working, it should be as it's copied from the working & tested command "followUser"
+                final String edgeKey = arango.getSingleEdgeId(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + actionMakerId, USER_COLLECTION_NAME + "/" + userId);
+
+                if(edgeKey.length() != 0){// if the user was following the user who he just blocked now, then unfollow said user
+                    int followerCount = Integer.parseInt(String.valueOf(userDocument.getAttribute(NUM_OF_FOLLOWERS_DB)));
+                    arango.deleteDocument(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, edgeKey);
+                    --followerCount;
+                    userDocument.updateAttribute(NUM_OF_FOLLOWERS_DB, followerCount);
+                    arango.updateDocument(DB_Name, USER_COLLECTION_NAME, userDocument, userId);
+
+                }
+
             }
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

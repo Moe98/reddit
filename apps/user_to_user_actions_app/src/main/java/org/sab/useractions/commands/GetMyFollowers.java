@@ -32,12 +32,9 @@ public class GetMyFollowers extends UserToUserCommand {
 
             final String userId = uriParams.getString(USER_ID);
 
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_FOLLOWS_USER_COLLECTION_NAME, true);
+
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }

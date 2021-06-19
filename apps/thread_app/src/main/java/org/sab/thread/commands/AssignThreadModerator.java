@@ -3,6 +3,7 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class AssignThreadModerator extends ThreadCommand {
     @Override
@@ -46,16 +49,9 @@ public class AssignThreadModerator extends ThreadCommand {
 
             arango = Arango.getInstance();
 
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                // TODO if this doesn't exist something is wrong!
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
 
             // check if thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
@@ -91,8 +87,13 @@ public class AssignThreadModerator extends ThreadCommand {
                 edgeDocument.setTo(THREAD_COLLECTION_NAME + "/" + threadId);
                 arango.createEdgeDocument(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, edgeDocument);
 
-            }
+                // notify the user that he is now a moderator
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_USER_IS_MOD_MSG.getMSG(), threadId, modId, SEND_NOTIFICATION_FUNCTION_NAME);
 
+                // notify the "mod" that he is assigned a moderator
+                notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_MOD_ASSIGNED_MOD_MSG.getMSG(), threadId, assignerId, SEND_NOTIFICATION_FUNCTION_NAME);
+
+            }
         } catch (Exception e) {
 //            System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

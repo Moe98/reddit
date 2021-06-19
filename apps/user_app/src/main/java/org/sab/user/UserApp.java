@@ -2,7 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
-import org.sab.models.user.User;
+import org.sab.models.CollectionNames;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
@@ -23,15 +23,6 @@ public class UserApp extends Service {
         return "user";
     }
 
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
         PostgresConnection.dbInit();
@@ -43,6 +34,6 @@ public class UserApp extends Service {
             throw new EnvironmentVariableNotLoaded("ARANGO_DB");
         Arango arango = Arango.getInstance();
         arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
-        arango.createCollectionIfNotExists(ARANGO_DB_NAME, User.getCollectionName(), false);
+        arango.createCollectionIfNotExists(ARANGO_DB_NAME, CollectionNames.USER.get(), false);
     }
 }
