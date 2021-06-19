@@ -59,14 +59,4 @@ public class RecommendationApp extends Service {
     public String getAppUriName() {
         return "RECOMMENDATION";
     }
-
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 }

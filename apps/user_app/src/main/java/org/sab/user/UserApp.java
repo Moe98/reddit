@@ -24,15 +24,6 @@ public class UserApp extends Service {
         return "user";
     }
 
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
         PostgresConnection.dbInit();
