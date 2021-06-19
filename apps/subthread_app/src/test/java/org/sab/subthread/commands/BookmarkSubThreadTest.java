@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
@@ -46,6 +47,7 @@ public class BookmarkSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            Couchbase.getInstance().connectIfNotConnected();
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabaseIfNotExists(DB_NAME);

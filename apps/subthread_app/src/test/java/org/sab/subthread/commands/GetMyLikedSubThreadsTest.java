@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -24,6 +25,7 @@ public class GetMyLikedSubThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            Couchbase.getInstance().connectIfNotConnected();
 
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
