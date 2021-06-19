@@ -50,7 +50,6 @@ public class DeleteThreadTest {
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);
 
             manta = TestUtils.setUpUser(mantaId, false, 0);
-            ;
             TestUtils.addObjectToCollection(arango, manta, USER_COLLECTION_NAME);
 
             lujine = TestUtils.setUpUser(lujineId, false, 0);
@@ -68,7 +67,7 @@ public class DeleteThreadTest {
             TestUtils.addObjectToCollection(arango, fishSubThread2, SUBTHREAD_COLLECTION_NAME);
 
             // insert comments under fish subthread 1
-            s1Level1Comm = insertFisrtLevelComments(fishSubthread1Id, lujineId, 5);
+            s1Level1Comm = insertFirstLevelComments(fishSubthread1Id, lujineId, 5);
             s1Level2Comm = new ArrayList<>();
             s1Level3Comm = new ArrayList<>();
 
@@ -80,7 +79,7 @@ public class DeleteThreadTest {
             }
 
             // insert comments under fish subthread 2
-            s2Level1Comm = insertFisrtLevelComments(fishSubthread2Id, moeId, 5);
+            s2Level1Comm = insertFirstLevelComments(fishSubthread2Id, moeId, 5);
             s2Level2Comm = new ArrayList<>();
             s2Level3Comm = new ArrayList<>();
 
@@ -97,7 +96,7 @@ public class DeleteThreadTest {
 
     }
 
-    private static ArrayList<String> insertFisrtLevelComments(String subthreadId, String userId, int numComments) {
+    private static ArrayList<String> insertFirstLevelComments(String subthreadId, String userId, int numComments) {
         ArrayList<String> commentIds = new ArrayList<>();
         for (int i = 0; i < numComments; i++) {
             // insert comment
@@ -133,7 +132,8 @@ public class DeleteThreadTest {
         DeleteThread deleteThread = new DeleteThread();
         JSONObject claims = new JSONObject().put(ThreadCommand.USERNAME, userId);
         AuthParamsHandler.putAuthorizedParams(request, claims);
-        return new JSONObject(deleteThread.execute(request));
+        String object = deleteThread.execute(request);
+        return new JSONObject(object);
     }
 
     @AfterClass

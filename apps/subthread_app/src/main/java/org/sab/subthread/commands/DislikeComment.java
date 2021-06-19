@@ -115,7 +115,6 @@ public class DislikeComment extends CommentCommand {
 
             }
         } catch (Exception e) {
-            // System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);

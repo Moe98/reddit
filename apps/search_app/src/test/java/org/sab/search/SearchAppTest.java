@@ -100,6 +100,8 @@ public class SearchAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         }
+
+        arango.dropDatabase(dbName);
     }
 
     private static JSONObject makeRequest(String input) {
