@@ -16,13 +16,4 @@ public class ThreadApp extends Service {
         return "thread";
     }
 
-    @Override
-    public int getThreadCount() {
-        return 10;
-    }
-
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
 }

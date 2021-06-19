@@ -14,11 +14,14 @@ public class InitConnectionRouter extends Router {
 
     @Override
     public void forwardRequestToQueue(ChannelHandlerContext ctx, JSONObject request) {
-        // TODO: Should authenticate before this.
+        boolean isAuthenticated = authenticate(request, "userId");
+        if (!isAuthenticated) {
+            rejectUnAuthenticatedRequest(ctx);
+            return;
+        }
         UUID userId = UUID.fromString((String) request.get("userId"));
         ClientManager.handleUserOnline(userId, ctx.channel());
 
-        // TODO: Get user chats.
         String[] attributes = {"userId"};
         packAndForwardRequest(ctx, request, attributes);
     }
@@ -52,7 +55,7 @@ public class InitConnectionRouter extends Router {
 
             JSONArray membersIds = (JSONArray) chat.get("memberIds");
             List<UUID> chatMembers = new ArrayList<>();
-            for (int j = 0; j <  membersIds.size(); j++) {
+            for (int j = 0; j < membersIds.size(); j++) {
                 chatMembers.add(UUID.fromString((String) membersIds.get(j)));
             }
             chats.put(chatId, chatMembers);

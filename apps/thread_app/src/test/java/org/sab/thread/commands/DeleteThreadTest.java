@@ -38,7 +38,7 @@ public class DeleteThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
@@ -138,7 +138,7 @@ public class DeleteThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.disconnect();
+
         arango.dropDatabase(DB_NAME);
     }
 

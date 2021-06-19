@@ -11,18 +11,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
-import org.sab.recommendation.RecommendationApp;
-import org.sab.service.Command;
 import org.sab.service.Responder;
+import org.sab.service.validation.HTTPMethod;
+import org.sab.validation.Schema;
 
-public class UpdatePopularSubThreads extends Command {
+public class UpdatePopularSubThreads extends RecommendationCommand {
     Arango arango;
+
     @Override
-    public String execute(JSONObject request) {
+    public String execute() {
         JSONArray data = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             String query = """
                     FOR subThread IN %s
                         SORT subThread.%s DESC
@@ -30,31 +31,29 @@ public class UpdatePopularSubThreads extends Command {
                         SORT SUM([subThread.%s, subThread.%s]) DESC
                         LIMIT 100
                         RETURN subThread"""
-                    .formatted(RecommendationApp.SUB_THREADS_COLLECTION_NAME,
-                            RecommendationApp.SUB_THREAD_DATE,
-                            RecommendationApp.SUB_THREAD_LIKES,
-                            RecommendationApp.SUB_THREAD_DISLIKES);
-            ArangoCursor<BaseDocument> cursor = arango.query(RecommendationApp.DB_NAME, query, null);
+                    .formatted(SUB_THREADS_COLLECTION_NAME,
+                            SUB_THREAD_DATE,
+                            SUB_THREAD_LIKES,
+                            SUB_THREAD_DISLIKES);
+            ArangoCursor<BaseDocument> cursor = arango.query(DB_NAME, query, null);
 
             cursor.forEachRemaining(document -> {
                 JSONObject subThread = new JSONObject();
-                subThread.put(RecommendationApp.SUB_THREAD_ID, document.getKey());
-                subThread.put(RecommendationApp.SUB_THREAD_PARENT_THREAD, document.getProperties().get(RecommendationApp.SUB_THREAD_PARENT_THREAD));
-                subThread.put(RecommendationApp.SUB_THREAD_TITLE, document.getProperties().get(RecommendationApp.SUB_THREAD_TITLE));
-                subThread.put(RecommendationApp.SUB_THREAD_CREATOR, document.getProperties().get(RecommendationApp.SUB_THREAD_CREATOR));
-                subThread.put(RecommendationApp.SUB_THREAD_LIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_LIKES));
-                subThread.put(RecommendationApp.SUB_THREAD_DISLIKES, document.getProperties().get(RecommendationApp.SUB_THREAD_DISLIKES));
-                subThread.put(RecommendationApp.SUB_THREAD_CONTENT, document.getProperties().get(RecommendationApp.SUB_THREAD_CONTENT));
-                subThread.put(RecommendationApp.SUB_THREAD_HAS_IMAGE, document.getProperties().get(RecommendationApp.SUB_THREAD_HAS_IMAGE));
-                subThread.put(RecommendationApp.SUB_THREAD_DATE, document.getProperties().get(RecommendationApp.SUB_THREAD_DATE));
+                subThread.put(SUB_THREAD_ID, document.getKey());
+                subThread.put(SUB_THREAD_PARENT_THREAD, document.getProperties().get(SUB_THREAD_PARENT_THREAD));
+                subThread.put(SUB_THREAD_TITLE, document.getProperties().get(SUB_THREAD_TITLE));
+                subThread.put(SUB_THREAD_CREATOR, document.getProperties().get(SUB_THREAD_CREATOR));
+                subThread.put(SUB_THREAD_LIKES, document.getProperties().get(SUB_THREAD_LIKES));
+                subThread.put(SUB_THREAD_DISLIKES, document.getProperties().get(SUB_THREAD_DISLIKES));
+                subThread.put(SUB_THREAD_CONTENT, document.getProperties().get(SUB_THREAD_CONTENT));
+                subThread.put(SUB_THREAD_HAS_IMAGE, document.getProperties().get(SUB_THREAD_HAS_IMAGE));
+                subThread.put(SUB_THREAD_DATE, document.getProperties().get(SUB_THREAD_DATE));
                 data.put(subThread);
             });
         } catch (ArangoDBException e) {
-            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500).toString();
+            return Responder.makeErrorResponse("ArangoDB error: " + e.getMessage(), 500);
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
-        } finally {
-            arango.disconnect();
         }
 
         if (data.length() != 0) {
@@ -62,16 +61,26 @@ public class UpdatePopularSubThreads extends Command {
                 Couchbase couchbase = Couchbase.getInstance();
                 couchbase.connectIfNotConnected();
 
-                JsonObject couchbaseData = JsonObject.create().put(RecommendationApp.SUB_THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
-                couchbase.upsertDocument(RecommendationApp.LISTINGS_BUCKET_NAME, RecommendationApp.LISTINGS_POPULAR_SUB_THREADS_KEY, couchbaseData);
+                JsonObject couchbaseData = JsonObject.create().put(SUB_THREADS_DATA_KEY, JacksonTransformers.stringToJsonArray(data.toString()));
+                couchbase.upsertDocument(LISTINGS_BUCKET_NAME, LISTINGS_POPULAR_SUB_THREADS_KEY, couchbaseData);
             } catch (TimeoutException e) {
-                return Responder.makeErrorResponse("Request to Couchbase timed out.", 408).toString();
+                return Responder.makeErrorResponse("Request to Couchbase timed out.", 408);
             } catch (CouchbaseException e) {
-                return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500).toString();
+                return Responder.makeErrorResponse("Couchbase error: " + e.getMessage(), 500);
             } catch (Exception e) {
-                return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500).toString();
+                return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
             }
         }
         return Responder.makeDataResponse(data).toString();
+    }
+
+    @Override
+    protected Schema getSchema() {
+        return Schema.emptySchema();
+    }
+
+    @Override
+    protected HTTPMethod getMethodType() {
+        return HTTPMethod.PUT;
     }
 }

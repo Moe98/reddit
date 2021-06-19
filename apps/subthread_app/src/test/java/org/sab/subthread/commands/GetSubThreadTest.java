@@ -24,7 +24,7 @@ public class GetSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(DB_NAME);
 
             user = new BaseDocument();

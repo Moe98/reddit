@@ -46,10 +46,9 @@ public class BookmarkSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
-            assertTrue(arango.isConnected());
+
 //            arango.dropDatabase(DB_NAME);
-            arango.createDatabase(DB_NAME);
+            arango.createDatabaseIfNotExists(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
             arango.createCollection(DB_NAME, THREAD_COLLECTION_NAME, false);
@@ -88,7 +87,7 @@ public class BookmarkSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.disconnect();
+
         arango.dropDatabase(SubThreadCommand.DB_Name);
     }
 

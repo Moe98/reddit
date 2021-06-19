@@ -10,7 +10,7 @@ const TextInput = importJsx('./text-input')
 const { useState } = React
 
 const RemoveGroupMember = ({ onBack }) => {
-	const { userId } = useContext(AppContext)
+	const { authToken } = useContext(AppContext)
 	const [chatContext, _] = useContext(ChatContext)
 	const [memberId, setMemberId] = useState('')
 
@@ -20,7 +20,7 @@ const RemoveGroupMember = ({ onBack }) => {
         chatContext.sendToChat({
             type: 'REMOVE_GROUP_MEMBER',
             chatId: chat.chatId,
-            adminId: userId,
+            authToken,
             memberId: mapSpecialIdToId(memberId)
         })
 		onBack()

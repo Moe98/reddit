@@ -1,12 +1,18 @@
 package org.sab.service;
 
 import org.json.JSONObject;
+import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
+import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
+import org.sab.rabbitmq.SingleServerChannel;
+import org.sab.reflection.ReflectionUtils;
+import org.sab.service.controllerbackdoor.BackdoorServer;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -17,98 +23,161 @@ import java.util.concurrent.*;
  */
 
 public abstract class Service {
-    public static final String DEFAULT_PROPERTIES_FILENAME = "configmap.properties";
-    private static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
-    private static final String THREADS_COUNT_PROPERTY_NAME = "threadsCount";
-    private static int DEFAULT_THREADS_COUNT = 10;
+    private final Properties configProperties = new Properties();
+    private boolean isFrozen = true;
     private ExecutorService threadPool;
+    private SingleServerChannel singleServerChannel;
 
-    // Singleton Design Pattern
-    private void getThreadPool(int threads) {
-        if (threadPool == null) {
-            threadPool = Executors.newFixedThreadPool(threads);
-        }
+    private void initThreadPool() {
+        threadPool = Executors.newFixedThreadPool(getThreadCount());
     }
 
     public abstract String getAppUriName();
 
-    public int getThreadCount() {
-        final Properties properties = new Properties();
-        final InputStream threadsCountStream = getClass().getClassLoader().getResourceAsStream(THREADS_COUNT_PROPERTY_NAME.toLowerCase() + ".properties");
-
-        if (threadsCountStream == null)
-            return DEFAULT_THREADS_COUNT;
-        else {
-            try {
-                properties.load(threadsCountStream);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return DEFAULT_THREADS_COUNT;
-            }
-            return Integer.parseInt(properties.getProperty(THREADS_COUNT_PROPERTY_NAME));
-        }
+    public int readProperty(String propertyName, int defaultPropertyValue) {
+        if (!configProperties.containsKey(propertyName))
+            return defaultPropertyValue;
+        return Integer.parseInt(configProperties.getProperty(propertyName));
     }
 
-    public abstract String getConfigMapPath();
+    private int getThreadCount() {
+        return readProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_THREADS_COUNT);
+    }
 
-    public void start() {
+    public final int getDbConnectionsCount() {
+        return readProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_DB_CONNECTIONS_COUNT);
+    }
+
+    public final String getConfigMapPath() {
+        return ServiceConstants.DEFAULT_PROPERTIES_FILENAME;
+    }
+
+    private void loadCommandMap() {
         final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
         try {
             ConfigMap.getInstance().instantiate(configMapStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        getThreadPool(getThreadCount());
+    public void start() {
+        listenToController();
+        loadProperties();
+        initAcceptingNewRequests();
+        resume();
+    }
 
+    private void loadProperties() {
+        loadCommandMap();
+        loadConfigProperties();
+    }
+
+    private void loadConfigProperties() {
+        final InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties");
         try {
-            listenOnQueue();
-        } catch (IOException | TimeoutException e) {
+            configProperties.load(inputStream);
+        } catch (IOException e) {
             e.printStackTrace();
+            System.exit(-1);
         }
     }
 
-    private void freeze() {
-        throw new UnsupportedOperationException();
+    public void freeze() {
+        if (isFrozen) {
+            return;
+        }
+
+        stopAcceptingNewRequests();
+        releaseThreadPool();
+        releaseDbPool();
+
+        isFrozen = true;
     }
 
-    private void resume() {
-        throw new UnsupportedOperationException();
+    public void resume() {
+        if (!isFrozen) {
+            return;
+        }
+
+        initThreadPool();
+        startAcceptingNewRequests();
+
+        isFrozen = false;
     }
 
     private void reloadThreadPool() {
-        throw new UnsupportedOperationException();
+        stopAcceptingNewRequests();
+        releaseThreadPool();
+        initThreadPool();
+        startAcceptingNewRequests();
     }
 
-    private void reloadCommandMap() {
-        throw new UnsupportedOperationException();
-    }
 
     private void reloadDbPool() {
         throw new UnsupportedOperationException();
     }
 
-    public void listenOnQueue() throws IOException, TimeoutException {
+    private void initAcceptingNewRequests() {
+        try {
+            initRPCServer();
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopAcceptingNewRequests() {
+        try {
+            singleServerChannel.pauseListening();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startAcceptingNewRequests() {
+        try {
+            singleServerChannel.startListening();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void releaseThreadPool() {
+        try {
+            threadPool.shutdown();
+            if (!threadPool.awaitTermination(ServiceConstants.MAX_THREAD_TIMEOUT, TimeUnit.MINUTES)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            threadPool.shutdownNow();
+        }
+    }
+
+    private void releaseDbPool() {
+        // TODO
+    }
+
+    public void initRPCServer() throws IOException, TimeoutException {
         // initializing a connection with rabbitMQ and initializing the queue on which
         // the app listens
-        final String queueName = getAppUriName().toUpperCase() + REQUEST_QUEUE_NAME_SUFFIX;
-
-        RPCServer server = RPCServer.getInstance(queueName);
+        final String queueName = getAppUriName().toUpperCase() + ServiceConstants.REQUEST_QUEUE_NAME_SUFFIX;
 
         TriFunction<String, JSONObject, String> invokeCallback = this::invokeCommand;
-
-        // call the method in RPC server
-        server.listenOnQueue(queueName, invokeCallback);
-
+        singleServerChannel = RPCServer.getSingleChannelExecutor(queueName, invokeCallback);
     }
 
     private void listenToController() {
-        throw new UnsupportedOperationException();
+        new Thread(() -> {
+            try {
+                new BackdoorServer(getControllerPort(), this).start();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    // Object is a placeholder.
-    private void receiveFile(Object file) {
-        throw new UnsupportedOperationException();
+    private InputStream decodedFileToInputStream(String encodedFile) {
+        return IoUtils.decodeFile(encodedFile);
     }
 
     private void reloadClass(String className) {
@@ -152,6 +221,61 @@ public abstract class Service {
             e.printStackTrace();
             return "{\"statusCode\": 510, \"msg\": \"Function-Name class: threw an exception\"}";
         }
+    }
+
+
+    public int getControllerPort() {
+        final InputStream stream = Controller.class.getClassLoader().getResourceAsStream("apps-ports.properties");
+        final Properties properties = new Properties();
+        try {
+            properties.load(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String propertyName = getAppUriName().toLowerCase();
+        return Integer.parseInt(properties.getProperty(propertyName));
+
+    }
+
+    public void handleControllerMessage(JSONObject message) {
+        System.out.printf("%s has received a message from the controller!\n%s\n", getAppUriName(), message.toString());
+        Method method = ReflectionUtils.getMethod(Service.class, message.getString("command"));
+        try {
+            boolean hasArgs = message.has(Controller.ARGS);
+            method.invoke(this, hasArgs ? message.optJSONArray(Controller.ARGS).toList().toArray() : null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setMaxThreadsCount(int maxThreadsCount) {
+        updateProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, String.valueOf(maxThreadsCount));
+        reloadThreadPool();
+
+    }
+
+    public void setMaxDbConnectionsCount(int maxDbConnectionsCount) {
+        updateProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, String.valueOf(maxDbConnectionsCount));
+        reloadDbPool();
+    }
+
+    private void updateProperty(String propertyName, String newValue) {
+        configProperties.replace(propertyName, newValue);
+    }
+
+    public void addCommand(String commandName, String encodedFile) {
+        ConfigMap.getInstance().addCommand(commandName);
+        // TODO ADD to JVM
+        throw new UnsupportedOperationException();
+    }
+
+    public void deleteCommand(String functionName) {
+        ConfigMap.getInstance().deleteCommand(functionName);
+    }
+
+    public void updateCommand(String commandName, String encodedFile) {
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
 }
