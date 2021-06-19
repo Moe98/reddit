@@ -145,7 +145,7 @@ public class DislikeSubThreadTest {
 
         String response = dislikeSubthread(mantaId, subthreadId);
         JSONObject responseJson = new JSONObject(response);
-        System.out.println(responseJson);
+
         // checking the response of the command
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONObject data = (JSONObject) (responseJson.get("data"));

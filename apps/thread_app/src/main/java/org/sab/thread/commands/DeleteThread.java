@@ -60,7 +60,7 @@ public class DeleteThread extends ThreadCommand {
             // TODO check thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 444);
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // TODO check person deleting is creator
@@ -114,39 +114,20 @@ public class DeleteThread extends ThreadCommand {
             // delete thread
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
-                try {
-                    arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                } catch (Exception e) {
-                    System.err.println("subthread: " + i);
-                    e.printStackTrace();
-                    System.err.println(e.getMessage());
-                    return Responder.makeErrorResponse(e.getMessage(), 333);
-                }
+                arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
             }
 
             // delete comments
-            System.err.println(commentJsonArr.length());
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
-                try {
-                    arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                } catch (Exception e) {
-                    System.err.printf("comment: %d out of: %d with id: %s\n", i, commentJsonArr.length(), commentId);
-                    e.printStackTrace();
-                    System.err.println(e.getMessage());
-                    return Responder.makeErrorResponse(e.getMessage(), 777);
-                }
+                arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
             }
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
-        } catch (ArangoDBException e) {
-            e.printStackTrace();
-            System.err.println(e.getMessage());
-            return Responder.makeErrorResponse(e.getMessage(), 666);
         } catch (Exception e) {
             System.err.println(e.getMessage());
-            return Responder.makeErrorResponse(e.getMessage(), 555);
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         } finally {
             response.put("msg", msg);
         }
