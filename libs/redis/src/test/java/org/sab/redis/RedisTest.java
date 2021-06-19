@@ -33,7 +33,7 @@ public class RedisTest {
 
     @BeforeClass
     public static void setUp() {
-        RedisTest.redis = new Redis();
+        RedisTest.redis = Redis.getClient();
         try {
             connection = redis.getConnection();
             RedisTest.syncCommand = redis.getSyncCommand(connection);
