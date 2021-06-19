@@ -3,7 +3,6 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -26,8 +25,8 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
-        JSONArray response = new JSONArray();
+        Arango arango;
+        JSONArray response;
         try {
             arango = Arango.getInstance();
 
@@ -37,8 +36,8 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
 
 
-            if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
+            if (!existsInCouchbase(userId) && !existsInArango(USER_COLLECTION_NAME, userId)) {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
             }
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arr = new ArrayList<>();
@@ -53,7 +52,7 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             response = arango.parseOutput(cursor, SUBTHREAD_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
         return Responder.makeDataResponse(response).toString();
     }
