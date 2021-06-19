@@ -122,7 +122,6 @@ public class DeleteThread extends ThreadCommand {
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
         } catch (Exception e) {
-            System.err.println(e.getMessage());
             return Responder.makeErrorResponse(e.getMessage(), 400);
         } finally {
             response.put("msg", msg);
