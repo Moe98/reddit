@@ -36,15 +36,11 @@ public class ModeratorSeeReports extends SubThreadCommand {
 
             arango = Arango.getInstance();
 
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_REPORTS_COLLECTION_NAME, false);
 
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(SubThreadCommand.DB_Name, SubThreadCommand.SUBTHREAD_REPORTS_COLLECTION_NAME, SubThreadCommand.THREAD_ID_DB, threadId);
             ArrayList<String> reportAtt = new ArrayList<>();
@@ -55,6 +51,7 @@ public class ModeratorSeeReports extends SubThreadCommand {
             reportAtt.add(SubThreadCommand.REPORT_MSG_DB);
             reportAtt.add(SubThreadCommand.SUBTHREAD_ID_DB);
             response = arango.parseOutput(cursor, SubThreadCommand.REPORT_ID_DB, reportAtt);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }

@@ -31,7 +31,7 @@ public class CreateSubThreadTest {
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
 
     // subthread attribs
-    final private static String fishName = "AsmakElRayes7amido", iceCreamName = "GelatiAzza";
+    final private static String fishName = "asmakIbn7amedo", iceCreamName = "GelatiAzza";
     private static Arango arango;
     private static BaseDocument moe, manta, lujine, fishThread, iceCreamThread;
 
@@ -42,9 +42,9 @@ public class CreateSubThreadTest {
 
             arango.createDatabase(SubThreadCommand.DB_Name);
 
-            arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
-            arango.createCollection(DB_NAME, THREAD_COLLECTION_NAME, false);
-            arango.createCollection(DB_NAME, SUBTHREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_NAME, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_NAME, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_NAME, SUBTHREAD_COLLECTION_NAME, false);
 
             moe = TestUtils.setUpUser(moeId, false, 0);
             TestUtils.addObjectToCollection(arango, moe, USER_COLLECTION_NAME);

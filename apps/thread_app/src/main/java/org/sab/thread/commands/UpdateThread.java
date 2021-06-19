@@ -2,6 +2,7 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -10,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class UpdateThread extends ThreadCommand {
     @Override
@@ -35,9 +38,7 @@ public class UpdateThread extends ThreadCommand {
 
             arango = Arango.getInstance();
 
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
@@ -63,6 +64,8 @@ public class UpdateThread extends ThreadCommand {
             thread.setDescription(description);
             thread.setDateCreated(dateCreated);
             thread.setNumOfFollowers(numOfFollowers);
+
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }

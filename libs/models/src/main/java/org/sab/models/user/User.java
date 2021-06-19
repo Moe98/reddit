@@ -69,10 +69,6 @@ public class User {
         this.numOfFollowers = numOfFollowers;
     }
 
-    public static String getCollectionName() {
-        return "Users";
-    }
-
     public String reformatUserId() {
         return Utilities.formatUUID(userId);
     }

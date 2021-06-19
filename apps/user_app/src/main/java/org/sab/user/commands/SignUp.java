@@ -3,6 +3,7 @@ package org.sab.user.commands;
 import com.arangodb.ArangoDBException;
 import org.sab.arango.Arango;
 import org.sab.auth.Auth;
+import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;

@@ -144,7 +144,7 @@ public class ReportSubThreadTest {
         String reportMsg = "ban this scammer naw!";
         String response = reportSubthread(mantaId, typeOfReport, reportedSubthreadId, threadId, reportMsg);
         JSONObject responseJson = new JSONObject(response);
-
+        System.out.println(responseJson);
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONObject data = (JSONObject) (responseJson.get("data"));
         assertEquals("Created Subthread Report", data.get("msg"));

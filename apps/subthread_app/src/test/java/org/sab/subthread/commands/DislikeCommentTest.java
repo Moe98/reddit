@@ -19,7 +19,7 @@ public class DislikeCommentTest {
     final private static String parentThreadId1 = "asmakElRayes7amido";
     final private static String parentThreadId2 = "GelatiAzza";
     final private static String moeId = "Moe", mantaId = "Manta", lujineId = "Lujine";
-    final private static String commentId1 = "20301", commentId2 = "20201", commentId3 = "20202";
+    final private static String commentId1 = "214302", commentId2 = "214311", commentId3 = "214320";
     private static Arango arango;
     private static BaseDocument moe, manta, lujine;
 
@@ -163,8 +163,13 @@ public class DislikeCommentTest {
         commentAtt.add(CommentCommand.DISLIKES_DB);
         commentAtt.add(CommentCommand.DATE_CREATED_DB);
         JSONArray commentArr = arango.parseOutput(cursor, CommentCommand.COMMENT_ID, commentAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(commentId, ((JSONObject) commentArr.get(0)).get(CommentCommand.COMMENT_ID));
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: commentArr){
+            if(((JSONObject) c).get(CommentCommand.COMMENT_ID).equals(commentId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument commentAfterDisike = arango.readDocument(CommentCommand.DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, commentId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(commentAfterDisike.getAttribute(CommentCommand.LIKES_DB)));
@@ -172,7 +177,7 @@ public class DislikeCommentTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes);
         assertEquals(newNumOfDislikes, oldNumOfDislikes + 1);
-        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
     }
 
     @Test
@@ -205,7 +210,13 @@ public class DislikeCommentTest {
         commentAtt.add(CommentCommand.DISLIKES_DB);
         commentAtt.add(CommentCommand.DATE_CREATED_DB);
         JSONArray commentArr = arango.parseOutput(cursor, CommentCommand.COMMENT_ID, commentAtt);
-        assertEquals(0, commentArr.length());
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: commentArr){
+            if(((JSONObject) c).get(CommentCommand.COMMENT_ID).equals(commentId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(0, tmpArr.size());
 
         BaseDocument commentAfter2ndDislike = arango.readDocument(CommentCommand.DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, commentId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(commentAfter2ndDislike.getAttribute(CommentCommand.LIKES_DB)));
@@ -214,7 +225,7 @@ public class DislikeCommentTest {
         assertEquals(newNumOfLikes, oldNumOfLikes);
         assertEquals(newNumOfDislikes, oldNumOfDislikes - 1);
 
-        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
     }
 
     @Test
@@ -247,8 +258,13 @@ public class DislikeCommentTest {
         commentAtt.add(CommentCommand.DISLIKES_DB);
         commentAtt.add(CommentCommand.DATE_CREATED_DB);
         JSONArray commentArr = arango.parseOutput(cursor, CommentCommand.COMMENT_ID, commentAtt);
-        assertEquals(1, commentArr.length());
-        assertEquals(commentId, ((JSONObject) commentArr.get(0)).get(CommentCommand.COMMENT_ID));
+        ArrayList tmpArr = new ArrayList();
+        for(Object c: commentArr){
+            if(((JSONObject) c).get(CommentCommand.COMMENT_ID).equals(commentId)){
+                tmpArr.add((JSONObject) c);
+            }
+        }
+        assertEquals(1, tmpArr.size());
 
         BaseDocument commentAfterDislike = arango.readDocument(CommentCommand.DB_Name, CommentCommand.COMMENT_COLLECTION_NAME, commentId);
         int newNumOfLikes = Integer.parseInt(String.valueOf(commentAfterDislike.getAttribute(CommentCommand.LIKES_DB)));
@@ -262,7 +278,7 @@ public class DislikeCommentTest {
         JSONArray commentArr2 = arango.parseOutput(cursor2, CommentCommand.COMMENT_ID, commentAtt);
         assertEquals(0, commentArr2.length());
 
-        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME);
-        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
     }
 }

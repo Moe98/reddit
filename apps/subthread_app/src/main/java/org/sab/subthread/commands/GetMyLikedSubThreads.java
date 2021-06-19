@@ -32,13 +32,10 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arango = Arango.getInstance();
 
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
-            
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
-            }
+
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
+
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();

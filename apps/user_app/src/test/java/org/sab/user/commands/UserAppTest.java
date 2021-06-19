@@ -11,6 +11,7 @@ import org.sab.arango.Arango;
 import org.sab.auth.Auth;
 import org.sab.auth.AuthParamsHandler;
 import org.sab.functions.Utilities;
+import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.user.UserApp;

@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class CreateCommentTest {
     private static final String DB_NAME = System.getenv("ARANGO_DB");
-    private static final String threadId = "TestThread", subThreadId = "TestSubThread", userId = "TestUser";
+    private static final String threadId = "asmakIbn7amedo", subThreadId = "214124", userId = "Manta";
     private static Arango arango;
     private static BaseDocument thread, subThread, user;
 
@@ -62,9 +62,6 @@ public class CreateCommentTest {
 
     @AfterClass
     public static void tearDown() {
-        removeObjectFromCollection(thread, "Thread");
-        removeObjectFromCollection(subThread, "Subthread");
-        removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
     }
 

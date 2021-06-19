@@ -242,6 +242,7 @@ public class UserToUserActionsTest {
         userUnblockUser(lujineId, moeId);
     }
 
+    //TODO: blocking now removes the follow link, so this test isn't needed, we can remove it.
     @Test
     public void T04_UserCannotUnfollowBlockedUser() {
 
@@ -266,13 +267,13 @@ public class UserToUserActionsTest {
 
         // If the length of |edgeId| is equal to zero, then that edge does not exist.
         // This means that it was added successfully.
-        assertNotEquals("", edgeId);
+        assertEquals("", edgeId);
 
 
         final BaseDocument newUserDocument = arango.readDocument(UserToUserCommand.TEST_DB_Name, UserToUserCommand.USER_COLLECTION_NAME, moeId);
         int newFollowerCount = Integer.parseInt(String.valueOf(newUserDocument.getAttribute(UserToUserCommand.NUM_OF_FOLLOWERS_DB)));
 
-        assertEquals(oldFollowerCount, newFollowerCount);
+        assertEquals(oldFollowerCount, newFollowerCount+1);
 
         //removing test effects
 

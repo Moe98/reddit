@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public class Controller {
 
     private static final String instanceNumberDelimiter = "_";
-    private static final String ENCODED_FILE = "encodedFile";
+    public static final String ARGS = "args";
     private final Map<String, String> ipMap = new HashMap<>();
     private final Map<String, String> portMap = new HashMap<>();
 
@@ -29,6 +29,10 @@ public class Controller {
         String command = request.getString("command");
         Method method = controller.getClass().getDeclaredMethod(command, JSONObject.class);
         method.invoke(controller, request);
+    }
+
+    private static void addArg(JSONObject request, Object newArg) {
+        request.getJSONArray(ARGS).put(newArg);
     }
 
     private void initMap(Map<String, String> map, String configFile) {
@@ -70,7 +74,6 @@ public class Controller {
 
     }
 
-
     private String readRequest() throws IOException {
         InputStream stream = getClass().getClassLoader().getResourceAsStream("request.json");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
@@ -104,10 +107,9 @@ public class Controller {
         return IoUtils.encodeFile(stream);
     }
 
-
     private void addOrUpdateClass(JSONObject request) throws Exception {
-        String fileName = request.getString("fileName");
-        request.put(ENCODED_FILE, fileNameToEncodedString(fileName));
+        String fileName = request.getJSONArray(ARGS).getString(0);
+        addArg(request, fileNameToEncodedString(fileName));
         sendMessage(request);
     }
 
@@ -123,7 +125,6 @@ public class Controller {
         sendMessage(request);
     }
 
-
     private void addCommand(JSONObject request) throws Exception {
         addOrUpdateClass(request);
     }
@@ -134,11 +135,6 @@ public class Controller {
 
     private void updateCommand(JSONObject request) throws Exception {
         addOrUpdateClass(request);
-    }
-
-    private void updateClass(JSONObject request) throws Exception {
-        addOrUpdateClass(request);
-
     }
 
     private void freeze(JSONObject request) throws Exception {

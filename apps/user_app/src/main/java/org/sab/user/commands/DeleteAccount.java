@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.functions.Utilities;
 import org.sab.minio.MinIO;
+import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
