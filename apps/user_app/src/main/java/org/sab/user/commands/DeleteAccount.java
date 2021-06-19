@@ -6,7 +6,6 @@ import org.sab.arango.Arango;
 import org.sab.functions.Utilities;
 import org.sab.minio.MinIO;
 import org.sab.models.CollectionNames;
-import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Responder;
@@ -75,6 +74,6 @@ public class DeleteAccount extends UserCommand {
 
 
     private void deleteFromArango(String username) {
-        Arango.updateDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), Map.of(UserAttributes.IS_DELETED.getArangoDb(), true), username);
+        Arango.updateDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), Map.of(UserAttributes.IS_DELETED.getArangoDb(), true), username);
     }
 }

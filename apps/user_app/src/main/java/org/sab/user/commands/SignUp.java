@@ -79,7 +79,7 @@ public class SignUp extends UserCommand {
     private void InsertUserInArango(String username) {
         Map<String, Object> properties = Map.of(UserAttributes.IS_DELETED.getArangoDb(), false, UserAttributes.NUM_OF_FOLLOWERS.getArangoDb(), 0);
 
-        Arango.createDocument(UserApp.ARANGO_DB_NAME, User.getCollectionName(), properties, username);
+        Arango.createDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), properties, username);
     }
 
     private boolean isUsernameDeleted(String username) throws SQLException, EnvironmentVariableNotLoaded {
