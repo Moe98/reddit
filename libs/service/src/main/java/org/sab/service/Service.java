@@ -5,6 +5,7 @@ import org.sab.controller.Controller;
 import org.sab.functions.TriFunction;
 import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
+import org.sab.rabbitmq.SingleServerChannel;
 import org.sab.reflection.ReflectionUtils;
 import org.sab.service.controllerbackdoor.BackdoorServer;
 
@@ -25,7 +26,7 @@ public abstract class Service {
     private final Properties configProperties = new Properties();
     private boolean isFrozen = true;
     private ExecutorService threadPool;
-    private RPCServer messagingServer;
+    private SingleServerChannel singleServerChannel;
 
     private void initThreadPool() {
         threadPool = Executors.newFixedThreadPool(getThreadCount());
@@ -127,7 +128,7 @@ public abstract class Service {
 
     private void stopAcceptingNewRequests() {
         try {
-            messagingServer.pauseListening();
+            singleServerChannel.pauseListening();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -135,7 +136,7 @@ public abstract class Service {
 
     private void startAcceptingNewRequests() {
         try {
-            messagingServer.startListening();
+            singleServerChannel.startListening();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -162,7 +163,7 @@ public abstract class Service {
         final String queueName = getAppUriName().toUpperCase() + ServiceConstants.REQUEST_QUEUE_NAME_SUFFIX;
 
         TriFunction<String, JSONObject, String> invokeCallback = this::invokeCommand;
-        messagingServer = RPCServer.getInstance(queueName, invokeCallback);
+        singleServerChannel = RPCServer.getSingleChannelExecutor(queueName, invokeCallback);
     }
 
     private void listenToController() {
