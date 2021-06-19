@@ -2,6 +2,8 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
+import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.*;
 import org.sab.models.report.SubThreadReportAttributes;
 import org.sab.models.user.UserAttributes;
@@ -161,6 +163,14 @@ public abstract class SubThreadCommand extends CommandWithVerification {
         subThread.setDislikes(dislikes);
 
         return subThread.toJSON();
+    }
+
+    protected final boolean existsInCouchbase(String key) {
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+    }
+
+    protected final boolean existsInArango(String collectionName, String key) {
+        return Arango.getInstance().documentExists(DB_Name, collectionName, key);
     }
 
 }
