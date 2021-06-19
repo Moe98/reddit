@@ -35,7 +35,6 @@ public class SubThread {
         return new SubThread(parentThreadId, creatorId, title, content, hasImage);
     }
     
-    // TODO fix duplicate methods
     // id
     public String getId() {
         return id;
@@ -54,30 +53,13 @@ public class SubThread {
         this.parentThreadId = parentThreadId;
     }
 
-    public String getParentThread() {
-        return parentThreadId;
-    }
-
-
-    public void setParentThread(String parentThread) {
-        this.parentThreadId = parentThread;
-    }
-
     // creatorId;
     public String getCreatorId() {
         return creatorId;
     }
 
-    public String getCreator() {
-        return creatorId;
-    }
-
     public void setCreatorId(String creatorId) {
         this.creatorId = creatorId;
-    }
-
-    public void setCreator(String creator) {
-        this.creatorId = creator;
     }
 
     // title;
@@ -122,15 +104,6 @@ public class SubThread {
         return hasImage;
     }
 
-    public void setHasImage(Boolean hasImage) {
-        this.hasImage = hasImage;
-    }
-
-    public boolean isHasImage() {
-        return hasImage;
-    }
-
-
     public void setHasImage(boolean hasImage) {
         this.hasImage = hasImage;
     }
@@ -144,53 +117,8 @@ public class SubThread {
         this.dateCreated = dateCreated;
     }
 
-    public String getDate() {
-        return dateCreated;
-    }
-    
     public void setDate(String date) {
         this.dateCreated = date;
-    }
-    
-    // TODO fix enums
-    public static String getCollectionName() {
-        return CollectionNames.SUBTHREAD.get();
-    }
-
-    public static String getIdAttributeName() {
-        return "_key";
-    }
-
-    public static String getParentThreadAttributeName() {
-        return "ParentThread";
-    }
-
-    public static String getTitleAttributeName() {
-        return "Title";
-    }
-    
-    public static String getCreatorAttributeName() {
-        return "Creator";
-    }
-    
-    public static String getLikesAttributeName() {
-        return "Likes";
-    }
-
-    public static String getDislikesAttributeName() {
-        return "Dislikes";
-    }
-
-    public static String getContentAttributeName() {
-        return "Content";
-    }
-
-    public static String getHasImageAttributeName() {
-        return "HasImage";
-    }
-
-    public static String getDateAttributeName() {
-        return "Time";
     }
 
     @Override

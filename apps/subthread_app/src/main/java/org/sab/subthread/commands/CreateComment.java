@@ -1,18 +1,26 @@
 package org.sab.subthread.commands;
 
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import static org.sab.innerAppComm.Comm.notifyApp;
+import static org.sab.innerAppComm.Comm.tag;
+
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class CreateComment extends CommentCommand {
 
@@ -65,7 +73,7 @@ public class CreateComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
-
+            arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
             // TODO check other things exist
             //  If the parent is a subthread check subthread exists
             //  If the parent is a comment check a comment exist
@@ -111,6 +119,22 @@ public class CreateComment extends CommentCommand {
             // Add the edge documents.
             arango.createEdgeDocument(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, edgeDocumentFromContentToComment);
             arango.createEdgeDocument(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocumentFromUserToComment);
+
+            // tag a person if someone was tagged in the content of the comment
+            tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
+
+            // getting/notifying the person who made the parent comment/subthread
+            if(parentContentType.toLowerCase().equals("comment")){
+                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, parentSubThreadId);
+                String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_COMMENT_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+            }
+            else{
+                BaseDocument subthreadDoc = arango.readDocument(DB_Name,  SUBTHREAD_COLLECTION_NAME, parentSubThreadId);
+                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_SUBTHREAD_MSG.getMSG(), commentId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

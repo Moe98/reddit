@@ -25,5 +25,4 @@ class RPCBase {
 
         return factory.newConnection();
     }
-
 }

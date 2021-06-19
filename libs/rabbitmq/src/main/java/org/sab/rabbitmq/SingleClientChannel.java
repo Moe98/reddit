@@ -33,6 +33,19 @@ public class SingleClientChannel extends SingleBasicChannel {
         return awaitResponse(corrId, declaredReplyToQueue);
     }
 
+    // Send |message| to |requestQueue|
+    public void call_withoutResponse(String message, String requestQueue)
+            throws IOException {
+        // Create a unique identifier for the request being placed in
+        // |requestQueue|.
+        final String corrId = UUID.randomUUID().toString();
+
+        // Initialize the request queue.
+        String declaredRequestQueue = declareSpecificQueue(requestQueue);
+
+        sendRequest_withoutReplyTo(corrId, message, declaredRequestQueue);
+    }
+
     public String awaitResponse(String corrId, String targetQueue) throws IOException, InterruptedException {
         // Create a blocking queue to put the expected response in.
         final BlockingQueue<String> response = new ArrayBlockingQueue<>(1);
@@ -70,6 +83,15 @@ public class SingleClientChannel extends SingleBasicChannel {
             throws IOException {
 
         final AMQP.BasicProperties senderProps = createSenderProps(corrId, replyToQueue);
+        final String exchange = "";
+        // sending the request message in the request queue with it's properties
+        channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void sendRequest_withoutReplyTo(String corrId, String message, String targetQueue)
+            throws IOException {
+
+        final AMQP.BasicProperties senderProps = createSenderProps(corrId, "");
         final String exchange = "";
         // sending the request message in the request queue with it's properties
         channel.basicPublish(exchange, targetQueue, senderProps, message.getBytes(StandardCharsets.UTF_8));

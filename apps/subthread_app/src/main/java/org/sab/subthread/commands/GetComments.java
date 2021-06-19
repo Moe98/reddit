@@ -47,9 +47,8 @@ public class GetComments extends CommentCommand {
                 parentCollection = COMMENT_COLLECTION_NAME;
             }
 
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+
 
             // check if comment exists
             if (!arango.documentExists(DB_Name, parentCollection, parentId)) {

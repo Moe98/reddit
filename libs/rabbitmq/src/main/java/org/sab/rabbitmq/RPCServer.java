@@ -28,7 +28,7 @@ public class RPCServer {
     }
 
     // Close the |channel| as to not waste resources.
-    public void close() throws IOException, TimeoutException {
+    public void close() throws IOException {
         connection.close();
     }
 
