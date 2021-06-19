@@ -24,7 +24,7 @@ public class GetMySubThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
@@ -52,7 +52,6 @@ public class GetMySubThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -137,7 +136,6 @@ public class GetMySubThreadsTest {
 
     @Test
     public void T01_GetMySubThreads() {
-        arango.connectIfNotConnected();
         String response = getMySubThreads(mantaId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -150,7 +148,6 @@ public class GetMySubThreadsTest {
 
     @Test
     public void T02_GetMySubThreads() {
-        arango.connectIfNotConnected();
         String response = getMySubThreads(moeId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -163,7 +160,6 @@ public class GetMySubThreadsTest {
 
     @Test
     public void T03_GetMySubThreads() {
-        arango.connectIfNotConnected();
         String response = getMySubThreads(lujineId);
         JSONObject responseJson = new JSONObject(response);
 

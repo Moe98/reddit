@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -13,6 +14,8 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteComment extends CommentCommand {
     @Override
@@ -44,15 +47,10 @@ public class DeleteComment extends CommentCommand {
             String commentId = body.getString(COMMENT_ID);
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             // check if comment exists
             if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
@@ -71,7 +69,6 @@ public class DeleteComment extends CommentCommand {
             // get all children comments at level 1
             ArangoCursor<BaseDocument> cursor;
 
-//            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
             commentJsonArr = new JSONArray();
@@ -111,9 +108,6 @@ public class DeleteComment extends CommentCommand {
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response).toString();

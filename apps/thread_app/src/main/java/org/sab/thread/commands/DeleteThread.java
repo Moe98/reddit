@@ -50,24 +50,12 @@ public class DeleteThread extends ThreadCommand {
             } catch (Exception e) {
                 return Responder.makeErrorResponse(e.getMessage(), 111);
             }
-            try {
-                arango.connectIfNotConnected();
-            } catch (Exception e) {
-                return Responder.makeErrorResponse(e.getMessage(), 222);
-            }
             String threadName = body.getString(THREAD_NAME);
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-            if (!arango.collectionExists(DB_Name, THREAD_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, THREAD_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, USER_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, USER_COLLECTION_NAME, false);
-            }
-            if (!arango.collectionExists(DB_Name, COMMENT_COLLECTION_NAME)) {
-                arango.createCollection(DB_Name, COMMENT_COLLECTION_NAME, false);
-            }
+            arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
+            arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             // TODO check thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
@@ -157,9 +145,6 @@ public class DeleteThread extends ThreadCommand {
             System.err.println(e.getMessage());
             return Responder.makeErrorResponse(e.getMessage(), 555);
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
         return Responder.makeDataResponse(response);
