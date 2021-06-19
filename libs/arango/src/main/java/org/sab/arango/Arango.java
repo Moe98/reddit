@@ -26,7 +26,6 @@ public class Arango {
     final private static Arango instance = new Arango();
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
-
     private Arango() {
 
         final Properties properties = new Properties();
@@ -37,17 +36,18 @@ public class Arango {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        String ARANG_HOST = "127.0.0.1";
+        if(System.getenv("ARANGO_HOST") != null)
+            ARANG_HOST = System.getenv("ARANGO_HOST");
         builder = new ArangoDB.Builder()
-                .host(System.getenv("ARANGO_HOST"), 8529)
-                .user(System.getenv("ARANGO_USER"))
-                .password(System.getenv("ARANGO_PASSWORD"))
-                .maxConnections(NUM_OF_CONNECTIONS)
-                .serializer(new ArangoJack())
-                .connectionTtl(null)
-                .keepAliveInterval(600);
-
+                    .host(ARANG_HOST, 8529)
+                    .user(System.getenv("ARANGO_USER"))
+                    .password(System.getenv("ARANGO_PASSWORD"))
+                    .maxConnections(NUM_OF_CONNECTIONS)
+                    .serializer(new ArangoJack())
+                    .connectionTtl(null)
+                    .keepAliveInterval(600);
+        
         arangoDB = builder.build();
     }
 
