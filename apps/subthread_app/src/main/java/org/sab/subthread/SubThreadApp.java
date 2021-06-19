@@ -1,6 +1,8 @@
 package org.sab.subthread;
 
 import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.service.Service;
 
 import java.util.ArrayList;
@@ -13,11 +15,13 @@ public class SubThreadApp extends Service {
     // TODO move all connection establishment here
     //  move all  DB creations here
     private static Arango arango;
+    private static Couchbase couchbase;
 
     public static void main(String[] args) {
 
         try {
             startArangoConnection();
+            startCouchbaseConnection();
             // TODO add collection creation here
             //        createCollections(collectionList, edgeCollectionList);
             new SubThreadApp().start();
@@ -36,6 +40,13 @@ public class SubThreadApp extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void startCouchbaseConnection() {
+        couchbase = Couchbase.getInstance();
+
+        couchbase.createBucketIfNotExists(CouchbaseBuckets.COMMENTS.get(), 100);
+        couchbase.createBucketIfNotExists(CouchbaseBuckets.SUBTHREADS.get(), 100);
     }
 
     public static void shutdownGracefully() {
@@ -67,7 +78,4 @@ public class SubThreadApp extends Service {
     public String getAppUriName() {
         return "subThread";
     }
-
-
-
 }
