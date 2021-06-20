@@ -45,7 +45,7 @@ public class CreateThread extends ThreadCommand {
 
         Arango arango = null;
 
-        Thread thread = null;
+        Thread thread = new Thread();
 
         try {
             String name = body.getString(THREAD_NAME);
