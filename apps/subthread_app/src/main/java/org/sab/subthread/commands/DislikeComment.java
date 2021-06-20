@@ -1,11 +1,10 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -13,7 +12,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.sab.innerAppComm.Comm.notifyApp;
@@ -39,7 +37,7 @@ public class DislikeComment extends CommentCommand {
     @Override
     public String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -49,9 +47,6 @@ public class DislikeComment extends CommentCommand {
             String userId = authenticationParams.getString(CommentCommand.USERNAME);
             arango = Arango.getInstance();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
-
-            // TODO if this doesn't exist something is wrong!
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
@@ -60,9 +55,15 @@ public class DislikeComment extends CommentCommand {
 
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+            BaseDocument originalComment;
+
+            if (existsInCouchbase(commentId)) {
+                originalComment = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
+            } else if (existsInArango(COMMENT_COLLECTION_NAME, commentId)) {
+                originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+            } else {
                 msg = "Comment does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
@@ -71,7 +72,6 @@ public class DislikeComment extends CommentCommand {
             if (!dislikeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, dislikeEdgeId);
 
-                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 // TODO make this thread safe
                 //  I feel like this var is unnecessary to begin with
                 int newDisikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) - 1;
@@ -80,7 +80,7 @@ public class DislikeComment extends CommentCommand {
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
 
                 msg = "removed your dislike on the comment";
-            } else { // then user wants to dilike this comment, so we create an edge and update the number of dilikes
+            } else { // then user wants to dislike this comment, so we create an edge and update the number of dislikes
                 msg = "added your dislike on the comment";
 
                 BaseEdgeDocument edgeDocument = new BaseEdgeDocument();
@@ -91,34 +91,34 @@ public class DislikeComment extends CommentCommand {
                 arango.createEdgeDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
-                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) + 1;
                 // TODO why update likes?
                 int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB)));
                 //checking if the user likes this content to remove his like
                 String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
+
                 if (!likeEdgeId.equals("")) {
                     arango.deleteDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
                     newLikes -= 1;
                     msg += " & removed your like";
                 }
+
                 originalComment.updateAttribute(LIKES_DB, newLikes);
                 originalComment.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
 
-
-                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, commentId);
+                BaseDocument commentDoc = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
                 String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_DISLIKE_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
-
-
             }
+
+            replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 }
