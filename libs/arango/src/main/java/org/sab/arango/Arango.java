@@ -14,7 +14,7 @@ import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import com.arangodb.Protocol;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,14 +38,15 @@ public class Arango {
             e.printStackTrace();
         }
 
-
         builder = new ArangoDB.Builder()
+                .host(System.getenv("ARANGO_HOST"), 8529)
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
                 .maxConnections(NUM_OF_CONNECTIONS)
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
+        arangoDB = builder.build();
     }
 
     public static Arango getInstance() {
