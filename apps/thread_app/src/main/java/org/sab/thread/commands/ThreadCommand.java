@@ -2,11 +2,11 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.CollectionNames;
-import org.sab.models.CommentAttributes;
-import org.sab.models.SubThreadAttributes;
-import org.sab.models.ThreadAttributes;
+import org.sab.models.*;
+import org.sab.couchbase.Couchbase;
+import org.sab.models.Thread;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.CommandWithVerification;
 
@@ -24,6 +24,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
     protected static final String BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
 
+    protected static final String THREAD_NAME_DB = ThreadAttributes.THREAD_NAME.getDb();
     protected static final String DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
@@ -105,5 +106,52 @@ public abstract class ThreadCommand extends CommandWithVerification {
             userExists = !isDeleted;
         }
         return userExists;
+    }
+
+    protected final JSONObject baseDocumentToJson(BaseDocument document) {
+        Thread thread;
+
+        final String threadName = document.getKey();
+        final String creatorId = (String) document.getAttribute(CREATOR_ID_DB);
+        final String description = (String) document.getAttribute(DESCRIPTION_DB);
+        final int numOfFollowers = Integer.parseInt(String.valueOf(document.getAttribute(NUM_OF_FOLLOWERS_DB)));
+        final String date = (String) document.getAttribute(DATE_CREATED_DB);
+
+        thread = Thread.createNewThread(threadName, creatorId, description) ;
+        thread.setDateCreated(date);
+        thread.setNumOfFollowers(numOfFollowers);
+
+        return thread.toJSON();
+    }
+
+    protected final boolean existsInCouchbase(String key) {
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+    }
+
+    protected final boolean existsInArango(String collectionName, String key) {
+        return Arango.getInstance().documentExists(DB_Name, collectionName, key);
+    }
+
+    protected final void deleteDocumentFromCouchbase(String bucketName, String key) {
+        Couchbase.getInstance().deleteDocumentIfExists(bucketName, key);
+    }
+
+    protected final BaseDocument getDocumentFromCouchbase(String bucketName, String key) {
+        JSONObject thread = Couchbase.getInstance().getDocumentJson(bucketName, key);
+
+        BaseDocument myObject = new BaseDocument();
+
+        myObject.setKey(String.valueOf(thread.get(THREAD_NAME_DB)));
+        myObject.addAttribute(DESCRIPTION_DB, thread.get(DESCRIPTION_DB));
+        myObject.addAttribute(CREATOR_ID_DB, thread.get(CREATOR_ID_DB));
+        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+        myObject.addAttribute(DATE_CREATED_DB, sqlDate);
+        myObject.addAttribute(NUM_OF_FOLLOWERS_DB, thread.get(NUM_OF_FOLLOWERS_DB));
+        
+        return myObject;
+    }
+
+    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
     }
 }

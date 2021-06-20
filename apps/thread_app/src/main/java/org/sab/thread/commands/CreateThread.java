@@ -45,8 +45,7 @@ public class CreateThread extends ThreadCommand {
 
         Arango arango = null;
 
-        // TODO change from empty constructor
-        Thread thread = new Thread();
+        Thread thread = null;
 
         try {
             String name = body.getString(THREAD_NAME);
@@ -55,7 +54,6 @@ public class CreateThread extends ThreadCommand {
 
             arango = Arango.getInstance();
 
-            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
