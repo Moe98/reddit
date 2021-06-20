@@ -41,7 +41,7 @@ public class Arango implements PooledDatabaseClient {
                 .connectionTtl(null)
                 .keepAliveInterval(600);
 
-        arangoDB = builder.build();
+        connect();
     }
 
     // Mandatory public static ConcreteClass getClient() method
@@ -54,19 +54,17 @@ public class Arango implements PooledDatabaseClient {
     public void destroyPool() throws PoolDoesNotExistException {
         if (arangoDB != null) {
             arangoDB.shutdown();
+            builder = null;
         } else {
             throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
         }
-
-        // TODO useless method
-        disconnect();
-        builder = null;
     }
 
     @Override
     public void setMaxConnections(int maxConnections) throws PoolDoesNotExistException {
         if(builder != null) {
             builder.maxConnections(maxConnections);
+            connect();
         } else {
             throw new PoolDoesNotExistException("Can't set the number of connections if pool does not exist");
         }
@@ -78,18 +76,6 @@ public class Arango implements PooledDatabaseClient {
 
     private boolean isConnected() {
         return arangoDB != null && arangoDB.db().exists();
-    }
-
-    private void connectIfNotConnected() {
-        if (!isConnected()){
-            connect();
-        }
-    }
-
-    private void disconnect() {
-        if (arangoDB != null) {
-            arangoDB.shutdown();
-        }
     }
 
     public boolean createDatabase(String dbName) {
