@@ -43,7 +43,7 @@ public class BookmarkThread extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_BOOKMARK_THREAD_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!existsInCouchbase(threadName) &&!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 responseMessage = THREAD_DOES_NOT_EXIST;
                 return Responder.makeErrorResponse(responseMessage, 400).toString();
             }
