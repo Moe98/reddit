@@ -7,11 +7,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +27,7 @@ public class UpdateCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-
+            SubThreadApp.startCouchbaseConnection();
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
 
@@ -67,6 +69,7 @@ public class UpdateCommentTest {
         removeObjectFromCollection(subThread, "Subthread");
         removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
