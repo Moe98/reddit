@@ -25,7 +25,7 @@ public class SubThreadApp extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            shutdownGracefully();
+//            shutdownGracefully();
         }
     }
 
@@ -38,9 +38,9 @@ public class SubThreadApp extends Service {
         }
     }
 
-    public static void shutdownGracefully() {
-        // TODO stop threads and halt app (super call?)
-    }
+//    public static void shutdownGracefully() {
+//        // TODO stop threads and halt app (super call?)
+//    }
 
     public static void createCollections(ArrayList<String> collectionNames, ArrayList<String> edgeCollectionNames) {
         try {
