@@ -24,9 +24,7 @@ public class ArangoTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
-            arango.createPool(10);
-
+            arango = Arango.getConnectedInstance();
 
             dbName = "TestDB";
             collectionName = "TestCollection";
@@ -108,7 +106,7 @@ public class ArangoTest {
     @Test
     public void getInstance() {
         try {
-            Arango arango1 = Arango.getInstance();
+            Arango arango1 = Arango.getConnectedInstance();
             assertSame(arango1, arango);
         } catch (ArangoDBException e) {
             fail(e.getMessage());

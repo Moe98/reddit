@@ -52,6 +52,15 @@ public class Arango implements PooledDatabaseClient {
         }
         return instance;
     }
+    
+    // For the purpose of running tests
+    public static Arango getConnectedInstance() {
+        if(instance == null) {
+            instance = new Arango();
+        }
+        instance.connect();
+        return instance;
+    }
 
     @Override
     public void destroyPool() throws PoolDoesNotExistException {
