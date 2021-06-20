@@ -8,12 +8,14 @@ import com.arangodb.entity.CollectionType;
 import com.arangodb.entity.ViewEntity;
 import com.arangodb.entity.arangosearch.CollectionLink;
 import com.arangodb.entity.arangosearch.FieldLink;
+import com.arangodb.internal.ArangoDefaults;
 import com.arangodb.mapping.ArangoJack;
 import com.arangodb.model.CollectionCreateOptions;
 import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.sab.environmentvariables.EnvVariablesUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class Arango {
     final private static Arango instance = new Arango();
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
+
     private Arango() {
 
         final Properties properties = new Properties();
@@ -36,19 +39,24 @@ public class Arango {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String ARANG_HOST = "127.0.0.1";
-        if(System.getenv("ARANGO_HOST") != null)
-            ARANG_HOST = System.getenv("ARANGO_HOST");
-        builder = new ArangoDB.Builder()
-                    .host(ARANG_HOST, 8529)
-                    .user(System.getenv("ARANGO_USER"))
-                    .password(System.getenv("ARANGO_PASSWORD"))
-                    .maxConnections(NUM_OF_CONNECTIONS)
-                    .serializer(new ArangoJack())
-                    .connectionTtl(null)
-                    .keepAliveInterval(600);
+
+        final String arangoHost = EnvVariablesUtils.getOrDefaultEnvVariable("ARANGO_HOST", ArangoDefaults.DEFAULT_HOST);
         
+        builder = new ArangoDB.Builder()
+                .host(arangoHost, getPort())
+                .user(System.getenv("ARANGO_USER"))
+                .password(System.getenv("ARANGO_PASSWORD"))
+                .maxConnections(NUM_OF_CONNECTIONS)
+                .serializer(new ArangoJack())
+                .connectionTtl(null)
+                .keepAliveInterval(600);
+
         arangoDB = builder.build();
+    }
+
+    private static int getPort() {
+        String arangoPortFromEnv = System.getenv("ARANGO_PORT");
+        return arangoPortFromEnv == null ? ArangoDefaults.DEFAULT_PORT : Integer.parseInt(arangoPortFromEnv);
     }
 
     public static Arango getInstance() {
@@ -224,7 +232,7 @@ public class Arango {
         return edgeId;
     }
 
-    
+
     public boolean containsDatabase(String dbName) {
         return arangoDB.getDatabases().contains(dbName);
     }
