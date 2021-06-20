@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -53,9 +54,9 @@ public class DeleteComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             // check if comment exists
-            if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+            if(!commentExistsInCouchbase(commentId) && !existsInArango(COMMENT_COLLECTION_NAME, commentId)){
                 msg = "Comment does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // check person deleting is creator
@@ -101,6 +102,7 @@ public class DeleteComment extends CommentCommand {
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String currCommentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, currCommentId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), currCommentId);
             }
 
             msg = "Deleted comment: with it's " + numOfComments + " nested comments.";
