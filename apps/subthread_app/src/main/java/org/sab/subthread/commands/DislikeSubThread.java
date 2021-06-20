@@ -6,6 +6,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -53,22 +54,32 @@ public class DislikeSubThread extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
 
-            // TODO check if subthread exists
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            boolean subthreadIsCached = false;
+            BaseDocument originalSubthread;
+
+            if(existsInCouchbase(subthreadId)){
+                subthreadIsCached = true;
+                originalSubthread = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+            }
+            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
+                originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+            }
+            else{
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
+
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if (!dislikeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, dislikeEdgeId);
 
-                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 int newDisikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) - 1;
                 originalSubthread.updateAttribute(DISLIKES_DB, newDisikes);
                 // putting the comment with the updated amount of dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
+
 
                 msg = "removed your dislike on the subthread";
             } else { // then user wants to dislike this subthread, so we create an edge and update the number of dislikes
@@ -81,8 +92,6 @@ public class DislikeSubThread extends SubThreadCommand {
                 // adding new edgeDocument representing that a user dislikes a subthread
                 arango.createEdgeDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
-                // retrieving the original comment with the old amount of dislikes and likes
-                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) + 1;
                 int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB)));
                 String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
@@ -97,12 +106,15 @@ public class DislikeSubThread extends SubThreadCommand {
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
-                BaseDocument subthreadDoc = arango.readDocument(DB_Name,  SUBTHREAD_COLLECTION_NAME, subthreadId);
-                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                String subthreadCreatorId = originalSubthread.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_DISLIKE_MSG.getMSG(), subthreadId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
 
             }
+
+            if(subthreadIsCached)
+                upsertDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), originalSubthread.getKey(), originalSubthread);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {

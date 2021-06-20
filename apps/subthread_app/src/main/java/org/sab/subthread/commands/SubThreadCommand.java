@@ -177,4 +177,23 @@ public abstract class SubThreadCommand extends CommandWithVerification {
         Couchbase.getInstance().deleteDocumentIfExists(bucketName, key);
     }
 
+    protected final BaseDocument getDocumentFromCouchbase(String bucketName, String key) {
+        JSONObject subthread = Couchbase.getInstance().getDocumentJson(bucketName, key);
+
+        BaseDocument myObject = new BaseDocument();
+
+        myObject.addAttribute(PARENT_THREAD_ID_DB, subthread.get(PARENT_THREAD_ID_DB));
+        myObject.addAttribute(CREATOR_ID_DB, subthread.get(CREATOR_ID_DB));
+        myObject.addAttribute(TITLE_DB, subthread.get(TITLE_DB));
+        myObject.addAttribute(CONTENT_DB, subthread.get(CONTENT_DB));
+        myObject.addAttribute(LIKES_DB, subthread.get(LIKES_DB));
+        myObject.addAttribute(DISLIKES_DB, subthread.get(DISLIKES_DB));
+        myObject.addAttribute(HASIMAGE_DB, subthread.get(HASIMAGE_DB));
+
+        return myObject;
+    }
+
+    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
+    }
 }
