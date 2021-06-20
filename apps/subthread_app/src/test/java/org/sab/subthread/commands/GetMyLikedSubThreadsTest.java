@@ -40,7 +40,6 @@ public class GetMyLikedSubThreadsTest {
             likeSubthread(mantaId, "20204");
             likeSubthread(mantaId, "20205");
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }

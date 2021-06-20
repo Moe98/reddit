@@ -35,7 +35,6 @@ public class GetFollowedThreadsTest {
             followThread(parentThreadId3, lujineId);
 
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
