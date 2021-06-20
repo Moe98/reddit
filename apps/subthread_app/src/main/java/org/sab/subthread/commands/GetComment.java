@@ -30,7 +30,7 @@ public class GetComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
 
-            if (existsInCouchbase(commentId)) {
+            if (commentExistsInCouchbase(commentId)) {
                 commentDocument = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
             } else if (existsInArango(COMMENT_COLLECTION_NAME, commentId)) {
                 commentDocument = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);

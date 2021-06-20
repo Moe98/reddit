@@ -57,7 +57,7 @@ public class DislikeComment extends CommentCommand {
 
             BaseDocument originalComment;
 
-            if (existsInCouchbase(commentId)) {
+            if (commentExistsInCouchbase(commentId)) {
                 originalComment = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
             } else if (existsInArango(COMMENT_COLLECTION_NAME, commentId)) {
                 originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
