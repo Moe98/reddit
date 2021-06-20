@@ -36,7 +36,7 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
 
 
-            if (!existsInCouchbase(userId) && !existsInArango(USER_COLLECTION_NAME, userId)) {
+            if (!existsInArango(USER_COLLECTION_NAME, userId)) {
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
             }
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
