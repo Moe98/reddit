@@ -22,6 +22,6 @@ public interface PooledDatabaseClient {
      *
      * ConcreteClass should be replaced by the DB client type Ex. Arango
      * */
-    // public static ConcreteClass getClient()
+    // public static ConcreteClass getInstance()
      
 }
