@@ -1,6 +1,9 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.entity.BaseDocument;
 import org.json.JSONObject;
+import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.*;
 import org.sab.models.user.UserAttributes;
 import org.sab.rabbitmq.RPCClient;
@@ -119,5 +122,58 @@ public abstract class CommentCommand extends CommandWithVerification {
     // TODO get function name from somewhere consitant
     protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 
+    protected final JSONObject baseDocumentToJson(BaseDocument document) {
+        final String commentId = document.getKey();
+        final String parentSubThreadId = (String) document.getAttribute(PARENT_SUBTHREAD_ID_DB);
+        final String creatorId = (String) document.getAttribute(CREATOR_ID_DB);
+        final String content = (String) document.getAttribute(CONTENT_DB);
+        final String parentContentType = (String) document.getAttribute(PARENT_CONTENT_TYPE_DB);
+        final int likes = Integer.parseInt(String.valueOf(document.getAttribute(LIKES_DB)));
+        final int dislikes = Integer.parseInt(String.valueOf(document.getAttribute(DISLIKES_DB)));
+        final String dateCreated = (String) document.getAttribute(DATE_CREATED_DB);
 
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setParentId(parentSubThreadId);
+        comment.setCreatorId(creatorId);
+        comment.setContent(content);
+        comment.setParentContentType(parentContentType);
+        comment.setLikes(likes);
+        comment.setDislikes(dislikes);
+        comment.setDateCreated(dateCreated);
+
+        return comment.toJSON();
+    }
+
+    protected final boolean existsInCouchbase(String key) {
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+    }
+
+    protected final boolean existsInArango(String collectionName, String key) {
+        return Arango.getInstance().documentExists(DB_Name, collectionName, key);
+    }
+
+    protected final void deleteDocumentFromCouchbase(String bucketName, String key) {
+        Couchbase.getInstance().deleteDocumentIfExists(bucketName, key);
+    }
+
+    protected final BaseDocument getDocumentFromCouchbase(String bucketName, String key) {
+        JSONObject comment = Couchbase.getInstance().getDocumentJson(bucketName, key);
+
+        BaseDocument myObject = new BaseDocument();
+
+        myObject.addAttribute(PARENT_SUBTHREAD_ID_DB, comment.get(PARENT_SUBTHREAD_ID_DB));
+        myObject.addAttribute(CREATOR_ID_DB, comment.get(CREATOR_ID_DB));
+        myObject.addAttribute(CONTENT_DB, comment.get(CONTENT_DB));
+        myObject.addAttribute(PARENT_CONTENT_TYPE_DB, comment.get(PARENT_CONTENT_TYPE_DB));
+        myObject.addAttribute(LIKES_DB, comment.get(LIKES_DB));
+        myObject.addAttribute(DISLIKES_DB, comment.get(DISLIKES_DB));
+        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+        myObject.addAttribute(DATE_CREATED_DB, sqlDate);
+        return myObject;
+    }
+
+    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
+    }
 }
