@@ -29,7 +29,6 @@ public class UpdateRecommendedSubThreads extends RecommendationCommand {
         try {
             username = authenticationParams.getString(USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             // Recommended SubThreads are fetched by 2 ways combined together:
             // 1st, trending SubThreads (5) from a random sample of followed Threads (5).
@@ -110,8 +109,6 @@ public class UpdateRecommendedSubThreads extends RecommendationCommand {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400);
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
-        } finally {
-            arango.disconnect();
         }
 
         if (data.length() != 0) {

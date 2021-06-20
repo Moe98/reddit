@@ -13,9 +13,6 @@ public class ExampleApp extends Service {
         return "EXAMPLE";
     }
 
-    @Override
-    public String getConfigMapPath() {
-        return DEFAULT_PROPERTIES_FILENAME;
-    }
+
 
 }

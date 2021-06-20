@@ -12,7 +12,6 @@ import org.sab.auth.Auth;
 import org.sab.auth.AuthParamsHandler;
 import org.sab.functions.Utilities;
 import org.sab.models.CollectionNames;
-import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
 import org.sab.user.UserApp;
 
@@ -238,17 +237,12 @@ public class UserAppTest {
     @AfterClass
     public static void deleteFromArango() {
         Arango arango = Arango.getInstance();
-        try {
-            arango.connectIfNotConnected();
-            BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
-            Map<String, Object> props = user.getProperties();
-            boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
-            assertTrue(isDeleted);
-            int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
-            assertEquals(0, numberOfFollowers);
-            arango.deleteDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
-        } finally {
-            arango.disconnect();
-        }
+        BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
+        Map<String, Object> props = user.getProperties();
+        boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());
+        assertTrue(isDeleted);
+        int numberOfFollowers = (int) props.get(UserAttributes.NUM_OF_FOLLOWERS.getArangoDb());
+        assertEquals(0, numberOfFollowers);
+        arango.deleteDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
     }
 }

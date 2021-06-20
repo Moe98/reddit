@@ -5,7 +5,6 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -14,8 +13,6 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteThread extends ThreadCommand {
 
@@ -48,7 +45,6 @@ public class DeleteThread extends ThreadCommand {
         // TODO add authentication
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String threadName = body.getString(THREAD_NAME);
             String userId = authenticationParams.getString(ThreadCommand.USERNAME);
@@ -60,7 +56,7 @@ public class DeleteThread extends ThreadCommand {
             // TODO check thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // TODO check person deleting is creator
@@ -68,13 +64,12 @@ public class DeleteThread extends ThreadCommand {
             String creatorID = (String) threadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this thread!";
-                return Responder.makeErrorResponse(msg, 401).toString();
+                return Responder.makeErrorResponse(msg, 401);
             }
 
             // get all children subthreads
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, PARENT_THREAD_ID_DB, threadName);
 
-//            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
             subThreadJsonArr = arango.parseOutput(cursor, SUBTHREAD_ID_DB, attribs);
@@ -126,16 +121,12 @@ public class DeleteThread extends ThreadCommand {
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
 
-
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 }
 

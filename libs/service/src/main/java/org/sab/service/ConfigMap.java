@@ -1,5 +1,7 @@
 package org.sab.service;
 
+import org.sab.strings.StringManipulation;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -36,7 +38,7 @@ public class ConfigMap {
 
     public Class<?> getClass(String command) throws ClassNotFoundException {
         final String className = cmdMap.get(command);
-        if(className == null){
+        if (className == null) {
             throw new ClassNotFoundException();
         }
         return Class.forName(className);
@@ -44,6 +46,22 @@ public class ConfigMap {
 
     public void replaceClassWith(String key, String newClass) {
         cmdMap.put(key, newClass);
-        System.out.println("replaced");
+    }
+
+    /**
+     * @param commandName String representing the name of the .class file (e.g org.sab.user.signUp)
+     */
+    public void addCommand(String commandName) {
+        String[] splittedCommandName = commandName.split(".");
+        String functionName = StringManipulation.pascalToScreamingCase(splittedCommandName[splittedCommandName.length - 1]);
+        addCommand(functionName, commandName);
+    }
+
+    private void addCommand(String functionName, String commandName) {
+        cmdMap.put(functionName, commandName);
+    }
+
+    public void deleteCommand(String functionName) {
+        cmdMap.remove(functionName);
     }
 }

@@ -24,7 +24,7 @@ public class GetMyLikedSubThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertSubthread("20301", parentThreadId1, mantaId, "title", "content");
@@ -40,7 +40,6 @@ public class GetMyLikedSubThreadsTest {
             likeSubthread(mantaId, "20204");
             likeSubthread(mantaId, "20205");
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
@@ -69,7 +68,6 @@ public class GetMyLikedSubThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.connectIfNotConnected();
         arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
@@ -136,7 +134,6 @@ public class GetMyLikedSubThreadsTest {
 
     @Test
     public void T01_GetMyLikedSubthreads() {
-        arango.connectIfNotConnected();
         String response = getMyLikedSubThreads(mantaId);
         JSONObject responseJson = new JSONObject(response);
 
@@ -147,7 +144,6 @@ public class GetMyLikedSubThreadsTest {
 
     @Test
     public void T02_GetMyLikedSubthreads() {
-        arango.connectIfNotConnected();
         String response = getMyLikedSubThreads(moeId);
         JSONObject responseJson = new JSONObject(response);
 

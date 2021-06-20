@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.sab.rabbitmq.RPCClient;
+import org.sab.rabbitmq.SingleClientChannel;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -24,12 +25,11 @@ public class QueueHandler extends SimpleChannelInboundHandler<JSONObject> {
         String reqQueueName = queueName + "_REQ";
         String resQueueName = queueName + "_RES";
 
-        try (RPCClient rpcClient = RPCClient.getInstance()) {
-            String response = rpcClient.call(request, reqQueueName, resQueueName);
+        try (SingleClientChannel channelExecutor = RPCClient.getSingleChannelExecutor()) {
+            String response = channelExecutor.call(request, reqQueueName, resQueueName);
             JSONParser parser = new JSONParser();
             JSONObject responseJson = (JSONObject) parser.parse(response);
             responseJson.put("type", requestJson.get("functionName"));
-            System.out.println(responseJson.toJSONString());
             ctx.fireChannelRead(responseJson);
         } catch (IOException | TimeoutException | InterruptedException | NullPointerException | ParseException e) {
             e.printStackTrace();

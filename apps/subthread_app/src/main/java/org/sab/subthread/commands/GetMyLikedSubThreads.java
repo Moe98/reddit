@@ -30,7 +30,6 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
         JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String userId = authenticationParams.getString(SubThreadCommand.USERNAME);
 
@@ -55,10 +54,6 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(response).toString();
     }

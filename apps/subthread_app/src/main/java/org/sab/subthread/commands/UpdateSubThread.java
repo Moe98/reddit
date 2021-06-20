@@ -43,7 +43,6 @@ public class UpdateSubThread extends SubThreadCommand {
 
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             String content = null, title = null;
             if (body.has(CONTENT))
@@ -101,10 +100,6 @@ public class UpdateSubThread extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
 
         return Responder.makeDataResponse(subthread.toJSON()).toString();

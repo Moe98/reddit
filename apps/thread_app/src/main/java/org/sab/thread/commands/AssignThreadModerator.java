@@ -48,7 +48,6 @@ public class AssignThreadModerator extends ThreadCommand {
             String assignerId = authenticationParams.getString(ThreadCommand.USERNAME);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
@@ -96,14 +95,13 @@ public class AssignThreadModerator extends ThreadCommand {
 
             }
         } catch (Exception e) {
-//            System.out.println(e.getStackTrace());
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
 
         } finally {
             if (arango != null) {
-                arango.disconnect();
+
             }
-            arango.disconnect();
+
             response.put("msg", msg);
         }
 

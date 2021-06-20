@@ -2,27 +2,22 @@ package org.sab.netty;
 
 import com.rabbitmq.client.*;
 import org.junit.Test;
-import org.sab.demo.ExampleApp;
+import org.sab.HttpServerUtilities.HttpClient;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.util.concurrent.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class ServerTest {
+    static String response = "";
     int NUM_THREADS = 5;
     String queueName = "TEST_APP_REQ";
     String receivedMessage = "";
     String expectedReplyMessage = "{\"msg\":\"Not Found\"}";
-    static String response = "";
 
     /**
      * Much Rigorous Test :-)
@@ -30,16 +25,7 @@ public class ServerTest {
      * No need to trust me that it works:(
      * ┏(・o・)┛
      */
-    public String get(String uri, String functionName) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uri))
-                .setHeader("Function-Name", functionName)
-                .setHeader("Content-Type", "application/json")
-                .build();
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return response.body();
-    }
 
     @Test
     public void serverReturnsNotFound() {
@@ -61,7 +47,7 @@ public class ServerTest {
 
         final Runnable runRabbitClient = () -> {
             try {
-                response = get("http://localhost:8080/api/test_app", "HELLO_WORLD");
+                response = HttpClient.get("api/test_app", "HELLO_WORLD");
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
@@ -116,41 +102,7 @@ public class ServerTest {
 
         while (!shutdownServerFuture.isDone()) ;
 
-        System.out.println("Done with callables");
         assertEquals(expectedReplyMessage, response);
     }
 
-    public void runServer() {
-        new Thread(() -> {
-            try {
-                Server.main(null);
-            } catch (Exception e) {
-                fail("Server did not start\n" + e.getMessage());
-            }
-        }).start();
-    }
-
-    public void runExampleApp() {
-        new Thread(() -> {
-            try {
-                ExampleApp.main(null);
-            } catch (Exception e) {
-                fail("Example App did not start\n" + e.getMessage());
-            }
-        }).start();
-    }
-
-    @Test
-    public void callingExampleAppAPI() {
-        runServer();
-        runExampleApp();
-        String response = null;
-        try {
-            response = get("http://localhost:8080/api/example", "HELLO_WORLD");
-        } catch (IOException | InterruptedException e) {
-            fail(e.getMessage());
-        }
-        assertEquals(response, "{\"msg\":\"Hello World\"}");
-
-    }
 }

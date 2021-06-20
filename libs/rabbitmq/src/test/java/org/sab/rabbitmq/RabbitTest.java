@@ -33,8 +33,8 @@ public class RabbitTest {
         ExecutorService threadPool = Executors.newFixedThreadPool(threads);
 
         Callable<String> runRabbitClient = () -> {
-            RPCClient client = RPCClient.getInstance();
-            return client.call(message, queueName, replyQueueName);
+            final SingleClientChannel channelExecutor = RPCClient.getSingleChannelExecutor();
+            return channelExecutor.call(message, queueName, replyQueueName);
         };
 
         Callable<String> respondToClient = () -> {
@@ -67,14 +67,11 @@ public class RabbitTest {
 
 
         while (!executorCallable1.isDone() || !executorCallable2.isDone()) ;
-        System.out.println("Done with callables");
 
         String callbackReply = executorCallable1.get();
-        System.out.println("Callback Reply: " + callbackReply);
         assertEquals(callbackReply, expectedReplyMessage);
 
         String callbackSentMessage = this.receivedMessage;
-        System.out.println("Callback 2 Reply: " + callbackSentMessage);
         assertEquals(callbackSentMessage, message);
     }
 }

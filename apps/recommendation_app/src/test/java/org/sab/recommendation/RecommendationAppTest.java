@@ -63,7 +63,7 @@ public class RecommendationAppTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
+
             couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
 
@@ -186,9 +186,11 @@ public class RecommendationAppTest {
         } catch (Exception e) {
             fail(e.getMessage());
         } finally {
-            arango.disconnect();
+
             couchbase.disconnect();
         }
+
+        arango.dropDatabase(dbName);
     }
 
     private static JSONObject makeRequest(String methodType) {

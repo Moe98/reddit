@@ -83,7 +83,6 @@ public class UpdateRecommendedThreads extends RecommendationCommand {
         try {
             username = authenticationParams.getString(USERNAME);
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             Map<String, Object> bindVars = Collections.singletonMap("username", username);
             ArangoCursor<BaseDocument> cursor = arango.query(DB_NAME, getQuery(), bindVars);
@@ -103,8 +102,6 @@ public class UpdateRecommendedThreads extends RecommendationCommand {
             return Responder.makeErrorResponse("Bad Request: " + e.getMessage(), 400);
         } catch (Exception e) {
             return Responder.makeErrorResponse("Something went wrong: " + e.getMessage(), 500);
-        } finally {
-            arango.disconnect();
         }
 
         if (data.length() != 0) {

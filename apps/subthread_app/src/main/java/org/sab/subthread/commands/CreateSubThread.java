@@ -61,7 +61,6 @@ public class CreateSubThread extends SubThreadCommand {
             boolean hasImage = body.getBoolean(HASIMAGE);
 
             arango = Arango.getInstance();
-            arango.connectIfNotConnected();
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
@@ -130,10 +129,6 @@ public class CreateSubThread extends SubThreadCommand {
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
-        } finally {
-            if (arango != null) {
-                arango.disconnect();
-            }
         }
         return Responder.makeDataResponse(subThread.toJSON()).toString();
 
