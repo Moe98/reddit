@@ -70,6 +70,7 @@ jobs:
         uses: brantburnett/run-couchbasefakeit@v0.1
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+          CB_DATARAM: ${{ secrets.CB_DATARAM }}
         with:
           couchbase-version: enterprise-6.6.0
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
