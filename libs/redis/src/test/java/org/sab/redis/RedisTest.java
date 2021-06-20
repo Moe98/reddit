@@ -75,7 +75,6 @@ public class RedisTest {
 
     @After
     public void deleteAllKeys() {
-        System.out.println("After");
         final String key = "key";
         final String key1 = "key1";
         final String key2 = "key2";

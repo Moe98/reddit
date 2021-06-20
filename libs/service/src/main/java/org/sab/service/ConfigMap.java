@@ -65,7 +65,6 @@ public class ConfigMap {
 
     public void replaceClassWith(String key, String newClass) {
         cmdMap.put(key, newClass);
-        System.out.println("replaced");
     }
 
     /**
