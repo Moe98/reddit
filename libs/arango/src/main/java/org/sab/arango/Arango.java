@@ -58,7 +58,7 @@ public class Arango implements PooledDatabaseClient {
         if(instance == null) {
             instance = new Arango();
         }
-        instance.connect();
+        instance.createPool(10);
         return instance;
     }
 
