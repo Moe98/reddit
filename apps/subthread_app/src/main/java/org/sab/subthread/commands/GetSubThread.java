@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -28,11 +29,16 @@ public class GetSubThread extends SubThreadCommand {
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId)) {
+            BaseDocument subThreadDocument;
+            if(existsInCouchbase(subThreadId)){
+                subThreadDocument = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subThreadId);
+            }
+            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subThreadId)){
+                subThreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId);
+            }
+            else{
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
-
-            final BaseDocument subThreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId);
 
             final String parentThreadId = (String) subThreadDocument.getAttribute(PARENT_THREAD_ID_DB);
             final String creatorId = (String) subThreadDocument.getAttribute(CREATOR_ID_DB);
@@ -48,6 +54,7 @@ public class GetSubThread extends SubThreadCommand {
             subThread.setDateCreated(date);
             subThread.setLikes(likes);
             subThread.setDislikes(dislikes);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
