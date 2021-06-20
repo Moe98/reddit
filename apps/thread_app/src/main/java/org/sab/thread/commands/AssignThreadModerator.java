@@ -54,7 +54,7 @@ public class AssignThreadModerator extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
 
             // check if thread exists
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if (!existsInCouchbase(threadId) && !arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
