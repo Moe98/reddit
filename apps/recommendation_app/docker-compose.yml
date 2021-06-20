@@ -26,6 +26,9 @@ services:
       - ARANGO_USER=root
       - ARANGO_PASSWORD=root
       - ARANGO_HOST=arangodb
+      - COUCHBASE_HOST=localhost
+      - COUCHBASE_USERNAME=Administrator
+      - COUCHBASE_PASSWORD=root
     depends_on:
       - "rabbitmq"
       - "arangodb"
