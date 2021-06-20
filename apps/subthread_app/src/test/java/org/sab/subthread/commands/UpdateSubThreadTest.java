@@ -7,8 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThreadAttributes;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -39,6 +41,7 @@ public class UpdateSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
+            SubThreadApp.startCouchbaseConnection();
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
@@ -156,6 +159,7 @@ public class UpdateSubThreadTest {
     @AfterClass
     public static void tearDown() {
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     private static void validateSubthreadBase(JSONObject updatedSubthread, BaseDocument oldSubthread, boolean titleUpdated, boolean contentUpdated ) {
