@@ -34,7 +34,6 @@ public class DislikeSubThreadTest {
             createSubThread(subthreadId2, parentThreadId1, content1, moeId, title1, hasImage1);
             createSubThread(subthreadId3, parentThreadId2, content2, moeId, title2, hasImage2);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
@@ -146,7 +145,7 @@ public class DislikeSubThreadTest {
 
         String response = dislikeSubthread(mantaId, subthreadId);
         JSONObject responseJson = new JSONObject(response);
-        System.out.println(responseJson);
+
         // checking the response of the command
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONObject data = (JSONObject) (responseJson.get("data"));

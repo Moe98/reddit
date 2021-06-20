@@ -46,7 +46,6 @@ public class GetMyDislikedCommentsTest {
             dislikeComment(mantaId, "20204");
             dislikeComment(mantaId, "20205");
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
