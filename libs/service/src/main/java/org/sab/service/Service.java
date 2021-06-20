@@ -83,7 +83,7 @@ public abstract class Service {
 
     public abstract String getAppUriName();
 
-    public int readProperty(String propertyName, int defaultPropertyValue) {
+
     public int readIntProperty(String propertyName, int defaultPropertyValue) {
         if (!configProperties.containsKey(propertyName))
             return defaultPropertyValue;
