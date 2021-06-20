@@ -24,6 +24,7 @@ services:
     build:
       context: "../../"
       dockerfile: "apps/recommendation_app/Dockerfile"
+    restart: on-failure
     environment:
       - RABBIT_HOST=rabbitmq
       - ARANGO_DB=Reddit
