@@ -125,7 +125,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
     }
 
     protected final boolean existsInCouchbase(String key) {
-        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.THREADS.get(), key);
     }
 
     protected final boolean existsInArango(String collectionName, String key) {
@@ -147,7 +147,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
         java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
         myObject.addAttribute(DATE_CREATED_DB, sqlDate);
         myObject.addAttribute(NUM_OF_FOLLOWERS_DB, thread.get(NUM_OF_FOLLOWERS_DB));
-        
+
         return myObject;
     }
 
