@@ -17,29 +17,18 @@ import org.json.JSONObject;
 import org.sab.databases.PoolDoesNotExistException;
 import org.sab.databases.PooledDatabaseClient;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+
 
 public class Arango implements PooledDatabaseClient {
-    private static Arango instance = getInstance();
+    final private static Arango instance = getInstance();
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
 
     private Arango() {
-
-        final Properties properties = new Properties();
-        int NUM_OF_CONNECTIONS = 10;
-        try {
-            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
-            NUM_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        createPool(NUM_OF_CONNECTIONS);
+        super();
     }
 
     @Override
@@ -58,10 +47,6 @@ public class Arango implements PooledDatabaseClient {
     // Mandatory public static ConcreteClass getClient() method
     // TODO change method name (once everything else is merged)
     public static Arango getInstance() {
-        if(instance == null) {
-            instance = new Arango();
-        }
-
         return instance;
     }
 
