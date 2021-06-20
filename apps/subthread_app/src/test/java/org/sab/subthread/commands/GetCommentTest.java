@@ -23,7 +23,7 @@ public class GetCommentTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);

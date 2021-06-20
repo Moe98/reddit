@@ -23,7 +23,7 @@ public class GetMySubThreadsTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();

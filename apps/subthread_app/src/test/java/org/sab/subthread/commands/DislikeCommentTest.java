@@ -26,7 +26,7 @@ public class DislikeCommentTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertComments(commentId1, parentThreadId1, "content", mantaId, "SubThread");

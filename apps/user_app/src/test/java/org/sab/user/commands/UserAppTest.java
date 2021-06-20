@@ -236,7 +236,7 @@ public class UserAppTest {
 
     @AfterClass
     public static void deleteFromArango() {
-        Arango arango = Arango.getInstance();
+        Arango arango = Arango.getConnectedInstance();
         BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
         Map<String, Object> props = user.getProperties();
         boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());

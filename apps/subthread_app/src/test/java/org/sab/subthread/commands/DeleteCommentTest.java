@@ -35,7 +35,7 @@ public class DeleteCommentTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             arango.createDatabase(DB_NAME);
 

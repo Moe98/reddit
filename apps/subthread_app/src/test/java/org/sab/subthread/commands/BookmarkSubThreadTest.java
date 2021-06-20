@@ -45,7 +45,7 @@ public class BookmarkSubThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabaseIfNotExists(DB_NAME);

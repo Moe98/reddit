@@ -24,7 +24,7 @@ public class GetMyCommentsTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();

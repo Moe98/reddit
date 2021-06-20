@@ -31,7 +31,7 @@ public class AssignThreadModeratorTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);

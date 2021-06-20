@@ -62,7 +62,7 @@ public class RecommendationAppTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             couchbase = Couchbase.getInstance();
             couchbase.connectIfNotConnected();
