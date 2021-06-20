@@ -28,6 +28,7 @@ public class UpdateCommentTest {
         try {
             arango = Arango.getInstance();
             SubThreadApp.startCouchbaseConnection();
+
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
 

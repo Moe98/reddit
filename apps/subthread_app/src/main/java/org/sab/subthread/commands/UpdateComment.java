@@ -2,7 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
-import org.sab.models.Comment;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -12,7 +12,6 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateComment extends CommentCommand {
@@ -30,9 +29,9 @@ public class UpdateComment extends CommentCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
-        final Comment comment;
+        BaseDocument commentDocument;
 
         try {
             arango = Arango.getInstance();
@@ -45,46 +44,37 @@ public class UpdateComment extends CommentCommand {
 
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
-            if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
-            }
+            boolean isCommentCached = false;
 
-            final BaseDocument commentDocument = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+            if (commentExistsInCouchbase(commentId)) {
+                isCommentCached = true;
+                commentDocument = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
+            } else if (existsInArango(COMMENT_COLLECTION_NAME, commentId)) {
+                commentDocument = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+            } else {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            }
 
             final String creatorId = (String) commentDocument.getAttribute(CREATOR_ID_DB);
 
             if (!userId.equals(creatorId)) {
-                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
+                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403);
             }
 
             commentDocument.updateAttribute(CONTENT_DB, content);
             arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, commentDocument, commentId);
 
-            final String parentId = (String) commentDocument.getAttribute(PARENT_SUBTHREAD_ID_DB);
-            final String updatedContent = (String) commentDocument.getAttribute(CONTENT_DB);
-            final String parentContentType = (String) commentDocument.getAttribute(PARENT_CONTENT_TYPE_DB);
-            final int likes = Integer.parseInt(String.valueOf(commentDocument.getAttribute(LIKES_DB)));
-            final int dislikes = Integer.parseInt(String.valueOf(commentDocument.getAttribute(DISLIKES_DB)));
-            final String dateCreated = (String) commentDocument.getAttribute(DATE_CREATED_DB);
-
-            comment = new Comment();
-            comment.setId(commentId);
-            comment.setParentId(parentId);
-            comment.setCreatorId(creatorId);
-            comment.setContent(updatedContent);
-            comment.setParentContentType(parentContentType);
-            comment.setLikes(likes);
-            comment.setDislikes(dislikes);
-            comment.setDateCreated(dateCreated);
-
             // tag a person if someone was tagged in the content of the comment
             tag(Notification_Queue_Name, NotificationMessages.COMMENT_TAG_MSG.getMSG(), commentId, content, SEND_NOTIFICATION_FUNCTION_NAME);
 
+            if (isCommentCached)
+                replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, commentDocument);
+
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeDataResponse(comment.toJSON()).toString();
+        return Responder.makeDataResponse(baseDocumentToJson(commentDocument));
     }
 
     @Override
