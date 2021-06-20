@@ -173,7 +173,8 @@ public abstract class CommentCommand extends CommandWithVerification {
         return myObject;
     }
 
-    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
-        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
+    protected final void replaceDocumentInCouchbase(String bucketName, String key, BaseDocument document) {
+        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(document));
     }
+
 }
