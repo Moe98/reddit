@@ -23,7 +23,7 @@ import java.util.Map;
 
 
 public class Arango implements PooledDatabaseClient {
-    final private static Arango instance = getInstance();
+    private static Arango instance;
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
 
@@ -47,6 +47,9 @@ public class Arango implements PooledDatabaseClient {
     // Mandatory public static ConcreteClass getClient() method
     // TODO change method name (once everything else is merged)
     public static Arango getInstance() {
+        if(instance == null) {
+            instance = new Arango();
+        }
         return instance;
     }
 
