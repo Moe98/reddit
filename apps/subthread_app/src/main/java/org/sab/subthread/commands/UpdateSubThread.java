@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
@@ -55,11 +56,19 @@ public class UpdateSubThread extends SubThreadCommand {
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            boolean subthreadIsCached = false;
+            BaseDocument subthreadDocument;
+
+            if(existsInCouchbase(subthreadId)){
+                subthreadIsCached = true;
+                subthreadDocument = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+            }
+            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
+                subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+            }
+            else{
                 return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
-
-            final BaseDocument subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
 
             final String creatorId = (String) subthreadDocument.getAttribute(CREATOR_ID_DB);
 
@@ -94,6 +103,9 @@ public class UpdateSubThread extends SubThreadCommand {
             subthread.setDateCreated(dateCreated);
             subthread.setHasImage(hasImage);
             subthread.setParentThreadId(parentId);
+
+            if(subthreadIsCached)
+                upsertDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadDocument.getKey(), subthreadDocument);
 
             // tag a person if someone was tagged in the content of the subthread
             tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
