@@ -6,6 +6,7 @@ import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -54,7 +55,17 @@ public class LikeSubThread extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            boolean subthreadIsCached = false;
+            BaseDocument originalSubthread;
+
+            if(existsInCouchbase(subthreadId)){
+                subthreadIsCached = true;
+                originalSubthread = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+            }
+            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
+                originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+            }
+            else{
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -65,10 +76,9 @@ public class LikeSubThread extends SubThreadCommand {
             if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
 
-                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) - 1;
                 originalSubthread.updateAttribute(LIKES_DB, newLikes);
-                // putting the comment with the updated amount of likes
+                // putting the subthread with the updated amount of likes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
                 msg = "removed your like on the subthread";
@@ -78,11 +88,9 @@ public class LikeSubThread extends SubThreadCommand {
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
                 edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
-                // adding new edgeDocument representing that a user likes a comment
+                // adding new edgeDocument representing that a user likes a subthread
                 arango.createEdgeDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
-                // retrieving the original comment with the old amount of likes and dislikes
-                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
                 int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) + 1;
                 int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB)));
 
@@ -95,15 +103,17 @@ public class LikeSubThread extends SubThreadCommand {
                 }
                 originalSubthread.updateAttribute(LIKES_DB, newLikes);
                 originalSubthread.updateAttribute(DISLIKES_DB, newDislikes);
-                // putting the comment with the updated amount of likes and dislikes
+                // putting the subthread with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
-                BaseDocument subthreadDoc = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                String subthreadCreatorId = originalSubthread.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_LIKE_MSG.getMSG(), subthreadId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
-
             }
+
+            if(subthreadIsCached)
+                upsertDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), originalSubthread.getKey(), originalSubthread);
+
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
