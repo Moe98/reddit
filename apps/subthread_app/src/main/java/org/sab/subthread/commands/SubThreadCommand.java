@@ -62,7 +62,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     protected static final String REPORT_MSG_DB = SubThreadReportAttributes.REPORT_MSG.getDb();
 
     // messages
-    protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
+    protected static final String OBJECT_NOT_FOUND = "The data you have requested does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
 
     // Thread attributes

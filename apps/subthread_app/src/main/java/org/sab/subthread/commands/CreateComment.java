@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -73,9 +74,32 @@ public class CreateComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, CONTENT_COMMENT_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
-            // TODO check other things exist
-            //  If the parent is a subthread check subthread exists
-            //  If the parent is a comment check a comment exist
+
+            BaseDocument parentContentDoc;
+            if(parentContentType.toLowerCase().equals("comment")){
+                if(commentExistsInCouchbase(parentSubThreadId)){
+                    parentContentDoc = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), parentSubThreadId);
+                }
+                else if(existsInArango(COMMENT_COLLECTION_NAME, parentSubThreadId)){
+                    parentContentDoc = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, parentSubThreadId);
+                }
+                else{
+                    String msg = "Parent comment does not exist";
+                    return Responder.makeErrorResponse(msg, 400);
+                }
+            }
+            else{
+                if(subthreadExistsInCouchbase(parentSubThreadId)){
+                    parentContentDoc = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), parentSubThreadId);
+                }
+                else if(existsInArango(SUBTHREAD_COLLECTION_NAME, parentSubThreadId)){
+                    parentContentDoc = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, parentSubThreadId);
+                }
+                else{
+                    String msg = "Parent subthread does not exist";
+                    return Responder.makeErrorResponse(msg, 400);
+                }
+            }
 
             final BaseDocument myObject = new BaseDocument();
 
@@ -124,21 +148,18 @@ public class CreateComment extends CommentCommand {
 
             // getting/notifying the person who made the parent comment/subthread
             if(parentContentType.toLowerCase().equals("comment")){
-                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, parentSubThreadId);
-                String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
+                String commentCreatorId = parentContentDoc.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_COMMENT_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
             else{
-                BaseDocument subthreadDoc = arango.readDocument(DB_Name,  SUBTHREAD_COLLECTION_NAME, parentSubThreadId);
-                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
+                String subthreadCreatorId = parentContentDoc.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_CREATE_ON_SUBTHREAD_MSG.getMSG(), commentId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
-        return Responder.makeDataResponse(comment.toJSON()).toString();
+        return Responder.makeDataResponse(comment.toJSON());
     }
 
     @Override

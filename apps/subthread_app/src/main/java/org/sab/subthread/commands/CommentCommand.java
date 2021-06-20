@@ -145,8 +145,12 @@ public abstract class CommentCommand extends CommandWithVerification {
         return comment.toJSON();
     }
 
-    protected final boolean existsInCouchbase(String key) {
+    protected final boolean subthreadExistsInCouchbase(String key) {
         return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+    }
+
+    protected final boolean commentExistsInCouchbase(String key) {
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.COMMENTS.get(), key);
     }
 
     protected final boolean existsInArango(String collectionName, String key) {
