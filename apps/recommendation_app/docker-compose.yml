@@ -9,12 +9,7 @@ services:
     ports:
       - 8529:8529
     environment:
-      - ARANGO_ROOT_PASSWORD=koko
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://arangodb:8529" ]
-      interval: 10s
-      timeout: 10s
-      retries: 10
+      - ARANGO_ROOT_PASSWORD=root
   couchbase:
     image: "couchbase"
     ports:
@@ -29,7 +24,7 @@ services:
       - RABBIT_HOST=rabbitmq
       - ARANGO_DB=Reddit
       - ARANGO_USER=root
-      - ARANGO_PASSWORD=koko
+      - ARANGO_PASSWORD=root
       - ARANGO_HOST=arangodb
     depends_on:
       - "rabbitmq"
