@@ -44,8 +44,9 @@ public class SubThreadApp extends Service {
         }
     }
 
-    private static void startCouchbaseConnection() {
+    public static void startCouchbaseConnection() {
         couchbase = Couchbase.getInstance();
+        couchbase.connectIfNotConnected();
 
         final Properties properties = new Properties();
 

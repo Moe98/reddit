@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
 import org.sab.couchbase.Couchbase;
+import org.sab.models.CouchbaseBuckets;
+import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -25,7 +27,7 @@ public class GetMyDislikedSubThreadsTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-            Couchbase.getInstance().connectIfNotConnected();
+            SubThreadApp.startCouchbaseConnection();
 
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
@@ -70,7 +72,8 @@ public class GetMyDislikedSubThreadsTest {
 
     @AfterClass
     public static void tearDown() {
-        arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
+        arango.dropDatabase(SubThreadCommand.DB_Name);
+        Couchbase.getInstance().disconnect();
     }
 
     public static void createUsers() {
