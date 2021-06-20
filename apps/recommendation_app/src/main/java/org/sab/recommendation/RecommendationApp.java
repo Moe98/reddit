@@ -40,6 +40,9 @@ public class RecommendationApp extends Service {
     }
 
     public static void main(String[] args) {
+
+        dbInit();
+        new RecommendationApp().start();
         Runnable periodicTasks = () -> {
             new UpdatePopularThreads().execute();
             new UpdatePopularSubThreads().execute();
@@ -47,8 +50,6 @@ public class RecommendationApp extends Service {
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(periodicTasks, 0, periodicTasksPeriod, TimeUnit.MINUTES);
-        dbInit();
-        new RecommendationApp().start();
     }
 
     @Override
