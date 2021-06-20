@@ -189,6 +189,8 @@ public class RecommendationAppTest {
 
             couchbase.disconnect();
         }
+
+        arango.dropDatabase(dbName);
     }
 
     private static JSONObject makeRequest(String methodType) {

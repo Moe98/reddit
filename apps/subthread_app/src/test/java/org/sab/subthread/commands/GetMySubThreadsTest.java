@@ -32,7 +32,6 @@ public class GetMySubThreadsTest {
             createSubThread(parentThreadId1, title2, content2, hasImage2, moeId, 50);
             createSubThread(parentThreadId2, title2, content2, hasImage2, moeId, 50);
         } catch (Exception e) {
-            System.out.println("failed");
             fail(e.getMessage());
         }
     }
