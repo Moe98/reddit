@@ -2,19 +2,26 @@ package org.sab.service;
 
 import org.json.JSONObject;
 import org.sab.controller.Controller;
+import org.sab.databases.PoolDoesNotExistException;
+import org.sab.databases.PooledDatabaseClient;
 import org.sab.functions.TriFunction;
 import org.sab.io.IoUtils;
 import org.sab.rabbitmq.RPCServer;
 import org.sab.rabbitmq.SingleServerChannel;
 import org.sab.reflection.ReflectionUtils;
 import org.sab.service.controllerbackdoor.BackdoorServer;
+import org.sab.service.databases.DBConfig;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Abstract class service which will be extended by the main class of each mini-app.
@@ -24,6 +31,8 @@ import java.util.concurrent.*;
 
 public abstract class Service {
     private final Properties configProperties = new Properties();
+    protected final HashMap<String, DBConfig> requiredDbs = new HashMap<>();
+
     private boolean isFrozen = true;
     private ExecutorService threadPool;
     private SingleServerChannel singleServerChannel;
@@ -32,30 +41,79 @@ public abstract class Service {
         threadPool = Executors.newFixedThreadPool(getThreadCount());
     }
 
+    private void initDbPool() {
+
+        for(DBConfig dbConfig : requiredDbs.values()) {
+            final Class<?> clazz;
+            PooledDatabaseClient clientInstance = null;
+            String dbName = dbConfig.getName();
+            try {
+                clazz = ConfigMap.getInstance().getDb(dbName);
+                System.out.println("DB class: " + clazz);
+
+                clientInstance = (PooledDatabaseClient) clazz.getMethod(ServiceConstants.GET_DB_CLIENT_METHOD_NAME).invoke(null);
+                System.out.println("Client Instance: " + clientInstance);
+
+            } catch (ClassNotFoundException e) {
+                System.err.println("Database class: (" + dbName + ") not found");
+                e.printStackTrace();
+                shutdownGracefully();
+            } catch (NoSuchMethodException e) {
+                System.err.println("Compulsory method in " + dbName + " class (" + ServiceConstants.GET_DB_CLIENT_METHOD_NAME + ") not found");
+                e.printStackTrace();
+                shutdownGracefully();
+            } catch (IllegalAccessException e) {
+                System.err.println("Db class: not operational");
+                e.printStackTrace();
+                shutdownGracefully();
+            } catch (InvocationTargetException e) {
+                System.err.println("DB class: threw an exception");
+                e.printStackTrace();
+                shutdownGracefully();
+            }
+
+            int connectionCount = dbConfig.getConnectionCount();
+            clientInstance.createPool(connectionCount);
+
+            dbConfig.setClient(clientInstance);
+            System.out.println("Initialized the " + dbConfig.getName() + " pool");
+        }
+    }
+
+
     public abstract String getAppUriName();
 
     public int readProperty(String propertyName, int defaultPropertyValue) {
+    public int readIntProperty(String propertyName, int defaultPropertyValue) {
         if (!configProperties.containsKey(propertyName))
             return defaultPropertyValue;
         return Integer.parseInt(configProperties.getProperty(propertyName));
     }
 
-    private int getThreadCount() {
-        return readProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_THREADS_COUNT);
+    public ArrayList<String> readArrayProperty(String propertyName, String delimiter, ArrayList<String> defaultPropertyValue) {
+        if (!configProperties.containsKey(propertyName))
+            return defaultPropertyValue;
+        return new ArrayList<String>(Arrays.asList(configProperties.getProperty(propertyName).split(delimiter)));
     }
 
-    public final int getDbConnectionsCount() {
-        return readProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_DB_CONNECTIONS_COUNT);
+    private int getThreadCount() {
+        return readIntProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, ServiceConstants.DEFAULT_THREADS_COUNT);
     }
 
     public final String getConfigMapPath() {
         return ServiceConstants.DEFAULT_PROPERTIES_FILENAME;
     }
 
+    public final String getDbMapPath() {
+        return ServiceConstants.DEFAULT_DB_PROPERTIES_FILENAME;
+    }
+
     private void loadCommandMap() {
         final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
+        // TODO seperate this
+        final InputStream dbMapStream = Service.class.getClassLoader().getResourceAsStream(getDbMapPath());
         try {
-            ConfigMap.getInstance().instantiate(configMapStream);
+            ConfigMap.getInstance().instantiate(configMapStream, dbMapStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,9 +126,15 @@ public abstract class Service {
         resume();
     }
 
+    protected void shutdownGracefully() {
+        // TODO release resources and halt app
+        System.exit(-1);
+    }
+
     private void loadProperties() {
         loadCommandMap();
         loadConfigProperties();
+        parseDbProperties();
     }
 
     private void loadConfigProperties() {
@@ -79,8 +143,23 @@ public abstract class Service {
             configProperties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(-1);
+            shutdownGracefully();
         }
+    }
+
+    private void parseDbProperties() {
+        ArrayList<String> requiredDBsList = readArrayProperty(ServiceConstants.REQUIRED_DATABASES_PROPERTY_NAME,
+                    ServiceConstants.REQUIRED_DATABASES_ARRAY_DELIMITER,
+                    ServiceConstants.DEFAULT_REQUIRED_DATABASES);
+
+        for(String dbPair : requiredDBsList) {
+            String [] split = dbPair.split(ServiceConstants.REQUIRED_DATABASES_PAIR_DELIMITER);
+            String dbName = split[0];
+            int connectionCount = Integer.parseInt(split[1]);
+            this.requiredDbs.put(dbName, new DBConfig(dbName, connectionCount));
+        }
+
+        System.out.println("Required Dbs: "  + this.requiredDbs);
     }
 
     public void freeze() {
@@ -101,6 +180,7 @@ public abstract class Service {
         }
 
         initThreadPool();
+        initDbPool();
         startAcceptingNewRequests();
 
         isFrozen = false;
@@ -111,11 +191,6 @@ public abstract class Service {
         releaseThreadPool();
         initThreadPool();
         startAcceptingNewRequests();
-    }
-
-
-    private void reloadDbPool() {
-        throw new UnsupportedOperationException();
     }
 
     private void initAcceptingNewRequests() {
@@ -254,9 +329,22 @@ public abstract class Service {
 
     }
 
-    public void setMaxDbConnectionsCount(int maxDbConnectionsCount) {
-        updateProperty(ServiceConstants.DB_CONNECTIONS_COUNT_PROPERTY_NAME, String.valueOf(maxDbConnectionsCount));
-        reloadDbPool();
+    public void setMaxDbConnectionsCount(String dbName, int maxDbConnectionsCount) {
+        DBConfig dbToModify = requiredDbs.get(dbName);
+        dbToModify.setConnectionCount(maxDbConnectionsCount);
+
+        String dbs = requiredDbs.values()
+                .stream()
+                .map(dbConfig -> dbConfig.getName() + ServiceConstants.REQUIRED_DATABASES_PAIR_DELIMITER + dbConfig.getConnectionCount())
+                .collect(Collectors.joining(ServiceConstants.REQUIRED_DATABASES_ARRAY_DELIMITER));
+        updateProperty(ServiceConstants.REQUIRED_DATABASES_PROPERTY_NAME, dbs);
+
+        try {
+            dbToModify.getClient().setMaxConnections(maxDbConnectionsCount);
+        } catch (PoolDoesNotExistException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void updateProperty(String propertyName, String newValue) {

@@ -17,27 +17,46 @@ public class ConfigMap {
     private static ConfigMap instance = new ConfigMap();
 
     private ConcurrentHashMap<String, String> cmdMap;
+    private ConcurrentHashMap<String, String> dbMap;
 
     private ConfigMap() {
         cmdMap = new ConcurrentHashMap<>();
-
+        dbMap = new ConcurrentHashMap<>();
     }
 
     public static ConfigMap getInstance() {
         return instance;
     }
 
-    public void instantiate(InputStream inputStream) throws IOException {
-        final Properties properties = new Properties();
-        properties.load(inputStream);
+    public void instantiate(InputStream cmdInputStream, InputStream dbInputStream) throws IOException {
+        final Properties cmdProperties = new Properties();
+        cmdProperties.load(cmdInputStream);
 
-        for (final String key : properties.stringPropertyNames()) {
-            cmdMap.put(key, properties.get(key).toString());
+        final Properties dbProperties = new Properties();
+        dbProperties.load(dbInputStream);
+
+        for (final String key : cmdProperties.stringPropertyNames()) {
+            cmdMap.put(key, cmdProperties.get(key).toString());
         }
+
+        for (final String key : dbProperties.stringPropertyNames()) {
+            dbMap.put(key, dbProperties.get(key).toString());
+        }
+
+        System.out.println("Commands: " + cmdMap);
+        System.out.println("DBs: " + dbMap);
     }
 
     public Class<?> getClass(String command) throws ClassNotFoundException {
         final String className = cmdMap.get(command);
+        if (className == null) {
+            throw new ClassNotFoundException();
+        }
+        return Class.forName(className);
+    }
+
+    public Class<?> getDb(String dbName) throws ClassNotFoundException {
+        final String className = dbMap.get(dbName);
         if (className == null) {
             throw new ClassNotFoundException();
         }
