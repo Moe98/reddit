@@ -10,6 +10,9 @@ import org.sab.demo.commands.GoodByeWorld;
 import org.sab.demo.commands.HelloWorld;
 import org.sab.netty.Server;
 import org.sab.service.Service;
+import org.sab.service.managers.ControlManager;
+import org.sab.service.managers.PropertiesManager;
+import org.sab.service.managers.ThreadPoolManager;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
@@ -43,9 +46,9 @@ public class ExampleAppTest {
      * A function to get the {@code threadPool} from the app even though it's private
      */
     private static ExecutorService getThreadPool(ExampleApp app) throws NoSuchFieldException, IllegalAccessException {
-        Field field = Service.class.getDeclaredField("threadPool");
+        Field field = ThreadPoolManager.class.getDeclaredField("threadPool");
         field.setAccessible(true);
-        return (ExecutorService) field.get(app);
+        return (ExecutorService) field.get(app.getControlManager().getThreadPoolManager());
 
     }
 
@@ -53,10 +56,24 @@ public class ExampleAppTest {
      * Creates a mocked app that uses the controller port specified by {@link #obtainPort}.
      * @return the mocked app.
      */
-    private static ExampleApp mockApp() {
+    private static ExampleApp mockApp() throws ReflectiveOperationException {
         final int controllerPort = obtainPort();
-        ExampleApp app = Mockito.spy(new ExampleApp());
-        Mockito.when(app.getControllerPort()).thenReturn(controllerPort);
+
+        final ExampleApp app = new ExampleApp();
+
+        final PropertiesManager propertiesManager = Mockito.spy(new PropertiesManager(app.getAppUriName()));
+        Mockito.when(propertiesManager.getControllerPort()).thenReturn(controllerPort);
+
+        final ControlManager controlManager = new ControlManager(app.getAppUriName());
+
+        final Field propertiesManagerField = ControlManager.class.getDeclaredField("propertiesManager");
+        propertiesManagerField.setAccessible(true);
+        propertiesManagerField.set(controlManager, propertiesManager);
+
+        final Field controlManagerField = Service.class.getDeclaredField("controlManager");
+        controlManagerField.setAccessible(true);
+        controlManagerField.set(app, controlManager);
+
         return app;
     }
 
@@ -91,7 +108,7 @@ public class ExampleAppTest {
 
     @Test
     public void readControllerPort() {
-        int port = new ExampleApp().getControllerPort();
+        int port = new ExampleApp().getControlManager().getPropertiesManager().getControllerPort();
         assertTrue(port >= 4000 && port < 5000);
     }
 
@@ -99,12 +116,18 @@ public class ExampleAppTest {
     @Test
     public void freeze() {
         ExecutorService threadPool = Executors.newScheduledThreadPool(3);
-        ExampleApp app = mockApp();
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
+
         app.start();
-        app.freeze();
+        app.getControlManager().freeze();
         final Callable<String> getRequest = () -> HttpClient.get("api/example", "HELLO_WORLD");
         final int sleepSeconds = 4;
-        Runnable resumeAfterXSeconds = app::resume;
+        Runnable resumeAfterXSeconds = app.getControlManager()::resume;
         Executors.newSingleThreadScheduledExecutor().schedule(resumeAfterXSeconds, sleepSeconds, TimeUnit.SECONDS);
 
         Future<String> getRequestFuture = threadPool.submit(getRequest);
@@ -120,7 +143,13 @@ public class ExampleAppTest {
 
     @Test
     public void callingExampleAppAPI() {
-        ExampleApp app = mockApp();
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
+
         app.start();
         String response = null;
         try {
@@ -134,9 +163,15 @@ public class ExampleAppTest {
 
     @Test
     public void deleteCommandWorksAsExpected() {
-        ExampleApp app = mockApp();
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
+
         app.start();
-        app.deleteCommand("HELLO_WORLD");
+        app.getControlManager().getClassManager().deleteCommand("HELLO_WORLD");
         String response = null;
         try {
             response = HttpClient.get("api/example", "HELLO_WORLD");
@@ -149,7 +184,13 @@ public class ExampleAppTest {
 
     @Test
     public void setMaxThreadsCountWaitsForActiveThreadsToTerminate() {
-        ExampleApp app = mockApp();
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
+
         app.start();
         final String testString = "Hello";
         Callable<String> callable = () -> {
@@ -162,7 +203,7 @@ public class ExampleAppTest {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             fail(e.getMessage());
         }
-        app.setMaxThreadsCount(4);
+        app.getControlManager().setMaxThreadsCount(4);
 
         try {
             // This assert shows that the reloadThreadCount waits until the callable has finished ans submitted its value
@@ -174,11 +215,16 @@ public class ExampleAppTest {
 
     @Test
     public void threadPoolReloadsProperlyAfterSettingMaxThreadsCount() {
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
 
-        ExampleApp app = mockApp();
         app.start();
 
-        app.setMaxThreadsCount(4);
+        app.getControlManager().setMaxThreadsCount(4);
         final String testString = "Hello";
         Callable<String> trivialCallable = () -> testString;
         Future<String> future = null;
@@ -196,9 +242,15 @@ public class ExampleAppTest {
 
     @Test
     public void startThenResumeThenFreeze() {
-        ExampleApp app = mockApp();
+        ExampleApp app = null;
+        try {
+            app = mockApp();
+        } catch (ReflectiveOperationException e) {
+            fail(e.getMessage());
+        }
+
         app.start();
-        app.resume();
-        app.freeze();
+        app.getControlManager().resume();
+        app.getControlManager().freeze();
     }
 }

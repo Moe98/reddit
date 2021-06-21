@@ -32,6 +32,11 @@ public class Arango implements PooledDatabaseClient {
     }
 
     @Override
+    public String getName(){
+        return "ARANGO";
+    }
+
+    @Override
     public void createPool(int maxConnections) {
         builder = new ArangoDB.Builder()
                 .user(System.getenv("ARANGO_USER"))

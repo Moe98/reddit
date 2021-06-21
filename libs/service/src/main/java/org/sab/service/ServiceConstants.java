@@ -2,13 +2,12 @@ package org.sab.service;
 
 import java.util.ArrayList;
 
-class ServiceConstants {
+public class ServiceConstants {
 
     private ServiceConstants () {
     }
 
-    public static final String DEFAULT_PROPERTIES_FILENAME = "commandMap.properties".toLowerCase();
-    public static final String DEFAULT_DB_PROPERTIES_FILENAME = "dbMap.properties".toLowerCase();
+    public static final String COMMAND_MAP_FILENAME = "commandMap.properties".toLowerCase();
 
     public static final String REQUEST_QUEUE_NAME_SUFFIX = "_REQ";
     public static final int MAX_THREAD_TIMEOUT = 4;
@@ -19,7 +18,7 @@ class ServiceConstants {
     public static final String REQUIRED_DATABASES_PROPERTY_NAME = "requiredDatabases";
     public static final String REQUIRED_DATABASES_ARRAY_DELIMITER = ",";
     public static final String REQUIRED_DATABASES_PAIR_DELIMITER = "-";
-    public static final ArrayList DEFAULT_REQUIRED_DATABASES = new ArrayList();
+    public static final ArrayList<String> DEFAULT_REQUIRED_DATABASES = new ArrayList<>();
 
     public static final int DEFAULT_CONNECTION_COUNT = 10;
 

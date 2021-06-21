@@ -15,6 +15,7 @@ public interface PooledDatabaseClient {
     void createPool(int maxConnections);
     void destroyPool() throws PoolDoesNotExistException;
     void setMaxConnections(int maxConnections) throws PoolDoesNotExistException;
+    String getName();
 
     /**
      * Compulsory method!
