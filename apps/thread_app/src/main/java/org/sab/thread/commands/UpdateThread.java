@@ -3,7 +3,6 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
 import org.sab.models.CouchbaseBuckets;
-import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -12,8 +11,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
-
-import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class UpdateThread extends ThreadCommand {
     @Override
@@ -28,7 +25,7 @@ public class UpdateThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
 
         final Thread thread;
 
@@ -56,7 +53,7 @@ public class UpdateThread extends ThreadCommand {
             final String creatorId = (String) threadDocument.getAttribute(CREATOR_ID_DB);
 
             if (!userId.equals(creatorId)) {
-                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
+                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403);
             }
 
             threadDocument.updateAttribute(DESCRIPTION_DB, description);
@@ -73,13 +70,13 @@ public class UpdateThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
 
             if(threadIsCached)
-                replacetDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
+                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeDataResponse(thread.toJSON()).toString();
+        return Responder.makeDataResponse(thread.toJSON());
     }
 
     @Override

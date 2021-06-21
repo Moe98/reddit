@@ -37,7 +37,7 @@ public class UpdateSubThread extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
 
         final SubThread subthread;
 
@@ -66,7 +66,7 @@ public class UpdateSubThread extends SubThreadCommand {
                 subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
             }
             else{
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
             }
 
             final String creatorId = (String) subthreadDocument.getAttribute(CREATOR_ID_DB);
@@ -90,7 +90,7 @@ public class UpdateSubThread extends SubThreadCommand {
             final int likes = Integer.parseInt(String.valueOf(subthreadDocument.getAttribute(LIKES_DB)));
             final int dislikes = Integer.parseInt(String.valueOf(subthreadDocument.getAttribute(DISLIKES_DB)));
             final String dateCreated = (String) subthreadDocument.getAttribute(DATE_CREATED_DB);
-            final boolean hasImage = (Boolean) subthreadDocument.getAttribute(HASIMAGE_DB);
+            final boolean hasImage = (Boolean) subthreadDocument.getAttribute(HAS_IMAGE_DB);
 
             subthread = new SubThread();
             subthread.setId(subthreadId);

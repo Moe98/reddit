@@ -4,11 +4,11 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -70,7 +70,7 @@ public class LikeComment extends CommentCommand {
                 return Responder.makeErrorResponse(msg, 400);
             }
 
-            int newLikes = 0;
+            int newLikes;
 
             // if user already likes the comment, then remove his like and update like count
             if (!likeEdgeId.equals("")) {
@@ -113,7 +113,7 @@ public class LikeComment extends CommentCommand {
 
             if (isCommentCached)
                 replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
-            else if(newLikes > Couchbase.COMMENT_LIKES_CACHING_THRESHOLD){
+            else if(newLikes > SubThreadApp.COMMENT_LIKES_CACHING_THRESHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
             }
         } catch (Exception e) {

@@ -126,7 +126,7 @@ public class GetCommentTest {
 
         final JSONObject createCommentResponseData = createCommentResponse.getJSONObject("data");
 
-        final String commentId = createCommentResponseData.getString(CommentAttributes.COMMENT_ID.getHTTP());
+        final String commentId = createCommentResponseData.getString(CommentAttributes.COMMENT_ID.getDb());
 
         final JSONObject response = getComment(commentId);
 
@@ -134,13 +134,13 @@ public class GetCommentTest {
 
         final JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(responseData.getString(CommentAttributes.COMMENT_ID.getHTTP()), commentId);
-        assertEquals(responseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP()), "Subthread");
-        assertEquals(responseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP()), subThreadId);
-        assertEquals(responseData.getString(CommentAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(responseData.getString(CommentAttributes.CONTENT.getHTTP()), content);
-        assertEquals(responseData.getInt(CommentAttributes.LIKES.getHTTP()), 0);
-        assertEquals(responseData.getInt(CommentAttributes.DISLIKES.getHTTP()), 0);
+        assertEquals(responseData.getString(CommentAttributes.COMMENT_ID.getDb()), commentId);
+        assertEquals(responseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getDb()), "Subthread");
+        assertEquals(responseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getDb()), subThreadId);
+        assertEquals(responseData.getString(CommentAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(responseData.getString(CommentAttributes.CONTENT.getDb()), content);
+        assertEquals(responseData.getInt(CommentAttributes.LIKES.getDb()), 0);
+        assertEquals(responseData.getInt(CommentAttributes.DISLIKES.getDb()), 0);
     }
 
     @Test

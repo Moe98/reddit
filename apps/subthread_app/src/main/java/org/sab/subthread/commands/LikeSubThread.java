@@ -4,11 +4,11 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -38,7 +38,7 @@ public class LikeSubThread extends SubThreadCommand {
     @Override
     public String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -70,7 +70,7 @@ public class LikeSubThread extends SubThreadCommand {
 
             String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
-            int newLikes = 0;
+            int newLikes;
             // if user already likes the subthread, then remove his like and update like count
             if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
@@ -112,7 +112,7 @@ public class LikeSubThread extends SubThreadCommand {
 
             if(subthreadIsCached)
                 replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
-            else if(newLikes > Couchbase.SUBTHREAD_LIKES_CACHING_THRESHOLD){
+            else if(newLikes > SubThreadApp.SUBTHREAD_LIKES_CACHING_THRESHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             }
         } catch (Exception e) {

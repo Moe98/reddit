@@ -36,7 +36,7 @@ public class DeleteThread extends ThreadCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
         JSONObject response = new JSONObject();
         String msg = "";
 

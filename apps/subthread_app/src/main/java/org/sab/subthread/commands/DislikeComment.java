@@ -4,11 +4,11 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -118,7 +118,7 @@ public class DislikeComment extends CommentCommand {
             }
             if(commentIsCached)
                 replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
-            else if(newDislikes > Couchbase.COMMENT_DISLIKES_CACHING_THRESHOLD){
+            else if(newDislikes > SubThreadApp.COMMENT_DISLIKES_CACHING_THRESHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
             }
 

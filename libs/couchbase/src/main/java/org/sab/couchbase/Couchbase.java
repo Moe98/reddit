@@ -10,9 +10,7 @@ import com.couchbase.client.java.manager.bucket.BucketType;
 import com.couchbase.client.java.manager.bucket.EvictionPolicyType;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.time.Duration;
-import java.util.Properties;
 
 @SuppressWarnings("unused")
 public class Couchbase {
@@ -20,25 +18,8 @@ public class Couchbase {
 
     private Cluster cluster;
 
-    public static int THREAD_FOLLOWERS_CACHING_THRESHOLD = 1000;
-    public static int SUBTHREAD_LIKES_CACHING_THRESHOLD = 1000;
-    public static int SUBTHREAD_DISLIKES_CACHING_THREHOLD = 1000;
-    public static int COMMENT_LIKES_CACHING_THRESHOLD = 1000;
-    public static int COMMENT_DISLIKES_CACHING_THRESHOLD = 1000;
-
     private Couchbase() {
         connect();
-        final Properties properties = new Properties();
-        try {
-            properties.load(getClass().getClassLoader().getResourceAsStream("cachingThreshold.properties"));
-            THREAD_FOLLOWERS_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("THREAD_FOLLOWERS"));;
-            SUBTHREAD_LIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("SUBTHREAD_LIKES"));
-            SUBTHREAD_DISLIKES_CACHING_THREHOLD = Integer.parseInt(properties.getProperty("SUBTHREAD_DISLIKES"));
-            COMMENT_LIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("COMMENT_LIKES"));
-            COMMENT_DISLIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("COMMENT_DISLIKES"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static Couchbase getInstance() {

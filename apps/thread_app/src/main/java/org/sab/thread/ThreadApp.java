@@ -12,12 +12,12 @@ public class ThreadApp extends Service {
     // TODO get this from config file
     private static final String THREAD_APP_QUEUE = "THREAD_APP_REQ";
     private static Couchbase couchbase;
-    private static int THREAD_FOLLOWERS;
+    public static int THREAD_FOLLOWERS_CACHING_THRESHOLD;
 
     public static void main(String[] args) {
         try {
             startCouchbaseConnection();
-            initCacheThreshold();
+
             new ThreadApp().start();
 
         } catch (Exception e) {
@@ -31,6 +31,8 @@ public class ThreadApp extends Service {
     }
 
     public static void startCouchbaseConnection() {
+        initCacheThreshold();
+
         couchbase = Couchbase.getInstance();
         couchbase.connectIfNotConnected();
 
@@ -50,11 +52,11 @@ public class ThreadApp extends Service {
     public static void initCacheThreshold(){
         final Properties properties = new Properties();
         int defaultVal = 1000;
-        THREAD_FOLLOWERS = defaultVal;
+        THREAD_FOLLOWERS_CACHING_THRESHOLD = defaultVal;
 
         try {
             properties.load(ThreadApp.class.getClassLoader().getResourceAsStream("cacheThreshold.properties"));
-            THREAD_FOLLOWERS = Integer.parseInt(properties.getProperty("THREAD_FOLLOWERS"));
+            THREAD_FOLLOWERS_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("THREAD_FOLLOWERS"));
         } catch (IOException e) {
             e.printStackTrace();
         }

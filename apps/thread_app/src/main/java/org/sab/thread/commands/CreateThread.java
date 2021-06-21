@@ -3,7 +3,6 @@ package org.sab.thread.commands;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.sab.arango.Arango;
-import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -12,8 +11,6 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
-
-import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class CreateThread extends ThreadCommand {
     private final long INITIAL_NUM_FOLLOWERS = 0;
@@ -61,7 +58,7 @@ public class CreateThread extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, creatorId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
             }
             // TODO can we do this as a transaction?
 
@@ -90,13 +87,13 @@ public class CreateThread extends ThreadCommand {
 
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
             if (arango != null) {
 
             }
         }
-        return Responder.makeDataResponse(thread.toJSON()).toString();
+        return Responder.makeDataResponse(thread.toJSON());
     }
 
 }

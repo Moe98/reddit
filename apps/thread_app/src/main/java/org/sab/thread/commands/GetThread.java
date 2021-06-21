@@ -19,7 +19,7 @@ public class GetThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
         final Thread thread;
 
         try {
@@ -52,10 +52,10 @@ public class GetThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
         } catch (Exception e) {
             e.printStackTrace();
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeDataResponse(thread.toJSON()).toString();
+        return Responder.makeDataResponse(thread.toJSON());
     }
 
     @Override

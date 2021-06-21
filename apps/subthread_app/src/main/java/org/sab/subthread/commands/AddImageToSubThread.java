@@ -1,7 +1,6 @@
 package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
-import com.couchbase.client.java.json.JsonObject;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
@@ -31,10 +30,9 @@ public class AddImageToSubThread extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        // JSONObject response = new JSONObject();
-        String msg = "";
+        String msg;
 
-        Arango arango = null;
+        Arango arango;
 
         try {
             // retrieving the body objects
@@ -51,7 +49,7 @@ public class AddImageToSubThread extends SubThreadCommand {
             }
 
             final BaseDocument subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-            subthreadDocument.updateAttribute(HASIMAGE_DB, true);
+            subthreadDocument.updateAttribute(HAS_IMAGE_DB, true);
 
             final String creatorId = (String) subthreadDocument.getAttribute(CREATOR_ID_DB);
             // check that the user is the creator

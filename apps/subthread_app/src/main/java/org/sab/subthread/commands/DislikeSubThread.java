@@ -4,11 +4,11 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -37,7 +37,7 @@ public class DislikeSubThread extends SubThreadCommand {
     @Override
     public String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -113,7 +113,7 @@ public class DislikeSubThread extends SubThreadCommand {
 
             if(subthreadIsCached)
                 replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
-            else if(newDislikes > Couchbase.SUBTHREAD_DISLIKES_CACHING_THREHOLD){
+            else if(newDislikes > SubThreadApp.SUBTHREAD_DISLIKES_CACHING_THRESHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             }
         } catch (Exception e) {

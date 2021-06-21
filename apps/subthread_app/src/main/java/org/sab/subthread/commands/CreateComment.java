@@ -1,11 +1,8 @@
 package org.sab.subthread.commands;
 
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.Comment;
 import org.sab.models.CouchbaseBuckets;
@@ -19,29 +16,10 @@ import org.sab.validation.Schema;
 import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class CreateComment extends CommentCommand {
-
-    public static JSONObject createCommentReq(String parentId, String content, String parentContentType, String commenterId) {
-
-        JSONObject body = new JSONObject();
-        body.put(PARENT_SUBTHREAD_ID, parentId);
-        body.put(CONTENT, content);
-        body.put(PARENT_CONTENT_TYPE, parentContentType);
-
-        JSONObject uriParams = new JSONObject();
-        uriParams.put(ACTION_MAKER_ID, commenterId);
-
-        JSONObject request = new JSONObject();
-        request.put("body", body);
-        request.put("methodType", "POST");
-        request.put("uriParams", uriParams);
-        return request;
-    }
-
     @Override
     protected boolean isAuthNeeded() {
         return true;
@@ -55,7 +33,7 @@ public class CreateComment extends CommentCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         final int INITIAL_LIKES = 0;
         final int INITIAL_DISLIKES = 0;
@@ -76,7 +54,7 @@ public class CreateComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
 
             BaseDocument parentContentDoc;
-            if(parentContentType.toLowerCase().equals("comment")){
+            if(parentContentType.equalsIgnoreCase("comment")){
                 if(commentExistsInCouchbase(parentSubThreadId)){
                     parentContentDoc = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), parentSubThreadId);
                 }

@@ -6,13 +6,7 @@ import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.*;
 import org.sab.models.user.UserAttributes;
-import org.sab.rabbitmq.RPCClient;
 import org.sab.service.validation.CommandWithVerification;
-import org.sab.service.validation.HTTPMethod;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 
 
 public abstract class CommentCommand extends CommandWithVerification {
@@ -20,10 +14,7 @@ public abstract class CommentCommand extends CommandWithVerification {
     // TODO rename |PARENT_SUBTHREAD_ID| to |PARENT_CONTENT_ID|.
     protected static final String PARENT_SUBTHREAD_ID = CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP();
     protected static final String CREATOR_ID = CommentAttributes.CREATOR_ID.getHTTP();
-    protected static final String LIKES = CommentAttributes.LIKES.getHTTP();
-    protected static final String DISLIKES = CommentAttributes.DISLIKES.getHTTP();
     protected static final String CONTENT = CommentAttributes.CONTENT.getHTTP();
-    //    protected static final String DATE_CREATED = "dateCreated";
     protected static final String COMMENT_ID = CommentAttributes.COMMENT_ID.getHTTP();
     protected static final String PARENT_CONTENT_TYPE = CommentAttributes.PARENT_CONTENT_TYPE.getHTTP();
 
@@ -37,7 +28,6 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String PARENT_CONTENT_TYPE_DB = CommentAttributes.PARENT_CONTENT_TYPE.getDb();
 
     protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
-    protected static final String ACTION_MAKER_ID = "userId";
 
     protected static final String OBJECT_NOT_FOUND = "The data you are requested does not exist.";
     protected static final String REQUESTER_NOT_AUTHOR = "You are not the author of this comment";
@@ -45,20 +35,9 @@ public abstract class CommentCommand extends CommandWithVerification {
     // Subthread attributes
     // http
     protected static final String SUBTHREAD_ID = SubThreadAttributes.SUBTHREAD_ID.getHTTP();
-    protected static final String SUBTHREAD_PARENT_THREAD_ID = SubThreadAttributes.PARENT_THREAD_ID.getHTTP();
-    protected static final String SUBTHREAD_CREATOR_ID = SubThreadAttributes.CREATOR_ID.getHTTP();
-
-    protected static final String SUBTHREAD_TITLE = SubThreadAttributes.TITLE.getHTTP();
-    protected static final String SUBTHREAD_CONTENT = SubThreadAttributes.CONTENT.getHTTP();
-
-    protected static final String SUBTHREAD_LIKES = SubThreadAttributes.LIKES.getHTTP();
-    protected static final String SUBTHREAD_DISLIKES = SubThreadAttributes.DISLIKES.getHTTP();
-
-    protected static final String SUBTHREAD_HASIMAGE = SubThreadAttributes.HAS_IMAGE.getHTTP();
 
     // Subthread attributes
     // db
-    protected static final String SUBTHREAD_SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
     protected static final String SUBTHREAD_PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
     protected static final String SUBTHREAD_CREATOR_ID_DB = SubThreadAttributes.CREATOR_ID.getDb();
 
@@ -68,35 +47,17 @@ public abstract class CommentCommand extends CommandWithVerification {
     protected static final String SUBTHREAD_LIKES_DB = SubThreadAttributes.LIKES.getDb();
     protected static final String SUBTHREAD_DISLIKES_DB = SubThreadAttributes.DISLIKES.getDb();
 
-    protected static final String SUBTHREAD_HASIMAGE_DB = SubThreadAttributes.HAS_IMAGE.getDb();
+    protected static final String SUBTHREAD_HAS_IMAGE_DB = SubThreadAttributes.HAS_IMAGE.getDb();
     protected static final String SUBTHREAD_DATE_CREATED_DB = SubThreadAttributes.DATE_CREATED.getDb();
 
 
     // User attributes
     protected static final String USERNAME = UserAttributes.USERNAME.toString();
-    protected static final String USER_ACTION_MAKER_ID = UserAttributes.ACTION_MAKER_ID.getHTTP();
-    protected static final String USER_IS_DELETED = UserAttributes.IS_DELETED.getHTTP();
-    protected static final String USER_USER_ID = UserAttributes.USER_ID.getHTTP();
-    protected static final String USER_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getHTTP();
 
-    protected static final String USER_ACTION_MAKER_ID_DB = UserAttributes.ACTION_MAKER_ID.getArangoDb();
     protected static final String USER_IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
-    protected static final String USER_ID_DB = UserAttributes.USER_ID.getArangoDb();
     protected static final String USER_NUM_OF_FOLLOWERS_DB = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
 
     // Thread attributes
-    protected static final String THREAD_NAME = ThreadAttributes.THREAD_NAME.getHTTP();
-    protected static final String THREAD_DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
-    protected static final String THREAD_CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
-    protected static final String THREAD_NUM_OF_FOLLOWERS = ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP();
-    // TODO remove attribute
-    protected static final String THREAD_DATE_CREATED = ThreadAttributes.DATE_CREATED.getHTTP();
-
-    protected static final String THREAD_ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
-    protected static final String THREAD_MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
-    protected static final String THREAD_ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
-    protected static final String THREAD_BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
-
     protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
     protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
     protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();

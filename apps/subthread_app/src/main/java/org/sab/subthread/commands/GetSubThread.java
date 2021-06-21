@@ -19,7 +19,7 @@ public class GetSubThread extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
         final SubThread subThread;
 
         try {
@@ -45,7 +45,7 @@ public class GetSubThread extends SubThreadCommand {
             final String title = (String) subThreadDocument.getAttribute(TITLE_DB);
             final String content = (String) subThreadDocument.getAttribute(CONTENT_DB);
             final String date = (String) subThreadDocument.getAttribute(DATE_CREATED_DB);
-            final boolean hasImage = (Boolean) subThreadDocument.getAttribute(HASIMAGE_DB);
+            final boolean hasImage = (Boolean) subThreadDocument.getAttribute(HAS_IMAGE_DB);
             final int likes = Integer.parseInt(String.valueOf(subThreadDocument.getAttribute(LIKES_DB)));
             final int dislikes = Integer.parseInt(String.valueOf(subThreadDocument.getAttribute(DISLIKES_DB)));
 

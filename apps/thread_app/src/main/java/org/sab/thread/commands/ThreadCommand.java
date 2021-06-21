@@ -16,12 +16,8 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String DESCRIPTION = ThreadAttributes.DESCRIPTION.getHTTP();
     protected static final String CREATOR_ID = ThreadAttributes.CREATOR_ID.getHTTP();
     protected static final String NUM_OF_FOLLOWERS = ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP();
-    // TODO remove attribute
-    protected static final String DATE_CREATED = ThreadAttributes.DATE_CREATED.getHTTP();
 
-    protected static final String ASSIGNER_ID = ThreadAttributes.ASSIGNER_ID.getHTTP();
     protected static final String MODERATOR_ID = ThreadAttributes.MODERATOR_ID.getHTTP();
-    protected static final String ACTION_MAKER_ID = ThreadAttributes.ACTION_MAKER_ID.getHTTP();
     protected static final String BANNED_USER_ID = ThreadAttributes.BANNED_USER_ID.getHTTP();
 
     protected static final String THREAD_NAME_DB = ThreadAttributes.THREAD_NAME.getDb();
@@ -31,15 +27,12 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
 
     // user attributes
-    // TODO get from enum
     protected static final String USERNAME = UserAttributes.USERNAME.toString();
-    protected static final String USER_ID = UserAttributes.USER_ID.getHTTP();
     protected static final String IS_DELETED_DB = UserAttributes.IS_DELETED.getArangoDb();
 
     // subthread attributes
     protected static final String SUBTHREAD_ID_DB = SubThreadAttributes.SUBTHREAD_ID.getDb();
     protected static final String PARENT_THREAD_ID_DB = SubThreadAttributes.PARENT_THREAD_ID.getDb();
-    protected static final String SUBTHREAD_TITLE_DB = SubThreadAttributes.TITLE.getDb();
     // comment attributes
     protected static final String COMMENT_ID_DB = CommentAttributes.COMMENT_ID.getDb();
     protected static final String PARENT_SUBTHREAD_ID_DB = CommentAttributes.PARENT_SUBTHREAD_ID.getDb();
@@ -70,14 +63,14 @@ public abstract class ThreadCommand extends CommandWithVerification {
     protected static final String SUBTHREAD_COLLECTION_NAME = CollectionNames.SUBTHREAD.get();
     protected static final String COMMENT_COLLECTION_NAME = CollectionNames.COMMENT.get();
 
-    // TODO: remove hardcoded strings about the recomendation app
-    protected static final String RECOMENDATION_REQUEST_QUEUE = "RECOMMENDATION_REQ";
+    // TODO: remove hardcoded strings about the recommendation app
+    protected static final String RECOMMENDATION_REQUEST_QUEUE = "RECOMMENDATION_REQ";
     protected static final String UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_THREADS";
     protected static final String UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME = "UPDATE_RECOMMENDED_SUBTHREADS";
 
     // TODO get queueName from somewhere instead of hardcoding it
     protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
-    // TODO get function name from somewhere consitant
+    // TODO get function name from somewhere consistent
     protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
 
     protected final BaseEdgeDocument addEdgeFromUserToThread(String userId, String threadName) {
@@ -151,7 +144,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
         return myObject;
     }
 
-    protected final void replacetDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+    protected final void replaceDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
         Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
     }
 

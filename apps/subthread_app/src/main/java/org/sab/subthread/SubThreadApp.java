@@ -19,16 +19,15 @@ public class SubThreadApp extends Service {
     private static Couchbase couchbase;
 
     private static final String THREAD_APP_QUEUE = "THREAD_APP_REQ";
-    private static int SUBTHREAD_LIKES_CACHING_THRESHOLD ;
-    private static int SUBTHREAD_DISLIKES_CACHING_THREHOLD ;
-    private static int COMMENT_LIKES_CACHING_THRESHOLD ;
-    private static int COMMENT_DISLIKES_CACHING_THRESHOLD ;
+    public static int SUBTHREAD_LIKES_CACHING_THRESHOLD, SUBTHREAD_DISLIKES_CACHING_THRESHOLD,
+            COMMENT_LIKES_CACHING_THRESHOLD, COMMENT_DISLIKES_CACHING_THRESHOLD;
+    
     public static void main(String[] args) {
 
         try {
             startArangoConnection();
             startCouchbaseConnection();
-            initCacheThreshold();
+
             // TODO add collection creation here
             //        createCollections(collectionList, edgeCollectionList);
             new SubThreadApp().start();
@@ -50,6 +49,8 @@ public class SubThreadApp extends Service {
     }
 
     public static void startCouchbaseConnection() {
+        initCacheThreshold();
+
         couchbase = Couchbase.getInstance();
         couchbase.connectIfNotConnected();
 
@@ -100,15 +101,18 @@ public class SubThreadApp extends Service {
 
     public static void initCacheThreshold(){
         final Properties properties = new Properties();
+
         int defaultVal = 1000;
+
         SUBTHREAD_LIKES_CACHING_THRESHOLD = defaultVal;
-        SUBTHREAD_DISLIKES_CACHING_THREHOLD = defaultVal;
+        SUBTHREAD_DISLIKES_CACHING_THRESHOLD = defaultVal;
         COMMENT_LIKES_CACHING_THRESHOLD = defaultVal;
         COMMENT_DISLIKES_CACHING_THRESHOLD = defaultVal;
+
         try {
             properties.load(SubThreadApp.class.getClassLoader().getResourceAsStream("cacheThreshold.properties"));
             SUBTHREAD_LIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("SUBTHREAD_LIKES"));
-            SUBTHREAD_DISLIKES_CACHING_THREHOLD = Integer.parseInt(properties.getProperty("SUBTHREAD_DISLIKES"));
+            SUBTHREAD_DISLIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("SUBTHREAD_DISLIKES"));
             COMMENT_LIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("COMMENT_LIKES"));
             COMMENT_DISLIKES_CACHING_THRESHOLD = Integer.parseInt(properties.getProperty("COMMENT_DISLIKES"));
         } catch (IOException e) {

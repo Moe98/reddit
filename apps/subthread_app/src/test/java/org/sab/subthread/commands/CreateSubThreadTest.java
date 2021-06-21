@@ -14,16 +14,8 @@ import org.sab.models.user.UserAttributes;
 import static org.junit.Assert.*;
 
 public class CreateSubThreadTest {
-    // thread attribs
-    protected static final String THREAD_DESCRIPTION_DB = ThreadAttributes.DESCRIPTION.getDb();
-    protected static final String THREAD_CREATOR_ID_DB = ThreadAttributes.CREATOR_ID.getDb();
-    protected static final String THREAD_NUM_OF_FOLLOWERS_DB = ThreadAttributes.NUM_OF_FOLLOWERS.getDb();
-    protected static final String THREAD_DATE_CREATED_DB = ThreadAttributes.DATE_CREATED.getDb();
     // db attribs
     final static String DB_NAME = SubThreadCommand.DB_Name;
-    // user attributes
-    final static String USR_IS_DELETED = UserAttributes.IS_DELETED.getArangoDb();
-    final static String USR_NUM_OF_FOLLOWERS = UserAttributes.NUM_OF_FOLLOWERS.getArangoDb();
     // collections
     final static String THREAD_COLLECTION_NAME = SubThreadCommand.THREAD_COLLECTION_NAME;
     final static String USER_COLLECTION_NAME = SubThreadCommand.USER_COLLECTION_NAME;
@@ -73,7 +65,7 @@ public class CreateSubThreadTest {
         body.put(SubThreadCommand.PARENT_THREAD_ID, parentThreadId);
         body.put(SubThreadCommand.TITLE, title);
         body.put(SubThreadCommand.CONTENT, content);
-        body.put(SubThreadCommand.HASIMAGE, Boolean.toString(hasImage));
+        body.put(SubThreadCommand.HAS_IMAGE, Boolean.toString(hasImage));
 
         JSONObject uriParams = new JSONObject();
 

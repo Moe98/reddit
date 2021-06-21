@@ -45,7 +45,7 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arr.add(CREATOR_ID_DB);
             arr.add(CONTENT_DB);
             arr.add(TITLE_DB);
-            arr.add(HASIMAGE_DB);
+            arr.add(HAS_IMAGE_DB);
             arr.add(LIKES_DB);
             arr.add(DISLIKES_DB);
             arr.add(DATE_CREATED_DB);

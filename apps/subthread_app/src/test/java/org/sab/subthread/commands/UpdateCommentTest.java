@@ -127,7 +127,7 @@ public class UpdateCommentTest {
 
         final JSONObject initialCommentResponseData = initialCommentResponse.getJSONObject("data");
 
-        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getHTTP());
+        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getDb());
         final String updatedContent = "Updated Content.";
 
         final JSONObject updatedCommentResponse = updateComment(updatedContent, userId, commentId);
@@ -136,12 +136,12 @@ public class UpdateCommentTest {
 
         final JSONObject updatedCommentResponseData = updatedCommentResponse.getJSONObject("data");
 
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP()), "Subthread");
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP()), subThreadId);
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CONTENT.getHTTP()), updatedContent);
-        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.LIKES.getHTTP()), 0);
-        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.DISLIKES.getHTTP()), 0);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getDb()), "Subthread");
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getDb()), subThreadId);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CONTENT.getDb()), updatedContent);
+        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.LIKES.getDb()), 0);
+        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.DISLIKES.getDb()), 0);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class UpdateCommentTest {
 
         final JSONObject initialCommentResponseData = initialCommentResponse.getJSONObject("data");
 
-        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getHTTP());
+        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getDb());
 
         final String dummyUserId = "DummyUser";
 

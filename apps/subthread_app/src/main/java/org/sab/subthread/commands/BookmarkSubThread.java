@@ -35,7 +35,7 @@ public class BookmarkSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -79,11 +79,11 @@ public class BookmarkSubThread extends SubThreadCommand {
 
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
 
         }
 
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
 
     }
 
