@@ -169,7 +169,7 @@ public abstract class Service {
 
         stopAcceptingNewRequests();
         releaseThreadPool();
-        releaseDbPool();
+        releaseDbPools();
 
         isFrozen = true;
     }
@@ -228,8 +228,14 @@ public abstract class Service {
         }
     }
 
-    private void releaseDbPool() {
-        // TODO
+    private void releaseDbPools() {
+        for(DBConfig dbConfig : requiredDbs.values()) {
+            try {
+                dbConfig.getClient().destroyPool();
+            } catch (PoolDoesNotExistException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void initRPCServer() throws IOException, TimeoutException {
