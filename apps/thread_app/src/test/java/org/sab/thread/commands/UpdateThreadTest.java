@@ -100,10 +100,10 @@ public class UpdateThreadTest {
 
         final JSONObject updatedThreadResponseData = updatedThreadResponse.getJSONObject("data");
 
-        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.THREAD_NAME.getHTTP()), threadName);
-        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.DESCRIPTION.getHTTP()), updatedDescription);
-        assertEquals(updatedThreadResponseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP()), 0);
+        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.THREAD_NAME.getDb()), threadName);
+        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(updatedThreadResponseData.getString(ThreadAttributes.DESCRIPTION.getDb()), updatedDescription);
+        assertEquals(updatedThreadResponseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getDb()), 0);
     }
 
     @Test

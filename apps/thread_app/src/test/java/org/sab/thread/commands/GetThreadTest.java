@@ -103,10 +103,10 @@ public class GetThreadTest {
 
         final JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(responseData.getString(ThreadAttributes.THREAD_NAME.getHTTP()), threadName);
-        assertEquals(responseData.getString(ThreadAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(responseData.getString(ThreadAttributes.DESCRIPTION.getHTTP()), description);
-        assertEquals(responseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP()), 0);
+        assertEquals(responseData.getString(ThreadAttributes.THREAD_NAME.getDb()), threadName);
+        assertEquals(responseData.getString(ThreadAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(responseData.getString(ThreadAttributes.DESCRIPTION.getDb()), description);
+        assertEquals(responseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getDb()), 0);
     }
 
     @Test
