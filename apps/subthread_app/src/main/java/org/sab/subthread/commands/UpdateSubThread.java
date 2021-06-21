@@ -104,7 +104,7 @@ public class UpdateSubThread extends SubThreadCommand {
             subthread.setParentThreadId(parentId);
 
             if(subthreadIsCached)
-                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadDocument.getKey(), subthreadDocument);
+                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadDocument.getKey(), subthreadDocument);
 
             // tag a person if someone was tagged in the content of the subthread
             tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
