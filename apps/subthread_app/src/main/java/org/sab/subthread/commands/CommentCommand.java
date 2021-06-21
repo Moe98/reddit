@@ -146,7 +146,7 @@ public abstract class CommentCommand extends CommandWithVerification {
     }
 
     protected final boolean subthreadExistsInCouchbase(String key) {
-        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), key);
     }
 
     protected final boolean commentExistsInCouchbase(String key) {

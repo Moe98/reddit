@@ -66,7 +66,7 @@ public class DeleteSubThread extends SubThreadCommand {
             String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this subthread!";
-                return Responder.makeErrorResponse(msg, 401).toString();
+                return Responder.makeErrorResponse(msg, 401);
             }
 
             // get all children comments at level 1
@@ -97,7 +97,7 @@ public class DeleteSubThread extends SubThreadCommand {
             // TODO turn into transaction
             // delete subthread
             arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-            deleteDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+            deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
@@ -108,11 +108,11 @@ public class DeleteSubThread extends SubThreadCommand {
 
             msg = "Deleted subthread: " + subthreadId + " with it's " + numOfComments + " comments.";
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 
 }

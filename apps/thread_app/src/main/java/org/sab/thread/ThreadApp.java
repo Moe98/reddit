@@ -42,6 +42,6 @@ public class ThreadApp extends Service {
 
         final int threadRamQuota = Integer.parseInt(properties.getProperty("THREAD_RAM_QUOTA"));
 
-        couchbase.createBucketIfNotExists(CouchbaseBuckets.THREADS.get(), threadRamQuota);
+        couchbase.createBucketIfNotExists(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadRamQuota);
     }
 }

@@ -166,7 +166,7 @@ public abstract class SubThreadCommand extends CommandWithVerification {
     }
 
     protected final boolean existsInCouchbase(String key) {
-        return Couchbase.getInstance().documentExists(CouchbaseBuckets.SUBTHREADS.get(), key);
+        return Couchbase.getInstance().documentExists(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), key);
     }
 
     protected final boolean existsInArango(String collectionName, String key) {

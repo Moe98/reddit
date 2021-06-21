@@ -31,13 +31,13 @@ public class GetSubThread extends SubThreadCommand {
 
             BaseDocument subThreadDocument;
             if(existsInCouchbase(subThreadId)){
-                subThreadDocument = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subThreadId);
+                subThreadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subThreadId);
             }
             else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subThreadId)){
                 subThreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subThreadId);
             }
             else{
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
             }
 
             final String parentThreadId = (String) subThreadDocument.getAttribute(PARENT_THREAD_ID_DB);
@@ -56,10 +56,10 @@ public class GetSubThread extends SubThreadCommand {
             subThread.setDislikes(dislikes);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeDataResponse(subThread.toJSON()).toString();
+        return Responder.makeDataResponse(subThread.toJSON());
     }
 
     @Override

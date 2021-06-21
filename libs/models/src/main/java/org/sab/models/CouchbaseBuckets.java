@@ -5,8 +5,6 @@ public enum CouchbaseBuckets {
     RECOMMENDED_SUB_THREADS("RecommendedSubThreads"),
     RECOMMENDED_THREADS("RecommendedThreads"),
     RECOMMENDED_USERS("RecommendedUsers"),
-    THREADS("Threads"),
-    SUBTHREADS("SubThreads"),
     COMMENTS("Comments");
 
 

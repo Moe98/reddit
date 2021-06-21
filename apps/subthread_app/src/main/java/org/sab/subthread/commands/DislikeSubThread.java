@@ -1,9 +1,7 @@
 package org.sab.subthread.commands;
 
-import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.models.CouchbaseBuckets;
@@ -14,7 +12,6 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.sab.innerAppComm.Comm.notifyApp;
@@ -59,14 +56,14 @@ public class DislikeSubThread extends SubThreadCommand {
 
             if(existsInCouchbase(subthreadId)){
                 subthreadIsCached = true;
-                originalSubthread = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+                originalSubthread = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
             }
             else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
                 originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
             }
             else{
                 msg = "Subthread does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
@@ -113,13 +110,13 @@ public class DislikeSubThread extends SubThreadCommand {
             }
 
             if(subthreadIsCached)
-                upsertDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), originalSubthread.getKey(), originalSubthread);
+                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 }

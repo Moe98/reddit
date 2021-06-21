@@ -58,7 +58,7 @@ public class DeleteThread extends ThreadCommand {
 
             if (existsInCouchbase(threadName)) {
                 threadIsCached = true;
-                threadDoc = getDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+                threadDoc = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
             } else if (existsInArango(THREAD_COLLECTION_NAME, threadName)) {
                 threadDoc = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
             } else {
@@ -112,20 +112,20 @@ public class DeleteThread extends ThreadCommand {
             // TODO turn into transaction
             // delete thread
             arango.deleteDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
-            deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+            deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
 
             // delete thread
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
                 arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), subthreadId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), subthreadId);
             }
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), commentId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), commentId);
             }
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
