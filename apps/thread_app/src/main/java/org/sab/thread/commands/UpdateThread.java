@@ -73,7 +73,7 @@ public class UpdateThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
 
             if(threadIsCached)
-                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
+                replacetDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

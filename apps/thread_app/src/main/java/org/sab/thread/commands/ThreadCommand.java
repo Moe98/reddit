@@ -151,7 +151,11 @@ public abstract class ThreadCommand extends CommandWithVerification {
         return myObject;
     }
 
-    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+    protected final void replacetDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
         Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
+    }
+
+    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+        Couchbase.getInstance().upsertDocument(bucketName, key, baseDocumentToJson(updatedDoc));
     }
 }

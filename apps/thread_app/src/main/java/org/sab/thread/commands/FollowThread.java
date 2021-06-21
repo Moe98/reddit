@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
@@ -96,7 +97,10 @@ public class FollowThread extends ThreadCommand {
             updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
 
             if(threadIsCached)
+                replacetDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadDocument.getKey(), threadDocument);
+            else if(followerCount > Couchbase.THREAD_FOLLOWERS_CACHING_THRESHOLD){
                 upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadDocument.getKey(), threadDocument);
+            }
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
