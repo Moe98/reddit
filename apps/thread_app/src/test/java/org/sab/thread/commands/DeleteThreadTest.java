@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.thread.ThreadApp;
 
 import java.util.ArrayList;
 
@@ -38,7 +40,7 @@ public class DeleteThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-
+            ThreadApp.startCouchbaseConnection();
             arango.createDatabase(DB_NAME);
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
@@ -138,8 +140,8 @@ public class DeleteThreadTest {
 
     @AfterClass
     public static void tearDown() {
-
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     @Test

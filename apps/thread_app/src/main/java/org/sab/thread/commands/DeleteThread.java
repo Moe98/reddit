@@ -5,6 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -42,7 +43,6 @@ public class DeleteThread extends ThreadCommand {
         JSONArray subThreadJsonArr;
         JSONArray commentJsonArr;
 
-        // TODO add authentication
         try {
             arango = Arango.getInstance();
 
@@ -53,14 +53,20 @@ public class DeleteThread extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
-            // TODO check thread exists
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            boolean threadIsCached = false;
+            BaseDocument threadDoc;
+
+            if (existsInCouchbase(threadName)) {
+                threadIsCached = true;
+                threadDoc = getDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+            } else if (existsInArango(THREAD_COLLECTION_NAME, threadName)) {
+                threadDoc = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
+            } else {
                 msg = "Thread does not exist";
                 return Responder.makeErrorResponse(msg, 400);
             }
 
-            // TODO check person deleting is creator
-            BaseDocument threadDoc = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
+
             String creatorID = (String) threadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this thread!";
@@ -106,17 +112,20 @@ public class DeleteThread extends ThreadCommand {
             // TODO turn into transaction
             // delete thread
             arango.deleteDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
+            deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
 
             // delete thread
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
                 arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), subthreadId);
             }
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), commentId);
             }
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";
