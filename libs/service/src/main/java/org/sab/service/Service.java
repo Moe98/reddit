@@ -110,10 +110,18 @@ public abstract class Service {
 
     private void loadCommandMap() {
         final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(getConfigMapPath());
-        // TODO seperate this
+
+        try {
+            ConfigMap.getInstance().instantiateCmdMap(configMapStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadDbMap() {
         final InputStream dbMapStream = Service.class.getClassLoader().getResourceAsStream(getDbMapPath());
         try {
-            ConfigMap.getInstance().instantiate(configMapStream, dbMapStream);
+            ConfigMap.getInstance().instantiateDbMap(dbMapStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -133,6 +141,7 @@ public abstract class Service {
 
     private void loadProperties() {
         loadCommandMap();
+        loadDbMap();
         loadConfigProperties();
         parseDbProperties();
     }

@@ -28,22 +28,26 @@ public class ConfigMap {
         return instance;
     }
 
-    public void instantiate(InputStream cmdInputStream, InputStream dbInputStream) throws IOException {
+    public void instantiateCmdMap(InputStream cmdInputStream) throws IOException {
         final Properties cmdProperties = new Properties();
         cmdProperties.load(cmdInputStream);
-
-        final Properties dbProperties = new Properties();
-        dbProperties.load(dbInputStream);
 
         for (final String key : cmdProperties.stringPropertyNames()) {
             cmdMap.put(key, cmdProperties.get(key).toString());
         }
 
+        System.out.println("Commands: " + cmdMap);
+    }
+
+    public void instantiateDbMap(InputStream dbInputStream) throws IOException {
+
+        final Properties dbProperties = new Properties();
+        dbProperties.load(dbInputStream);
+
         for (final String key : dbProperties.stringPropertyNames()) {
             dbMap.put(key, dbProperties.get(key).toString());
         }
 
-        System.out.println("Commands: " + cmdMap);
         System.out.println("DBs: " + dbMap);
     }
 
