@@ -2,6 +2,7 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
@@ -40,11 +41,17 @@ public class UpdateThread extends ThreadCommand {
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
-            }
+            boolean threadIsCached = false;
+            BaseDocument threadDocument;
 
-            final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
+            if (existsInCouchbase(threadId)) {
+                threadIsCached = true;
+                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId);
+            } else if (existsInArango(THREAD_COLLECTION_NAME, threadId)) {
+                threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
+            } else {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            }
 
             final String creatorId = (String) threadDocument.getAttribute(CREATOR_ID_DB);
 
@@ -65,6 +72,8 @@ public class UpdateThread extends ThreadCommand {
             thread.setDateCreated(dateCreated);
             thread.setNumOfFollowers(numOfFollowers);
 
+            if(threadIsCached)
+                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();
