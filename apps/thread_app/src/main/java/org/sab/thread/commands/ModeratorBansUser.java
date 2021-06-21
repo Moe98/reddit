@@ -44,7 +44,7 @@ public class ModeratorBansUser extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!existsInCouchbase(threadName) && !arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 messageResponse = THREAD_DOES_NOT_EXIST;
                 return Responder.makeErrorResponse(messageResponse, 400).toString();
             }
