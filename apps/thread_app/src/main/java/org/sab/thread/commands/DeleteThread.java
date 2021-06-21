@@ -118,14 +118,14 @@ public class DeleteThread extends ThreadCommand {
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
                 arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), subthreadId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
             }
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), commentId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
             }
 
             msg = "Deleted thread: " + threadName + " with it's " + numOfSubThread + " subthreads, and " + numOfComments + " comments.";

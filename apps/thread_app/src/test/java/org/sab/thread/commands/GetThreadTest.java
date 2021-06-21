@@ -7,8 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
+import org.sab.thread.ThreadApp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -23,7 +25,7 @@ public class GetThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getInstance();
-
+            ThreadApp.startCouchbaseConnection();
             arango.createDatabaseIfNotExists(DB_NAME);
 
             user = new BaseDocument();
@@ -40,6 +42,7 @@ public class GetThreadTest {
     public static void tearDown() {
         removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
