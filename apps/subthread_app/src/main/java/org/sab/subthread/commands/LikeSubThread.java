@@ -111,7 +111,7 @@ public class LikeSubThread extends SubThreadCommand {
             }
 
             if(subthreadIsCached)
-                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
+                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             else if(newLikes > Couchbase.SUBTHREAD_LIKES_CACHING_THRESHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             }

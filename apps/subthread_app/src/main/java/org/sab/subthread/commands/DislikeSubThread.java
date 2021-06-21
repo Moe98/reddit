@@ -112,7 +112,7 @@ public class DislikeSubThread extends SubThreadCommand {
             }
 
             if(subthreadIsCached)
-                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
+                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             else if(newDislikes > Couchbase.SUBTHREAD_DISLIKES_CACHING_THREHOLD){
                 upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             }
