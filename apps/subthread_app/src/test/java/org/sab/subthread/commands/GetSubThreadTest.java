@@ -112,7 +112,7 @@ public class GetSubThreadTest {
 
         final JSONObject createSubThreadResponseData = createSubThreadResponse.getJSONObject("data");
 
-        final String subThreadId = createSubThreadResponseData.getString(SubThreadAttributes.SUBTHREAD_ID.getHTTP());
+        final String subThreadId = createSubThreadResponseData.getString(SubThreadAttributes.SUBTHREAD_ID.getDb());
 
         final JSONObject response = getSubThread(subThreadId);
 
@@ -120,14 +120,14 @@ public class GetSubThreadTest {
 
         final JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(responseData.getString(SubThreadAttributes.SUBTHREAD_ID.getHTTP()), subThreadId);
-        assertEquals(responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getHTTP()), threadId);
-        assertEquals(responseData.getString(SubThreadAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(responseData.getString(SubThreadAttributes.TITLE.getHTTP()), title);
-        assertEquals(responseData.getString(SubThreadAttributes.CONTENT.getHTTP()), content);
-        assertEquals(responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getHTTP()), hasImage);
-        assertEquals(responseData.getInt(SubThreadAttributes.LIKES.getHTTP()), 0);
-        assertEquals(responseData.getInt(SubThreadAttributes.DISLIKES.getHTTP()), 0);
+        assertEquals(responseData.getString(SubThreadAttributes.SUBTHREAD_ID.getDb()), subThreadId);
+        assertEquals(responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getDb()), threadId);
+        assertEquals(responseData.getString(SubThreadAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(responseData.getString(SubThreadAttributes.TITLE.getDb()), title);
+        assertEquals(responseData.getString(SubThreadAttributes.CONTENT.getDb()), content);
+        assertEquals(responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getDb()), hasImage);
+        assertEquals(responseData.getInt(SubThreadAttributes.LIKES.getDb()), 0);
+        assertEquals(responseData.getInt(SubThreadAttributes.DISLIKES.getDb()), 0);
     }
 
     @Test

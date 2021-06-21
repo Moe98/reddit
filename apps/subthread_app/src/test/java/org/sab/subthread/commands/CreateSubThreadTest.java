@@ -99,14 +99,14 @@ public class CreateSubThreadTest {
 
         JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(mantaId, responseData.getString(SubThreadAttributes.CREATOR_ID.getHTTP()));
-        assertEquals(fishName, responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getHTTP()));
-        assertEquals(title, responseData.getString(SubThreadAttributes.TITLE.getHTTP()));
-        assertEquals(content, responseData.getString(SubThreadAttributes.CONTENT.getHTTP()));
-        assertEquals(hasImage, responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getHTTP()));
-        assertEquals(0, responseData.getInt(SubThreadAttributes.LIKES.getHTTP()));
-        assertEquals(0, responseData.getInt(SubThreadAttributes.DISLIKES.getHTTP()));
-        assertNotNull(responseData.get(SubThreadAttributes.DATE_CREATED.getHTTP()));
+        assertEquals(mantaId, responseData.getString(SubThreadAttributes.CREATOR_ID.getDb()));
+        assertEquals(fishName, responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getDb()));
+        assertEquals(title, responseData.getString(SubThreadAttributes.TITLE.getDb()));
+        assertEquals(content, responseData.getString(SubThreadAttributes.CONTENT.getDb()));
+        assertEquals(hasImage, responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getDb()));
+        assertEquals(0, responseData.getInt(SubThreadAttributes.LIKES.getDb()));
+        assertEquals(0, responseData.getInt(SubThreadAttributes.DISLIKES.getDb()));
+        assertNotNull(responseData.get(SubThreadAttributes.DATE_CREATED.getDb()));
 
     }
 
@@ -123,14 +123,14 @@ public class CreateSubThreadTest {
 
         JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(mantaId, responseData.getString(SubThreadAttributes.CREATOR_ID.getHTTP()));
-        assertEquals(iceCreamName, responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getHTTP()));
-        assertEquals(title, responseData.getString(SubThreadAttributes.TITLE.getHTTP()));
-        assertEquals(content, responseData.getString(SubThreadAttributes.CONTENT.getHTTP()));
-        assertEquals(hasImage, responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getHTTP()));
-        assertEquals(0, responseData.getInt(SubThreadAttributes.LIKES.getHTTP()));
-        assertEquals(0, responseData.getInt(SubThreadAttributes.DISLIKES.getHTTP()));
-        assertNotNull(responseData.get(SubThreadAttributes.DATE_CREATED.getHTTP()));
+        assertEquals(mantaId, responseData.getString(SubThreadAttributes.CREATOR_ID.getDb()));
+        assertEquals(iceCreamName, responseData.getString(SubThreadAttributes.PARENT_THREAD_ID.getDb()));
+        assertEquals(title, responseData.getString(SubThreadAttributes.TITLE.getDb()));
+        assertEquals(content, responseData.getString(SubThreadAttributes.CONTENT.getDb()));
+        assertEquals(hasImage, responseData.getBoolean(SubThreadAttributes.HAS_IMAGE.getDb()));
+        assertEquals(0, responseData.getInt(SubThreadAttributes.LIKES.getDb()));
+        assertEquals(0, responseData.getInt(SubThreadAttributes.DISLIKES.getDb()));
+        assertNotNull(responseData.get(SubThreadAttributes.DATE_CREATED.getDb()));
 
     }
 
