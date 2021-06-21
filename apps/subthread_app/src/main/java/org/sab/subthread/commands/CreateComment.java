@@ -90,7 +90,7 @@ public class CreateComment extends CommentCommand {
             }
             else{
                 if(subthreadExistsInCouchbase(parentSubThreadId)){
-                    parentContentDoc = getDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), parentSubThreadId);
+                    parentContentDoc = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), parentSubThreadId);
                 }
                 else if(existsInArango(SUBTHREAD_COLLECTION_NAME, parentSubThreadId)){
                     parentContentDoc = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, parentSubThreadId);

@@ -48,7 +48,7 @@ public class FollowThread extends ThreadCommand {
 
             if (existsInCouchbase(threadName)) {
                 threadIsCached = true;
-                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
             } else if (existsInArango(THREAD_COLLECTION_NAME, threadName)) {
                 threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
             } else {
@@ -96,7 +96,7 @@ public class FollowThread extends ThreadCommand {
             updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
 
             if(threadIsCached)
-                upsertDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadDocument.getKey(), threadDocument);
+                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadDocument.getKey(), threadDocument);
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404).toString();

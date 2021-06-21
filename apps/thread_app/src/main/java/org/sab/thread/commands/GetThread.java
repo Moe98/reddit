@@ -32,7 +32,7 @@ public class GetThread extends ThreadCommand {
             BaseDocument threadDocument;
 
             if (existsInCouchbase(threadId)) {
-                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadId);
+                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId);
             } else if (existsInArango(THREAD_COLLECTION_NAME, threadId)) {
                 threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
             } else {

@@ -70,7 +70,7 @@ public class AddImageToSubThread extends SubThreadCommand {
 
             final BaseDocument updatedSubThreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
             final JSONObject object = baseDocumentToJson(updatedSubThreadDocument);
-            Couchbase.getInstance().replaceDocument(CouchbaseBuckets.SUBTHREADS.get(),
+            Couchbase.getInstance().replaceDocument(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(),
                     updatedSubThreadDocument.getKey(), object);
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);

@@ -58,7 +58,7 @@ public class DeleteThread extends ThreadCommand {
 
             if (existsInCouchbase(threadName)) {
                 threadIsCached = true;
-                threadDoc = getDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+                threadDoc = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
             } else if (existsInArango(THREAD_COLLECTION_NAME, threadName)) {
                 threadDoc = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
             } else {
@@ -112,13 +112,13 @@ public class DeleteThread extends ThreadCommand {
             // TODO turn into transaction
             // delete thread
             arango.deleteDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
-            deleteDocumentFromCouchbase(CouchbaseBuckets.THREADS.get(), threadName);
+            deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
 
             // delete thread
             for (int i = 0; i < subThreadJsonArr.length(); i++) {
                 String subthreadId = subThreadJsonArr.getJSONObject(i).getString(SUBTHREAD_ID_DB);
                 arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.SUBTHREADS.get(), subthreadId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
             }
 
             // delete comments
