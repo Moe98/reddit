@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
@@ -70,14 +71,16 @@ public class DislikeComment extends CommentCommand {
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
 
+            int newDislikes = 0;
+
             // if user already dislikes the comment, then remove his dislike and update dislike count
             if (!dislikeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, dislikeEdgeId);
 
                 // TODO make this thread safe
                 //  I feel like this var is unnecessary to begin with
-                int newDisikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) - 1;
-                originalComment.updateAttribute(DISLIKES_DB, newDisikes);
+                newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) - 1;
+                originalComment.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of dislikes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
 
@@ -93,7 +96,7 @@ public class DislikeComment extends CommentCommand {
                 arango.createEdgeDocument(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
-                int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) + 1;
+                newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB))) + 1;
                 int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB)));
                 //checking if the user likes this content to remove his like
                 String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
@@ -115,6 +118,9 @@ public class DislikeComment extends CommentCommand {
             }
             if(commentIsCached)
                 replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
+            else if(newDislikes > Couchbase.COMMENT_DISLIKES_CACHING_THRESHOLD){
+                upsertDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
+            }
 
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);

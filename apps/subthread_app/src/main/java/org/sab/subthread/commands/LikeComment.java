@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
@@ -69,11 +70,13 @@ public class LikeComment extends CommentCommand {
                 return Responder.makeErrorResponse(msg, 400);
             }
 
+            int newLikes = 0;
+
             // if user already likes the comment, then remove his like and update like count
             if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
 
-                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) - 1;
+                newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) - 1;
                 originalComment.updateAttribute(LIKES_DB, newLikes);
                 // putting the comment with the updated amount of likes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
@@ -89,7 +92,7 @@ public class LikeComment extends CommentCommand {
                 arango.createEdgeDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
-                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) + 1;
+                newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) + 1;
                 int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)));
                 //checking if the user dislikes this content to remove his dislike
                 String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
@@ -110,6 +113,9 @@ public class LikeComment extends CommentCommand {
 
             if (isCommentCached)
                 replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
+            else if(newLikes > Couchbase.COMMENT_LIKES_CACHING_THRESHOLD){
+                upsertDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
+            }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
