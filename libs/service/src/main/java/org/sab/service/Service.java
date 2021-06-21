@@ -57,19 +57,19 @@ public abstract class Service {
             } catch (ClassNotFoundException e) {
                 System.err.println("Database class: (" + dbName + ") not found");
                 e.printStackTrace();
-                shutdownGracefully();
+                releaseResourcesAndExit();
             } catch (NoSuchMethodException e) {
                 System.err.println("Compulsory method in " + dbName + " class (" + ServiceConstants.GET_DB_CLIENT_METHOD_NAME + ") not found");
                 e.printStackTrace();
-                shutdownGracefully();
+                releaseResourcesAndExit();
             } catch (IllegalAccessException e) {
                 System.err.println("Db class: not operational");
                 e.printStackTrace();
-                shutdownGracefully();
+                releaseResourcesAndExit();
             } catch (InvocationTargetException e) {
                 System.err.println("DB class: threw an exception");
                 e.printStackTrace();
-                shutdownGracefully();
+                releaseResourcesAndExit();
             }
 
             int connectionCount = dbConfig.getConnectionCount();
@@ -134,8 +134,22 @@ public abstract class Service {
         resume();
     }
 
-    protected void shutdownGracefully() {
-        // TODO release resources and halt app
+    protected void releaseResourcesAndExit() {
+        // release resources and halt app
+
+        if(singleServerChannel != null) {
+            stopAcceptingNewRequests();
+            singleServerChannel = null;
+        }
+
+        if(threadPool != null) {
+            releaseThreadPool();
+            threadPool = null;
+        }
+
+        releaseDbPools();
+
+        // crash app
         System.exit(-1);
     }
 
@@ -152,7 +166,7 @@ public abstract class Service {
             configProperties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();
-            shutdownGracefully();
+            releaseResourcesAndExit();
         }
     }
 
