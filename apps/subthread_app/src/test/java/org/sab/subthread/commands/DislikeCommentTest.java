@@ -10,6 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
+import org.sab.subthread.SubThreadApp;
 
 import java.util.ArrayList;
 
@@ -27,6 +29,8 @@ public class DislikeCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
+            SubThreadApp.startCouchbaseConnection();
+
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
             insertComments(commentId1, parentThreadId1, "content", mantaId, "SubThread");
@@ -65,8 +69,8 @@ public class DislikeCommentTest {
 
     @AfterClass
     public static void tearDown() {
-
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
+        Couchbase.getInstance().disconnect();
     }
 
     public static void createUsers() {

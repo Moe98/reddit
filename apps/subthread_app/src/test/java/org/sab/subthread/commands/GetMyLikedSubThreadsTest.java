@@ -45,30 +45,24 @@ public class GetMyLikedSubThreadsTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
-        // TODO: Add testing DB.
-        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, false);
+        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.DB_Name, collectionName, false);
         }
 
-        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
+        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
     }
 
     private static void addObjectToEdgeCollection(BaseDocument document, String collectionName) {
-        // TODO: Add testing DB.
-        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, true);
+        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.DB_Name, collectionName, true);
         }
 
-        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
-    }
-
-    private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
-        arango.deleteDocument(SubThreadCommand.TEST_DB_Name, collectionName, document.getKey());
+        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
     }
 
     @AfterClass
     public static void tearDown() {
-        arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
+        arango.dropDatabase(SubThreadCommand.DB_Name);
     }
 
     public static void createUsers() {
@@ -100,7 +94,7 @@ public class GetMyLikedSubThreadsTest {
         subThread.addAttribute(SubThreadCommand.CONTENT_DB, content);
         subThread.addAttribute(SubThreadCommand.LIKES_DB, 0);
         subThread.addAttribute(SubThreadCommand.DISLIKES_DB, 0);
-        subThread.addAttribute(SubThreadCommand.HASIMAGE_DB, 0);
+        subThread.addAttribute(SubThreadCommand.HAS_IMAGE_DB, 0);
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         subThread.addAttribute(SubThreadCommand.DATE_CREATED_DB, sqlDate2);
 
