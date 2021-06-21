@@ -4,9 +4,11 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.thread.ThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
@@ -29,7 +31,7 @@ public class FollowThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
         final JSONObject response = new JSONObject();
         String responseMessage = "";
 
@@ -42,9 +44,17 @@ public class FollowThread extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            boolean threadIsCached = false;
+            BaseDocument threadDocument;
+
+            if (existsInCouchbase(threadName)) {
+                threadIsCached = true;
+                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadName);
+            } else if (existsInArango(THREAD_COLLECTION_NAME, threadName)) {
+                threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
+            } else {
                 responseMessage = THREAD_DOES_NOT_EXIST;
-                return Responder.makeErrorResponse(responseMessage, 400).toString();
+                return Responder.makeErrorResponse(responseMessage, 400);
             }
 
             final String followEdgeId = arango.getSingleEdgeId(DB_Name,
@@ -52,7 +62,6 @@ public class FollowThread extends ThreadCommand {
                     USER_COLLECTION_NAME + "/" + userId,
                     THREAD_COLLECTION_NAME + "/" + threadName);
 
-            final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadName);
             int followerCount = Integer.parseInt(String.valueOf(threadDocument.getAttribute(ThreadCommand.NUM_OF_FOLLOWERS_DB)));
 
             if (!followEdgeId.equals("")) {
@@ -62,8 +71,7 @@ public class FollowThread extends ThreadCommand {
                 --followerCount;
 
                 // notify the user about the unfollow
-                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
-                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                String threadCreatorId = threadDocument.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_UNFOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
             } else {
@@ -75,8 +83,7 @@ public class FollowThread extends ThreadCommand {
                 ++followerCount;
 
                 // notify the user about the follow
-                BaseDocument threadDoc = arango.readDocument(DB_Name,  THREAD_COLLECTION_NAME, threadName);
-                String threadCreatorId = threadDoc.getAttribute(CREATOR_ID_DB).toString();
+                String threadCreatorId = threadDocument.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_FOLLOW_MSG.getMSG(), threadName, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
             }
@@ -86,17 +93,22 @@ public class FollowThread extends ThreadCommand {
             arango.updateDocument(DB_Name, THREAD_COLLECTION_NAME, threadDocument, threadName);
 
             // send message to the notification app to update the recommendation list
-            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME);
-            updateRecommendation(RECOMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
+            updateRecommendation(RECOMMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_THREADS_FUNCTION_NAME);
+            updateRecommendation(RECOMMENDATION_REQUEST_QUEUE, userId, UPDATE_RECOMMENDED_SUBTHREADS_FUNCTION_NAME);
 
+            if (threadIsCached)
+                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadDocument.getKey(), threadDocument);
+            else if(followerCount > ThreadApp.THREAD_FOLLOWERS_CACHING_THRESHOLD) {
+                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadDocument.getKey(), threadDocument);
+            }
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
             response.put("msg", responseMessage);
         }
 
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 
     @Override
