@@ -5,7 +5,9 @@ import org.sab.service.Service;
 public class ExampleApp extends Service {
 
     public static void main(String[] args) {
-        new ExampleApp().start();
+        ExampleApp a = new ExampleApp();
+        a.start();
+        System.out.println("The required databases for Example App: " + a.requiredDbs);
     }
 
     @Override
