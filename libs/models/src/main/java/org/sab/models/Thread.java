@@ -80,11 +80,11 @@ public class Thread {
 
     public JSONObject toJSON() {
         JSONObject thread = new JSONObject();
-        thread.put(ThreadAttributes.THREAD_NAME.getHTTP(), name);
-        thread.put(ThreadAttributes.DESCRIPTION.getHTTP(), description);
-        thread.put(ThreadAttributes.CREATOR_ID.getHTTP(), creatorId);
-        thread.put(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP(), numOfFollowers);
-        thread.put(ThreadAttributes.DATE_CREATED.getHTTP(), dateCreated);
+        thread.put(ThreadAttributes.THREAD_NAME.getDb(), name);
+        thread.put(ThreadAttributes.DESCRIPTION.getDb(), description);
+        thread.put(ThreadAttributes.CREATOR_ID.getDb(), creatorId);
+        thread.put(ThreadAttributes.NUM_OF_FOLLOWERS.getDb(), numOfFollowers);
+        thread.put(ThreadAttributes.DATE_CREATED.getDb(), dateCreated);
         return thread;
     }
 }

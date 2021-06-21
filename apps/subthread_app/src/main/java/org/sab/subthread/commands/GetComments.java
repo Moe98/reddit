@@ -29,8 +29,8 @@ public class GetComments extends CommentCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
-        JSONArray response = new JSONArray();
+        Arango arango;
+        JSONArray response;
         String msg;
         try {
             arango = Arango.getInstance();
@@ -52,13 +52,12 @@ public class GetComments extends CommentCommand {
             // check if comment exists
             if (!arango.documentExists(DB_Name, parentCollection, parentId)) {
                 msg = parentType + " does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // get all children comments at level 1
             ArangoCursor<BaseDocument> cursor = null;
 
-//            ArrayList<String> attribs = new ArrayList(Arrays.asList(SUBTHREAD_TITLE_DB));
             ArrayList<String> attribs = new ArrayList<>();
 
             JSONArray commentJsonArr = new JSONArray();
@@ -93,7 +92,7 @@ public class GetComments extends CommentCommand {
             response = commentJsonArr;
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         }
         return Responder.makeDataResponse(response).toString();
     }

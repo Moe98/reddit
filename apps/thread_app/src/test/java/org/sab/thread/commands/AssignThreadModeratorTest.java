@@ -10,7 +10,9 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.thread.ThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -33,6 +35,7 @@ public class AssignThreadModeratorTest {
         try {
             arango = Arango.getInstance();
             arango.createDatabase(DB_NAME);
+            ThreadApp.startCouchbaseConnection();
 
             arango.createCollection(DB_NAME, USER_COLLECTION_NAME, false);
             arango.createCollection(DB_NAME, THREAD_COLLECTION_NAME, false);
@@ -89,6 +92,7 @@ public class AssignThreadModeratorTest {
     @AfterClass
     public static void tearDown() {
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     @Test
