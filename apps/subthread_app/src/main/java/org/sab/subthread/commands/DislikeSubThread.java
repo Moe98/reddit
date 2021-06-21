@@ -4,6 +4,7 @@ import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
@@ -68,12 +69,13 @@ public class DislikeSubThread extends SubThreadCommand {
 
             String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
+            int newDislikes = 0;
             // if user already dislikes the subthread, then remove his dislike and update dislike count
             if (!dislikeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, dislikeEdgeId);
 
-                int newDisikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) - 1;
-                originalSubthread.updateAttribute(DISLIKES_DB, newDisikes);
+                newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) - 1;
+                originalSubthread.updateAttribute(DISLIKES_DB, newDislikes);
                 // putting the comment with the updated amount of dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
@@ -89,7 +91,7 @@ public class DislikeSubThread extends SubThreadCommand {
                 // adding new edgeDocument representing that a user dislikes a subthread
                 arango.createEdgeDocument(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
-                int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) + 1;
+                newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB))) + 1;
                 int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB)));
                 String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
                 //checking if the user likes this subthread to remove his like
@@ -110,8 +112,10 @@ public class DislikeSubThread extends SubThreadCommand {
             }
 
             if(subthreadIsCached)
-                upsertDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
-
+                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
+            else if(newDislikes > Couchbase.SUBTHREAD_DISLIKES_CACHING_THREHOLD){
+                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
+            }
         } catch (Exception e) {
             return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {

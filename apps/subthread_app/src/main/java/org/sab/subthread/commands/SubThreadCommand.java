@@ -193,7 +193,11 @@ public abstract class SubThreadCommand extends CommandWithVerification {
         return myObject;
     }
 
-    protected final void upsertDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+    protected final void replaceDocumentFromCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
+        Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
+    }
+
+    protected final void upsertDocumentInCouchbase(String bucketName, String key, BaseDocument updatedDoc) {
         Couchbase.getInstance().replaceDocument(bucketName, key, baseDocumentToJson(updatedDoc));
     }
 }
