@@ -2,12 +2,10 @@ package org.sab.couchbase;
 
 import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.query.QueryResult;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
