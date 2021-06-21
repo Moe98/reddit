@@ -279,18 +279,4 @@ public class RecommendationAppTest {
         assertTrue(responseJson.getJSONArray("data").getString(0).equals(users[users.length - 1]));
     }
 
-    @Test
-    public void TestConfigMap() {
-        try {
-            final InputStream configMapStream = getClass().getClassLoader().getResourceAsStream(new RecommendationApp().getConfigMapPath());
-            final Properties properties = new Properties();
-            properties.load(configMapStream);
-
-            for (final String key : properties.stringPropertyNames()) {
-                Class.forName(properties.get(key).toString());
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            fail(e.getMessage());
-        }
-    }
 }
