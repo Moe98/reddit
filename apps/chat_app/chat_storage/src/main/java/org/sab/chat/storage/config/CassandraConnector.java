@@ -1,6 +1,7 @@
 package org.sab.chat.storage.config;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.PoolingOptions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 
@@ -40,7 +41,8 @@ public class CassandraConnector {
     }
 
     public void connect() {
-        Cluster.Builder clusterBuilder = Cluster.builder().addContactPoint(node);
+        PoolingOptions poolingOptions = new PoolingOptions();
+        Cluster.Builder clusterBuilder = Cluster.builder().addContactPoint(node).withPoolingOptions(poolingOptions);
         if (port != null) {
             clusterBuilder.withPort(port);
         }
