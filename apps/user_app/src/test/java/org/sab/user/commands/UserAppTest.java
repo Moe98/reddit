@@ -32,13 +32,13 @@ public class UserAppTest {
 
     @BeforeClass
     public static void connectToDbs() {
+        arango = Arango.getConnectedInstance();
         try {
             UserApp.dbInit();
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        arango = Arango.getConnectedInstance();
     }
 
 
