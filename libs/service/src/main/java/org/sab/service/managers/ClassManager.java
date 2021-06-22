@@ -49,6 +49,9 @@ public class ClassManager {
 
     public Class<?> getCommand(String functionName) throws ClassNotFoundException {
         final String className = commandMap.get(functionName);
+        if(className == null) {
+            throw new ClassNotFoundException("Class not found in command map.");
+        }
         return classRegistry.getClass(className);
     }
 
