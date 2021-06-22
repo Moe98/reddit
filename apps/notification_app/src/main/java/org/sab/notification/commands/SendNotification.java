@@ -22,8 +22,8 @@ public class SendNotification extends CommandWithVerification {
 
         final Attribute title = new Attribute(NotificationAttributes.TITLE.getValue(), DataType.STRING, true);
         final Attribute body = new Attribute(NotificationAttributes.NOTIFICATION_BODY.getValue(), DataType.STRING, true);
-        final Attribute registrationTokens = new Attribute(NotificationAttributes.USERS_LIST.getValue(), DataType.ARRAY_OF_STRING, true);
-        return new Schema(List.of(title, body, registrationTokens));
+        final Attribute usersList = new Attribute(NotificationAttributes.USERS_LIST.getValue(), DataType.ARRAY_OF_STRING, true);
+        return new Schema(List.of(title, body, usersList));
     }
 
     @Override
