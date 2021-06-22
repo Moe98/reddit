@@ -1,8 +1,10 @@
 package org.sab.user.commands;
 
 import com.arangodb.ArangoDBException;
+import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.auth.Auth;
+import org.sab.innerAppComm.Comm;
 import org.sab.models.CollectionNames;
 import org.sab.models.user.User;
 import org.sab.models.user.UserAttributes;
@@ -67,6 +69,8 @@ public class SignUp extends UserCommand {
             return Responder.makeErrorResponse("ArangoDB Error: " + e.getMessage(), 500);
         }
 
+        registerUserInFirebase(username);
+
         try {
             User user = getUser(username, UserAttributes.USER_ID, UserAttributes.USERNAME, UserAttributes.EMAIL, UserAttributes.BIRTHDATE);
             return Responder.makeDataResponse(user.toJSON());
@@ -74,6 +78,17 @@ public class SignUp extends UserCommand {
             return Responder.makeErrorResponse(e.getMessage(), 502);
         }
 
+    }
+
+    /**
+     * Calls the RegisterUser command in the NotificationApp
+     *
+     * @param username username of the user who is registering
+     * @throws Exception if something goes wrong
+     */
+    private void registerUserInFirebase(String username) {
+        JSONObject body = new JSONObject().put(USERNAME, username);
+        Comm.putMessageInQueue(body, new JSONObject(), HTTPMethod.POST.toString(), "REGISTER_USER", Comm.Notification_Queue_Name);
     }
 
     private void InsertUserInArango(String username) {
