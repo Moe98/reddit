@@ -54,9 +54,9 @@ public class AssignThreadModerator extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
 
             // check if thread exists
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+            if (!existsInCouchbase(threadId) && !arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // check if assigner is a moderator on this thread
@@ -67,7 +67,7 @@ public class AssignThreadModerator extends ThreadCommand {
             if (assignerModEdgeId.equals("")) {
                 // assigner is not a mod
                 msg = "You don't have permission to assign a moderator for this thread";
-                return Responder.makeErrorResponse(msg, 401).toString();
+                return Responder.makeErrorResponse(msg, 401);
             }
 
             String moderatorModEdgeId = arango.getSingleEdgeId(DB_Name,
@@ -77,7 +77,7 @@ public class AssignThreadModerator extends ThreadCommand {
 
             if (!moderatorModEdgeId.equals("")) {
                 msg = "User already moderates this thread";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
 
             } else {
                 // bookmark
@@ -95,7 +95,7 @@ public class AssignThreadModerator extends ThreadCommand {
 
             }
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
 
         } finally {
             if (arango != null) {
@@ -105,7 +105,7 @@ public class AssignThreadModerator extends ThreadCommand {
             response.put("msg", msg);
         }
 
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
 
     }
 

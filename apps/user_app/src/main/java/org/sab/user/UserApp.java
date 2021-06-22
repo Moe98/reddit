@@ -2,6 +2,7 @@ package org.sab.user;
 
 
 import org.sab.arango.Arango;
+import org.sab.functions.Utilities;
 import org.sab.models.CollectionNames;
 import org.sab.postgres.PostgresConnection;
 import org.sab.service.Service;
@@ -18,14 +19,9 @@ public class UserApp extends Service {
         new UserApp().start();
     }
 
-    @Override
-    public String getAppUriName() {
-        return "user";
-    }
-
-
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        PostgresConnection.dbInit();
+        if (!Utilities.inContainerizationMode())
+            PostgresConnection.dbInit();
         arangoDbInit();
     }
 
@@ -35,5 +31,10 @@ public class UserApp extends Service {
         Arango arango = Arango.getInstance();
         arango.createDatabaseIfNotExists(ARANGO_DB_NAME);
         arango.createCollectionIfNotExists(ARANGO_DB_NAME, CollectionNames.USER.get(), false);
+    }
+
+    @Override
+    public String getAppUriName() {
+        return "user";
     }
 }

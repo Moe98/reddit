@@ -5,7 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.NotificationMessages;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -14,8 +14,6 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteComment extends CommentCommand {
     @Override
@@ -37,7 +35,7 @@ public class DeleteComment extends CommentCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
         JSONObject response = new JSONObject();
         String msg = "";
 
@@ -53,9 +51,9 @@ public class DeleteComment extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
 
             // check if comment exists
-            if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
+            if(!commentExistsInCouchbase(commentId) && !existsInArango(COMMENT_COLLECTION_NAME, commentId)){
                 msg = "Comment does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
 
             // check person deleting is creator
@@ -63,7 +61,7 @@ public class DeleteComment extends CommentCommand {
             String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this comment!";
-                return Responder.makeErrorResponse(msg, 401).toString();
+                return Responder.makeErrorResponse(msg, 401);
             }
 
             // get all children comments at level 1
@@ -101,15 +99,16 @@ public class DeleteComment extends CommentCommand {
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String currCommentId = commentJsonArr.getJSONObject(i).getString(COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, COMMENT_COLLECTION_NAME, currCommentId);
+                deleteDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), currCommentId);
             }
 
             msg = "Deleted comment: with it's " + numOfComments + " nested comments.";
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 400);
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 }

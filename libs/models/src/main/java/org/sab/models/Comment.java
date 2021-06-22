@@ -92,14 +92,14 @@ public class Comment {
     public JSONObject toJSON() {
                 
         JSONObject comment = new JSONObject();
-        comment.put(CommentAttributes.COMMENT_ID.getHTTP(), id);
-        comment.put(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP(), parentSubthreadId);
-        comment.put(CommentAttributes.CREATOR_ID.getHTTP(), creatorId);
-        comment.put(CommentAttributes.LIKES.getHTTP(), likes);
-        comment.put(CommentAttributes.DISLIKES.getHTTP(), dislikes);
-        comment.put(CommentAttributes.CONTENT.getHTTP(), content);
-        comment.put(CommentAttributes.DATE_CREATED.getHTTP(), dateCreated);
-        comment.put(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP(), parentContentType);
+        comment.put(CommentAttributes.COMMENT_ID.getDb(), id);
+        comment.put(CommentAttributes.PARENT_SUBTHREAD_ID.getDb(), parentSubthreadId);
+        comment.put(CommentAttributes.CREATOR_ID.getDb(), creatorId);
+        comment.put(CommentAttributes.LIKES.getDb(), likes);
+        comment.put(CommentAttributes.DISLIKES.getDb(), dislikes);
+        comment.put(CommentAttributes.CONTENT.getDb(), content);
+        comment.put(CommentAttributes.DATE_CREATED.getDb(), dateCreated);
+        comment.put(CommentAttributes.PARENT_CONTENT_TYPE.getDb(), parentContentType);
         
         return comment;
     }
