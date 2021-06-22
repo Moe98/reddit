@@ -1,6 +1,7 @@
 package org.sab.notification.commands;
 
 import org.json.JSONObject;
+import org.sab.models.NotificationAttributes;
 import org.sab.notification.FirebaseMessagingConnector;
 import org.sab.notification.GoogleCredentialsLoadingFailedException;
 import org.sab.notification.NotificationSendingFailedException;
@@ -18,22 +19,22 @@ public class SendNotification extends CommandWithVerification {
 
     @Override
     protected Schema getSchema() {
-        // TODO: use attributes from the libs.models.notificationAttributes file rather than hardcoding strings here
-        final Attribute title = new Attribute("title", DataType.STRING, true);
-        final Attribute body = new Attribute("notificationBody", DataType.STRING, true);
-        final Attribute registrationTokens = new Attribute("registrationTokens", DataType.ARRAY_OF_STRING, true);
+
+        final Attribute title = new Attribute(NotificationAttributes.TITLE.getValue(), DataType.STRING, true);
+        final Attribute body = new Attribute(NotificationAttributes.NOTIFICATION_BODY.getValue(), DataType.STRING, true);
+        final Attribute registrationTokens = new Attribute(NotificationAttributes.USERS_LIST.getValue(), DataType.ARRAY_OF_STRING, true);
         return new Schema(List.of(title, body, registrationTokens));
     }
 
     @Override
     protected String execute() {
-        // TODO: use attributes from the libs.models.notificationAttributes file rather than hardcoding strings here
-        final List<String> registrationTokens = List.of((String[]) body.get("registrationTokens"));
-        final String title = body.getString("title");
-        final String notificationBody = body.getString("notificationBody");
+        
+        final List<String> usersList = List.of((String[]) body.get(NotificationAttributes.USERS_LIST.getValue()));
+        final String title = body.getString(NotificationAttributes.TITLE.getValue());
+        final String notificationBody = body.getString(NotificationAttributes.NOTIFICATION_BODY.getValue());
 
         try {
-            final String notificationResult = FirebaseMessagingConnector.getInstance().notify(registrationTokens, title, notificationBody);
+            final String notificationResult = FirebaseMessagingConnector.getInstance().notify(getRegistrationTokens(usersList), title, notificationBody);
             final JSONObject resultObject = new JSONObject(Map.of("notificationResult", notificationResult));
             return Responder.makeDataResponse(resultObject).toString();
         } catch (GoogleCredentialsLoadingFailedException e) {
@@ -43,8 +44,23 @@ public class SendNotification extends CommandWithVerification {
         }
     }
 
+    /**
+     * Retrieves the list of tokens from the firestore db given a userList
+     * @param usersList list of usernames
+     * @return list of tokens
+     */
+    private List<String> getRegistrationTokens(List<String> usersList) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     protected HTTPMethod getMethodType() {
-        throw new UnsupportedOperationException("This command is not a server-command that is available through an HTTP request");
+        return HTTPMethod.PUT;
+    }
+
+    @Override
+    protected boolean isAuthNeeded() {
+        return true;
     }
 }
