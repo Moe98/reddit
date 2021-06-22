@@ -44,14 +44,15 @@ public class DBPoolManager {
         }
     }
 
-    public void setMaxConnectionCountForAll(int maxConnectionCount) {
+    public void setMaxConnectionCountForAll(int maxConnectionCount)
+            throws PoolDoesNotExistException {
         for (final String key: requiredDbs.keySet()) {
             final DBConfig dbConfig = requiredDbs.get(key);
             dbConfig.setConnectionCount(maxConnectionCount);
         }
     }
 
-    public void setMaxDbConnectionsCount(String clientName, int maxDbConnectionsCount)
+    public void setMaxDbConnectionCount(String clientName, int maxDbConnectionsCount)
             throws PoolDoesNotExistException {
         DBConfig dbToModify = getClientByName(clientName);
         dbToModify.setConnectionCount(maxDbConnectionsCount);

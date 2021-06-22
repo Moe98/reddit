@@ -2,6 +2,7 @@ package org.sab.service.managers;
 
 import org.json.JSONObject;
 import org.sab.controller.Controller;
+import org.sab.databases.PoolDoesNotExistException;
 import org.sab.reflection.ReflectionUtils;
 import org.sab.service.ServiceConstants;
 import org.sab.service.controllerbackdoor.BackdoorServer;
@@ -91,8 +92,17 @@ public class ControlManager {
         reloadThreadPool();
     }
 
-    public void setMaxDbConnectionCount(int maxDBConnectionCount) {
+    public void setMaxDbConnectionCountForAll(int maxDBConnectionCount) {
         dbPoolManager.setMaxConnectionCountForAll(maxDBConnectionCount);
+        reloadDBPool();
+    }
+
+    public void setMaxDbConnectionCount(String clientName, int maxDBConnectionCount) {
+        try {
+            dbPoolManager.setMaxDbConnectionCount(clientName, maxDBConnectionCount);
+        } catch (PoolDoesNotExistException e) {
+            e.printStackTrace();
+        }
         reloadDBPool();
     }
 
