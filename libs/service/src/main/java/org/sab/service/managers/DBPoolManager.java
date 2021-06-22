@@ -49,6 +49,7 @@ public class DBPoolManager {
         for (final String key: requiredDbs.keySet()) {
             final DBConfig dbConfig = requiredDbs.get(key);
             dbConfig.setConnectionCount(maxConnectionCount);
+            dbConfig.getClient().setMaxConnections(maxConnectionCount);
         }
     }
 
