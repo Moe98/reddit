@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arangodb
+  labels:
+    app: arangodb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: arangodb
+      labels:
+        app: arangodb
+    spec:
+      containers:
+        - name: arangodb
+          image: gcr.io/sampleproject-31/arangodb:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          envFrom:  
+            - configMapRef:
+                name: env-config
+          ports:
+            - containerPort: 8529
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred
+  selector:
+    matchLabels:
+      app: arangodb
