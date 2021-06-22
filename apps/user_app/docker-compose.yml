@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"
+  arangodb:
+    image: "arangodb"
+    environment:
+      - ARANGO_ROOT_PASSWORD=root
+    ports:
+      - "1234:8529"
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - ../../libs/postgres/src/main/resources/sql/CreateUsersTable.sql:/docker-entrypoint-initdb.d/1_CreateTables.sql
+      - ../../libs/postgres/src/main/resources/sql/CreateUserProcedures.sql:/docker-entrypoint-initdb.d/2_CreateProcedures.sql
+  user_app:
+    build:
+      context: "../../"
+      dockerfile: "apps/user_app/Dockerfile"
+    restart: on-failure
+    env_file:
+      - "../../.env"
+
+    depends_on:
+      - "rabbitmq"
+      - "arangodb"
+      - "postgres"
+
+networks:
+  default:
+    name: user_nw
