@@ -3,11 +3,14 @@ services:
   rabbitmq:
     image: "rabbitmq:management"
     ports:
-      - "15672:15672"
+      - 15672:15672
   arangodb:
     image: "arangodb"
     ports:
       - 8529:8529
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps_data:/var/lib/arangodb3-apps
     environment:
       - ARANGO_ROOT_PASSWORD=root
   search_app:
@@ -28,3 +31,7 @@ services:
 networks:
   default:
     name: search_nw
+
+volumes:
+  arangodb_data:
+  arangodb_apps_data:

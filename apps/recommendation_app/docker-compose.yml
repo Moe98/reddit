@@ -3,18 +3,30 @@ services:
   rabbitmq:
     image: "rabbitmq:management"
     ports:
-      - "15672:15672"
+      - 15672:15672
   arangodb:
     image: "arangodb"
     ports:
       - 8529:8529
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps_data:/var/lib/arangodb3-apps
     environment:
       - ARANGO_ROOT_PASSWORD=root
   couchbase:
-    image: "couchbase"
+    build:
+      context: "../../"
+      dockerfile: "libs/couchbase/Dockerfile"
+    environment:
+      - COUCHBASE_ADMINISTRATOR_USERNAME=Administrator
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=password
+      - COUCHBASE_CLUSTER_NAME=Reddit
+      - COUCHBASE_RAM=1024
     ports:
       - 8091-8094:8091-8094
       - 11210:11210
+    volumes:
+      - cb_data:/opt/couchbase/var
   recommendation_app:
     build:
       context: "../../"
@@ -26,9 +38,9 @@ services:
       - ARANGO_USER=root
       - ARANGO_PASSWORD=root
       - ARANGO_HOST=arangodb
-      - COUCHBASE_HOST=localhost
+      - COUCHBASE_HOST=couchbase
       - COUCHBASE_USERNAME=Administrator
-      - COUCHBASE_PASSWORD=root
+      - COUCHBASE_PASSWORD=password
     depends_on:
       - "rabbitmq"
       - "arangodb"
@@ -37,3 +49,8 @@ services:
 networks:
   default:
     name: recommendation_nw
+
+volumes:
+  cb_data:
+  arangodb_data:
+  arangodb_apps_data:

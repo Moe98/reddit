@@ -13,7 +13,7 @@ COPY apps apps
 RUN mvn clean package -pl :${APP_NAME} -am -DskipTests
 
 # Package stage
-FROM openjdk:15-alpine
+FROM openjdk:15
 ENV APP_NAME=recommendation_app
 
 COPY --from=build /reddit/apps/${APP_NAME}/target/${APP_NAME}-1.0-SNAPSHOT.jar /usr/local/lib/${APP_NAME}.jar

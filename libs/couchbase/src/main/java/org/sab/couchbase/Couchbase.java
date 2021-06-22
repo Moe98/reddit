@@ -9,8 +9,6 @@ import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.manager.bucket.BucketType;
 import com.couchbase.client.java.manager.bucket.EvictionPolicyType;
 
-import java.time.Duration;
-
 @SuppressWarnings("unused")
 public class Couchbase {
     final private static Couchbase instance = new Couchbase();
@@ -31,7 +29,7 @@ public class Couchbase {
         cluster = Cluster.connect(System.getenv("COUCHBASE_HOST"),
                 System.getenv("COUCHBASE_USERNAME"),
                 System.getenv("COUCHBASE_PASSWORD"));
-        cluster.waitUntilReady(Duration.ofSeconds(3));
+        cluster.waitUntilReady(cluster.environment().timeoutConfig().connectTimeout());
     }
 
     public boolean isConnected() {
