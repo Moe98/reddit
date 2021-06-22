@@ -36,12 +36,18 @@ public class SendNotification extends CommandWithVerification {
         try {
             final String notificationResult = FirebaseMessagingConnector.getInstance().notify(getRegistrationTokens(usersList), title, notificationBody);
             final JSONObject resultObject = new JSONObject(Map.of("notificationResult", notificationResult));
+            insertNotificationToFirestore();
             return Responder.makeDataResponse(resultObject).toString();
         } catch (GoogleCredentialsLoadingFailedException e) {
             return Responder.makeErrorResponse("Could not init Firebase app", 500).toString();
         } catch (NotificationSendingFailedException e) {
             return Responder.makeErrorResponse("Could not notify", 500).toString();
         }
+    }
+
+    private void insertNotificationToFirestore() {
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     /**
