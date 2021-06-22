@@ -93,7 +93,11 @@ public class ControlManager {
     }
 
     public void setMaxDbConnectionCountForAll(int maxDBConnectionCount) {
-        dbPoolManager.setMaxConnectionCountForAll(maxDBConnectionCount);
+        try {
+            dbPoolManager.setMaxConnectionCountForAll(maxDBConnectionCount);
+        } catch (PoolDoesNotExistException e) {
+            e.printStackTrace();
+        }
         reloadDBPool();
     }
 
