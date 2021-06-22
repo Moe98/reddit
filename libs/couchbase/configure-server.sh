@@ -5,7 +5,7 @@ set -m
 sleep 15
 
 # Setup initial cluster/ Initialize Node
-couchbase-cli cluster-init -c 127.0.0.1 --cluster-name $CLUSTER_NAME --cluster-username $COUCHBASE_ADMINISTRATOR_USERNAME \
+couchbase-cli cluster-init -c 127.0.0.1 --cluster-name $COUCHBASE_CLUSTER_NAME --cluster-username $COUCHBASE_ADMINISTRATOR_USERNAME \
 --cluster-password $COUCHBASE_ADMINISTRATOR_PASSWORD --services data --cluster-ramsize $COUCHBASE_RAM --index-storage-setting default \
 
 # Setup Administrator username and password
