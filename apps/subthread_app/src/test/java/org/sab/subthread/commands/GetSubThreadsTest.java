@@ -24,7 +24,7 @@ public class GetSubThreadsTest {
         try {
             arango = Arango.getInstance();
 
-            arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
+            arango.createDatabaseIfNotExists(SubThreadCommand.DB_Name);
 
             createThreads();
             createOneSubThread(parentThreadId1, title1, content1, hasImage1, moeId);
@@ -37,21 +37,16 @@ public class GetSubThreadsTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
-        // TODO: Add testing DB.
-        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, false);
+        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.DB_Name, collectionName, false);
         }
 
-        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
-    }
-
-    private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
-        arango.deleteDocument(SubThreadCommand.TEST_DB_Name, collectionName, document.getKey());
+        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
     }
 
     @AfterClass
     public static void tearDown() {
-        arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
+        arango.dropDatabase(SubThreadCommand.DB_Name);
     }
 
     public static void createThreads() {
@@ -82,7 +77,7 @@ public class GetSubThreadsTest {
         body.put(SubThreadCommand.PARENT_THREAD_ID, parentThreadId);
         body.put(SubThreadCommand.TITLE, title);
         body.put(SubThreadCommand.CONTENT, content);
-        body.put(SubThreadCommand.HASIMAGE, hasImage);
+        body.put(SubThreadCommand.HAS_IMAGE, hasImage);
 
         JSONObject uriParams = new JSONObject();
 //        uriParams.put("creatorId", creatorId);
@@ -105,7 +100,7 @@ public class GetSubThreadsTest {
             body.put(SubThreadCommand.PARENT_THREAD_ID, parentThreadId);
             body.put(SubThreadCommand.TITLE, title);
             body.put(SubThreadCommand.CONTENT, content);
-            body.put(SubThreadCommand.HASIMAGE, hasImage);
+            body.put(SubThreadCommand.HAS_IMAGE, hasImage);
 
             JSONObject uriParams = new JSONObject();
 //            uriParams.put("creatorId", creatorId);
