@@ -144,10 +144,10 @@ public class CreateThreadTest {
         // checking the response of the command
         assertEquals(200, responseJson.getInt("statusCode"));
         JSONObject data = (JSONObject) (responseJson.get("data"));
-        assertEquals(description, data.get(ThreadCommand.DESCRIPTION));
-        assertEquals(0, data.get(ThreadCommand.NUM_OF_FOLLOWERS));
-        assertEquals(mantaId, data.get(ThreadCommand.CREATOR_ID));
-        assertEquals(threadName, data.get(ThreadCommand.THREAD_NAME));
+        assertEquals(description, data.get(ThreadCommand.DESCRIPTION_DB));
+        assertEquals(0, data.get(ThreadCommand.NUM_OF_FOLLOWERS_DB));
+        assertEquals(mantaId, data.get(ThreadCommand.CREATOR_ID_DB));
+        assertEquals(threadName, data.get(ThreadCommand.THREAD_NAME_DB));
 
         // checking the thread created in DB
 

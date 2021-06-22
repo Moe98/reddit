@@ -2,6 +2,7 @@ package org.sab.subthread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
+import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
@@ -12,7 +13,6 @@ import org.sab.validation.Schema;
 
 import java.util.List;
 
-import static org.sab.innerAppComm.Comm.notifyApp;
 import static org.sab.innerAppComm.Comm.tag;
 
 public class UpdateSubThread extends SubThreadCommand {
@@ -37,7 +37,7 @@ public class UpdateSubThread extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
 
         final SubThread subthread;
 
@@ -55,16 +55,24 @@ public class UpdateSubThread extends SubThreadCommand {
 
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
 
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
-            }
+            boolean subthreadIsCached = false;
+            BaseDocument subthreadDocument;
 
-            final BaseDocument subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+            if(existsInCouchbase(subthreadId)){
+                subthreadIsCached = true;
+                subthreadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
+            }
+            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
+                subthreadDocument = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+            }
+            else{
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            }
 
             final String creatorId = (String) subthreadDocument.getAttribute(CREATOR_ID_DB);
 
             if (!userId.equals(creatorId)) {
-                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
+                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403);
             }
 
             if (content != null) {
@@ -82,7 +90,7 @@ public class UpdateSubThread extends SubThreadCommand {
             final int likes = Integer.parseInt(String.valueOf(subthreadDocument.getAttribute(LIKES_DB)));
             final int dislikes = Integer.parseInt(String.valueOf(subthreadDocument.getAttribute(DISLIKES_DB)));
             final String dateCreated = (String) subthreadDocument.getAttribute(DATE_CREATED_DB);
-            final boolean hasImage = (Boolean) subthreadDocument.getAttribute(HASIMAGE_DB);
+            final boolean hasImage = (Boolean) subthreadDocument.getAttribute(HAS_IMAGE_DB);
 
             subthread = new SubThread();
             subthread.setId(subthreadId);
@@ -95,14 +103,17 @@ public class UpdateSubThread extends SubThreadCommand {
             subthread.setHasImage(hasImage);
             subthread.setParentThreadId(parentId);
 
+            if(subthreadIsCached)
+                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadDocument.getKey(), subthreadDocument);
+
             // tag a person if someone was tagged in the content of the subthread
             tag(Notification_Queue_Name, NotificationMessages.SUBTHREAD_TAG_MSG.getMSG(), subthreadId, content, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         }
 
-        return Responder.makeDataResponse(subthread.toJSON()).toString();
+        return Responder.makeDataResponse(subthread.toJSON());
     }
 
 }

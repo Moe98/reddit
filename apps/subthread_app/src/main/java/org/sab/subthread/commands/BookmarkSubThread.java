@@ -35,7 +35,7 @@ public class BookmarkSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
 
-        Arango arango = null;
+        Arango arango;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -49,11 +49,12 @@ public class BookmarkSubThread extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, SUBTHREAD_COLLECTION_NAME, false);
             arango.createCollectionIfNotExists(DB_Name, USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME, true);
 
-            // check subthread exist
-            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+
+            if (!existsInCouchbase(subthreadId) && !existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
-                return Responder.makeErrorResponse(msg, 400).toString();
+                return Responder.makeErrorResponse(msg, 400);
             }
+
 
             String userBookmarkEdgeId = arango.getSingleEdgeId(DB_Name,
                     USER_BOOKMARK_SUBTHREAD_COLLECTION_NAME,
@@ -78,11 +79,11 @@ public class BookmarkSubThread extends SubThreadCommand {
 
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
 
         }
 
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
 
     }
 

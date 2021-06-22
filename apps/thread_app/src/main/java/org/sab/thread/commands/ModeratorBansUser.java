@@ -27,7 +27,7 @@ public class ModeratorBansUser extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango = null;
+        Arango arango;
 
         final JSONObject response = new JSONObject();
         String messageResponse = "";
@@ -44,15 +44,15 @@ public class ModeratorBansUser extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_MOD_THREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_BANNED_FROM_THREAD_COLLECTION_NAME, true);
 
-            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
+            if (!existsInCouchbase(threadName) && !arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadName)) {
                 messageResponse = THREAD_DOES_NOT_EXIST;
-                return Responder.makeErrorResponse(messageResponse, 400).toString();
+                return Responder.makeErrorResponse(messageResponse, 400);
             }
 
             // TODO what if this user is a mod??
             if (!checkUserExists(arango, bannedUserId)) {
                 messageResponse = USER_DOES_NOT_EXIST;
-                return Responder.makeErrorResponse(messageResponse, 400).toString();
+                return Responder.makeErrorResponse(messageResponse, 400);
             }
 
             final String threadModeratorEdgeKey = arango.getSingleEdgeId(DB_Name,
@@ -67,12 +67,12 @@ public class ModeratorBansUser extends ThreadCommand {
             if (threadModeratorEdgeKey.equals("")) {
                 // User isn't a moderator of this thread.
                 messageResponse = NOT_A_MODERATOR;
-                return Responder.makeErrorResponse(messageResponse, 401).toString();
+                return Responder.makeErrorResponse(messageResponse, 401);
             }
             if (!bannedUserEdgeKey.equals("")) {
                 // User is already banned from this thread.
                 messageResponse = USER_ALREADY_BANNED;
-                return Responder.makeErrorResponse(messageResponse, 400).toString();
+                return Responder.makeErrorResponse(messageResponse, 400);
             }
 
             // The request was made from a moderator of this thread, and the
@@ -85,12 +85,12 @@ public class ModeratorBansUser extends ThreadCommand {
             notifyApp(Notification_Queue_Name, NotificationMessages.THREAD_USER_BANNED_MSG.getMSG(), threadName, bannedUserId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
+            return Responder.makeErrorResponse(e.getMessage(), 404);
         } finally {
             response.put("msg", messageResponse);
         }
 
-        return Responder.makeDataResponse(response).toString();
+        return Responder.makeDataResponse(response);
     }
 
     @Override
