@@ -71,6 +71,7 @@ public class Arango implements PooledDatabaseClient {
     public void destroyPool() throws PoolDoesNotExistException {
         if (arangoDB != null) {
             arangoDB.shutdown();
+            arangoDB = null;
             builder = null;
         } else {
             throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
