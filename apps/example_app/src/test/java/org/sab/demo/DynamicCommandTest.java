@@ -4,8 +4,10 @@ import kotlin.Pair;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sab.classes.Reader;
 import org.sab.service.managers.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +54,32 @@ public class ChangingCommandsTest {
 
     @Test
     public void addCommand() {
+        try {
+            final Pair<ExampleApp, InvocationManager> pair = startMockApp();
+            final ExampleApp app = pair.getFirst();
+            final InvocationManager invocationManager = pair.getSecond();
 
+            final String functionName = "MORNING_WORLD";
+            final String invocationResult = invocationManager.invokeCommand(functionName, new JSONObject());
+            assertEquals(
+                    "{\"statusCode\": 404, \"msg\": \"Function-Name class: (" + functionName + ") not found\"}",
+                    invocationResult
+            );
+
+            app.getControlManager().addCommand(
+                    functionName,
+                    "org.sab.demo.commands.MorningWorld",
+                    Reader.readBytesFromResource("MorningWorld")
+            );
+
+            final String afterAdditionResult = invocationManager.invokeCommand(functionName, new JSONObject());
+            assertEquals(
+                    "{\"msg\":\"Morning World\", \"statusCode\": 200}",
+                    afterAdditionResult
+            );
+        } catch (ReflectiveOperationException | IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
