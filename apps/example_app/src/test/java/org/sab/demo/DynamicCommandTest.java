@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class ChangingCommandsTest {
+public class DynamicCommandTest {
 
     private static Pair<ExampleApp, InvocationManager> startMockApp() throws ReflectiveOperationException {
         final ExampleApp app = new ExampleApp();
@@ -84,7 +84,32 @@ public class ChangingCommandsTest {
 
     @Test
     public void updateCommand() {
+        try {
+            final Pair<ExampleApp, InvocationManager> pair = startMockApp();
+            final ExampleApp app = pair.getFirst();
+            final InvocationManager invocationManager = pair.getSecond();
 
+            final String functionName = "HELLO_WORLD";
+            final String invocationResult = invocationManager.invokeCommand(functionName, new JSONObject());
+            assertEquals(
+                    "{\"msg\":\"Hello World\", \"statusCode\": 200}",
+                    invocationResult
+            );
+
+            app.getControlManager().updateCommand(
+                    functionName,
+                    "org.sab.demo.commands.HelloWorld",
+                    Reader.readBytesFromResource("ImprovedHello")
+            );
+
+            final String afterUpdateResult = invocationManager.invokeCommand(functionName, new JSONObject());
+            assertEquals(
+                    "{\"msg\":\"Hi\", \"statusCode\": 200}",
+                    afterUpdateResult
+            );
+        } catch (ReflectiveOperationException | IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
