@@ -18,15 +18,14 @@ public class SubThreadApp extends Service {
     private static Arango arango;
     private static Couchbase couchbase;
 
-    private static final String THREAD_APP_QUEUE = "THREAD_APP_REQ";
+    private static final String SUBTHREAD_APP_QUEUE = "SUBTHREAD_APP_REQ";
     public static int SUBTHREAD_LIKES_CACHING_THRESHOLD, SUBTHREAD_DISLIKES_CACHING_THRESHOLD,
             COMMENT_LIKES_CACHING_THRESHOLD, COMMENT_DISLIKES_CACHING_THRESHOLD;
     
     public static void main(String[] args) {
 
         try {
-            startArangoConnection();
-            startCouchbaseConnection();
+            dbInit();
 
             // TODO add collection creation here
             //        createCollections(collectionList, edgeCollectionList);
@@ -34,18 +33,18 @@ public class SubThreadApp extends Service {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            shutdownGracefully();
+            System.exit(-1);
         }
     }
 
-    public static void startArangoConnection() {
-        try {
-            // TODO do we get the instance here?
-            arango = Arango.getInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void dbInit() {
+        startCouchbaseConnection();
+        startArangoConnection();
+    }
+
+    static void startArangoConnection() {
+        arango = Arango.getInstance();
+        arango.createDatabaseIfNotExists(System.getenv("ARANGO_DB"));
     }
 
     public static void startCouchbaseConnection() {
