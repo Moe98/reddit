@@ -18,7 +18,6 @@ public class RecommendationApp extends Service {
     final private static int periodicTasksPeriod = 15;
 
     public static void dbInit() {
-        try {
             Arango arango = Arango.getInstance();
 
             Couchbase couchbase = Couchbase.getInstance();
@@ -38,12 +37,11 @@ public class RecommendationApp extends Service {
             arango.createCollectionIfNotExists(RecommendationCommand.DB_NAME, RecommendationCommand.USER_BLOCK_USER_COLLECTION_NAME, true);
             arango.createViewIfNotExists(RecommendationCommand.DB_NAME, RecommendationCommand.getViewName(RecommendationCommand.THREADS_COLLECTION_NAME), RecommendationCommand.THREADS_COLLECTION_NAME, new String[]{RecommendationCommand.THREAD_NAME, RecommendationCommand.THREAD_DESCRIPTION});
             arango.createViewIfNotExists(RecommendationCommand.DB_NAME, RecommendationCommand.getViewName(RecommendationCommand.SUB_THREADS_COLLECTION_NAME), RecommendationCommand.SUB_THREADS_COLLECTION_NAME, new String[]{RecommendationCommand.SUB_THREAD_TITLE, RecommendationCommand.SUB_THREAD_CONTENT});
-        } catch (ArangoDBException | CouchbaseException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void main(String[] args) {
+
+        dbInit();
         Runnable periodicTasks = () -> {
             new UpdatePopularThreads().execute();
             new UpdatePopularSubThreads().execute();
@@ -51,7 +49,6 @@ public class RecommendationApp extends Service {
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(periodicTasks, 0, periodicTasksPeriod, TimeUnit.MINUTES);
-        dbInit();
         new RecommendationApp().start();
     }
 
