@@ -28,6 +28,9 @@ jobs:
         # Provide the password for postgres
         env:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        volumes:
+          - ../../libs/postgres/src/main/resources/sql/CreateUsersTable.sql:/docker-entrypoint-initdb.d/1_CreateTables.sql
+          - ../../libs/postgres/src/main/resources/sql/CreateUserProcedures.sql:/docker-entrypoint-initdb.d/2_CreateProcedures.sql
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -61,8 +64,6 @@ jobs:
         with:
           java-version: "15"
           distribution: "adopt"
-      - run: psql -f libs/postgres/src/main/resources/sql/CreateUsersTable.sql postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/postgres
-      - run: psql -f libs/postgres/src/main/resources/sql/CreateUserProcedures.sql postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost:5432/postgres
       - uses: xinova/arangodb-action@v1
         with:
           arangodb version: 'latest'
