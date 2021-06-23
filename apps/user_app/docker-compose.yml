@@ -43,6 +43,8 @@ services:
       context: "../../"
       dockerfile: "apps/user_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4008:4008"
     env_file:
       - "../../.env"
 

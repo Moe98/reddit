@@ -10,6 +10,8 @@ services:
       context: "../../"
       dockerfile: "apps/notification_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4003:4003"
     env_file:
       - "../../.env"
     depends_on:
