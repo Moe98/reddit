@@ -16,6 +16,8 @@ services:
       context: "../../"
       dockerfile: "apps/user_to_user_actions_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4009:4009"
     env_file:
       - "../../.env"
 

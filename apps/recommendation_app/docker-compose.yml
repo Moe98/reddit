@@ -32,6 +32,8 @@ services:
       context: "../../"
       dockerfile: "apps/recommendation_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4004:4004"
     environment:
       - RABBIT_HOST=rabbitmq
       - ARANGO_DB=Reddit
