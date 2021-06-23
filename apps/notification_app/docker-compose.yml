@@ -4,6 +4,7 @@ services:
     image: "rabbitmq:management"
     ports:
       - "15672:15672"
+      - "5762:5762"
   notificiation_app:
     build:
       context: "../../"
