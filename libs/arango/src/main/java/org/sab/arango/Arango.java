@@ -88,7 +88,7 @@ public class Arango implements PooledDatabaseClient {
             throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
         }
     }
-
+    
     @Override
     public void setMaxConnections(int maxConnections) throws PoolDoesNotExistException {
         if(builder != null) {
@@ -98,13 +98,29 @@ public class Arango implements PooledDatabaseClient {
             throw new PoolDoesNotExistException("Can't set the number of connections if pool does not exist");
         }
     }
-
+    
     private void connect() {
         arangoDB = builder.build();
     }
-
+    
     private boolean isConnected() {
         return arangoDB != null && arangoDB.db().exists();
+    }
+    
+    public static BaseDocument createDocument(String dbName, String collectionName, Map<String, Object> properties, String key) {
+        BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
+        newDocument.setKey(key);
+        Arango arango = getInstance();
+
+        return arango.createDocument(dbName, collectionName, newDocument);
+    }
+
+    public static BaseDocument updateDocument(String dbName, String collectionName, Map<String, Object> updatedProperties, String documentKey) {
+        BaseDocument updatedDocument = new BaseDocument(new HashMap<>(updatedProperties));
+        updatedDocument.setKey(documentKey);
+        Arango arango = Arango.getInstance();
+
+        return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
     }
 
     public boolean createDatabase(String dbName) {
@@ -146,14 +162,6 @@ public class Arango implements PooledDatabaseClient {
         return readDocument(dbName, collectionName, baseDocument.getKey());
     }
 
-    public static BaseDocument createDocument(String dbName, String collectionName, Map<String, Object> properties, String key) {
-        BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
-        newDocument.setKey(key);
-        Arango arango = getInstance();
-
-        return arango.createDocument(dbName, collectionName, newDocument);
-    }
-
     public BaseEdgeDocument createEdgeDocument(String dbName, String collectionName, BaseEdgeDocument baseEdgeDocument) {
         arangoDB.db(dbName).collection(collectionName).insertDocument(baseEdgeDocument);
         return readEdgeDocument(dbName, collectionName, baseEdgeDocument.getKey());
@@ -170,14 +178,6 @@ public class Arango implements PooledDatabaseClient {
     public BaseDocument updateDocument(String dbName, String collectionName, BaseDocument updatedDocument, String documentKey) {
         arangoDB.db(dbName).collection(collectionName).updateDocument(documentKey, updatedDocument);
         return readDocument(dbName, collectionName, updatedDocument.getKey());
-    }
-
-    public static BaseDocument updateDocument(String dbName, String collectionName, Map<String, Object> updatedProperties, String documentKey) {
-        BaseDocument updatedDocument = new BaseDocument(new HashMap<>(updatedProperties));
-        updatedDocument.setKey(documentKey);
-        Arango arango = Arango.getInstance();
-
-        return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
     }
 
     public BaseEdgeDocument updateEdgeDocument(String dbName, String collectionName, BaseEdgeDocument updatedDocument, String documentKey) {
@@ -236,14 +236,14 @@ public class Arango implements PooledDatabaseClient {
         return arangoDB.db(dbName).query(query, bindVars, null, BaseDocument.class);
     }
 
-    public String getSingleEdgeId(String DB_Name, String collectionName, String fromNodeId, String toNodeId){
+    public String getSingleEdgeId(String DB_Name, String collectionName, String fromNodeId, String toNodeId) {
         String query = """
                 FOR node, edge IN 1..1 OUTBOUND @fromNodeId @collectionName
                     FILTER node._id == @toNodeId
                     RETURN DISTINCT {edgeId:edge._key}
                 """;
 
-        Map<String, Object> bindVars =  new HashMap<>();
+        Map<String, Object> bindVars = new HashMap<>();
         bindVars.put("fromNodeId", fromNodeId);
         bindVars.put("toNodeId", toNodeId);
         bindVars.put("collectionName", collectionName);
@@ -269,26 +269,26 @@ public class Arango implements PooledDatabaseClient {
         return arangoDB.db(dbName).collection(collectionName).count().getCount().intValue();
     }
 
-    public ArangoCursor<BaseDocument> filterCollection(String DB_Name, String collectionName, String attributeName, String attributeValue){
+    public ArangoCursor<BaseDocument> filterCollection(String DB_Name, String collectionName, String attributeName, String attributeValue) {
         JSONArray data = new JSONArray();
         String query = """
-                    FOR obj IN %s
-                        FILTER obj.%s == @attributeValue
-                        RETURN obj    
-                    """.formatted(collectionName,attributeName);
+                FOR obj IN %s
+                    FILTER obj.%s == @attributeValue
+                    RETURN obj    
+                """.formatted(collectionName, attributeName);
 
-        Map<String, Object> bindVars =  new HashMap<>();
+        Map<String, Object> bindVars = new HashMap<>();
         bindVars.put("attributeValue", attributeValue);
         return query(DB_Name, query, bindVars);
     }
 
-    public ArangoCursor<BaseDocument> filterEdgeCollection(String DB_Name, String collectionName, String fromNodeId){
+    public ArangoCursor<BaseDocument> filterEdgeCollection(String DB_Name, String collectionName, String fromNodeId) {
         String query = """
-                    FOR node IN 1..1 OUTBOUND @fromNodeId @collectionName
-                    RETURN node
-                    """;
+                FOR node IN 1..1 OUTBOUND @fromNodeId @collectionName
+                RETURN node
+                """;
 
-        Map<String, Object> bindVars =  new HashMap<>();
+        Map<String, Object> bindVars = new HashMap<>();
         bindVars.put("fromNodeId", fromNodeId);
         bindVars.put("collectionName", collectionName);
         return query(DB_Name, query, bindVars);
@@ -298,7 +298,7 @@ public class Arango implements PooledDatabaseClient {
         JSONArray data = new JSONArray();
         cursor.forEachRemaining(document -> {
             JSONObject object = new JSONObject();
-            for(String attribute : attributeNames) {
+            for (String attribute : attributeNames) {
                 object.put(attribute, document.getProperties().get(attribute));
             }
             object.put(keyName, document.getKey());
@@ -307,13 +307,13 @@ public class Arango implements PooledDatabaseClient {
         return data;
     }
 
-    public ArangoCursor<BaseDocument> filterEdgeCollectionInbound(String DB_Name, String collectionName, String toNodeId){
+    public ArangoCursor<BaseDocument> filterEdgeCollectionInbound(String DB_Name, String collectionName, String toNodeId) {
         String query = """
-                    FOR node IN 1..1 INBOUND @fromNodeId @collectionName
-                    RETURN node
-                    """;
+                FOR node IN 1..1 INBOUND @fromNodeId @collectionName
+                RETURN node
+                """;
 
-        Map<String, Object> bindVars =  new HashMap<>();
+        Map<String, Object> bindVars = new HashMap<>();
         bindVars.put("fromNodeId", toNodeId);
         bindVars.put("collectionName", collectionName);
         return query(DB_Name, query, bindVars);

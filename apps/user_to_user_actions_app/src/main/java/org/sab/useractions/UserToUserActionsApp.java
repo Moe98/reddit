@@ -1,6 +1,5 @@
 package org.sab.useractions;
 
-import com.arangodb.ArangoDBException;
 import org.sab.service.Service;
 import org.sab.arango.Arango;
 
