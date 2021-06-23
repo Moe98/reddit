@@ -23,6 +23,8 @@ services:
             context: "../../"
             dockerfile: "apps/chat_app/chat_storage/Dockerfile"
         restart: on-failure
+        ports:
+            - "4001:4001"
         environment:
             - RABBIT_HOST=rabbitmq
             - CASSANDRA_NODE=cassandra

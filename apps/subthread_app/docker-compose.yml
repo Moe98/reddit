@@ -28,6 +28,8 @@ services:
       context: "../../"
       dockerfile: "apps/subthread_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4006:4006"
     environment: 
       - ARANGO_HOST=arangodb
       - COUCHBASE_HOST=couchbase
