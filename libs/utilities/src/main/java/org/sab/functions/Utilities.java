@@ -8,6 +8,10 @@ public class Utilities {
         String mode = System.getenv("ENV_TYPE");
         return mode != null && mode.equals("Development");
     }
+    public static boolean inContainerizationMode() {
+        String mode = System.getenv("ENV_TYPE");
+        return mode != null && mode.equals("Staging");
+    }
 
     public static String formatUUID(String UUID) {
         return UUID.replaceAll("[-]", "");

@@ -7,11 +7,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.HTTPMethod;
+import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -25,6 +27,7 @@ public class UpdateCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
+            SubThreadApp.startCouchbaseConnection();
 
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
@@ -67,6 +70,7 @@ public class UpdateCommentTest {
         removeObjectFromCollection(subThread, "Subthread");
         removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
@@ -123,7 +127,7 @@ public class UpdateCommentTest {
 
         final JSONObject initialCommentResponseData = initialCommentResponse.getJSONObject("data");
 
-        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getHTTP());
+        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getDb());
         final String updatedContent = "Updated Content.";
 
         final JSONObject updatedCommentResponse = updateComment(updatedContent, userId, commentId);
@@ -132,12 +136,12 @@ public class UpdateCommentTest {
 
         final JSONObject updatedCommentResponseData = updatedCommentResponse.getJSONObject("data");
 
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP()), "Subthread");
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP()), subThreadId);
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CONTENT.getHTTP()), updatedContent);
-        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.LIKES.getHTTP()), 0);
-        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.DISLIKES.getHTTP()), 0);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getDb()), "Subthread");
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getDb()), subThreadId);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(updatedCommentResponseData.getString(CommentAttributes.CONTENT.getDb()), updatedContent);
+        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.LIKES.getDb()), 0);
+        assertEquals(updatedCommentResponseData.getInt(CommentAttributes.DISLIKES.getDb()), 0);
     }
 
     @Test
@@ -149,7 +153,7 @@ public class UpdateCommentTest {
 
         final JSONObject initialCommentResponseData = initialCommentResponse.getJSONObject("data");
 
-        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getHTTP());
+        final String commentId = initialCommentResponseData.getString(CommentAttributes.COMMENT_ID.getDb());
 
         final String dummyUserId = "DummyUser";
 

@@ -7,8 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
+import org.sab.couchbase.Couchbase;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
+import org.sab.thread.ThreadApp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -23,7 +25,7 @@ public class GetThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
-
+            ThreadApp.startCouchbaseConnection();
             arango.createDatabaseIfNotExists(DB_NAME);
 
             user = new BaseDocument();
@@ -40,6 +42,7 @@ public class GetThreadTest {
     public static void tearDown() {
         removeObjectFromCollection(user, "User");
         arango.dropDatabase(DB_NAME);
+        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
@@ -100,10 +103,10 @@ public class GetThreadTest {
 
         final JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(responseData.getString(ThreadAttributes.THREAD_NAME.getHTTP()), threadName);
-        assertEquals(responseData.getString(ThreadAttributes.CREATOR_ID.getHTTP()), userId);
-        assertEquals(responseData.getString(ThreadAttributes.DESCRIPTION.getHTTP()), description);
-        assertEquals(responseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getHTTP()), 0);
+        assertEquals(responseData.getString(ThreadAttributes.THREAD_NAME.getDb()), threadName);
+        assertEquals(responseData.getString(ThreadAttributes.CREATOR_ID.getDb()), userId);
+        assertEquals(responseData.getString(ThreadAttributes.DESCRIPTION.getDb()), description);
+        assertEquals(responseData.getInt(ThreadAttributes.NUM_OF_FOLLOWERS.getDb()), 0);
     }
 
     @Test

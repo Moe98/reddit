@@ -71,10 +71,11 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         with:
-          couchbase-version: enterprise-6.6.0
+          couchbase-version: latest
           couchbase-configuration: libs/couchbase/src/main/java/org/sab/couchbase/config
           couchbase-username: ${{ secrets.COUCHBASE_USERNAME }}
           couchbase-password: ${{ secrets.COUCHBASE_PASSWORD }}
+          couchbase-registry: 'omarsamyb/custom-couchbase'
       # - uses: shogo82148/actions-setup-redis@v1
       #   with:
       #     redis-version: '6.x' 
@@ -137,7 +138,7 @@ jobs:
           REPLICATION_FACTOR: 2
         uses: nick-invision/retry@v2
         with:
-          timeout_seconds: 180
+          timeout_seconds: 240
           max_attempts: 1
           retry_on: any
           command: mvn -B package --file pom.xml

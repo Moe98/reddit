@@ -1,0 +1,55 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"
+  arangodb:
+    image: "arangodb"
+    environment:
+      - ARANGO_ROOT_PASSWORD=root
+    ports:
+      - "1234:8529"
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - ../../libs/postgres/src/main/resources/sql/CreateUsersTable.sql:/docker-entrypoint-initdb.d/1_CreateTables.sql
+      - ../../libs/postgres/src/main/resources/sql/CreateUserProcedures.sql:/docker-entrypoint-initdb.d/2_CreateProcedures.sql
+  pgpool:
+    image: bitnami/pgpool:4
+    ports:
+      - 5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:postgres:5432
+      - PGPOOL_SR_CHECK_USER=postgres
+      - PGPOOL_SR_CHECK_PASSWORD=root
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_ENABLE_POOL_HBA=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=root
+      - PGPOOL_ADMIN_USERNAME=postgres
+      - PGPOOL_ADMIN_PASSWORD=root
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  user_app:
+    build:
+      context: "../../"
+      dockerfile: "apps/user_app/Dockerfile"
+    restart: on-failure
+    env_file:
+      - "../../.env"
+
+    depends_on:
+      - "rabbitmq"
+      - "arangodb"
+      - "postgres"
+
+networks:
+  default:
+    name: user_nw
