@@ -7,10 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
-import org.sab.thread.ThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +22,7 @@ public class FollowThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
-            ThreadApp.startCouchbaseConnection();
+
             arango.createDatabaseIfNotExists(DB_NAME);
 
             threadOwner = new BaseDocument();
@@ -58,7 +56,6 @@ public class FollowThreadTest {
         removeObjectFromCollection(threadOwner, "User");
         removeObjectFromCollection(follower, "User");
         arango.dropDatabase(DB_NAME);
-        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {

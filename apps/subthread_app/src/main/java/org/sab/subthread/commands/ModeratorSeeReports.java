@@ -20,14 +20,15 @@ public class ModeratorSeeReports extends SubThreadCommand {
 
     @Override
     protected HTTPMethod getMethodType() {
+        // TODO get?
         return HTTPMethod.GET;
     }
 
     @Override
     protected String execute() {
-        Arango arango;
+        Arango arango = null;
 
-        JSONArray response;
+        JSONArray response = new JSONArray();
 
         try {
             // TODO why is the thread id not the user id in the URI?
@@ -52,7 +53,7 @@ public class ModeratorSeeReports extends SubThreadCommand {
             response = arango.parseOutput(cursor, SubThreadCommand.REPORT_ID_DB, reportAtt);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

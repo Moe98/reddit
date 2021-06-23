@@ -5,7 +5,7 @@ import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.CouchbaseBuckets;
+import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Attribute;
@@ -14,6 +14,8 @@ import org.sab.validation.Schema;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class DeleteSubThread extends SubThreadCommand {
 
@@ -36,7 +38,7 @@ public class DeleteSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
 
-        Arango arango;
+        Arango arango = null;
         JSONObject response = new JSONObject();
         String msg = "";
 
@@ -56,7 +58,7 @@ public class DeleteSubThread extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, false);
 
             // check if subthread exists
-            if (!existsInCouchbase(subthreadId) && !existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)) {
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
                 return Responder.makeErrorResponse(msg, 400).toString();
             }
@@ -66,7 +68,7 @@ public class DeleteSubThread extends SubThreadCommand {
             String creatorID = (String) subthreadDoc.getAttribute(CREATOR_ID_DB);
             if (!creatorID.equals(userId)) {
                 msg = "You are not authorized to delete this subthread!";
-                return Responder.makeErrorResponse(msg, 401);
+                return Responder.makeErrorResponse(msg, 401).toString();
             }
 
             // get all children comments at level 1
@@ -97,22 +99,22 @@ public class DeleteSubThread extends SubThreadCommand {
             // TODO turn into transaction
             // delete subthread
             arango.deleteDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-            deleteDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
 
             // delete comments
             for (int i = 0; i < commentJsonArr.length(); i++) {
                 String commentId = commentJsonArr.getJSONObject(i).getString(SubThreadCommand.COMMENT_ID_DB);
                 arango.deleteDocument(DB_Name, SubThreadCommand.COMMENT_COLLECTION_NAME, commentId);
-                deleteDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
             }
 
             msg = "Deleted subthread: " + subthreadId + " with it's " + numOfComments + " comments.";
+
+
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 400);
+            return Responder.makeErrorResponse(e.getMessage(), 400).toString();
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response);
+        return Responder.makeDataResponse(response).toString();
     }
 
 }

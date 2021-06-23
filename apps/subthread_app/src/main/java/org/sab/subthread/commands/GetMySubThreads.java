@@ -25,8 +25,8 @@ public class GetMySubThreads extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
-        JSONArray response;
+        Arango arango = null;
+        JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
 
@@ -38,7 +38,7 @@ public class GetMySubThreads extends SubThreadCommand {
 
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
 
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, SUBTHREAD_COLLECTION_NAME, CREATOR_ID_DB, userId);
@@ -52,7 +52,7 @@ public class GetMySubThreads extends SubThreadCommand {
             response = arango.parseOutput(cursor, SUBTHREAD_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

@@ -1,21 +1,22 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
-import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
-import java.util.List;
-
 import static org.sab.innerAppComm.Comm.notifyApp;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class LikeComment extends CommentCommand {
@@ -39,7 +40,7 @@ public class LikeComment extends CommentCommand {
     @Override
     public String execute() {
 
-        Arango arango;
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -50,33 +51,29 @@ public class LikeComment extends CommentCommand {
 
             arango = Arango.getInstance();
 
+            // TODO: System.getenv("ARANGO_DB") instead of writing the DB
             arango.createCollectionIfNotExists(DB_Name, COMMENT_COLLECTION_NAME, false);
+
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, true);
+
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
+
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_COMMENT_COLLECTION_NAME, true);
 
             String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
 
-            boolean isCommentCached = false;
-            BaseDocument originalComment;
-
-            if (commentExistsInCouchbase(commentId)) {
-                isCommentCached = true;
-                originalComment = getDocumentFromCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId);
-            } else if (existsInArango(COMMENT_COLLECTION_NAME, commentId)) {
-                originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
-            } else {
+            // TODO check if comment exists
+            if (!arango.documentExists(DB_Name, COMMENT_COLLECTION_NAME, commentId)) {
                 msg = "Comment does not exist";
-                return Responder.makeErrorResponse(msg, 400);
+                return Responder.makeErrorResponse(msg, 400).toString();
             }
-
-            int newLikes;
 
             // if user already likes the comment, then remove his like and update like count
             if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, likeEdgeId);
 
-                newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) - 1;
+                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) - 1;
                 originalComment.updateAttribute(LIKES_DB, newLikes);
                 // putting the comment with the updated amount of likes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
@@ -92,7 +89,8 @@ public class LikeComment extends CommentCommand {
                 arango.createEdgeDocument(DB_Name, USER_LIKE_COMMENT_COLLECTION_NAME, edgeDocument);
 
                 // retrieving the original comment with the old amount of likes
-                newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) + 1;
+                BaseDocument originalComment = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                int newLikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(LIKES_DB))) + 1;
                 int newDislikes = Integer.parseInt(String.valueOf(originalComment.getAttribute(DISLIKES_DB)));
                 //checking if the user dislikes this content to remove his dislike
                 String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, COMMENT_COLLECTION_NAME + "/" + commentId);
@@ -106,21 +104,16 @@ public class LikeComment extends CommentCommand {
                 // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, COMMENT_COLLECTION_NAME, originalComment, commentId);
 
-                BaseDocument commentDoc = arango.readDocument(DB_Name, COMMENT_COLLECTION_NAME, commentId);
+                BaseDocument commentDoc = arango.readDocument(DB_Name,  COMMENT_COLLECTION_NAME, commentId);
                 String commentCreatorId = commentDoc.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.COMMENT_LIKE_MSG.getMSG(), commentId, commentCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
-            }
 
-            if (isCommentCached)
-                replaceDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
-            else if(newLikes > SubThreadApp.COMMENT_LIKES_CACHING_THRESHOLD){
-                upsertDocumentInCouchbase(CouchbaseBuckets.COMMENTS.get(), commentId, originalComment);
-            }
+           }
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response);
+        return Responder.makeDataResponse(response).toString();
     }
 }

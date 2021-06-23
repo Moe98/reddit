@@ -3,6 +3,7 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -25,8 +26,8 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
-        JSONArray response;
+        Arango arango = null;
+        JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
 
@@ -36,8 +37,8 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, true);
 
 
-            if (!existsInArango(USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arr = new ArrayList<>();
@@ -45,14 +46,14 @@ public class GetMyLikedSubThreads extends SubThreadCommand {
             arr.add(CREATOR_ID_DB);
             arr.add(CONTENT_DB);
             arr.add(TITLE_DB);
-            arr.add(HAS_IMAGE_DB);
+            arr.add(HASIMAGE_DB);
             arr.add(LIKES_DB);
             arr.add(DISLIKES_DB);
             arr.add(DATE_CREATED_DB);
             response = arango.parseOutput(cursor, SUBTHREAD_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

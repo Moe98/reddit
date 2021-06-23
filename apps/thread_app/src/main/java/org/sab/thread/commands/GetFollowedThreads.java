@@ -25,7 +25,7 @@ public class GetFollowedThreads extends ThreadCommand {
     @Override
     protected String execute() {
         Arango arango = null;
-        JSONArray response;
+        JSONArray response = new JSONArray();
         try {
             arango = Arango.getInstance();
 
@@ -35,7 +35,7 @@ public class GetFollowedThreads extends ThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_FOLLOW_THREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arr = new ArrayList<>();
@@ -46,7 +46,7 @@ public class GetFollowedThreads extends ThreadCommand {
             response = arango.parseOutput(cursor, THREAD_NAME, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             if (arango != null) {
 

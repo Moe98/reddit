@@ -3,6 +3,7 @@ package org.sab.subthread.commands;
 import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.sab.arango.Arango;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -24,8 +25,8 @@ public class GetMyDislikedComments extends CommentCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
-        JSONArray response;
+        Arango arango = null;
+        JSONArray response = new JSONArray();
 
         try {
             arango = Arango.getInstance();
@@ -36,7 +37,7 @@ public class GetMyDislikedComments extends CommentCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, true);
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
             ArangoCursor<BaseDocument> cursor = arango.filterEdgeCollection(DB_Name, USER_DISLIKE_COMMENT_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId);
             ArrayList<String> arr = new ArrayList<>();
@@ -50,7 +51,7 @@ public class GetMyDislikedComments extends CommentCommand {
             response = arango.parseOutput(cursor, COMMENT_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

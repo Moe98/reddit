@@ -8,7 +8,6 @@ import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.manager.bucket.BucketType;
 import com.couchbase.client.java.manager.bucket.EvictionPolicyType;
-import org.json.JSONObject;
 
 import java.time.Duration;
 
@@ -24,10 +23,6 @@ public class Couchbase {
 
     public static Couchbase getInstance() {
         return instance;
-    }
-
-    public static org.json.JSONObject convertToJson(JsonObject jsonObject) {
-        return new org.json.JSONObject(jsonObject.toMap());
     }
 
     private void connect() {
@@ -77,21 +72,10 @@ public class Couchbase {
             createBucket(bucketName, ramQuotaMB);
     }
 
-    public MutationResult upsertDocument(String bucketName, String documentKey, JSONObject object) {
-        final JsonObject couchbaseData = JsonObject.from(object.toMap());
-        return upsertDocument(bucketName, documentKey, couchbaseData);
-    }
-
-    @Deprecated
     public MutationResult upsertDocument(String bucketName, String documentKey, JsonObject object) {
         return cluster.bucket(bucketName).defaultCollection().upsert(documentKey, object);
     }
 
-    public JSONObject getDocumentJson(String bucketName, String documentKey) {
-        return convertToJson(getDocument(bucketName, documentKey));
-    }
-
-    @Deprecated
     public JsonObject getDocument(String bucketName, String documentKey) {
         GetResult getResult = cluster.bucket(bucketName).defaultCollection().get(documentKey);
         return getResult.contentAsObject();
@@ -101,22 +85,10 @@ public class Couchbase {
         return cluster.bucket(bucketName).defaultCollection().exists(documentKey).exists();
     }
 
-    public MutationResult replaceDocument(String bucketName, String documentKey, JSONObject object) {
-        final JsonObject couchbaseData = JsonObject.from(object.toMap());
-        return replaceDocument(bucketName, documentKey, couchbaseData);
-    }
-
-    @Deprecated
     public MutationResult replaceDocument(String bucketName, String documentKey, JsonObject object) {
         return cluster.bucket(bucketName).defaultCollection().replace(documentKey, object);
     }
 
-    public void deleteDocumentIfExists(String bucketName, String documentKey) {
-        if (documentExists(bucketName, documentKey))
-            deleteDocument(bucketName, documentKey);
-    }
-
-    @Deprecated
     public MutationResult deleteDocument(String bucketName, String documentKey) {
         return cluster.bucket(bucketName).defaultCollection().remove(documentKey);
     }

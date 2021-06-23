@@ -10,8 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
-import org.sab.couchbase.Couchbase;
-import org.sab.subthread.SubThreadApp;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -30,7 +28,6 @@ public class LikeCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
-            SubThreadApp.startCouchbaseConnection();
 
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);
             createUsers();
@@ -47,6 +44,7 @@ public class LikeCommentTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
+        // TODO: Add testing DB.
         if (!arango.collectionExists(CommentCommand.TEST_DB_Name, collectionName)) {
             arango.createCollection(CommentCommand.TEST_DB_Name, collectionName, false);
         }
@@ -55,6 +53,7 @@ public class LikeCommentTest {
     }
 
     private static void addObjectToEdgeCollection(BaseDocument document, String collectionName) {
+        // TODO: Add testing DB.
         if (!arango.collectionExists(CommentCommand.TEST_DB_Name, collectionName)) {
             arango.createCollection(CommentCommand.TEST_DB_Name, collectionName, true);
         }
@@ -69,7 +68,6 @@ public class LikeCommentTest {
     @AfterClass
     public static void tearDown() {
         arango.dropDatabase(CommentCommand.TEST_DB_Name);
-        Couchbase.getInstance().disconnect();
     }
 
     public static void createUsers() {
@@ -180,6 +178,7 @@ public class LikeCommentTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes + 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME);
     }
 
     @Test
@@ -229,6 +228,8 @@ public class LikeCommentTest {
 
         assertEquals(newNumOfLikes, oldNumOfLikes - 1);
         assertEquals(newNumOfDislikes, oldNumOfDislikes);
+
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME);
     }
 
     @Test
@@ -284,5 +285,8 @@ public class LikeCommentTest {
         ArangoCursor<BaseDocument> cursor2 = arango.filterEdgeCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME, CommentCommand.USER_COLLECTION_NAME + "/" + mantaId);
         JSONArray commentArr2 = arango.parseOutput(cursor2, CommentCommand.COMMENT_ID, commentAtt);
         assertEquals(0, commentArr2.length());
+
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_LIKE_COMMENT_COLLECTION_NAME);
+//        arango.dropCollection(CommentCommand.DB_Name, CommentCommand.USER_DISLIKE_COMMENT_COLLECTION_NAME);
     }
 }

@@ -2,7 +2,7 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
-import org.sab.models.CouchbaseBuckets;
+import org.sab.models.NotificationMessages;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -11,6 +11,8 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.List;
+
+import static org.sab.innerAppComm.Comm.notifyApp;
 
 public class UpdateThread extends ThreadCommand {
     @Override
@@ -25,7 +27,7 @@ public class UpdateThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
+        Arango arango = null;
 
         final Thread thread;
 
@@ -38,22 +40,16 @@ public class UpdateThread extends ThreadCommand {
 
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
-            boolean threadIsCached = false;
-            BaseDocument threadDocument;
-
-            if (existsInCouchbase(threadId)) {
-                threadIsCached = true;
-                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId);
-            } else if (existsInArango(THREAD_COLLECTION_NAME, threadId)) {
-                threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
-            } else {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
+
+            final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
 
             final String creatorId = (String) threadDocument.getAttribute(CREATOR_ID_DB);
 
             if (!userId.equals(creatorId)) {
-                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403);
+                return Responder.makeErrorResponse(REQUESTER_NOT_AUTHOR, 403).toString();
             }
 
             threadDocument.updateAttribute(DESCRIPTION_DB, description);
@@ -69,14 +65,12 @@ public class UpdateThread extends ThreadCommand {
             thread.setDateCreated(dateCreated);
             thread.setNumOfFollowers(numOfFollowers);
 
-            if(threadIsCached)
-                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId, threadDocument);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
 
-        return Responder.makeDataResponse(thread.toJSON());
+        return Responder.makeDataResponse(thread.toJSON()).toString();
     }
 
     @Override

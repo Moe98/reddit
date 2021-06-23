@@ -24,8 +24,8 @@ public class GetMyComments extends CommentCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
-        JSONArray response;
+        Arango arango = null;
+        JSONArray response = new JSONArray();
 
         try {
             arango = Arango.getInstance();
@@ -37,7 +37,7 @@ public class GetMyComments extends CommentCommand {
 
 
             if (!arango.documentExists(DB_Name, USER_COLLECTION_NAME, userId)) {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
             ArangoCursor<BaseDocument> cursor = arango.filterCollection(DB_Name, COMMENT_COLLECTION_NAME, CREATOR_ID_DB, userId);
             ArrayList<String> arr = new ArrayList<>();
@@ -51,7 +51,7 @@ public class GetMyComments extends CommentCommand {
             response = arango.parseOutput(cursor, COMMENT_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

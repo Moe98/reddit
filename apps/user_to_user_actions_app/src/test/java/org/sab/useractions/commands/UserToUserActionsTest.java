@@ -7,7 +7,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
-import org.sab.useractions.UserToUserActionsApp;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +19,7 @@ public class UserToUserActionsTest {
         try {
             arango = Arango.getConnectedInstance();
 
-            UserToUserActionsApp.dbInit();
+            arango.createDatabaseIfNotExists(UserToUserCommand.TEST_DB_Name);
 
             BaseDocument moe = new BaseDocument();
             moe.setKey(moeId);

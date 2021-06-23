@@ -7,13 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
-import org.sab.couchbase.Couchbase;
-import org.sab.models.CouchbaseBuckets;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
 import org.sab.service.validation.HTTPMethod;
-import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -48,10 +45,7 @@ public class BookmarkSubThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-
             arango = Arango.getConnectedInstance();
-            SubThreadApp.startCouchbaseConnection();
-
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabaseIfNotExists(DB_NAME);
@@ -93,8 +87,8 @@ public class BookmarkSubThreadTest {
 
     @AfterClass
     public static void tearDown() {
+
         arango.dropDatabase(SubThreadCommand.DB_Name);
-        Couchbase.getInstance().disconnect();
     }
 
     private static JSONObject bookmarkSubThread(String userId, String subthreadId) {

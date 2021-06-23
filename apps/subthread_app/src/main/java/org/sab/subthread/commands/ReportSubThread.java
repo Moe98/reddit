@@ -41,7 +41,7 @@ public class ReportSubThread extends SubThreadCommand {
     @Override
     public String execute() {
 
-        Arango arango;
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -61,13 +61,13 @@ public class ReportSubThread extends SubThreadCommand {
             // check if thread exists
             if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
                 msg = "Thread does not exist";
-                return Responder.makeErrorResponse(msg, 400);
+                return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // check if subthread exists
             if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
-                return Responder.makeErrorResponse(msg, 400);
+                return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             // TODO check if subthread belongs to thread!
@@ -96,10 +96,10 @@ public class ReportSubThread extends SubThreadCommand {
             notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_REPORT_MSG.getMSG(), subthreadId, userNames, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response);
+        return Responder.makeDataResponse(response).toString();
     }
 }

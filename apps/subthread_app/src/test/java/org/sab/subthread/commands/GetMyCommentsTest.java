@@ -51,11 +51,16 @@ public class GetMyCommentsTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
+        // TODO: Add testing DB.
         if (!arango.collectionExists(CommentCommand.TEST_DB_Name, collectionName)) {
             arango.createCollection(CommentCommand.TEST_DB_Name, collectionName, false);
         }
 
         arango.createDocument(CommentCommand.TEST_DB_Name, collectionName, document);
+    }
+
+    private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
+        arango.deleteDocument(CommentCommand.TEST_DB_Name, collectionName, document.getKey());
     }
 
     @AfterClass
@@ -113,7 +118,7 @@ public class GetMyCommentsTest {
         comment.addAttribute(CommentCommand.SUBTHREAD_TITLE_DB, title);
         comment.addAttribute(CommentCommand.SUBTHREAD_LIKES_DB, 0);
         comment.addAttribute(CommentCommand.SUBTHREAD_DISLIKES_DB, 0);
-        comment.addAttribute(CommentCommand.SUBTHREAD_HAS_IMAGE_DB, hasImage);
+        comment.addAttribute(CommentCommand.SUBTHREAD_HASIMAGE_DB, hasImage);
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         comment.addAttribute(CommentCommand.SUBTHREAD_DATE_CREATED_DB, sqlDate2);
 

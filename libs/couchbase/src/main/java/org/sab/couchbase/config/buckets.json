@@ -40,16 +40,6 @@
     "flushEnabled": 1
   },
   {
-    "name": "Comments",
-    "ramQuotaMB": 100,
-    "bucketType": "ephemeral",
-    "authType": "sasl",
-    "saslPassword": "",
-    "evictionPolicy": "nruEviction",
-    "replicaNumber": 0,
-    "flushEnabled": 1
-  },
-  {
     "name": "TestBucket",
     "ramQuotaMB": 100,
     "bucketType": "ephemeral",

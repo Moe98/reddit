@@ -4,9 +4,7 @@ public enum CouchbaseBuckets {
     LISTINGS("Listings"),
     RECOMMENDED_SUB_THREADS("RecommendedSubThreads"),
     RECOMMENDED_THREADS("RecommendedThreads"),
-    RECOMMENDED_USERS("RecommendedUsers"),
-    COMMENTS("Comments");
-
+    RECOMMENDED_USERS("RecommendedUsers");
 
     private final String bucketName;
 

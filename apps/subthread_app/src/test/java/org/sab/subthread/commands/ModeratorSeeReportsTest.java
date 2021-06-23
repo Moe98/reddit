@@ -26,7 +26,7 @@ public class ModeratorSeeReportsTest {
         try {
             arango = Arango.getConnectedInstance();
 
-            arango.createDatabaseIfNotExists(SubThreadCommand.DB_Name);
+            arango.createDatabaseIfNotExists(SubThreadCommand.TEST_DB_Name);
             createUsers();
             createThreads();
             assignMod(mantaId, parentThreadId1);
@@ -43,16 +43,31 @@ public class ModeratorSeeReportsTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
-        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.DB_Name, collectionName, false);
+        // TODO: Add testing DB.
+        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, false);
         }
 
-        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
+        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
+    }
+
+    private static void addObjectToEdgeCollection(BaseDocument document, String collectionName) {
+        // TODO: Add testing DB.
+        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, true);
+        }
+
+        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
+    }
+
+    private static void removeObjectFromCollection(BaseDocument document, String collectionName) {
+        arango.deleteDocument(SubThreadCommand.TEST_DB_Name, collectionName, document.getKey());
     }
 
     @AfterClass
     public static void tearDown() {
-        arango.dropDatabase(SubThreadCommand.DB_Name);
+
+        arango.dropDatabase(SubThreadCommand.TEST_DB_Name);
     }
 
     public static void createUsers() {
@@ -85,7 +100,7 @@ public class ModeratorSeeReportsTest {
         comment.addAttribute(SubThreadCommand.TITLE_DB, title);
         comment.addAttribute(SubThreadCommand.LIKES_DB, 0);
         comment.addAttribute(SubThreadCommand.DISLIKES_DB, 0);
-        comment.addAttribute(SubThreadCommand.HAS_IMAGE_DB, hasImage);
+        comment.addAttribute(SubThreadCommand.HASIMAGE_DB, hasImage);
         java.sql.Date sqlDate2 = new java.sql.Date(System.currentTimeMillis());
         comment.addAttribute(SubThreadCommand.DATE_CREATED_DB, sqlDate2);
 

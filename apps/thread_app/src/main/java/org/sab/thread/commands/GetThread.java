@@ -2,7 +2,6 @@ package org.sab.thread.commands;
 
 import com.arangodb.entity.BaseDocument;
 import org.sab.arango.Arango;
-import org.sab.models.CouchbaseBuckets;
 import org.sab.models.Thread;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
@@ -19,7 +18,7 @@ public class GetThread extends ThreadCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
+        Arango arango = null;
         final Thread thread;
 
         try {
@@ -27,17 +26,14 @@ public class GetThread extends ThreadCommand {
 
             arango = Arango.getInstance();
 
+
             arango.createCollectionIfNotExists(DB_Name, THREAD_COLLECTION_NAME, false);
 
-            BaseDocument threadDocument;
-
-            if (existsInCouchbase(threadId)) {
-                threadDocument = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_THREADS.get(), threadId);
-            } else if (existsInArango(THREAD_COLLECTION_NAME, threadId)) {
-                threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
-            } else {
-                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404);
+            if (!arango.documentExists(DB_Name, THREAD_COLLECTION_NAME, threadId)) {
+                return Responder.makeErrorResponse(OBJECT_NOT_FOUND, 404).toString();
             }
+
+            final BaseDocument threadDocument = arango.readDocument(DB_Name, THREAD_COLLECTION_NAME, threadId);
 
             final String description = (String) threadDocument.getAttribute(DESCRIPTION_DB);
             final String creatorId = (String) threadDocument.getAttribute(CREATOR_ID_DB);
@@ -52,10 +48,10 @@ public class GetThread extends ThreadCommand {
             thread.setNumOfFollowers(numOfFollowers);
         } catch (Exception e) {
             e.printStackTrace();
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
 
-        return Responder.makeDataResponse(thread.toJSON());
+        return Responder.makeDataResponse(thread.toJSON()).toString();
     }
 
     @Override

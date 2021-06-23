@@ -24,8 +24,8 @@ public class GetMyLikedComments extends CommentCommand {
 
     @Override
     protected String execute() {
-        Arango arango;
-        JSONArray response;
+        Arango arango = null;
+        JSONArray response = new JSONArray();
 
         try {
             arango = Arango.getInstance();
@@ -51,7 +51,7 @@ public class GetMyLikedComments extends CommentCommand {
             response = arango.parseOutput(cursor, COMMENT_ID_DB, arr);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
         return Responder.makeDataResponse(response).toString();
     }

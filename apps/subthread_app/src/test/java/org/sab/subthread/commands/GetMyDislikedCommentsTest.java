@@ -51,16 +51,18 @@ public class GetMyDislikedCommentsTest {
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
-        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.DB_Name, collectionName, false);
+        // TODO: Add testing DB.
+        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, false);
         }
 
-        arango.createDocument(SubThreadCommand.DB_Name, collectionName, document);
+        arango.createDocument(SubThreadCommand.TEST_DB_Name, collectionName, document);
     }
 
     private static void addObjectToEdgeCollection(BaseDocument document, String collectionName) {
-        if (!arango.collectionExists(SubThreadCommand.DB_Name, collectionName)) {
-            arango.createCollection(SubThreadCommand.DB_Name, collectionName, true);
+        // TODO: Add testing DB.
+        if (!arango.collectionExists(SubThreadCommand.TEST_DB_Name, collectionName)) {
+            arango.createCollection(SubThreadCommand.TEST_DB_Name, collectionName, true);
         }
 
         arango.createDocument(CommentCommand.TEST_DB_Name, collectionName, document);

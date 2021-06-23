@@ -7,10 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
-import org.sab.couchbase.Couchbase;
 import org.sab.models.SubThreadAttributes;
 import org.sab.service.validation.HTTPMethod;
-import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -41,7 +39,6 @@ public class UpdateSubThreadTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
-            SubThreadApp.startCouchbaseConnection();
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
@@ -118,10 +115,10 @@ public class UpdateSubThreadTest {
         validateSubthreadBase(updatedSubthread, fishSubThread1, true, true);
         assertEquals(
                 updatedTitle,
-                updatedSubthread.getString(SubThreadAttributes.TITLE.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.TITLE.getHTTP()));
         assertEquals(
                 updatedContent,
-                updatedSubthread.getString(SubThreadAttributes.CONTENT.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.CONTENT.getHTTP()));
     }
 
     @Test
@@ -136,7 +133,7 @@ public class UpdateSubThreadTest {
         validateSubthreadBase(updatedSubthread, fishSubThread2, true, false);
         assertEquals(
                 updatedTitle,
-                updatedSubthread.getString(SubThreadAttributes.TITLE.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.TITLE.getHTTP()));
 
     }
 
@@ -153,43 +150,42 @@ public class UpdateSubThreadTest {
         validateSubthreadBase(updatedSubthread, fishSubThread3, false, true);
         assertEquals(
                 updatedContent,
-                updatedSubthread.getString(SubThreadAttributes.CONTENT.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.CONTENT.getHTTP()));
     }
 
     @AfterClass
     public static void tearDown() {
         arango.dropDatabase(DB_NAME);
-        Couchbase.getInstance().disconnect();
     }
 
     private static void validateSubthreadBase(JSONObject updatedSubthread, BaseDocument oldSubthread, boolean titleUpdated, boolean contentUpdated ) {
          assertEquals(
                  oldSubthread.getAttribute(SubThreadAttributes.DATE_CREATED.getDb()),
-                 updatedSubthread.getString(SubThreadAttributes.DATE_CREATED.getDb()));
+                 updatedSubthread.getString(SubThreadAttributes.DATE_CREATED.getHTTP()));
         assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.CREATOR_ID.getDb()),
-                updatedSubthread.getString(SubThreadAttributes.CREATOR_ID.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.CREATOR_ID.getHTTP()));
         assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.DISLIKES.getDb()),
-                updatedSubthread.getInt(SubThreadAttributes.DISLIKES.getDb()));
+                updatedSubthread.getInt(SubThreadAttributes.DISLIKES.getHTTP()));
         assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.LIKES.getDb()),
-                updatedSubthread.getInt(SubThreadAttributes.LIKES.getDb()));
+                updatedSubthread.getInt(SubThreadAttributes.LIKES.getHTTP()));
         assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.HAS_IMAGE.getDb()),
-                updatedSubthread.getBoolean(SubThreadAttributes.HAS_IMAGE.getDb()));
+                updatedSubthread.getBoolean(SubThreadAttributes.HAS_IMAGE.getHTTP()));
         assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.PARENT_THREAD_ID.getDb()),
-                updatedSubthread.getString(SubThreadAttributes.PARENT_THREAD_ID.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.PARENT_THREAD_ID.getHTTP()));
         if(!contentUpdated) {
             assertEquals(
                     oldSubthread.getAttribute(SubThreadAttributes.CONTENT.getDb()),
-                    updatedSubthread.getString(SubThreadAttributes.CONTENT.getDb()));
+                    updatedSubthread.getString(SubThreadAttributes.CONTENT.getHTTP()));
         }
         if(!titleUpdated) {
             assertEquals(
                 oldSubthread.getAttribute(SubThreadAttributes.TITLE.getDb()),
-                updatedSubthread.getString(SubThreadAttributes.TITLE.getDb()));
+                updatedSubthread.getString(SubThreadAttributes.TITLE.getHTTP()));
 
         }
     }

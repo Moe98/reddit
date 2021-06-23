@@ -1,18 +1,19 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.arango.Arango;
-import org.sab.models.CouchbaseBuckets;
 import org.sab.models.NotificationMessages;
 import org.sab.service.Responder;
 import org.sab.service.validation.HTTPMethod;
-import org.sab.subthread.SubThreadApp;
 import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.sab.innerAppComm.Comm.notifyApp;
@@ -38,7 +39,7 @@ public class LikeSubThread extends SubThreadCommand {
     @Override
     public String execute() {
 
-        Arango arango;
+        Arango arango = null;
 
         JSONObject response = new JSONObject();
         String msg = "";
@@ -53,31 +54,21 @@ public class LikeSubThread extends SubThreadCommand {
             arango.createCollectionIfNotExists(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, true);
             arango.createCollectionIfNotExists(DB_Name, USER_CREATE_SUBTHREAD_COLLECTION_NAME, true);
 
-            boolean subthreadIsCached = false;
-            BaseDocument originalSubthread;
-
-            if(existsInCouchbase(subthreadId)){
-                subthreadIsCached = true;
-                originalSubthread = getDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadId);
-            }
-            else if(existsInArango(SUBTHREAD_COLLECTION_NAME, subthreadId)){
-                originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
-            }
-            else{
+            if (!arango.documentExists(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId)) {
                 msg = "Subthread does not exist";
-                return Responder.makeErrorResponse(msg, 400);
+                return Responder.makeErrorResponse(msg, 400).toString();
             }
 
             String likeEdgeId = arango.getSingleEdgeId(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
-            int newLikes;
             // if user already likes the subthread, then remove his like and update like count
             if (!likeEdgeId.equals("")) {
                 arango.deleteDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, likeEdgeId);
 
-                newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) - 1;
+                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) - 1;
                 originalSubthread.updateAttribute(LIKES_DB, newLikes);
-                // putting the subthread with the updated amount of likes
+                // putting the comment with the updated amount of likes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
                 msg = "removed your like on the subthread";
@@ -87,10 +78,12 @@ public class LikeSubThread extends SubThreadCommand {
                 edgeDocument.setFrom(USER_COLLECTION_NAME + "/" + userId);
                 edgeDocument.setTo(SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
 
-                // adding new edgeDocument representing that a user likes a subthread
+                // adding new edgeDocument representing that a user likes a comment
                 arango.createEdgeDocument(DB_Name, USER_LIKE_SUBTHREAD_COLLECTION_NAME, edgeDocument);
 
-                newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) + 1;
+                // retrieving the original comment with the old amount of likes and dislikes
+                BaseDocument originalSubthread = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                int newLikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(LIKES_DB))) + 1;
                 int newDislikes = Integer.parseInt(String.valueOf(originalSubthread.getAttribute(DISLIKES_DB)));
 
                 String dislikeEdgeId = arango.getSingleEdgeId(DB_Name, USER_DISLIKE_SUBTHREAD_COLLECTION_NAME, USER_COLLECTION_NAME + "/" + userId, SUBTHREAD_COLLECTION_NAME + "/" + subthreadId);
@@ -102,24 +95,20 @@ public class LikeSubThread extends SubThreadCommand {
                 }
                 originalSubthread.updateAttribute(LIKES_DB, newLikes);
                 originalSubthread.updateAttribute(DISLIKES_DB, newDislikes);
-                // putting the subthread with the updated amount of likes and dislikes
+                // putting the comment with the updated amount of likes and dislikes
                 arango.updateDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, originalSubthread, subthreadId);
 
-                String subthreadCreatorId = originalSubthread.getAttribute(CREATOR_ID_DB).toString();
+                BaseDocument subthreadDoc = arango.readDocument(DB_Name, SUBTHREAD_COLLECTION_NAME, subthreadId);
+                String subthreadCreatorId = subthreadDoc.getAttribute(CREATOR_ID_DB).toString();
                 notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_LIKE_MSG.getMSG(), subthreadId, subthreadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
-            }
 
-            if(subthreadIsCached)
-                replaceDocumentFromCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
-            else if(newLikes > SubThreadApp.SUBTHREAD_LIKES_CACHING_THRESHOLD){
-                upsertDocumentInCouchbase(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), originalSubthread.getKey(), originalSubthread);
             }
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         } finally {
             response.put("msg", msg);
         }
-        return Responder.makeDataResponse(response);
+        return Responder.makeDataResponse(response).toString();
     }
 }

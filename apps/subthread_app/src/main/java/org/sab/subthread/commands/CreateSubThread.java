@@ -1,8 +1,11 @@
 package org.sab.subthread.commands;
 
+import com.arangodb.ArangoCursor;
 import com.arangodb.entity.BaseDocument;
 import com.arangodb.entity.BaseEdgeDocument;
+import org.json.JSONArray;
 import org.sab.arango.Arango;
+import org.sab.models.Comment;
 import org.sab.models.NotificationMessages;
 import org.sab.models.SubThread;
 import org.sab.service.Responder;
@@ -11,6 +14,7 @@ import org.sab.validation.Attribute;
 import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.sab.innerAppComm.Comm.notifyApp;
@@ -37,7 +41,7 @@ public class CreateSubThread extends SubThreadCommand {
         Attribute title = new Attribute(TITLE, DataType.STRING, true);
         Attribute content = new Attribute(CONTENT, DataType.STRING, true);
 
-        Attribute hasImage = new Attribute(HAS_IMAGE, DataType.BOOLEAN, true);
+        Attribute hasImage = new Attribute(HASIMAGE, DataType.BOOLEAN, true);
 
         return new Schema(List.of(parentThreadId, title, content, hasImage));
     }
@@ -45,7 +49,7 @@ public class CreateSubThread extends SubThreadCommand {
     @Override
     protected String execute() {
 
-        Arango arango;
+        Arango arango = null;
 
         SubThread subThread;
 
@@ -54,7 +58,7 @@ public class CreateSubThread extends SubThreadCommand {
             String parentThreadId = body.getString(PARENT_THREAD_ID);
             String title = body.getString(TITLE);
             String content = body.getString(CONTENT);
-            boolean hasImage = body.getBoolean(HAS_IMAGE);
+            boolean hasImage = body.getBoolean(HASIMAGE);
 
             arango = Arango.getInstance();
 
@@ -76,7 +80,7 @@ public class CreateSubThread extends SubThreadCommand {
             myObject.addAttribute(CONTENT_DB, content);
             myObject.addAttribute(LIKES_DB, INITIAL_LIKES);
             myObject.addAttribute(DISLIKES_DB, INITIAL_DISLIKES);
-            myObject.addAttribute(HAS_IMAGE_DB, hasImage);
+            myObject.addAttribute(HASIMAGE_DB, hasImage);
 
             if (hasImage) {
                 // TODO handle adding the image to the DB
@@ -96,7 +100,7 @@ public class CreateSubThread extends SubThreadCommand {
             content = (String) res.getAttribute(CONTENT_DB);
 
             String date = (String) res.getAttribute(DATE_CREATED_DB);
-            hasImage = (Boolean) res.getAttribute(HAS_IMAGE_DB);
+            hasImage = (Boolean) res.getAttribute(HASIMAGE_DB);
 
             int likes = Integer.parseInt(String.valueOf(res.getAttribute(LIKES_DB)));
             int dislikes = Integer.parseInt(String.valueOf(res.getAttribute(DISLIKES_DB)));
@@ -124,9 +128,9 @@ public class CreateSubThread extends SubThreadCommand {
             notifyApp(Notification_Queue_Name, NotificationMessages.SUBTHREAD_CREATE_MSG.getMSG(), subThreadId, threadCreatorId, SEND_NOTIFICATION_FUNCTION_NAME);
 
         } catch (Exception e) {
-            return Responder.makeErrorResponse(e.getMessage(), 404);
+            return Responder.makeErrorResponse(e.getMessage(), 404).toString();
         }
-        return Responder.makeDataResponse(subThread.toJSON());
+        return Responder.makeDataResponse(subThread.toJSON()).toString();
 
     }
 

@@ -7,13 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sab.arango.Arango;
 import org.sab.auth.AuthParamsHandler;
-import org.sab.couchbase.Couchbase;
-import org.sab.innerAppComm.Comm;
 import org.sab.models.CommentAttributes;
 import org.sab.models.SubThreadAttributes;
 import org.sab.models.ThreadAttributes;
 import org.sab.models.user.UserAttributes;
-import org.sab.subthread.SubThreadApp;
 
 import static org.junit.Assert.*;
 
@@ -27,7 +24,6 @@ public class CreateCommentTest {
     public static void setUp() {
         try {
             arango = Arango.getConnectedInstance();
-            SubThreadApp.startCouchbaseConnection();
 
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
@@ -67,7 +63,6 @@ public class CreateCommentTest {
     @AfterClass
     public static void tearDown() {
         arango.dropDatabase(DB_NAME);
-        Couchbase.getInstance().disconnect();
     }
 
     private static void addObjectToCollection(BaseDocument document, String collectionName) {
@@ -110,12 +105,12 @@ public class CreateCommentTest {
 
         JSONObject responseData = response.getJSONObject("data");
 
-        assertEquals(responseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getDb()), "Subthread");
-        assertEquals(responseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getDb()), subThreadId);
-        assertEquals(responseData.getString(CommentAttributes.CREATOR_ID.getDb()), userId);
-        assertEquals(responseData.getString(CommentAttributes.CONTENT.getDb()), content);
-        assertEquals(responseData.getInt(CommentAttributes.LIKES.getDb()), 0);
-        assertEquals(responseData.getInt(CommentAttributes.DISLIKES.getDb()), 0);
+        assertEquals(responseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP()), "Subthread");
+        assertEquals(responseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP()), subThreadId);
+        assertEquals(responseData.getString(CommentAttributes.CREATOR_ID.getHTTP()), userId);
+        assertEquals(responseData.getString(CommentAttributes.CONTENT.getHTTP()), content);
+        assertEquals(responseData.getInt(CommentAttributes.LIKES.getHTTP()), 0);
+        assertEquals(responseData.getInt(CommentAttributes.DISLIKES.getHTTP()), 0);
     }
 
     @Test
@@ -127,7 +122,7 @@ public class CreateCommentTest {
 
         assertEquals(200, parentCommentResponse.getInt("statusCode"));
 
-        String parentCommentId = parentCommentResponse.getJSONObject("data").getString(CommentCommand.COMMENT_ID_DB);
+        String parentCommentId = parentCommentResponse.getJSONObject("data").getString("commentId");
 
         JSONObject childCommentResponse = createComment(parentCommentId, childCommentContent, "Comment", userId);
 
@@ -135,11 +130,11 @@ public class CreateCommentTest {
 
         JSONObject childCommentResponseData = childCommentResponse.getJSONObject("data");
 
-        assertEquals(childCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getDb()), "Comment");
-        assertEquals(childCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getDb()), parentCommentId);
-        assertEquals(childCommentResponseData.getString(CommentAttributes.CREATOR_ID.getDb()), userId);
-        assertEquals(childCommentResponseData.getString(CommentAttributes.CONTENT.getDb()), childCommentContent);
-        assertEquals(childCommentResponseData.getInt(CommentAttributes.LIKES.getDb()), 0);
-        assertEquals(childCommentResponseData.getInt(CommentAttributes.DISLIKES.getDb()), 0);
+        assertEquals(childCommentResponseData.getString(CommentAttributes.PARENT_CONTENT_TYPE.getHTTP()), "Comment");
+        assertEquals(childCommentResponseData.getString(CommentAttributes.PARENT_SUBTHREAD_ID.getHTTP()), parentCommentId);
+        assertEquals(childCommentResponseData.getString(CommentAttributes.CREATOR_ID.getHTTP()), userId);
+        assertEquals(childCommentResponseData.getString(CommentAttributes.CONTENT.getHTTP()), childCommentContent);
+        assertEquals(childCommentResponseData.getInt(CommentAttributes.LIKES.getHTTP()), 0);
+        assertEquals(childCommentResponseData.getInt(CommentAttributes.DISLIKES.getHTTP()), 0);
     }
 }
