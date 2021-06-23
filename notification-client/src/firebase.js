@@ -17,26 +17,39 @@ var db = firebase.firestore();
 console.log("db",db.collection("userTokens"))
 const messaging = firebase.messaging();
 
-export const getToken = (setTokenFound,flag,setFlag) => {
-    return messaging.getToken().then((currentToken) => {
+export const getToken =(setTokenFound,username) => {
+    return  messaging.getToken().then(async (currentToken) => {
       if (currentToken) {
         console.log('current token for client: ', currentToken);
-        if(!flag){
-        db.collection("userTokens").doc("zizo").set({
-            username: "zizo",
-            token: currentToken
-         })
-    .then((docRef) => {
-        console.log("Document written with ID");
-    })
-    .catch((error) => {
-        console.error("Error adding document: ", error);
-        setFlag(false)
-    });
-    }
-    setFlag(true)
+        let userData
+        await db.collection("userTokens").doc(username).get().then((doc)=>{
+         userData= doc.data()
+        } )
 
+        // case 2 if user data available check if the token is not inserted so insert it 
+        if(userData&&userData.tokens&&!userData.tokens.includes(currentToken)){
+          userData.tokens.push(currentToken)
+          await insertInDb(username,userData.tokens)
 
+          // await  db.collection("userTokens").doc(username).set({tokens:userData.tokens})
+          // .then((docRef) => {
+          //     console.log("Document written with ID");
+          // })
+          // .catch((error) => {
+          //     console.error("Error adding document: ", error);
+          // });
+        }
+        // case 1  if user data is null or undefined means user didn't enter the system before 
+        if(userData==null){
+          await insertInDb(username,[currentToken])
+          // await  db.collection("userTokens").doc(username).set({tokens:[currentToken]})
+          // .then((docRef) => {
+          //     console.log("Document written with ID");
+          // })
+          // .catch((error) => {
+          //     console.error("Error adding document: ", error);
+          // });
+        }
         setTokenFound(true);
         // Track the token -> client mapping, by sending to backend server
         // show on the UI that permission is secured
@@ -51,6 +64,15 @@ export const getToken = (setTokenFound,flag,setFlag) => {
     });
   }
 
+async function insertInDb(username,tokenArray) {
+  return  db.collection("userTokens").doc(username).set({tokens:tokenArray})
+  .then((docRef) => {
+      console.log("Document written with ID");
+  })
+  .catch((error) => {
+      console.error("Error adding document: ", error);
+  });
+}
 
   export const onMessageListener = () =>
   new Promise((resolve) => {
