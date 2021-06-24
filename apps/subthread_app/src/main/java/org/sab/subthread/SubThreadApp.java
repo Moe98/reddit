@@ -60,17 +60,17 @@ public class SubThreadApp extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        
         final int commentRamQuota = Integer.parseInt(properties.getProperty("COMMENT_RAM_QUOTA"));
         final int subthreadRamQuota = Integer.parseInt(properties.getProperty("SUBTHREAD_RAM_QUOTA"));
-
+        
         couchbase.createBucketIfNotExists(CouchbaseBuckets.COMMENTS.get(), commentRamQuota);
         couchbase.createBucketIfNotExists(CouchbaseBuckets.RECOMMENDED_SUB_THREADS.get(), subthreadRamQuota);
     }
-
-    public static void shutdownGracefully() {
-        // TODO stop threads and halt app (super call?)
-    }
+    
+    //    public static void shutdownGracefully() {
+    //        // TODO stop threads and halt app (super call?)
+    //    }
 
     public static void createCollections(ArrayList<String> collectionNames, ArrayList<String> edgeCollectionNames) {
         try {

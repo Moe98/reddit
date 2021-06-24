@@ -42,7 +42,7 @@ public class DeleteSubThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
 //            arango.dropDatabase(DB_NAME);
             arango.createDatabase(DB_NAME);
