@@ -1,5 +1,6 @@
 package org.sab.notification.commands;
 
+import com.google.cloud.Timestamp;
 import org.json.JSONObject;
 import org.sab.models.NotificationAttributes;
 import org.sab.notification.FirebaseMessagingConnector;
@@ -14,6 +15,7 @@ import org.sab.validation.DataType;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,11 +37,12 @@ public class SendNotification extends CommandWithVerification {
         final List<String> usersList = List.of((String[]) body.get(NotificationAttributes.USERS_LIST.getValue()));
         final String title = body.getString(NotificationAttributes.TITLE.getValue());
         final String notificationBody = body.getString(NotificationAttributes.NOTIFICATION_BODY.getValue());
+        final FirestoreConnector firestore = FirestoreConnector.getInstance();
 
         try {
-            final String notificationResult = FirebaseMessagingConnector.getInstance().notify(getRegistrationTokens(usersList), title, notificationBody);
+            final String notificationResult = FirebaseMessagingConnector.getInstance().notify(getRegistrationTokens(firestore, usersList), title, notificationBody);
             final JSONObject resultObject = new JSONObject(Map.of("notificationResult", notificationResult));
-            insertNotificationToFirestore();
+            insertNotificationToFirestore(firestore, usersList, title, notificationBody);
             return Responder.makeDataResponse(resultObject).toString();
         } catch (GoogleCredentialsLoadingFailedException e) {
             return Responder.makeErrorResponse("Could not init Firebase app", 500).toString();
@@ -56,9 +59,15 @@ public class SendNotification extends CommandWithVerification {
         }
     }
 
-    private void insertNotificationToFirestore() {
-        // TODO
-        throw new UnsupportedOperationException();
+    private void insertNotificationToFirestore(FirestoreConnector firestore, List<String> usersList, String title, String notificationBody) throws ExecutionException, InterruptedException {
+        Map<String, Object> notificationMap = new HashMap<>(3);
+        notificationMap.put("title", title);
+        notificationMap.put("body", notificationBody);
+        notificationMap.put("time", Timestamp.now());
+
+        for (String user : usersList) {
+            firestore.createDocumentWithRandomKey("userNotifications/" + user + "/notifications", notificationMap);
+        }
     }
 
     /**
@@ -66,9 +75,8 @@ public class SendNotification extends CommandWithVerification {
      * @param usersList list of usernames
      * @return list of tokens
      */
-    private List<String> getRegistrationTokens(List<String> usersList) throws ExecutionException, InterruptedException {
+    private List<String> getRegistrationTokens(FirestoreConnector firestore, List<String> usersList) throws ExecutionException, InterruptedException {
         ArrayList<String> tokens = new ArrayList<>();
-        FirestoreConnector firestore = FirestoreConnector.getInstance();
 
         for (String user : usersList) {
             Map<String, Object> document = firestore.readDocument("userTokens", user);
