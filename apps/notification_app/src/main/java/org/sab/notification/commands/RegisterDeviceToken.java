@@ -2,6 +2,7 @@ package org.sab.notification.commands;
 
 import org.sab.models.user.UserAttributes;
 import org.sab.notification.FirestoreConnector;
+import org.sab.notification.NotificationApp;
 import org.sab.service.Responder;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.service.validation.HTTPMethod;
@@ -15,8 +16,8 @@ import java.util.concurrent.ExecutionException;
 
 public class RegisterDeviceToken extends CommandWithVerification {
     static final String USERNAME = UserAttributes.USERNAME.toString();
-    static final String TOKEN = "token";
-    static final String TOKENS_COLLECTION = "userTokens";
+    static final String TOKEN = NotificationApp.TOKEN;
+    static final String TOKENS_COLLECTION = NotificationApp.TOKENS_COLLECTION;
 
     @Override
     protected String execute() {
@@ -25,7 +26,7 @@ public class RegisterDeviceToken extends CommandWithVerification {
             final String token = body.getString(TOKEN);
             final FirestoreConnector firestore = FirestoreConnector.getInstance();
 
-            Map<String, Object> document = firestore.readDocument("userTokens", username);
+            Map<String, Object> document = firestore.readDocument(TOKENS_COLLECTION, username);
             if (document == null)
                 newUserToken(firestore, username, token);
             else
