@@ -1,6 +1,7 @@
 package org.sab.notification.commands;
 
 import com.google.cloud.Timestamp;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.models.NotificationAttributes;
 import org.sab.notification.FirebaseMessagingConnector;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class SendNotification extends CommandWithVerification {
 
@@ -33,8 +35,8 @@ public class SendNotification extends CommandWithVerification {
 
     @Override
     protected String execute() {
-        
-        final List<String> usersList = List.of((String[]) body.get(NotificationAttributes.USERS_LIST.getValue()));
+
+        final List<String> usersList = parseJsonArray(body.getJSONArray(NotificationAttributes.USERS_LIST.getValue()));
         final String title = body.getString(NotificationAttributes.TITLE.getValue());
         final String notificationBody = body.getString(NotificationAttributes.NOTIFICATION_BODY.getValue());
         final FirestoreConnector firestore = FirestoreConnector.getInstance();
@@ -57,6 +59,10 @@ public class SendNotification extends CommandWithVerification {
         } catch (ClassCastException e) {
             return Responder.makeErrorResponse("Corrupted field at Firestore", 500).toString();
         }
+    }
+
+    private List<String> parseJsonArray(JSONArray jsonArray) {
+        return jsonArray.toList().stream().map(Object::toString).collect(Collectors.toList());
     }
 
     private void insertNotificationToFirestore(FirestoreConnector firestore, List<String> usersList, String title, String notificationBody) throws ExecutionException, InterruptedException {
