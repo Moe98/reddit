@@ -29,7 +29,7 @@ public class SendNotification extends CommandWithVerification {
 
         final Attribute title = new Attribute(NotificationAttributes.TITLE.getValue(), DataType.STRING, true);
         final Attribute body = new Attribute(NotificationAttributes.NOTIFICATION_BODY.getValue(), DataType.STRING, true);
-        final Attribute usersList = new Attribute(NotificationAttributes.USERS_LIST.getValue(), DataType.ARRAY_OF_STRING, true);
+        final Attribute usersList = new Attribute(NotificationAttributes.USERS_LIST.getValue(), DataType.JSON_ARRAY, true);
         return new Schema(List.of(title, body, usersList));
     }
 
