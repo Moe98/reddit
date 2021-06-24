@@ -30,6 +30,11 @@ public class FirestoreConnector {
         reference.set(properties);
     }
 
+    public String createDocumentWithRandomKey(String collectionName, Map<String, Object> properties) throws ExecutionException, InterruptedException {
+        ApiFuture<DocumentReference> referenceFuture = firestore.collection(collectionName).add(properties);
+        return referenceFuture.get().getId();
+    }
+
     public Map<String, Object> readDocument(String collectionName, String key) throws ExecutionException, InterruptedException {
         DocumentReference reference = firestore.collection(collectionName).document(key);
         ApiFuture<DocumentSnapshot> document = reference.get();
