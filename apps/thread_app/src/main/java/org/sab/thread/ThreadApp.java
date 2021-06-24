@@ -1,5 +1,6 @@
 package org.sab.thread;
 
+import org.sab.arango.Arango;
 import org.sab.couchbase.Couchbase;
 import org.sab.models.CouchbaseBuckets;
 import org.sab.service.Service;
@@ -16,13 +17,22 @@ public class ThreadApp extends Service {
 
     public static void main(String[] args) {
         try {
-            startCouchbaseConnection();
-
+            dbInit();
             new ThreadApp().start();
-
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
+    }
+
+    public static void dbInit() {
+        startCouchbaseConnection();
+        startArangoConnection();
+    }
+
+    static void startArangoConnection() {
+        Arango arango = Arango.getInstance();
+        arango.createDatabaseIfNotExists(System.getenv("ARANGO_DB"));
     }
 
     @Override

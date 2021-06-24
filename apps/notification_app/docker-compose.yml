@@ -4,11 +4,14 @@ services:
     image: "rabbitmq:management"
     ports:
       - "15672:15672"
+      - "5762:5762"
   notificiation_app:
     build:
       context: "../../"
       dockerfile: "apps/notification_app/Dockerfile"
     restart: on-failure
+    ports:
+      - "4003:4003"
     env_file:
       - "../../.env"
     depends_on:
