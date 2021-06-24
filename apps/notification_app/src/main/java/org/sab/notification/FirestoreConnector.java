@@ -17,7 +17,6 @@ public class FirestoreConnector {
     private FirestoreConnector() {
         FirebaseInitializer.initialize();
         firestore = FirestoreClient.getFirestore();
-        firestore.listCollections().forEach(a -> System.out.println(a.getId()));
     }
 
     public static FirestoreConnector getInstance() {
