@@ -4,8 +4,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
-import java.io.IOException;
-
 public class FirebaseInitializer {
     private static boolean initialized;
 
@@ -15,6 +13,7 @@ public class FirebaseInitializer {
                 FirebaseOptions options = FirebaseOptions.builder()
                         .setCredentials(GoogleCredentials.getApplicationDefault()).build();
                 FirebaseApp.initializeApp(options);
+                initialized = true;
             }
         } catch (Exception e) {
             e.printStackTrace();
