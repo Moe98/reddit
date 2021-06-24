@@ -49,6 +49,9 @@ public class RegisterDeviceToken extends CommandWithVerification {
     }
 
     private void oldUserToken(FirestoreConnector firestore, String username, String token, List<String> tokens) {
+        if (tokens.contains(token))
+            return;
+
         tokens.add(token);
         Map<String, Object> tokenMap = Map.of("tokens", tokens);
         firestore.upsertDocument(TOKENS_COLLECTION, username, tokenMap);
