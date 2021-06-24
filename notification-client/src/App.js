@@ -38,6 +38,9 @@ const onChange = (event) => {
 
   return (
     <div className="App">
+      <div style={{
+                  position: 'absolute'
+                }} >
       {notification.map((obj ,index)=>{
               return  <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide animation style={{
                   position: 'relative',
@@ -57,6 +60,7 @@ const onChange = (event) => {
                   <Toast.Body>{obj.body}</Toast.Body>
                 </Toast>
       })}
+      </div>
       <header className="App-header">
         <div>
       <Form>
