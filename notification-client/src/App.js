@@ -1,8 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
-import {useState} from 'react';
+import {useState } from 'react';
 import { getToken, onMessageListener } from './firebase';
-import {Button, Toast,Form} from 'react-bootstrap';
+import {Button,Form,Card} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -23,6 +22,7 @@ function App() {
 
 
   const handleSubmit = (evt) => {
+    console.log(notification)
     evt.preventDefault();
     alert(`Submitting Name ${username} `);
     getToken(setTokenFound,username);
@@ -34,29 +34,6 @@ const onChange = (event) => {
 
   return (
     <div className="App">
-      <div style={{
-                  position: 'absolute'
-                }} >
-      {notification.map((obj ,index)=>{
-              return  <Toast onClose={() => setShow(false)} show={show} delay={60000} autohide animation style={{
-                  position: 'relative',
-                  top: 20,
-                  right: 50,
-                  minWidth: 200
-                }}>
-                  <Toast.Header>
-                    <img
-                      src="holder.js/20x20?text=%20"
-                      className="rounded mr-2"
-                      alt=""
-                    />
-                    <strong className="mr-auto">{obj.title}</strong>
-                    <small>just now</small>
-                  </Toast.Header>
-                  <Toast.Body>{obj.body}</Toast.Body>
-                </Toast>
-      })}
-      </div>
       <header className="App-header">
         <div>
       {!isTokenFound&&<Form>
@@ -70,10 +47,24 @@ const onChange = (event) => {
     <div>
     {isTokenFound && <h1> Notification permission enabled 👍🏻 </h1>}
         {!isTokenFound && <h1> Need notification permission ❗️ </h1>}
-    {isTokenFound&& <Button onClick={() => setShow(true)}>Show Notifications</Button>}
-    
+    {isTokenFound&& <Button onClick={() => setShow(!show)}>Show Notifications</Button>}
+
     </div>
     </div>
+    {<div >
+      {show&&notification.map((obj ,index)=>{
+              return     <Card style={{ marginTop:"10px",width: '35rem' ,backgroundColor: '#343a40',borderColor: "#282c34"
+            }} key={index}>
+              <Card.Body>
+                <Card.Title>{obj.title}</Card.Title>
+                <Card.Text>
+                  {obj.body}
+                </Card.Text>
+                <Button variant="primary" onClick={() =>setNotification(oldArray => [...oldArray.slice(0,index),...oldArray.slice(index+1,oldArray.length)])}>Delete</Button>
+              </Card.Body>
+            </Card>
+      })}
+      </div>}
       </header>
 
 
