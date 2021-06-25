@@ -28,9 +28,11 @@ public class UserAppTest {
     static String password = "12345678";
     static String token;
     static String userId;
+    static Arango arango;
 
     @BeforeClass
     public static void connectToDbs() {
+        arango = Arango.getConnectedInstance();
         try {
             UserApp.dbInit();
         } catch (Exception e) {
@@ -236,7 +238,6 @@ public class UserAppTest {
 
     @AfterClass
     public static void deleteFromArango() {
-        Arango arango = Arango.getInstance();
         BaseDocument user = arango.readDocument(UserApp.ARANGO_DB_NAME, CollectionNames.USER.get(), username);
         Map<String, Object> props = user.getProperties();
         boolean isDeleted = (boolean) props.get(UserAttributes.IS_DELETED.getArangoDb());

@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - 15672:15672
+  arangodb:
+    image: "arangodb"
+    ports:
+      - 8529:8529
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps_data:/var/lib/arangodb3-apps
+    environment:
+      - ARANGO_ROOT_PASSWORD=root
+  search_app:
+    build:
+      context: "../../"
+      dockerfile: "apps/search_app/Dockerfile"
+    restart: on-failure
+    ports:
+      - "4005:4005"
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - ARANGO_DB=Reddit
+      - ARANGO_USER=root
+      - ARANGO_PASSWORD=root
+      - ARANGO_HOST=arangodb
+    depends_on:
+      - "arangodb"
+      - "rabbitmq"
+
+networks:
+  default:
+    name: search_nw
+
+volumes:
+  arangodb_data:
+  arangodb_apps_data:

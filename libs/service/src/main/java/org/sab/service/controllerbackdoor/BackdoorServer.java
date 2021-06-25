@@ -8,16 +8,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.sab.service.Service;
+import org.sab.service.managers.ControlManager;
 
 import java.net.InetSocketAddress;
 
 public class BackdoorServer {
     private final int port;
-    private Service service;
+    private final ControlManager controlManager;
 
-    public BackdoorServer(int port, Service service) {
+    public BackdoorServer(int port, ControlManager controlManager) {
         this.port = port;
-        this.service = service;
+        this.controlManager = controlManager;
     }
 
     public void start() throws InterruptedException {
@@ -30,7 +31,7 @@ public class BackdoorServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() { // Specifies channel handler to call when connection is accepted
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new BackdoorServerHandler(service)); // Adds channel handler to pipeline
+                            ch.pipeline().addLast(new BackdoorServerHandler(controlManager)); // Adds channel handler to pipeline
                         }
                     });
 

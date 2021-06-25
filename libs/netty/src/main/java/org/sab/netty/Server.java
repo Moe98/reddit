@@ -13,6 +13,9 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.AttributeKey;
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
+
 import javax.net.ssl.SSLException;
 
 import java.security.cert.CertificateException;
@@ -27,7 +30,9 @@ public final class Server {
     public static final AttributeKey<HttpRequest> REQ_KEY = AttributeKey.valueOf("req");
     public static final AttributeKey<String> QUEUE_KEY = AttributeKey.valueOf("queue");
     public static final ArrayList<String> apps = new ArrayList<>(Arrays.asList("example", "thread", "subthread", "recommendation", "notification", "chat", "search", "user", "authentication", "useraction"));
-
+    // TODO: fetch nThreads from somewhere consistante most probably a config file
+    public static final int nThreads = 8;
+    protected static final EventExecutorGroup queueExecutorGroup = new DefaultEventExecutorGroup(nThreads);
     public static EventLoopGroup bossGroup;
     public static EventLoopGroup workerGroup;
     
