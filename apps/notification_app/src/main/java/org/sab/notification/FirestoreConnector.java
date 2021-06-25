@@ -1,6 +1,7 @@
 package org.sab.notification;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -53,4 +54,9 @@ public class FirestoreConnector {
     public int documentCount(String collectionName) throws ExecutionException, InterruptedException {
         return firestore.collection(collectionName).get().get().size();
     }
+
+    public CollectionReference readCollection(String collectionName) {
+        return firestore.collection(collectionName);
+    }
+    
 }
