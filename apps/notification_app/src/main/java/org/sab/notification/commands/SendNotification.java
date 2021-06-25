@@ -4,10 +4,7 @@ import com.google.cloud.Timestamp;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sab.models.NotificationAttributes;
-import org.sab.notification.FirebaseMessagingConnector;
-import org.sab.notification.FirestoreConnector;
-import org.sab.notification.GoogleCredentialsLoadingFailedException;
-import org.sab.notification.NotificationSendingFailedException;
+import org.sab.notification.*;
 import org.sab.service.Responder;
 import org.sab.service.validation.CommandWithVerification;
 import org.sab.service.validation.HTTPMethod;
@@ -72,12 +69,13 @@ public class SendNotification extends CommandWithVerification {
         notificationMap.put("time", Timestamp.now());
 
         for (String user : usersList) {
-            firestore.createDocumentWithRandomKey("userNotifications/" + user + "/notifications", notificationMap);
+            firestore.createDocumentWithRandomKey(NotificationApp.getNotificationsCollectionName(user), notificationMap);
         }
     }
 
     /**
      * Retrieves the list of tokens from the firestore db given a userList
+     *
      * @param usersList list of usernames
      * @return list of tokens
      */
@@ -89,7 +87,7 @@ public class SendNotification extends CommandWithVerification {
             if (document == null)
                 continue;
 
-            tokens.addAll((List<String>)document.get("tokens"));
+            tokens.addAll((List<String>) document.get("tokens"));
         }
         return tokens;
     }

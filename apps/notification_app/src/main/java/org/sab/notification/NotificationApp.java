@@ -10,6 +10,10 @@ public class NotificationApp extends Service {
         new NotificationApp().start();
     }
 
+    public static String getNotificationsCollectionName(String user) {
+        return "userNotifications/" + user + "/notifications";
+    }
+
     @Override
     public String getAppUriName() {
         return "notification";
