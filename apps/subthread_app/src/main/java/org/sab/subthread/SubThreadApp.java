@@ -25,11 +25,11 @@ public class SubThreadApp extends Service {
     public static void main(String[] args) {
 
         try {
-            dbInit();
 
             // TODO add collection creation here
             //        createCollections(collectionList, edgeCollectionList);
             new SubThreadApp().start();
+            dbInit();
 
         } catch (Exception e) {
             e.printStackTrace();
