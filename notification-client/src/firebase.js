@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/messaging";
 import "firebase/firestore";
-import axios from "axios";
 
 var firebaseConfig = {
   apiKey: "AIzaSyD0dQIsSM2S-ToVv3NP1hqahEO3Nfkjbeo",
@@ -22,23 +21,17 @@ export const getToken = (setTokenFound, username) => {
     .getToken()
     .then(async (currentToken) => {
       if (currentToken) {
-        await axios
-          .create({
-            baseURL: "localhost:8080",
-            headers: {
-              "Function-Name": "REGISTER_DEVICE_TOKEN",
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-            },
-          })
-          .post(
-            "/api/notification",
-            { crossDomain: true },
-            {
-              username: username,
-              token: currentToken,
-            }
-          )
+        fetch("http://localhost:8080/api/notification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "appliaction/json",
+            "Function-Name": "REGISTER_DEVICE_TOKEN",
+          },
+          body: JSON.stringify({
+            username: username,
+            token: currentToken,
+          }),
+        })
           .then((res) => {
             if (res.status === 200) {
               setTokenFound(true);
