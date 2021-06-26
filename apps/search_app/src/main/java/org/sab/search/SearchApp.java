@@ -43,8 +43,8 @@ public class SearchApp extends Service {
     }
 
     public static void main(String[] args) {
-        dbInit();
         new SearchApp().start();
+        dbInit();
     }
 
     @Override

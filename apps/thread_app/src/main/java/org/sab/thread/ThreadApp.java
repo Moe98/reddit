@@ -17,8 +17,8 @@ public class ThreadApp extends Service {
 
     public static void main(String[] args) {
         try {
-            dbInit();
             new ThreadApp().start();
+            dbInit();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
