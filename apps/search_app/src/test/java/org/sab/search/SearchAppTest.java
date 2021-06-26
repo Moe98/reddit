@@ -48,7 +48,7 @@ public class SearchAppTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
 
             SearchApp.dbInit();
 

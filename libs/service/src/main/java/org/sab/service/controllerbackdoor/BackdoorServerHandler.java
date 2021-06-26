@@ -8,14 +8,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.json.JSONObject;
 import org.sab.service.Service;
+import org.sab.service.managers.ControlManager;
 
 
 @ChannelHandler.Sharable
 public class BackdoorServerHandler extends ChannelInboundHandlerAdapter {
-    private Service service;
+    private final ControlManager controlManager;
 
-    public BackdoorServerHandler(Service service) {
-        this.service = service;
+    public BackdoorServerHandler(ControlManager controlManager) {
+        this.controlManager = controlManager;
     }
 
     private String toString(Object msg) {
@@ -31,7 +32,7 @@ public class BackdoorServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) { //
         String controllerCmd = toString(msg);
-        service.handleControllerMessage(new JSONObject(controllerCmd));
+        controlManager.handleControllerMessage(new JSONObject(controllerCmd));
     }
 
     @Override

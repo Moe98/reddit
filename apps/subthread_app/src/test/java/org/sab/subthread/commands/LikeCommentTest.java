@@ -29,7 +29,7 @@ public class LikeCommentTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             SubThreadApp.startCouchbaseConnection();
 
             arango.createDatabaseIfNotExists(CommentCommand.TEST_DB_Name);

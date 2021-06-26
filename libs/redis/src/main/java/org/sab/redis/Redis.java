@@ -25,8 +25,10 @@ import static io.lettuce.core.cluster.ClusterTopologyRefreshOptions.DEFAULT_REFR
 
 public class Redis {
 
-    final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
+    private static Redis instance = getClient();
     private final RedisClusterClient redisClient;
+    private GenericObjectPool<StatefulRedisClusterConnection<String, String>> connectionPool;
+
     // TODO get from config file
     private final String HOST_URI = System.getenv("REDIS_HOST_URI");
     private final ArrayList<String> ports = new ArrayList(
@@ -37,16 +39,18 @@ public class Redis {
                             .replace("]", "")
                             .split(",")
             ));
+
     // Very top secret password.
     private final String PASSWORD = System.getenv("REDIS_PASSWORD");
     private final int OPERATION_TIMEOUT_MINUTES;
     private final int DATABASE_NUMBER;
     private final int NUMBER_OF_CONNECTIONS;
-    private GenericObjectPool<StatefulRedisClusterConnection<String, String>> connectionPool;
+
+    final static String TIMEOUT_ERROR_MESSAGE = "Could not complete within the timeout";
 
     // TODO singleton?
     //  check if we can pool the connection
-    public Redis() {
+    private Redis() {
         /*
         connection scheme
             redis :// [password@] host [: port] [/ database]
@@ -90,6 +94,13 @@ public class Redis {
                 .build());
 
         connect();
+    }
+
+    public static Redis getClient() {
+        if(instance == null) {
+            instance = new Redis();
+        }
+        return instance;
     }
 
     public void connect() {

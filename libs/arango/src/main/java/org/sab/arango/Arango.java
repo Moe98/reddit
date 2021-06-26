@@ -15,30 +15,31 @@ import com.arangodb.model.arangosearch.ArangoSearchCreateOptions;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.sab.databases.PoolDoesNotExistException;
+import org.sab.databases.PooledDatabaseClient;
 import org.sab.environmentvariables.EnvVariablesUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
-@SuppressWarnings("unused")
-public class Arango {
-    final private static Arango instance = new Arango();
+
+public class Arango implements PooledDatabaseClient {
+    private static Arango instance;
     private static ArangoDB.Builder builder;
     private ArangoDB arangoDB;
 
     private Arango() {
+        super();
+    }
 
-        final Properties properties = new Properties();
-        int NUM_OF_CONNECTIONS = 10;
-        try {
-            properties.load(getClass().getClassLoader().getResourceAsStream("config.properties"));
-            NUM_OF_CONNECTIONS = Integer.parseInt(properties.getProperty("NUMBER_OF_CONNECTIONS"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    public String getName(){
+        return "ARANGO";
+    }
+
+    @Override
+    public void createPool(int maxConnections) {
 
         final String arangoHost = EnvVariablesUtils.getOrDefaultEnvVariable("ARANGO_HOST", ArangoDefaults.DEFAULT_HOST);
         
@@ -46,22 +47,66 @@ public class Arango {
                 .host(arangoHost, getPort())
                 .user(System.getenv("ARANGO_USER"))
                 .password(System.getenv("ARANGO_PASSWORD"))
-                .maxConnections(NUM_OF_CONNECTIONS)
+                .maxConnections(maxConnections)
                 .serializer(new ArangoJack())
                 .connectionTtl(null)
                 .keepAliveInterval(600);
-        arangoDB = builder.build();
+
+        connect();
     }
 
     private static int getPort() {
         String arangoPortFromEnv = System.getenv("ARANGO_PORT");
         return arangoPortFromEnv == null ? ArangoDefaults.DEFAULT_PORT : Integer.parseInt(arangoPortFromEnv);
     }
-
+    
+    // Mandatory public static ConcreteClass getClient() method
+    // TODO change method name (once everything else is merged)
     public static Arango getInstance() {
+        if(instance == null) {
+            instance = new Arango();
+        }
+        return instance;
+    }
+    
+    // For the purpose of running tests
+    public static Arango getConnectedInstance() {
+        if(instance == null) {
+            instance = new Arango();
+        }
+        instance.createPool(10);
         return instance;
     }
 
+    @Override
+    public void destroyPool() throws PoolDoesNotExistException {
+        if (arangoDB != null) {
+            arangoDB.shutdown();
+            arangoDB = null;
+            builder = null;
+        } else {
+            throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
+        }
+    }
+    
+    @Override
+    public void setMaxConnections(int maxConnections) throws PoolDoesNotExistException {
+        if(builder != null) {
+            builder.maxConnections(maxConnections);
+            connect();
+        } else {
+            throw new PoolDoesNotExistException("Can't set the number of connections if pool does not exist");
+        }
+    }
+    
+    private void connect() {
+        arangoDB = builder.build();
+    }
+    
+    private boolean isConnected() {
+        return arangoDB != null && arangoDB.db().exists();
+    }
+    
     public static BaseDocument createDocument(String dbName, String collectionName, Map<String, Object> properties, String key) {
         BaseDocument newDocument = new BaseDocument(new HashMap<>(properties));
         newDocument.setKey(key);
@@ -76,26 +121,6 @@ public class Arango {
         Arango arango = Arango.getInstance();
 
         return arango.updateDocument(dbName, collectionName, updatedDocument, documentKey);
-    }
-
-    private void connect() {
-        arangoDB = builder.build();
-    }
-
-    private boolean isConnected() {
-        return arangoDB != null && arangoDB.db().exists();
-    }
-
-    private void connectIfNotConnected() {
-        if (!isConnected()) {
-            connect();
-        }
-    }
-
-    private void disconnect() {
-        if (arangoDB != null) {
-            arangoDB.shutdown();
-        }
     }
 
     public boolean createDatabase(String dbName) {

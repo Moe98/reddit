@@ -23,7 +23,7 @@ public class UpdateThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             ThreadApp.startCouchbaseConnection();
             // TODO: Use a test DB if possible.
             arango.createDatabaseIfNotExists(DB_NAME);
