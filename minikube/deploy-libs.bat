@@ -7,4 +7,6 @@
 @REM @REM Couchbase
 @REM kubectl apply -f ./couchbase/couchbase-deployment.yaml
 
+@REM kubectl create configmap sql-scripts --from-file=./sql
+
 PAUSE
