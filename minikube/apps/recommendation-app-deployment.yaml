@@ -50,7 +50,7 @@ spec:
 apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: recommendation-hpa
+  name: recommendation-app-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
