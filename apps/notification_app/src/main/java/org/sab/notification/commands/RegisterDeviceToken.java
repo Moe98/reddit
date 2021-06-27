@@ -44,12 +44,12 @@ public class RegisterDeviceToken extends CommandWithVerification {
         }
     }
 
-    private void newUserToken(FirestoreConnector firestore, String username, String token) {
+    private void newUserToken(FirestoreConnector firestore, String username, String token) throws ExecutionException, InterruptedException {
         Map<String, Object> tokenMap = Map.of("tokens", List.of(token));
         firestore.upsertDocument(TOKENS_COLLECTION, username, tokenMap);
     }
 
-    private void oldUserToken(FirestoreConnector firestore, String username, String token, List<String> tokens) {
+    private void oldUserToken(FirestoreConnector firestore, String username, String token, List<String> tokens) throws ExecutionException, InterruptedException {
         if (tokens.contains(token))
             return;
 

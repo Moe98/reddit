@@ -18,7 +18,11 @@ public class FirestoreTest {
 
     @BeforeClass
     public static void setup() {
-        firestore.deleteDocument(collectionName, key);
+        try {
+            firestore.deleteDocument(collectionName, key);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
