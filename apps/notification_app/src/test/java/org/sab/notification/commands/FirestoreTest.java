@@ -36,28 +36,24 @@ public class FirestoreTest {
             array.add("hello");
             properties.put("array", array);
 
-            firestore.upsertDocument(collectionName, key, properties);
+            firestore.upsertDocument(collectionName, key, properties, true);
             assertEquals(firestore.documentCount(collectionName), 2);
 
             Map<String, Object> document = firestore.readDocument(collectionName, key);
             assertEquals(firestore.documentCount(collectionName), 2);
-            assertEquals(document.size(), properties.size());
-            for (String field : document.keySet())
-                assertEquals(document.get(field), properties.get(field));
+            assertEquals(document, properties);
 
             properties.put("flag", true);
             ((ArrayList<String>)properties.get("array")).add("world");
 
-            firestore.upsertDocument(collectionName, key, properties);
+            firestore.upsertDocument(collectionName, key, properties, true);
             assertEquals(firestore.documentCount(collectionName), 2);
 
             document = firestore.readDocument(collectionName, key);
             assertEquals(firestore.documentCount(collectionName), 2);
-            assertEquals(document.size(), properties.size());
-            for (String field : document.keySet())
-                assertEquals(document.get(field), properties.get(field));
+            assertEquals(document, properties);
 
-            firestore.deleteDocument(collectionName, key);
+            firestore.deleteDocument(collectionName, key, true);
             assertEquals(firestore.documentCount(collectionName), 1);
             assertNull(firestore.readDocument(collectionName, key));
 
