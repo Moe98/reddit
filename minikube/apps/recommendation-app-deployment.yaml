@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: recommendation-app
-        image: recommendation_app:withoutarango
+        image: recommendation_app
         imagePullPolicy: IfNotPresent
         resources:
           limits:
