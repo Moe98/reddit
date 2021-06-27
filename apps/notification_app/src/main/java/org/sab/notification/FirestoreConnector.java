@@ -66,8 +66,17 @@ public class FirestoreConnector {
         return firestore.collection(collectionName).get().get().size();
     }
 
-    public CollectionReference readCollection(String collectionName) {
-        return firestore.collection(collectionName);
+    public List<Map<String, Object>> readCollection(String collectionName) {
+        CollectionReference collectionReference = firestore.collection(collectionName);
+        ArrayList<Map<String, Object>> documents = new ArrayList<>();
+        collectionReference.listDocuments().forEach(documentReference -> {
+            try {
+                documents.add(documentReference.get().get().getData());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+        return documents;
     }
     
 }

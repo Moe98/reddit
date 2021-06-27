@@ -11,6 +11,7 @@ import org.sab.service.validation.HTTPMethod;
 import org.sab.validation.Schema;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -21,15 +22,7 @@ public class GetNotifications extends CommandWithVerification {
         String username = authenticationParams.getString(UserAttributes.USERNAME.toString());
         FirestoreConnector firestoreConnector = FirestoreConnector.getInstance();
 
-        CollectionReference collectionReference = firestoreConnector.readCollection(NotificationApp.getNotificationsCollectionName(username));
-        ArrayList<Map<String, Object>> notifications = new ArrayList<>();
-        collectionReference.listDocuments().forEach(documentReference -> {
-            try {
-                notifications.add(documentReference.get().get().getData());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        List<Map<String, Object>> notifications = firestoreConnector.readCollection(NotificationApp.getNotificationsCollectionName(username));
 
         return Responder.makeDataResponse(new JSONArray(notifications)).toString();
     }
