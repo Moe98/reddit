@@ -9,7 +9,6 @@ import java.util.concurrent.TimeoutException;
 
 class RPCBase {
 
-    private static final String LOCALHOST  = "localhost";
 
     private RPCBase() {
     }
@@ -18,10 +17,15 @@ class RPCBase {
         ConnectionFactory factory = new ConnectionFactory();
 
         String rabbitHost = System.getenv("RABBIT_HOST");
-        if(rabbitHost == null)
-            rabbitHost = LOCALHOST;
+        String rabbitUser = System.getenv("RABBIT_USER");
+        String rabbitPassword = System.getenv("RABBIT_PASSWORD");
 
-        factory.setHost(rabbitHost);
+        if (rabbitHost != null)
+            factory.setHost(rabbitHost);
+        if (rabbitUser != null)
+            factory.setUsername(rabbitUser);
+        if (rabbitPassword != null)
+            factory.setPassword(rabbitPassword);
 
         return factory.newConnection();
     }
