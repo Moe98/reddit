@@ -34,19 +34,18 @@ public class NotificationAppTest {
     @Test
     public void T01_registerDeviceInsertsTokenInFirestore() {
 
-        JSONObject body = new JSONObject().put("username", USERNAME).put(NotificationApp.TOKEN, TOKEN);
+        JSONObject body = new JSONObject().put("username", USERNAME).put(NotificationApp.TOKEN, TOKEN).put("waitUntilRegistered", true);
         JSONObject request = TestsUtils.makeAuthorizedRequest(body, HTTPMethod.POST.toString(), new JSONObject());
         new RegisterDeviceToken().execute(request);
-        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
-            FirestoreConnector firestoreConnector = FirestoreConnector.getInstance();
-            try {
-                Map<String, Object> document = firestoreConnector.readDocument(NotificationApp.TOKENS_COLLECTION, USERNAME);
-                List<String> tokens = (List<String>) document.get("tokens");
-                assertEquals(TOKEN, tokens.get(tokens.size() - 1));
-            } catch (ExecutionException | InterruptedException e) {
-                fail(e.getMessage());
-            }
-        }, 1, TimeUnit.SECONDS);
+
+        FirestoreConnector firestoreConnector = FirestoreConnector.getInstance();
+        try {
+            Map<String, Object> document = firestoreConnector.readDocument(NotificationApp.TOKENS_COLLECTION, USERNAME);
+            List<String> tokens = (List<String>) document.get("tokens");
+            assertEquals(TOKEN, tokens.get(tokens.size() - 1));
+        } catch (ExecutionException | InterruptedException e) {
+            fail(e.getMessage());
+        }
 
     }
 
