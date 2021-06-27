@@ -16,6 +16,8 @@ import org.sab.tests.TestsUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -35,14 +37,17 @@ public class NotificationAppTest {
         JSONObject body = new JSONObject().put("username", USERNAME).put(NotificationApp.TOKEN, TOKEN);
         JSONObject request = TestsUtils.makeAuthorizedRequest(body, HTTPMethod.POST.toString(), new JSONObject());
         new RegisterDeviceToken().execute(request);
-        FirestoreConnector firestoreConnector = FirestoreConnector.getInstance();
-        try {
-            Map<String, Object> document = firestoreConnector.readDocument(NotificationApp.TOKENS_COLLECTION, USERNAME);
-            List<String> tokens = (List<String>) document.get("tokens");
-            assertEquals(TOKEN, tokens.get(tokens.size() - 1));
-        } catch (ExecutionException | InterruptedException e) {
-            fail(e.getMessage());
-        }
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            FirestoreConnector firestoreConnector = FirestoreConnector.getInstance();
+            try {
+                Map<String, Object> document = firestoreConnector.readDocument(NotificationApp.TOKENS_COLLECTION, USERNAME);
+                List<String> tokens = (List<String>) document.get("tokens");
+                assertEquals(TOKEN, tokens.get(tokens.size() - 1));
+            } catch (ExecutionException | InterruptedException e) {
+                fail(e.getMessage());
+            }
+        }, 1, TimeUnit.SECONDS);
+
     }
 
     @Test
