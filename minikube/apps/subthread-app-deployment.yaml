@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subthread-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: subthread_app
+  template:
+    metadata:
+      labels:
+        app: subthread_app
+    spec:
+      containers:
+      - name: subthread-app
+        image: subthread_app
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+          - name: COUCHBASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: couchbase-deployment-authentication
+                key: username
+          - name: COUCHBASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: couchbase-deployment-authentication
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: subthread-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: subthread_app
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60
