@@ -1,8 +1,8 @@
 package org.sab.models;
 
 public enum NotificationAttributes {
-    // TODO: change its name to userList instead of registrationToken here and in the sendNotification command
-    USERS_LIST("registrationTokens"),
+
+    USERS_LIST("usersList"),
     TITLE("title"),
     NOTIFICATION_BODY("notificationBody");
 

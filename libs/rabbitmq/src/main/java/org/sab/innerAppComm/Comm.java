@@ -1,6 +1,7 @@
 package org.sab.innerAppComm;
 
 import org.json.JSONObject;
+import org.sab.auth.AuthParamsHandler;
 import org.sab.models.AuthenticationAttributes;
 import org.sab.models.NotificationAttributes;
 import org.sab.models.RequestAttributes;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 
 public class Comm {
     // TODO get queueName from somewhere instead of hardcoding it
-    protected static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    public static final String Notification_Queue_Name = "NOTIFICATION_REQ";
 
     public static void tag(String queueName, String title, String contentId, String content, String functionName){
         if(content!=null && content.length()>0){
@@ -125,5 +126,15 @@ public class Comm {
         catch (IOException | TimeoutException | NullPointerException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void putMessageInQueue(JSONObject body, JSONObject uriParams, String methodType, String functionName, String queueName) {
+        JSONObject request = new JSONObject();
+        request.put(RequestAttributes.BODY.getValue(), body);
+        request.put(RequestAttributes.METHOD_TYPE.getValue(), methodType);
+        request.put(RequestAttributes.URI_PARAMS.getValue(), uriParams);
+        request.put(RequestAttributes.FUNCTION_NAME.getValue(), functionName);
+        AuthParamsHandler.putAuthorizedParams(request);
+        putMessageInQueue(request, queueName);
     }
 }
