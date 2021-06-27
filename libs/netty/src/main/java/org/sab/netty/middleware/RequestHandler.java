@@ -37,8 +37,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     HttpPostRequestDecoder requestDecoder;
     boolean isFormData;
 
-    private static boolean isEmptyHttpContent(HttpContent emptyHttpContent) {
-        return emptyHttpContent.content().capacity() == 0;
+    private static boolean isEmptyHttpContent(HttpContent httpContent) {
+        return httpContent.equals(LastHttpContent.EMPTY_LAST_CONTENT);
     }
 
     JSONObject getURIParams() {
