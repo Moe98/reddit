@@ -137,6 +137,8 @@ jobs:
           KEYSPACE_NAME: chat_app
           REPLICATION_STRATEGY: SimpleStrategy
           REPLICATION_FACTOR: 2
+          # Firebase
+          GOOGLE_APPLICATION_CREDENTIALS: src/main/resources/firebase-config.json
         uses: nick-invision/retry@v2
         with:
           timeout_seconds: 240

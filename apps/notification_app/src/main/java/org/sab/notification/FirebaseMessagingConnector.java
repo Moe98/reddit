@@ -15,9 +15,7 @@ public class FirebaseMessagingConnector {
     private final FirebaseMessaging firebaseMessaging;
 
     private FirebaseMessagingConnector() throws IOException {
-        final FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.getApplicationDefault()).build();
-        FirebaseApp.initializeApp(options);
+        FirebaseInitializer.initialize();
         this.firebaseMessaging = FirebaseMessaging.getInstance();
     }
 
