@@ -1,12 +1,11 @@
 package org.sab.notification;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -26,9 +25,15 @@ public class FirestoreConnector {
         return instance;
     }
 
-    public void upsertDocument(String collectionName, String key, Map<String, Object> properties) {
-        DocumentReference reference = firestore.collection(collectionName).document(key);
-        reference.set(properties);
+    public void upsertDocument(String collectionName, String key, Map<String, Object> properties) throws ExecutionException, InterruptedException {
+        upsertDocument(collectionName, key, properties, false);
+    }
+
+    public void upsertDocument(String collectionName, String key, Map<String, Object> properties, boolean waitForFuture) throws ExecutionException, InterruptedException {
+        ApiFuture<WriteResult> resultFuture = firestore.collection(collectionName).document(key).set(properties);
+
+        if (waitForFuture)
+            resultFuture.get();
     }
 
     public String createDocumentWithRandomKey(String collectionName, Map<String, Object> properties) throws ExecutionException, InterruptedException {
@@ -46,9 +51,15 @@ public class FirestoreConnector {
         return null;
     }
 
-    public void deleteDocument(String collectionName, String key) {
-        DocumentReference reference = firestore.collection(collectionName).document(key);
-        reference.delete();
+    public void deleteDocument(String collectionName, String key) throws ExecutionException, InterruptedException {
+        deleteDocument(collectionName, key, false);
+    }
+
+    public void deleteDocument(String collectionName, String key, boolean waitForFuture) throws ExecutionException, InterruptedException {
+        ApiFuture<WriteResult> resultFuture = firestore.collection(collectionName).document(key).delete();
+
+        if (waitForFuture)
+            resultFuture.get();
     }
 
     public int documentCount(String collectionName) throws ExecutionException, InterruptedException {
