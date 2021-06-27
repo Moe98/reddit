@@ -55,7 +55,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: thread_app
+    name: thread-app-deployment
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 60
