@@ -5,6 +5,7 @@ import com.arangodb.ArangoDBException;
 import com.arangodb.entity.BaseDocument;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.*;
+import org.sab.databases.PoolDoesNotExistException;
 
 import java.util.HashMap;
 
@@ -17,12 +18,13 @@ public class ArangoTest {
     private static HashMap<String, Object> documentProperties;
     private static String viewName;
 
+    final static int CONNECTION_COUNT = 10;
+
 
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
-
+            arango = Arango.getConnectedInstance();
 
             dbName = "TestDB";
             collectionName = "TestCollection";
@@ -49,6 +51,11 @@ public class ArangoTest {
             assertTrue(arango.dropDatabase(dbName));
         } catch (ArangoDBException e) {
             fail(e.getMessage());
+        }
+        try {
+            arango.destroyPool();
+        } catch (PoolDoesNotExistException e) {
+            e.printStackTrace();
         }
     }
 
@@ -99,7 +106,7 @@ public class ArangoTest {
     @Test
     public void getInstance() {
         try {
-            Arango arango1 = Arango.getInstance();
+            Arango arango1 = Arango.getConnectedInstance();
             assertSame(arango1, arango);
         } catch (ArangoDBException e) {
             fail(e.getMessage());

@@ -25,21 +25,6 @@ public class DynamicLoadingTest {
         return method.invoke(obj);
     }
 
-    private static Path getResourcePath(String resource) {
-        final URL url = DynamicLoadingTest.class.getClassLoader().getResource(resource);
-
-        if (url == null) {
-            return null;
-        }
-
-        try {
-            return Paths.get(url.toURI());
-        } catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-
     @Test
     public void readUpdateRemoveClass() {
         final String className = "org.sab.classes.Charlie";
@@ -54,8 +39,8 @@ public class DynamicLoadingTest {
         }
 
         // Two versions of the same class
-        final Path flyingPath = getResourcePath("CharlieFlying");
-        final Path hoppingPath = getResourcePath("CharlieHopping");
+        final Path flyingPath = Reader.getResourcePath("CharlieFlying");
+        final Path hoppingPath = Reader.getResourcePath("CharlieHopping");
 
         try {
             Objects.requireNonNull(flyingPath);

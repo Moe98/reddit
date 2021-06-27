@@ -29,7 +29,7 @@ public class LikeSubThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             SubThreadApp.startCouchbaseConnection();
 
             arango.createDatabaseIfNotExists(SubThreadCommand.DB_Name);
