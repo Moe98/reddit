@@ -7,8 +7,8 @@ public class UserToUserActionsApp extends Service {
 
     public static void main(String[] args) {
         try {
-            dbInit();
             new UserToUserActionsApp().start();
+            dbInit();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

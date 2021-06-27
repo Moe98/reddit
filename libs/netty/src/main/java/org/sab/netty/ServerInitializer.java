@@ -27,7 +27,7 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) {
         CorsConfig corsConfig = CorsConfigBuilder.forAnyOrigin()
-                .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length", "Authorization")
+                .allowedRequestHeaders("X-Requested-With", "Content-Type", "Content-Length", "Authorization", "Function-Name")
                 .allowedRequestMethods(
                         HttpMethod.GET,
                         HttpMethod.POST,
