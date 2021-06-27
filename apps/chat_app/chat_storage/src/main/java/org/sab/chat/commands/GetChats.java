@@ -24,21 +24,15 @@ public class GetChats extends CommandWithVerification {
 
     public void getGroupChatTableInstance() {
         if (groupChatTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            cassandra.createTables();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
             groupChatTable = cassandra.getGroupChatTable();
         }
     }
 
     public void getDirectChatTableInstance() {
         if (directChatTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            directChatTable = new DirectChatTable(cassandra);
-            directChatTable.createTable();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
+            directChatTable = cassandra.getDirectChatTable();
         }
     }
 

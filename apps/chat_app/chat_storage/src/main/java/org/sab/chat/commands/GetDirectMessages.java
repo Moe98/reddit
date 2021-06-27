@@ -21,10 +21,7 @@ public class GetDirectMessages extends CommandWithVerification {
 
     public void getDirectMessageTableInstance() {
         if (directMessageTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            cassandra.createTables();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
             directMessageTable = cassandra.getDirectMessageTable();
         }
     }

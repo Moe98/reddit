@@ -21,10 +21,7 @@ public class GetGroupMessages extends CommandWithVerification {
 
     public void getGroupMessageTableInstance() {
         if (groupMessageTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            cassandra.createTables();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
             groupMessageTable = cassandra.getGroupMessageTable();
         }
     }
