@@ -36,6 +36,14 @@ public class CassandraConnector implements PooledDatabaseClient {
         return instance;
     }
 
+    //For tests
+    public static CassandraConnector getConnectedInstance() {
+        if(instance == null)
+            instance = new CassandraConnector();
+        instance.createPool(10);
+        return instance;
+    }
+
     private void init() {
         node = System.getenv("CASSANDRA_NODE");
         port = Integer.parseInt(System.getenv("CASSANDRA_PORT"));

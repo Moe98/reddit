@@ -9,6 +9,7 @@ import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectMessage;
 import org.sab.chat.storage.models.GroupMessage;
+import org.sab.databases.PoolDoesNotExistException;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,18 +26,14 @@ public class DirectMessageTableTest {
 
     @Before
     public void connect() {
-        cassandra = new CassandraConnector();
-        cassandra.connect();
-        cassandra.initializeKeySpace();
-
-        directMessages = new DirectMessageTable(cassandra);
-        directMessages.createTable();
+        cassandra = CassandraConnector.getConnectedInstance();
+        directMessages = cassandra.getDirectMessageTable();
 
     }
 
     @After
-    public void disconnect() {
-        cassandra.close();
+    public void disconnect() throws PoolDoesNotExistException {
+        cassandra.destroyPool();
     }
 
     @Test
