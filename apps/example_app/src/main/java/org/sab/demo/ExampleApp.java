@@ -5,7 +5,8 @@ import org.sab.service.Service;
 public class ExampleApp extends Service {
 
     public static void main(String[] args) {
-        new ExampleApp().start();
+        ExampleApp a = new ExampleApp();
+        a.start();
     }
 
     @Override

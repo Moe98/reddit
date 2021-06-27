@@ -23,7 +23,7 @@ public class FollowThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             ThreadApp.startCouchbaseConnection();
             arango.createDatabaseIfNotExists(DB_NAME);
 
