@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
+import org.sab.databases.PoolDoesNotExistException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,14 +17,12 @@ public class CassandraConnectorTest {
 
     @Before
     public void connect() {
-        cassandra = new CassandraConnector();
-        cassandra.connect();
-        cassandra.initializeKeySpace();
+        cassandra = CassandraConnector.getConnectedInstance();
     }
 
     @After
-    public void disconnect() {
-        cassandra.close();
+    public void disconnect() throws PoolDoesNotExistException {
+        cassandra.destroyPool();
     }
 
     @Test

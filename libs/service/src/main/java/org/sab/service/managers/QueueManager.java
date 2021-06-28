@@ -20,12 +20,8 @@ public class QueueManager {
         this.invocationManager = invocationManager;
     }
 
-    public void initAcceptingNewRequests() {
-        try {
-            initRPCServer();
-        } catch (IOException | TimeoutException e) {
-            e.printStackTrace();
-        }
+    public void initAcceptingNewRequests() throws IOException, TimeoutException {
+        initRPCServer();
     }
     
     public void initRPCServer() throws IOException, TimeoutException {
@@ -37,28 +33,23 @@ public class QueueManager {
         singleServerChannel = RPCServer.getSingleChannelExecutor(queueName, invokeCallback);
     }
 
-    public void stopAcceptingNewRequests() {
-        try {
-            singleServerChannel.pauseListening();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void stopAcceptingNewRequests() throws IOException {
+        singleServerChannel.pauseListening();
     }
 
-    public void startAcceptingNewRequests() {
-        try {
-            singleServerChannel.startListening();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void startAcceptingNewRequests() throws IOException {
+        singleServerChannel.startListening();
     }
 
     public void dispose() {
         if(singleServerChannel == null) {
             return;
         }
-
-        stopAcceptingNewRequests();
+        try {
+            stopAcceptingNewRequests();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         singleServerChannel = null;
     }
 }

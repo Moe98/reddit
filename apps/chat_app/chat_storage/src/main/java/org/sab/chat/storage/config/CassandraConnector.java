@@ -1,9 +1,6 @@
 package org.sab.chat.storage.config;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PoolingOptions;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,8 +12,11 @@ import org.sab.chat.storage.tables.DirectChatTable;
 import org.sab.chat.storage.tables.DirectMessageTable;
 import org.sab.chat.storage.tables.GroupChatTable;
 import org.sab.chat.storage.tables.GroupMessageTable;
+import org.sab.databases.PoolDoesNotExistException;
+import org.sab.databases.PooledDatabaseClient;
 
-public class CassandraConnector {
+public class CassandraConnector implements PooledDatabaseClient {
+    public static CassandraConnector instance;
     private Cluster cluster;
     private String node, keyspaceName, replicationStrategy;
     private Integer port;
@@ -26,9 +26,24 @@ public class CassandraConnector {
     private DirectChatTable directChatTable;
     private DirectMessageTable directMessageTable;
     private GroupMessageTable groupMessageTable;
+    private int maxPoolConnections;
+    private String username;
+    private String password;
 
-    public CassandraConnector() {
-        init();
+    private CassandraConnector() {}
+
+    public static CassandraConnector getInstance() {
+        if(instance == null)
+            instance = new CassandraConnector();
+        return instance;
+    }
+
+    //For tests
+    public static CassandraConnector getConnectedInstance() {
+        if(instance == null)
+            instance = new CassandraConnector();
+        instance.createPool(10);
+        return instance;
     }
 
     private void init() {
@@ -38,11 +53,19 @@ public class CassandraConnector {
         keyspaceName = System.getenv("KEYSPACE_NAME");
         replicationStrategy = System.getenv("REPLICATION_STRATEGY");
         replicationFactor = Integer.parseInt(System.getenv("REPLICATION_FACTOR"));
+
+        username = System.getenv("CASSANDRA_USERNAME");
+        password = System.getenv("CASSANDRA_PASSWORD");
     }
 
     public void connect() {
         PoolingOptions poolingOptions = new PoolingOptions();
+        poolingOptions
+                .setMaxConnectionsPerHost( HostDistance.LOCAL, maxPoolConnections)
+                .setMaxConnectionsPerHost( HostDistance.REMOTE, maxPoolConnections);
         Cluster.Builder clusterBuilder = Cluster.builder().addContactPoint(node).withPoolingOptions(poolingOptions);
+        if(username != null && password != null)
+            clusterBuilder.withCredentials(username, password);
         if (port != null) {
             clusterBuilder.withPort(port);
         }
@@ -108,4 +131,34 @@ public class CassandraConnector {
         return configJSON;
     }
 
+    @Override
+    public void createPool(int maxConnections) {
+        this.maxPoolConnections = maxConnections;
+        init();
+        connect();
+        initializeKeySpace();
+        createTables();
+    }
+
+    @Override
+    public void destroyPool() throws PoolDoesNotExistException {
+        if(cluster == null || session == null)
+            throw new PoolDoesNotExistException("Can't destroy pool if it does not exist");
+        close();
+    }
+
+    @Override
+    public void setMaxConnections(int maxConnections) throws PoolDoesNotExistException {
+        this.maxPoolConnections = maxConnections;
+        if(cluster == null)
+            throw new PoolDoesNotExistException("Pool does not exist");
+        cluster.getConfiguration().getPoolingOptions()
+                .setMaxConnectionsPerHost( HostDistance.LOCAL, maxPoolConnections)
+                .setMaxConnectionsPerHost( HostDistance.REMOTE, maxPoolConnections);
+    }
+
+    @Override
+    public String getName() {
+        return "CASSANDRA";
+    }
 }
