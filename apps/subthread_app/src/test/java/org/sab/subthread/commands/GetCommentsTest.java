@@ -119,10 +119,10 @@ public class GetCommentsTest {
     private static JSONObject getComments(String parentId, String contentType, String userId) {
 
         JSONObject body = new JSONObject();
-        body.put(CommentCommand.PARENT_SUBTHREAD_ID, parentId);
-        body.put(CommentCommand.PARENT_CONTENT_TYPE, contentType);
 
         JSONObject uriParams = new JSONObject();
+        uriParams.put(CommentCommand.PARENT_SUBTHREAD_ID, parentId);
+        uriParams.put(CommentCommand.PARENT_CONTENT_TYPE, contentType);
 
         JSONObject request = TestUtils.makeRequest(body, uriParams, HTTPMethod.GET);
 
