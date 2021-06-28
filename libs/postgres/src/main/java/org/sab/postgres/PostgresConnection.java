@@ -1,6 +1,7 @@
 package org.sab.postgres;
 
 
+import org.sab.auth.Auth;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.BufferedReader;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Properties;
+import java.util.UUID;
 
 public class PostgresConnection {
     private static PostgresConnection instance = null;
@@ -102,6 +104,36 @@ public class PostgresConnection {
         runScript(getScriptPath("CreateUserProcedures"));
     }
 
+    private static void createMockData() throws IOException, EnvironmentVariableNotLoaded {
+        for (int rowNumber = 0; rowNumber < 10000; rowNumber++) {
+            String username = "user" + rowNumber;
+            String userId = UUID.randomUUID().toString();
+            String hashedPassword = Auth.hash("12345678");
+            String email = "user" + rowNumber + "@gmail.com";
+            Date birthdate = Date.valueOf("1998-1-1");
+
+            try {
+                PostgresConnection.call("create_user", userId, username, email, hashedPassword, birthdate);
+                System.out.println("user" + rowNumber + " Inserted");
+            } catch (EnvironmentVariableNotLoaded | SQLException e) {
+                System.out.println("Error Occured while adding user number " + rowNumber);
+            }
+        }
+    }
+    private static void runMockDataProcedure() throws EnvironmentVariableNotLoaded, SQLException {
+        PostgresConnection postgresConnection = getInstance();
+        Connection connection = postgresConnection.connect();
+            try {
+                connection.prepareCall("{call mockData()}").execute();
+            } catch ( SQLException e) {
+                System.out.println(e);
+                System.out.println("Error Occured while adding users mock data ");
+            }finally {
+                connection.close();
+            }
+    }
+
+
     private static void runScript(String scriptPath) throws IOException, EnvironmentVariableNotLoaded {
         for (String param : propertiesParams)
             if (System.getenv(param) == null)
@@ -126,9 +158,10 @@ public class PostgresConnection {
 
     }
 
-    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
+    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded, SQLException {
         createUsersTable();
         createUsersProcedures();
+        runMockDataProcedure();
     }
 
     private static String getScriptPath(String sqlScriptName) {
