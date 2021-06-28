@@ -12,6 +12,13 @@ data:
   ARANGO_HOST: arangodb-deployment.default.svc
   # Couchbase
   COUCHBASE_HOST: couchbase://couchbase-deployment-srv.default
+  # Cassandra
+  CASSANDRA_NODE: cassandra-cluster-cassandra-deployment-service.cass-operator.svc.cluster.local
+  CASSANDRA_PORT: "9042"
+  KEYSPACE_NAME: chat_app
+  REPLICATION_STRATEGY: SimpleStrategy
+  REPLICATION_FACTOR: "2"
+
   # JWT
   JWT_SECRET: scaleabull
   JWT_ISSUER: org.sab

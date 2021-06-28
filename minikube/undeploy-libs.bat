@@ -10,4 +10,7 @@
 @REM @REM Postgres
 @REM kubectl delete -f ./postgres/postgres-deployment.yaml
 
+@REM @REM Cassandra
+@REM kubectl -n cass-operator delete -f ./cassandra/cassandra-deployment.yaml
+
 PAUSE

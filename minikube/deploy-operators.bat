@@ -14,4 +14,8 @@
 @REM couchbase\bin\cbopcfg create admission
 @REM couchbase\bin\cbopcfg create operator
 
+@REM @REM Cassandra
+@REM kubectl apply -f ./cassandra/cassandra-operator.yaml
+@REM kubectl apply -f ./cassandra/cassandra-storage.yaml
+
 PAUSE

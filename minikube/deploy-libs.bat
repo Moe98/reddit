@@ -11,4 +11,7 @@
 @REM kubectl create configmap sql-scripts --from-file=../libs/postgres/src/main/resources/sql
 @REM kubectl apply -f ./postgres/postgres-deployment.yaml
 
+@REM @REM Cassandra
+@REM kubectl -n cass-operator apply -f ./cassandra/cassandra-deployment.yaml
+
 PAUSE

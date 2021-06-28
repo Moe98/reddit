@@ -10,5 +10,7 @@ kubectl apply -f secrets-deployment.yaml
 @REM kubectl apply -f ./apps/subthread-app-deployment.yaml
 @REM kubectl apply -f ./apps/user-to-user-actions-app-deployment.yaml
 @REM kubectl apply -f ./apps/user-app-deployment.yaml
+@REM kubectl apply -f ./apps/chat-storage-deployment.yaml
+@REM kubectl apply -f ./apps/notification-app-deployment.yaml
 
 PAUSE

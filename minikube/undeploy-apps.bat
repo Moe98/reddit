@@ -5,5 +5,7 @@
 @REM kubectl delete -f ./apps/subthread-app-deployment.yaml
 @REM kubectl delete -f ./apps/user-to-user-actions-app-deployment.yaml
 @REM kubectl delete -f ./apps/user-app-deployment.yaml
+@REM kubectl delete -f ./apps/chat-storage-deployment.yaml
+@REM kubectl delete -f ./apps/notification-app-deployment.yaml
 
 PAUSE
