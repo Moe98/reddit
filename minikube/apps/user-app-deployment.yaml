@@ -38,7 +38,7 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-deployment-default-user
+                  name: postgres-deployment-authentication
                   key: password
           envFrom:
             - configMapRef:
