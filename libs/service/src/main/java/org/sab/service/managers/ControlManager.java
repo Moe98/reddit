@@ -9,6 +9,7 @@ import org.sab.service.controllerbackdoor.BackdoorServer;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class ControlManager {
     private final String appUriName;
@@ -33,7 +34,8 @@ public class ControlManager {
         Method method = ReflectionUtils.getMethod(ControlManager.class, message.getString("command"));
         try {
             boolean hasArgs = message.has(ARGS);
-            method.invoke(this, hasArgs ? message.optJSONArray(ARGS).toList().toArray() : null);
+            final Object[] arguments = message.optJSONArray(ARGS).toList().toArray();
+            method.invoke(this, hasArgs ? arguments : null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -127,11 +129,21 @@ public class ControlManager {
         queueManager.startAcceptingNewRequests();
     }
 
-    public void addCommand(String functionName, String className, byte[] b) {
+    public void addCommand(String functionName, String className, ArrayList<Integer> byteList) {
+        final byte[] b = convertIntArrayListToByteArray(byteList);
+        addCommandWithBytes(functionName, className, b);
+    }
+
+    public void addCommandWithBytes(String functionName, String className, byte[] b) {
         classManager.addCommand(functionName, className, b);
     }
 
-    public void updateCommand(String functionName, String className, byte[] b) {
+    public void updateCommand(String functionName, String className, ArrayList<Integer> byteList) {
+        final byte[] b = convertIntArrayListToByteArray(byteList);
+        updateCommandWithBytes(functionName, className, b);
+    }
+
+    public void updateCommandWithBytes(String functionName, String className, byte[] b) {
         classManager.updateCommand(functionName, className, b);
     }
 
@@ -171,5 +183,13 @@ public class ControlManager {
 
     public boolean isFrozen() {
         return isFrozen;
+    }
+
+    private byte[] convertIntArrayListToByteArray(ArrayList<Integer> list) {
+        final byte[] b = new byte[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            b[i] = (byte) ((int) list.get(i));
+        }
+        return b;
     }
 }
