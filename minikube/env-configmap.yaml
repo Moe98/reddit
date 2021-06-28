@@ -20,3 +20,5 @@ data:
   POSTGRES_USER: postgres
   POSTGRES_HOST: postgres-service
   POSTGRES_PORT: "5432"
+  # MinIO
+  MINIO_HOST: https://play.min.io/
