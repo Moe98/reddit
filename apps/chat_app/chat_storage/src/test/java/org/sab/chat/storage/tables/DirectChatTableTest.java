@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.sab.chat.storage.config.CassandraConnector;
 import org.sab.chat.storage.exceptions.InvalidInputException;
 import org.sab.chat.storage.models.DirectChat;
+import org.sab.databases.PoolDoesNotExistException;
 
 
 import java.util.ArrayList;
@@ -26,17 +27,13 @@ public class DirectChatTableTest {
 
     @Before
     public void connect() {
-        cassandra = new CassandraConnector();
-        cassandra.connect();
-        cassandra.initializeKeySpace();
-
-        directChats = new DirectChatTable(cassandra);
-        directChats.createTable();
+        cassandra = CassandraConnector.getConnectedInstance();
+        directChats = cassandra.getDirectChatTable();
     }
 
     @After
-    public void disconnect() {
-        cassandra.close();
+    public void disconnect() throws PoolDoesNotExistException {
+        cassandra.destroyPool();
     }
 
     @Test
