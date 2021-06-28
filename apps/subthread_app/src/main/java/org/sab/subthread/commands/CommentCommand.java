@@ -133,8 +133,7 @@ public abstract class CommentCommand extends CommandWithVerification {
         myObject.addAttribute(PARENT_CONTENT_TYPE_DB, comment.get(PARENT_CONTENT_TYPE_DB));
         myObject.addAttribute(LIKES_DB, comment.get(LIKES_DB));
         myObject.addAttribute(DISLIKES_DB, comment.get(DISLIKES_DB));
-        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-        myObject.addAttribute(DATE_CREATED_DB, sqlDate);
+        myObject.addAttribute(DATE_CREATED_DB, comment.get(DATE_CREATED_DB));
         return myObject;
     }
 
