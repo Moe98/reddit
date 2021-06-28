@@ -1,7 +1,6 @@
 package org.sab.service.managers;
 
 import org.json.JSONObject;
-import org.sab.controller.Controller;
 import org.sab.databases.PoolDoesNotExistException;
 import org.sab.reflection.ReflectionUtils;
 import org.sab.service.ServiceConstants;
@@ -19,6 +18,8 @@ public class ControlManager {
     private final PropertiesManager propertiesManager;
     private final ClassManager classManager = new ClassManager();
 
+    private final static String ARGS = "args";
+
     private boolean isFrozen = true;
 
     public ControlManager(String appUriName) {
@@ -31,8 +32,8 @@ public class ControlManager {
         System.out.printf("%s has received a message from the controller!\n%s\n", appUriName, message.toString());
         Method method = ReflectionUtils.getMethod(ControlManager.class, message.getString("command"));
         try {
-            boolean hasArgs = message.has(Controller.ARGS);
-            method.invoke(this, hasArgs ? message.optJSONArray(Controller.ARGS).toList().toArray() : null);
+            boolean hasArgs = message.has(ARGS);
+            method.invoke(this, hasArgs ? message.optJSONArray(ARGS).toList().toArray() : null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
