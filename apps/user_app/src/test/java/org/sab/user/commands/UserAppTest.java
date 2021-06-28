@@ -13,9 +13,12 @@ import org.sab.auth.AuthParamsHandler;
 import org.sab.functions.Utilities;
 import org.sab.models.CollectionNames;
 import org.sab.models.user.UserAttributes;
+import org.sab.postgres.PostgresConnection;
 import org.sab.user.UserApp;
+import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 
@@ -40,7 +43,16 @@ public class UserAppTest {
         }
 
     }
-
+    @Test
+    public void T00_UserPopulationData() throws SQLException, EnvironmentVariableNotLoaded {
+        try {
+            int resultSet = PostgresConnection.countRows();
+            assertEquals(20000,resultSet);
+        } catch (SQLException e) {
+            System.out.println("Population Test Failure");
+            System.out.println(e);
+        }
+    }
 
     @Test
     public void T01_SignUpCreatesAnEntryInDB() {

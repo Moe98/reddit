@@ -120,6 +120,20 @@ public class PostgresConnection {
             }
         }
     }
+    public static int countRows() throws SQLException, EnvironmentVariableNotLoaded {
+        PostgresConnection postgresConnection = getInstance();
+        Connection connection = postgresConnection.connect();
+        int count = 0;
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery("SELECT count(*) FROM users");
+            while (resultSet.next()) {
+                count = resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return count;
+    }
     private static void runMockDataProcedure() throws EnvironmentVariableNotLoaded, SQLException {
         PostgresConnection postgresConnection = getInstance();
         Connection connection = postgresConnection.connect();
