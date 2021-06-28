@@ -20,10 +20,7 @@ public class RemoveGroupMember extends CommandWithVerification {
 
     public void getGroupChatTableInstance() {
         if (groupChatTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            cassandra.createTables();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
             groupChatTable = cassandra.getGroupChatTable();
         }
     }

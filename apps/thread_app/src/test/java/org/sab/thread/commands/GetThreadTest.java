@@ -24,7 +24,7 @@ public class GetThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             ThreadApp.startCouchbaseConnection();
             arango.createDatabaseIfNotExists(DB_NAME);
 

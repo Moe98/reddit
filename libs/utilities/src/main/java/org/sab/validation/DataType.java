@@ -1,5 +1,7 @@
 package org.sab.validation;
 
+import org.json.JSONArray;
+
 import java.util.regex.Pattern;
 
 public enum DataType {
@@ -46,7 +48,7 @@ public enum DataType {
             if (!STRING.isOfValidType(object)) {
                 return false;
             }
-            
+
             final String email = (String) object;
             final Pattern pattern = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}");
 
@@ -85,15 +87,23 @@ public enum DataType {
         public boolean isOfValidType(Object object) {
             return object instanceof String[];
         }
+
+    },
+    JSON_ARRAY("") {
+        @Override
+        public boolean isOfValidType(Object object) {
+            return object instanceof JSONArray;
+        }
     };
 
-    private String additionalErrorMessage;
 
-    public abstract boolean isOfValidType(Object object);
+    private String additionalErrorMessage;
 
     DataType(String additionalErrorMessage) {
         this.additionalErrorMessage = additionalErrorMessage;
     }
+
+    public abstract boolean isOfValidType(Object object);
 
     public String getAdditionalErrorMessage() {
         return additionalErrorMessage;

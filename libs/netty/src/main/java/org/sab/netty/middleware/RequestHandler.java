@@ -37,6 +37,10 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     HttpPostRequestDecoder requestDecoder;
     boolean isFormData;
 
+    private static boolean isEmptyHttpContent(HttpContent httpContent) {
+        return httpContent.equals(LastHttpContent.EMPTY_LAST_CONTENT);
+    }
+
     JSONObject getURIParams() {
         QueryStringDecoder decoder = new QueryStringDecoder(uri);
         String[] uriPathFields = decoder.path().substring(1).split("/");
@@ -85,6 +89,8 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
         }
         if (msg instanceof HttpContent && !isFormData) {
             HttpContent content = (HttpContent) msg;
+            if (isEmptyHttpContent(content))
+                return;
             ByteBuf jsonBuf = content.content();
             String jsonStr = jsonBuf.toString(CharsetUtil.UTF_8);
             if (!methodType.equals("GET") && !jsonStr.isEmpty()) {
@@ -149,7 +155,7 @@ public class RequestHandler extends SimpleChannelInboundHandler<HttpObject> {
     private JSONObject authenticate(JSONObject request) {
         // JWT token
         // set token if auth header is set
-        // format: Bearer xxxxxx-xxxxxx-xxxxxx     
+        // format: Bearer xxxxxx-xxxxxx-xxxxxx
         String authHeader = headers.has("Authorization") ? headers.getString("Authorization") : null;
         JSONObject authenticationParams = AuthParamsHandler.getUnauthorizedAuthParams();
         if (authHeader != null) {

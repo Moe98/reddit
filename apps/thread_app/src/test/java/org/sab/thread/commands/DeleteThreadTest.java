@@ -39,7 +39,7 @@ public class DeleteThreadTest {
     @BeforeClass
     public static void setUp() {
         try {
-            arango = Arango.getInstance();
+            arango = Arango.getConnectedInstance();
             ThreadApp.startCouchbaseConnection();
             arango.createDatabase(DB_NAME);
 

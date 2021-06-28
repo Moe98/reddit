@@ -15,8 +15,8 @@ public class UserApp extends Service {
 
     public static void main(String[] args) throws IOException, EnvironmentVariableNotLoaded {
 
-        dbInit();
         new UserApp().start();
+        dbInit();
     }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
