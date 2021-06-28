@@ -49,7 +49,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: minio-deployment-authentication
-                  key: pasword
+                  key: password
           envFrom:
             - configMapRef:
                 name: env-configmap
