@@ -7,4 +7,7 @@
 @REM @REM Couchbase
 @REM kubectl delete -f ./couchbase/couchbase-deployment.yaml
 
+@REM @REM Postgres
+@REM kubectl delete -f ./postgres/postgres-deployment.yaml
+
 PAUSE

@@ -9,5 +9,6 @@ kubectl apply -f secrets-deployment.yaml
 @REM kubectl apply -f ./apps/thread-app-deployment.yaml
 @REM kubectl apply -f ./apps/subthread-app-deployment.yaml
 @REM kubectl apply -f ./apps/user-to-user-actions-app-deployment.yaml
+@REM kubectl apply -f ./apps/user-app-deployment.yaml
 
 PAUSE
