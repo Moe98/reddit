@@ -27,6 +27,8 @@ public class CassandraConnector implements PooledDatabaseClient {
     private DirectMessageTable directMessageTable;
     private GroupMessageTable groupMessageTable;
     private int maxPoolConnections;
+    private String username;
+    private String password;
 
     private CassandraConnector() {}
 
@@ -51,6 +53,9 @@ public class CassandraConnector implements PooledDatabaseClient {
         keyspaceName = System.getenv("KEYSPACE_NAME");
         replicationStrategy = System.getenv("REPLICATION_STRATEGY");
         replicationFactor = Integer.parseInt(System.getenv("REPLICATION_FACTOR"));
+
+        username = System.getenv("CASSANDRA_USERNAME");
+        password = System.getenv("CASSANDRA_PASSWORD");
     }
 
     public void connect() {
@@ -59,6 +64,8 @@ public class CassandraConnector implements PooledDatabaseClient {
                 .setMaxConnectionsPerHost( HostDistance.LOCAL, maxPoolConnections)
                 .setMaxConnectionsPerHost( HostDistance.REMOTE, maxPoolConnections);
         Cluster.Builder clusterBuilder = Cluster.builder().addContactPoint(node).withPoolingOptions(poolingOptions);
+        if(username != null && password != null)
+            clusterBuilder.withCredentials(username, password);
         if (port != null) {
             clusterBuilder.withPort(port);
         }
