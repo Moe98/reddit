@@ -21,10 +21,7 @@ public class CreateDirectChat extends CommandWithVerification {
 
     public void getDirectChatTableInstance() {
         if (directChatTable == null) {
-            CassandraConnector cassandra = new CassandraConnector();
-            cassandra.connect();
-            cassandra.initializeKeySpace();
-            cassandra.createTables();
+            CassandraConnector cassandra = CassandraConnector.getInstance();
             directChatTable = cassandra.getDirectChatTable();
         }
     }
