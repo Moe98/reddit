@@ -40,6 +40,16 @@ spec:
                 secretKeyRef:
                   name: postgres-deployment-authentication
                   key: password
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-deployment-authentication
+                  key: username
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-deployment-authentication
+                  key: password
           envFrom:
             - configMapRef:
                 name: env-configmap

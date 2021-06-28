@@ -36,9 +36,13 @@ public class DBPoolManager {
     }
 
     public void initDbPool() {
+        System.out.println("Reading required DB values: " + requiredDbs);
         for (final DBConfig dbConfig : requiredDbs.values()) {
+            System.out.println("Getting the client...");
             final PooledDatabaseClient client = dbConfig.getClient();
+            System.out.println("Client is fetched: " + client + " " + client.getName());
             final int connectionCount = dbConfig.getConnectionCount();
+            System.out.println("Connection count is fetched");
             client.createPool(connectionCount);
             System.out.println("Initialized the " + dbConfig.getClientName() + " pool");
         }

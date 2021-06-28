@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.*;
 
 public class ControlManager {
     private final String appUriName;
@@ -20,6 +21,7 @@ public class ControlManager {
     private final ClassManager classManager = new ClassManager();
 
     private final static String ARGS = "args";
+    private final int DB_INIT_AWAIT_MINUTES = 1;
 
     private boolean isFrozen = true;
 
@@ -57,12 +59,15 @@ public class ControlManager {
             classManager.init();
             dbPoolManager = new DBPoolManager(propertiesManager.getRequiredDbs());
             dbPoolManager.initDbClasses();
-        } catch (IOException | ReflectiveOperationException e) {
+
+            listenToController(propertiesManager.getControllerPort());
+            queueManager.initAcceptingNewRequests();
+            System.out.println("Connection to queue initialized");
+        } catch (IOException | ReflectiveOperationException | TimeoutException e) {
+            e.printStackTrace();
             releaseResourcesAndExit();
         }
 
-        listenToController(propertiesManager.getControllerPort());
-        queueManager.initAcceptingNewRequests();
         resume();
     }
 
@@ -70,8 +75,11 @@ public class ControlManager {
         if (isFrozen) {
             return;
         }
-
-        queueManager.stopAcceptingNewRequests();
+        try {
+            queueManager.stopAcceptingNewRequests();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         threadPoolManager.releaseThreadPool();
         dbPoolManager.releaseDbPools();
 
@@ -82,17 +90,42 @@ public class ControlManager {
         if (!isFrozen) {
             return;
         }
-
+        System.out.println("About to resume...");
         threadPoolManager.initThreadPool(propertiesManager.getThreadCount());
-        dbPoolManager.initDbPool();
-        queueManager.startAcceptingNewRequests();
+        System.out.println("Thread pool is ready.");
 
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        ScheduledFuture<?> future = scheduler.schedule(dbPoolManager::initDbPool, 1, TimeUnit.MILLISECONDS);
+        try {
+            System.out.println("Awaiting DB initialization");
+            future.get(DB_INIT_AWAIT_MINUTES, TimeUnit.MINUTES);
+        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+            scheduler.shutdownNow();
+            releaseResourcesAndExit();
+        } finally {
+            System.out.println("Shutting down scheduler");
+            scheduler.shutdownNow();
+        }
+
+        System.out.println("DB pool is ready.");
+        try {
+            queueManager.startAcceptingNewRequests();
+        } catch (IOException e) {
+            e.printStackTrace();
+            releaseResourcesAndExit();
+        }
+        System.out.println("Accepting requests from queue.");
         isFrozen = false;
     }
 
     public void setMaxThreadsCount(int maxThreadsCount) {
         propertiesManager.updateProperty(ServiceConstants.THREADS_COUNT_PROPERTY_NAME, String.valueOf(maxThreadsCount));
-        reloadThreadPool();
+        try {
+            reloadThreadPool();
+        } catch (IOException e) {
+            e.printStackTrace();
+            releaseResourcesAndExit();
+        }
     }
 
     public void setMaxDbConnectionCountForAll(int maxDBConnectionCount) {
@@ -101,7 +134,12 @@ public class ControlManager {
         } catch (PoolDoesNotExistException e) {
             e.printStackTrace();
         }
-        reloadDBPool();
+        try {
+            reloadDBPool();
+        } catch (IOException e) {
+            e.printStackTrace();
+            releaseResourcesAndExit();
+        }
     }
 
     public void setMaxDbConnectionCount(String clientName, int maxDBConnectionCount) {
@@ -110,17 +148,22 @@ public class ControlManager {
         } catch (PoolDoesNotExistException e) {
             e.printStackTrace();
         }
-        reloadDBPool();
+        try {
+            reloadDBPool();
+        } catch (IOException e) {
+            e.printStackTrace();
+            releaseResourcesAndExit();
+        }
     }
 
-    private void reloadThreadPool() {
+    private void reloadThreadPool() throws IOException {
         queueManager.stopAcceptingNewRequests();
         threadPoolManager.releaseThreadPool();
         threadPoolManager.initThreadPool(propertiesManager.getThreadCount());
         queueManager.startAcceptingNewRequests();
     }
 
-    private void reloadDBPool() {
+    private void reloadDBPool() throws IOException {
         queueManager.stopAcceptingNewRequests();
         threadPoolManager.releaseThreadPool();
         dbPoolManager.releaseDbPools();

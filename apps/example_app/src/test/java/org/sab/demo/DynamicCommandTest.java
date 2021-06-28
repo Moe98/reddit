@@ -9,13 +9,15 @@ import org.sab.service.managers.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class DynamicCommandTest {
 
-    private static Pair<ExampleApp, InvocationManager> startMockApp() throws ReflectiveOperationException {
+    private static Pair<ExampleApp, InvocationManager> startMockApp() throws ReflectiveOperationException, IOException,
+            TimeoutException {
         final ExampleApp app = new ExampleApp();
 
         final ClassManager classManager = new ClassManager();
@@ -77,7 +79,7 @@ public class DynamicCommandTest {
                     "{\"msg\":\"Morning World\", \"statusCode\": 200}",
                     afterAdditionResult
             );
-        } catch (ReflectiveOperationException | IOException e) {
+        } catch (ReflectiveOperationException | IOException | TimeoutException e) {
             fail(e.getMessage());
         }
     }
@@ -107,7 +109,7 @@ public class DynamicCommandTest {
                     "{\"msg\":\"Hi\", \"statusCode\": 200}",
                     afterUpdateResult
             );
-        } catch (ReflectiveOperationException | IOException e) {
+        } catch (ReflectiveOperationException | IOException | TimeoutException e) {
             fail(e.getMessage());
         }
     }
@@ -130,7 +132,7 @@ public class DynamicCommandTest {
                     "{\"statusCode\": 404, \"msg\": \"Function-Name class: (" + functionName + ") not found\"}",
                     afterDeletionResult
             );
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | IOException | TimeoutException e) {
             fail(e.getMessage());
         }
     }
