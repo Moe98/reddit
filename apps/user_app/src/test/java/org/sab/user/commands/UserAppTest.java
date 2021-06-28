@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.sab.arango.Arango;
@@ -43,7 +44,7 @@ public class UserAppTest {
         }
 
     }
-    @Test
+    @Ignore
     public void T00_UserPopulationData() throws SQLException, EnvironmentVariableNotLoaded {
         try {
             int resultSet = PostgresConnection.countRows();
