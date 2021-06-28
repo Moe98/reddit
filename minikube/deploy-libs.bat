@@ -7,4 +7,8 @@
 @REM @REM Couchbase
 @REM kubectl apply -f ./couchbase/couchbase-deployment.yaml
 
+@REM @REM Postgres
+@REM kubectl create configmap sql-scripts --from-file=../libs/postgres/src/main/resources/sql
+@REM kubectl apply -f ./postgres/postgres-deployment.yaml
+
 PAUSE

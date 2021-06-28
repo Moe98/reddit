@@ -15,4 +15,8 @@ data:
   # JWT
   JWT_SECRET: scaleabull
   JWT_ISSUER: org.sab
-
+  # Postgres
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_HOST: postgres-service
+  POSTGRES_PORT: "5432"
