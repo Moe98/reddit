@@ -18,5 +18,5 @@ data:
   # Postgres
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
-  POSTGRES_HOST: postgres-service.default
+  POSTGRES_HOST: postgres-service
   POSTGRES_PORT: "5432"
