@@ -137,8 +137,7 @@ public abstract class ThreadCommand extends CommandWithVerification {
         myObject.setKey(String.valueOf(thread.get(THREAD_NAME_DB)));
         myObject.addAttribute(DESCRIPTION_DB, thread.get(DESCRIPTION_DB));
         myObject.addAttribute(CREATOR_ID_DB, thread.get(CREATOR_ID_DB));
-        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
-        myObject.addAttribute(DATE_CREATED_DB, sqlDate);
+        myObject.addAttribute(DATE_CREATED_DB, thread.get(DATE_CREATED_DB));
         myObject.addAttribute(NUM_OF_FOLLOWERS_DB, thread.get(NUM_OF_FOLLOWERS_DB));
 
         return myObject;
