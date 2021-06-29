@@ -70,7 +70,7 @@ public class DynamicCommandTest {
 
             app.getControlManager().addCommandWithBytes(
                     functionName,
-                    "org.sab.demo.commands.X.class",
+                    "org.sab.demo.commands.MorningWorld.class",
                     Reader.readBytesFromResource("MorningWorld")
             );
 
