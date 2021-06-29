@@ -231,13 +231,13 @@ public class PopulateArango {
             comments[i] = created1.getKey();
 
             edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setTo(USERS_COLLECTION_NAME + "/" + creatorId);
-            edgeDocument.setFrom(COMMENT_COLLECTION_NAME + "/" + comments[i]);
+            edgeDocument.setFrom(USERS_COLLECTION_NAME + "/" + creatorId);
+            edgeDocument.setTo(COMMENT_COLLECTION_NAME + "/" + comments[i]);
             arango.createEdgeDocument(dbName, USER_CREATE_COMMENT_COLLECTION_NAME, edgeDocument);
 
             edgeDocument = new BaseEdgeDocument();
-            edgeDocument.setTo(SUB_THREADS_COLLECTION_NAME + "/" + subthreadName);
-            edgeDocument.setFrom(COMMENT_COLLECTION_NAME + "/" + comments[i]);
+            edgeDocument.setFrom(SUB_THREADS_COLLECTION_NAME + "/" + subthreadName);
+            edgeDocument.setTo(COMMENT_COLLECTION_NAME + "/" + comments[i]);
             arango.createEdgeDocument(dbName, CONTENT_COMMENT_COLLECTION_NAME, edgeDocument);
         }
 
