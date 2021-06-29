@@ -71,3 +71,5 @@ spec:
                 path: 1_CreateUsersTable.sql
               - key: CreateUserProcedures.sql
                 path: 2_CreateUserProcedures.sql
+              - key: Populate.sql
+                path: 3_Populate.sql
