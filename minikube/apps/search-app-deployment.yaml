@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: search-app
-        image: gcr.io/reddit-31/search-app:v1
+        image: gcr.io/reddit-31/search-app:v3
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 4005
