@@ -22,9 +22,7 @@ public class GetComments extends CommentCommand {
 
     @Override
     protected Schema getSchema() {
-        final Attribute parentId = new Attribute(PARENT_SUBTHREAD_ID, DataType.STRING, true);
-        final Attribute parentType = new Attribute(PARENT_CONTENT_TYPE, DataType.STRING, true);
-        return new Schema(List.of(parentId, parentType));
+        return new Schema(List.of());
     }
 
     @Override
@@ -35,9 +33,9 @@ public class GetComments extends CommentCommand {
         try {
             arango = Arango.getInstance();
 
-            // TODO not a uri param
-            final String parentId = body.getString(PARENT_SUBTHREAD_ID);
-            final String parentType = body.getString(PARENT_CONTENT_TYPE);
+            final String parentId = uriParams.getString(PARENT_SUBTHREAD_ID);
+            final String parentType = uriParams.getString(PARENT_CONTENT_TYPE);
+
             final String parentCollection;
             // TODO do better
             if (parentType.equals("Subthread")) {
