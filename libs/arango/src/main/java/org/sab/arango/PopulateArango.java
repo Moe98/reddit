@@ -119,7 +119,7 @@ public class PopulateArango {
         int usersToBlockNum = 5, subThreadsToBookmarkNum = 5, subThreadsToLikeNum = 5, subThreadsToDislikeNum = 5;
         int commentsToLikeNum = 5, commentsToDislikeNum = 5;
 
-        userNum++;
+//        userNum++;
 
         // Dummy Data
         users = new String[userNum];
@@ -128,7 +128,7 @@ public class PopulateArango {
         comments = new String[commentNum];
         reports = new String[reportsNum];
 
-        for (int i = 0; i < userNum - 1; i++) {
+        for (int i = 0; i < userNum; i++) {
             BaseDocument user = new BaseDocument();
             // TODO add the rest of the attributes
             String userName = "users" + i;
@@ -138,14 +138,13 @@ public class PopulateArango {
             arango.createDocument(dbName, USERS_COLLECTION_NAME, user);
             users[i] = userName;
         }
-        BaseDocument user = new BaseDocument();
-        // TODO add the rest of the attributes
-        String userName = "Ronic";
-        user.setKey(userName);
-        user.addAttribute(userIsDeleted, false);
-        user.addAttribute(userNumOfFollowers, 0);
-        arango.createDocument(dbName, USERS_COLLECTION_NAME, user);
-        users[userNum-1] = userName;
+//        BaseDocument user = new BaseDocument();
+//        String userName = "Ronic";
+//        user.setKey(userName);
+//        user.addAttribute(userIsDeleted, false);
+//        user.addAttribute(userNumOfFollowers, 0);
+//        arango.createDocument(dbName, USERS_COLLECTION_NAME, user);
+//        users[userNum-1] = userName;
         System.out.println("Done with " + USERS_COLLECTION_NAME);
 
         BaseEdgeDocument edgeDocument;
