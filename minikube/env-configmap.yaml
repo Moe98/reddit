@@ -4,12 +4,12 @@ metadata:
   name: env-configmap
 data:
   # RabbitMQ
-  RABBIT_HOST: rabbitmq-deployment.default.svc
+  RABBIT_HOST: rabbitmq-deployment
   # ArangoDB
   ARANGO_DB: Reddit
   ARANGO_USER: root
   ARANGO_PASSWORD: ""
-  ARANGO_HOST: arangodb-deployment.default.svc
+  ARANGO_HOST: arangodb-deployment
   # Couchbase
   COUCHBASE_HOST: couchbase://couchbase-deployment-srv.default
   # Cassandra

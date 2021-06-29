@@ -3,7 +3,7 @@ kind: CouchbaseCluster
 metadata:
   name: couchbase-deployment
 spec:
-  image: couchbase/server:6.6.2
+  image: gcr.io/reddit-31/couchbase:6.6.2
   security:
     adminSecret: couchbase-deployment-authentication
   buckets:

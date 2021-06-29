@@ -13,15 +13,8 @@ spec:
     spec:
       containers:
         - name: user-app
-          image: user_app
+          image: gcr.io/reddit-31/user-app:v1
           imagePullPolicy: IfNotPresent
-          resources:
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
-            requests:
-              memory: "128Mi"
-              cpu: "200m"
           ports:
             - containerPort: 4008
           env:

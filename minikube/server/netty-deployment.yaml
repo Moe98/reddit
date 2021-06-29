@@ -13,15 +13,8 @@ spec:
     spec:
       containers:
       - name: netty
-        image: netty_server
-        imagePullPolicy: Never
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-          requests:
-            memory: "128Mi"
-            cpu: "200m"
+        image: gcr.io/reddit-31/netty-server:v2
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         env:
@@ -67,6 +60,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: reddit-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - host: notreddit.com

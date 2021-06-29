@@ -13,15 +13,8 @@ spec:
     spec:
       containers:
       - name: user-to-user-actions-app
-        image: user-to-user-actions_app
+        image: gcr.io/reddit-31/user-to-user-actions-app:v1
         imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-          requests:
-            memory: "128Mi"
-            cpu: "200m"
         env:
           - name: RABBIT_USER
             valueFrom:

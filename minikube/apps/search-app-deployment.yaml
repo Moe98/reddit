@@ -13,15 +13,8 @@ spec:
     spec:
       containers:
       - name: search-app
-        image: search_app
+        image: gcr.io/reddit-31/search-app:v1
         imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-          requests:
-            memory: "128Mi"
-            cpu: "200m"
         ports:
         - containerPort: 4005
         env:

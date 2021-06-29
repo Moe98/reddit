@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
         - name: postgres-deployment
-          image: postgres
+          image: gcr.io/reddit-31/postgres:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_PASSWORD
@@ -47,10 +47,6 @@ spec:
                 secretKeyRef:
                   name: postgres-deployment-authentication
                   key: password
-          resources:
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
           ports:
             - containerPort: 5432
           volumeMounts:

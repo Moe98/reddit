@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: notification-app
-        image: notification_app
+        image: gcr.io/reddit-31/notification-app:v1
         imagePullPolicy: IfNotPresent
         resources:
           limits:

@@ -3,10 +3,10 @@ kind: RabbitmqCluster
 metadata:
     name: rabbitmq-deployment
 spec:
-  image: rabbitmq:management
+  image: gcr.io/reddit-31/rabbitmq:management
   rabbitmq:
     additionalConfig: |
-      vm_memory_high_watermark.relative = 0.7
+      vm_memory_high_watermark.relative = 0.4
   resources:
     requests:
       cpu: "500m"
