@@ -186,7 +186,9 @@ public class ControlManager {
         // release resources and halt app
         queueManager.dispose();
         threadPoolManager.dispose();
-        dbPoolManager.dispose();
+        if(dbPoolManager != null) {
+            dbPoolManager.dispose();
+        }
 
         // crash app
         System.exit(-1);
