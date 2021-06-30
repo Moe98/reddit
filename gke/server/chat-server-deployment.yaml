@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-server-deployment
+spec:
+  selector:
+    matchLabels:
+      app: chat_server
+  template:
+    metadata:
+      labels:
+        app: chat_server
+    spec:
+      containers:
+      - name: chat-server
+        image: gcr.io/reddit-31/chat-server:v1
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 5000
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-server-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: chat_server
+  ports:
+  - port: 80
+    targetPort: 5000
