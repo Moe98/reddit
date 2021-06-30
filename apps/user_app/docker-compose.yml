@@ -19,6 +19,8 @@ services:
     volumes:
       - ../../libs/postgres/src/main/resources/sql/CreateUsersTable.sql:/docker-entrypoint-initdb.d/1_CreateTables.sql
       - ../../libs/postgres/src/main/resources/sql/CreateUserProcedures.sql:/docker-entrypoint-initdb.d/2_CreateProcedures.sql
+      - ../../libs/postgres/src/main/resources/sql/RunPopulationData.sql:/docker-entrypoint-initdb.d/3_RunPopulationData.sql
+
   pgpool:
     image: bitnami/pgpool:4
     ports:

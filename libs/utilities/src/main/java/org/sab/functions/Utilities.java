@@ -10,7 +10,7 @@ public class Utilities {
     }
     public static boolean inContainerizationMode() {
         String mode = System.getenv("ENV_TYPE");
-        return mode != null && mode.equals("Staging");
+        return mode != null && (mode.equals("Staging")||mode.equals("Production"));
     }
 
     public static String formatUUID(String UUID) {

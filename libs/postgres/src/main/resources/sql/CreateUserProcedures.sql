@@ -71,3 +71,18 @@ BEGIN
 END;
 $$
     LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION mockData()
+    RETURNS VOID AS $$
+declare
+   counter integer := 0;
+BEGIN
+   while counter < 15000 loop
+    INSERT INTO users (user_id,username, email, password, birthdate, photo_url)
+    VALUES (concat('',counter),concat('users',counter),concat('users',counter,'@gmail.com'),'$2a$12$0OuJpHP26OAffdKBU240w.clTIuL2m1juZLDsgRBkSlQvQP3TkTWa
+','1998-1-1','https://live.staticflickr.com/8172/8066465258_2c7eb75964_m.jpg');
+    counter := counter + 1;
+  end loop;
+END;
+$$
+     LANGUAGE PLPGSQL; 

@@ -22,7 +22,7 @@ export const getToken = (setTokenFound, username) => {
     .getToken()
     .then(async (currentToken) => {
       if (currentToken) {
-        fetch("http://localhost:8080/api/notification", {
+        fetch("http://34.116.182.85/api/notification", {
           method: "POST",
           headers: {
             "Content-Type": "appliaction/json",
@@ -35,6 +35,7 @@ export const getToken = (setTokenFound, username) => {
           }),
         })
           .then((res) => {
+            console.log(res);
             if (res.status === 200) {
               setTokenFound(true);
             }
