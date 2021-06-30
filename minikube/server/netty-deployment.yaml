@@ -17,7 +17,7 @@ spec:
         imagePullPolicy: Never
         resources:
           limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "500m"
           requests:
             memory: "128Mi"
@@ -60,7 +60,7 @@ spec:
   selector:
     app: netty
   ports:
-  - port: 8080
+  - port: 80
     targetPort: 8080
 ---
 apiVersion: networking.k8s.io/v1
@@ -78,4 +78,14 @@ spec:
           service:
             name: netty-service
             port: 
-              number: 8080
+              number: 80
+  - host: chat.notreddit.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /ws
+        backend:
+          service:
+            name: chat-server-service
+            port: 
+              number: 80
