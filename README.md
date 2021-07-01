@@ -1,6 +1,6 @@
 # Reddit
 
-A scalable Reddit replica that is able to handle ~2,300 concurrent performing 10 requests per second for 10 minutes straight, with a mean response time of ~5 seconds.
+A scalable Reddit replica that is able to handle ~2,300 concurrent users performing 10 requests per second for 10 minutes straight, with a mean response time of ~5 seconds.
 
 ## Technologies & Tools
 
