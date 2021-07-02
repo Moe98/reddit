@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: search_app
+  template:
+    metadata:
+      labels:
+        app: search_app
+    spec:
+      containers:
+      - name: search-app
+        image: gcr.io/reddit-31/search-app:v1
+        imagePullPolicy: IfNotPresent
+        resources:  
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: search-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: search-app-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60

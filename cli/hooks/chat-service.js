@@ -177,7 +177,7 @@ const useChatService = () => {
 	}
 
 	useEffect(() => {
-		ws.current = new W3CWebSocket('ws://localhost:5000/ws')
+		ws.current = new W3CWebSocket('ws://chat.notreddit.com/ws')
 
 		ws.current.onopen = () => {
 			ws.current.send(

@@ -1,0 +1,18 @@
+apiVersion: "database.arangodb.com/v1alpha"
+kind: "ArangoDeployment"
+metadata:
+  name: "arangodb-deployment"
+spec:
+  mode: Single
+  image: gcr.io/reddit-31/arangodb:3.7.12
+  agents:
+    resources:
+      requests:
+        storage: 4Gi
+  dbservers:
+    resources:
+      requests:
+        storage: 4Gi
+  tls:
+    caSecretName: None
+

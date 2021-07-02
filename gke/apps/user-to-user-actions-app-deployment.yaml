@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-to-user-actions-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: user-to-user-actions_app
+  template:
+    metadata:
+      labels:
+        app: user-to-user-actions_app
+    spec:
+      containers:
+      - name: user-to-user-actions-app
+        image: gcr.io/reddit-31/user-to-user-actions-app:v1
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-to-user-actions-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-to-user-actions-app-deployment
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 60

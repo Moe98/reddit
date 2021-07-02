@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: notification_app
+  template:
+    metadata:
+      labels:
+        app: notification_app
+    spec:
+      containers:
+      - name: notification-app
+        image: gcr.io/reddit-31/notification-app:v1
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: notification-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: notification-app-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60

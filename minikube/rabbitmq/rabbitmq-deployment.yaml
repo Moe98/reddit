@@ -1,0 +1,16 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+    name: rabbitmq-deployment
+spec:
+  image: rabbitmq:management
+  rabbitmq:
+    additionalConfig: |
+      vm_memory_high_watermark.relative = 0.7
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
