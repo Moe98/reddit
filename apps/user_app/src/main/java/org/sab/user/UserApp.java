@@ -9,17 +9,18 @@ import org.sab.service.Service;
 import org.sab.validation.exceptions.EnvironmentVariableNotLoaded;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class UserApp extends Service {
     public static final String ARANGO_DB_NAME = System.getenv("ARANGO_DB");
 
-    public static void main(String[] args) throws IOException, EnvironmentVariableNotLoaded {
+    public static void main(String[] args) throws IOException, EnvironmentVariableNotLoaded, SQLException {
 
         new UserApp().start();
         dbInit();
     }
 
-    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
+    public static void dbInit() throws IOException, EnvironmentVariableNotLoaded, SQLException {
         if (!Utilities.inContainerizationMode())
             PostgresConnection.dbInit();
         arangoDbInit();
