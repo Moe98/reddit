@@ -6,6 +6,8 @@ import org.json.simple.JSONObject;
 import org.sab.auth.AuthParamsHandler;
 import org.sab.chat.server.ClientManager;
 
+import java.util.UUID;
+
 public abstract class Router {
 
     public JSONObject packRequest(String functionName, JSONObject body) {
@@ -39,6 +41,7 @@ public abstract class Router {
         if(!isAuthenticated) return false;
         String userId = (String) authenticationParams.get("userId");
         request.put(userKey, userId);
+        ClientManager.userIdToUsername.putIfAbsent(UUID.fromString(userId), (String) authenticationParams.get("username"));
         return true;
     }
 
