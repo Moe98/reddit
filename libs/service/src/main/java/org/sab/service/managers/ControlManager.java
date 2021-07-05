@@ -1,7 +1,6 @@
 package org.sab.service.managers;
 
 import org.json.JSONObject;
-import org.sab.controller.Controller;
 import org.sab.databases.PoolDoesNotExistException;
 import org.sab.reflection.ReflectionUtils;
 import org.sab.service.ServiceConstants;
@@ -10,6 +9,7 @@ import org.sab.service.controllerbackdoor.BackdoorServer;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.concurrent.*;
 
 public class ControlManager {
@@ -20,6 +20,7 @@ public class ControlManager {
     private final PropertiesManager propertiesManager;
     private final ClassManager classManager = new ClassManager();
 
+    private final static String ARGS = "args";
     private final int DB_INIT_AWAIT_MINUTES = 1;
 
     private boolean isFrozen = true;
@@ -34,8 +35,9 @@ public class ControlManager {
         System.out.printf("%s has received a message from the controller!\n%s\n", appUriName, message.toString());
         Method method = ReflectionUtils.getMethod(ControlManager.class, message.getString("command"));
         try {
-            boolean hasArgs = message.has(Controller.ARGS);
-            method.invoke(this, hasArgs ? message.optJSONArray(Controller.ARGS).toList().toArray() : null);
+            boolean hasArgs = message.has(ARGS);
+            final Object[] arguments = message.optJSONArray(ARGS).toList().toArray();
+            method.invoke(this, hasArgs ? arguments : null);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -170,11 +172,21 @@ public class ControlManager {
         queueManager.startAcceptingNewRequests();
     }
 
-    public void addCommand(String functionName, String className, byte[] b) {
+    public void addCommand(String functionName, String className, ArrayList<Integer> byteList) {
+        final byte[] b = convertIntArrayListToByteArray(byteList);
+        addCommandWithBytes(functionName, className, b);
+    }
+
+    public void addCommandWithBytes(String functionName, String className, byte[] b) {
         classManager.addCommand(functionName, className, b);
     }
 
-    public void updateCommand(String functionName, String className, byte[] b) {
+    public void updateCommand(String functionName, String className, ArrayList<Integer> byteList) {
+        final byte[] b = convertIntArrayListToByteArray(byteList);
+        updateCommandWithBytes(functionName, className, b);
+    }
+
+    public void updateCommandWithBytes(String functionName, String className, byte[] b) {
         classManager.updateCommand(functionName, className, b);
     }
 
@@ -216,5 +228,13 @@ public class ControlManager {
 
     public boolean isFrozen() {
         return isFrozen;
+    }
+
+    private byte[] convertIntArrayListToByteArray(ArrayList<Integer> list) {
+        final byte[] b = new byte[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            b[i] = (byte) ((int) list.get(i));
+        }
+        return b;
     }
 }

@@ -1,0 +1,62 @@
+apiVersion: couchbase.com/v2
+kind: CouchbaseCluster
+metadata:
+  name: couchbase-deployment
+spec:
+  image: couchbase/server:6.6.2
+  security:
+    adminSecret: couchbase-deployment-authentication
+  buckets:
+    managed: true
+  cluster:
+    dataServiceMemoryQuota: "1Gi"
+  servers:
+  - size: 1
+    name: all_services
+    services:
+    - data
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseEphemeralBucket
+metadata:
+  name: bucket0  
+spec:
+  memoryQuota: 128Mi
+  evictionPolicy: nruEviction
+  name: Listings
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseEphemeralBucket
+metadata:
+  name: bucket1
+spec:
+  memoryQuota: 128Mi
+  evictionPolicy: nruEviction
+  name: RecommendedThreads
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseEphemeralBucket
+metadata:
+  name: bucket2
+spec:
+  memoryQuota: 128Mi
+  evictionPolicy: nruEviction
+  name: RecommendedSubThreads
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseEphemeralBucket
+metadata:
+  name: bucket3
+spec:
+  memoryQuota: 128Mi
+  evictionPolicy: nruEviction
+  name: RecommendedUsers
+---
+apiVersion: couchbase.com/v2
+kind: CouchbaseEphemeralBucket
+metadata:
+  name: bucket4
+spec:
+  memoryQuota: 128Mi
+  evictionPolicy: nruEviction
+  name: Comments

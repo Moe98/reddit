@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-server-deployment
+spec:
+  selector:
+    matchLabels:
+      app: chat_server
+  template:
+    metadata:
+      labels:
+        app: chat_server
+    spec:
+      containers:
+      - name: chat-server
+        image: chat_server
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 5000
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-server-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: chat_server
+  ports:
+  - port: 80
+    targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chat-ingress
+  # annotations:
+  #     nginx.ingress.kubernetes.io/websocket-services: chat-server-service
+  #     nginx.ingress.kubernetes.io/rewrite-target: /
+  #     nginx.ingress.kubernetes.io/proxy-body-size: 10m
+  #     kubernetes.io/ingress.class: nginx
+  #     nginx.org/websocket-services: socketserver-svc
+  #     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  #     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, PUT, POST, DELETE, OPTIONS"
+spec:
+  rules:
+  - host: chat.notreddit.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: /ws
+        backend:
+          service:
+            name: chat-server-service
+            port: 
+              number: 80

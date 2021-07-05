@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: recommendation_app
+  template:
+    metadata:
+      labels:
+        app: recommendation_app
+    spec:
+      containers:
+      - name: recommendation-app
+        image: recommendation_app
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+        env:
+          - name: RABBIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: username
+          - name: RABBIT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-deployment-default-user
+                key: password
+          - name: COUCHBASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: couchbase-deployment-authentication
+                key: username
+          - name: COUCHBASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: couchbase-deployment-authentication
+                key: password
+        envFrom:
+          - configMapRef:
+              name: env-configmap
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: recommendation-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: recommendation-app-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60

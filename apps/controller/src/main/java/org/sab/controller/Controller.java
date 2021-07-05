@@ -1,6 +1,7 @@
 package org.sab.controller;
 
 import org.json.JSONObject;
+import org.sab.classes.Reader;
 import org.sab.io.IoUtils;
 
 import java.io.BufferedReader;
@@ -108,8 +109,9 @@ public class Controller {
     }
 
     private void addOrUpdateClass(JSONObject request) throws Exception {
-        String fileName = request.getJSONArray(ARGS).getString(0);
-        addArg(request, fileNameToEncodedString(fileName));
+        String resource = request.getJSONArray(ARGS).getString(2);
+        final byte[] b = Reader.readBytesFromResource(resource);
+        request.getJSONArray(ARGS).put(2, b);
         sendMessage(request);
     }
 
