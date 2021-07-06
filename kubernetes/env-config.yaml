@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+  labels:
+    app: env-config
+data:
+  ENV_TYPE: Staging
+  GOOGLE_APPLICATION_CREDENTIALS: apps/notification_app/src/main/resources/firebase-config.json
+  RABBIT_HOST: rabbitmq
+  ARANGO_HOST: arangodb
+  POSTGRES_HOST: postgres
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: root
+  POSTGRES_PORT: '5432'
+  ARANGO_USER: root
+  ARANGO_DB: Reddit
+  ARANGO_PASSWORD: root
+  ARANGO_ROOT_PASSWORD: root
+  COUCHBASE_HOST: localhost
+  COUCHBASE_USERNAME: Administrator
+  COUCHBASE_PASSWORD: root
+  CASSANDRA_NODE: cassandra
+  CASSANDRA_PORT: 9042
+  KEYSPACE_NAME: chat_app
+  REPLICATION_STRATEGY: SimpleStrategy
+  REPLICATION_FACTOR: 2
+  PGPOOL_BACKEND_NODES=0:postgres:5432
+  PGPOOL_SR_CHECK_USER: postgres
+  PGPOOL_SR_CHECK_PASSWORD: root
+  PGPOOL_ENABLE_LDAP: no
+  PGPOOL_ENABLE_POOL_HBA: no
+  PGPOOL_POSTGRES_USERNAME: postgres
+  PGPOOL_POSTGRES_PASSWORD: root
+  PGPOOL_ADMIN_USERNAME: postgres
+  PGPOOL_ADMIN_PASSWORD: root
+  MINIO_HOST: https://play.min.io/
+  MINIO_ROOT_USER: Q3AM3UQ867SPQQA43P2F
+  MINIO_ROOT_PASSWORD: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG 
+  JWT_SECRET: scaleabull
+  JWT_ISSUER: org.sab
