@@ -12,9 +12,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static org.sab.innerAppComm.Comm.notifyApp;
+
 public class ClientManager {
     private static final ConcurrentHashMap<UUID, ConcurrentLinkedQueue<Channel>> activeUsers = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<ChannelId, UUID> channelToUser = new ConcurrentHashMap<>();
+    public static final String Notification_Queue_Name = "NOTIFICATION_REQ";
+    protected static final String SEND_NOTIFICATION_FUNCTION_NAME = "SEND_NOTIFICATION";
+
+    public static ConcurrentHashMap<UUID, String> userIdToUsername = new ConcurrentHashMap<>();
 
     private static final ConcurrentHashMap<UUID, ConcurrentLinkedQueue<UUID>> chatMembers = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<UUID, ConcurrentLinkedQueue<UUID>> userChats = new ConcurrentHashMap<>();
@@ -139,7 +145,8 @@ public class ClientManager {
             if (isUserOnline(memberId)) {
                 sendResponseToUser(memberId, response);
             } else {
-                // TODO: Add notify logic here.
+                String username = userIdToUsername.get(memberId);
+                notifyApp(Notification_Queue_Name, "`From chats:" + response.toString(), chatId.toString(), username, SEND_NOTIFICATION_FUNCTION_NAME);
             }
         }
     }
