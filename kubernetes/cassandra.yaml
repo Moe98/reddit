@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cassandra
+  labels:
+    app: cassandra
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: cassandra
+      labels:
+        app: cassandra
+    spec:
+      containers:
+        - name: cassandra
+          image: gcr.io/sampleproject-31/cassandra:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          envFrom:  
+            - configMapRef:
+                name: env-config
+          ports:
+            - containerPort: 9042
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred
+  selector:
+    matchLabels:
+      app: cassandra

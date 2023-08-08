@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-app
+  labels:
+    app: search-app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: search-app
+      labels:
+        app: search-app
+    spec:
+      containers:
+        - name: search-app
+          image: gcr.io/sampleproject-31/search-app:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
+          envFrom:  
+            - configMapRef:
+                name: env-config
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred
+  selector:
+    matchLabels:
+      app: search-app
