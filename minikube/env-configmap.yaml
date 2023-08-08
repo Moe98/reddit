@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-configmap
+data:
+  # RabbitMQ
+  RABBIT_HOST: rabbitmq-deployment.default.svc
+  # ArangoDB
+  ARANGO_DB: Reddit
+  ARANGO_USER: root
+  ARANGO_PASSWORD: ""
+  ARANGO_HOST: arangodb-deployment.default.svc
+  # Couchbase
+  COUCHBASE_HOST: couchbase://couchbase-deployment-srv.default
+  # Cassandra
+  CASSANDRA_NODE: cassandra-cluster-cassandra-deployment-service.cass-operator.svc.cluster.local
+  CASSANDRA_PORT: "9042"
+  KEYSPACE_NAME: chat_app
+  REPLICATION_STRATEGY: SimpleStrategy
+  REPLICATION_FACTOR: "2"
+
+  # JWT
+  JWT_SECRET: scaleabull
+  JWT_ISSUER: org.sab
+  # Postgres
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_HOST: postgres-service
+  POSTGRES_PORT: "5432"
+  # MinIO
+  MINIO_HOST: https://play.min.io/

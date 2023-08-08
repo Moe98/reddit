@@ -20,7 +20,7 @@ public class UserApp extends Service {
     }
 
     public static void dbInit() throws IOException, EnvironmentVariableNotLoaded {
-        if (!Utilities.inContainerizationMode())
+        if (Utilities.isDevelopmentMode())
             PostgresConnection.dbInit();
         arangoDbInit();
     }

@@ -1,0 +1,28 @@
+apiVersion: "database.arangodb.com/v1alpha"
+kind: "ArangoDeployment"
+metadata:
+  name: "arangodb-deployment"
+spec:
+  mode: Single
+  image: "arangodb/arangodb:3.7.12"
+  tls:
+    caSecretName: None
+  bootstrap:
+    passwordSecretNames:
+      root: arangodb-deployment-authentication
+  agents:
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+  dbservers:
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+  lifecycle:
+    resources:
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+
