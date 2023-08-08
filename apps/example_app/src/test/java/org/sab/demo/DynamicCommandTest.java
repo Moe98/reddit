@@ -68,7 +68,7 @@ public class DynamicCommandTest {
                     invocationResult
             );
 
-            app.getControlManager().addCommand(
+            app.getControlManager().addCommandWithBytes(
                     functionName,
                     "org.sab.demo.commands.MorningWorld",
                     Reader.readBytesFromResource("MorningWorld")
@@ -98,7 +98,7 @@ public class DynamicCommandTest {
                     invocationResult
             );
 
-            app.getControlManager().updateCommand(
+            app.getControlManager().updateCommandWithBytes(
                     functionName,
                     "org.sab.demo.commands.HelloWorld",
                     Reader.readBytesFromResource("ImprovedHello")
